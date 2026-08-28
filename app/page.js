@@ -236,61 +236,69 @@ export default function PetPassGoLanding() {
   return (
     <div style={{ background: tokens.sky, color: tokens.ink }} className="min-h-screen w-full">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;700&display=swap');
         * { box-sizing: border-box; }
         body { margin: 0; }
         .fade-up { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
         .fade-up.in { opacity: 1; transform: translateY(0); }
+        .step-divider-active { border-left: none; }
+        @media (min-width: 768px) {
+          .step-divider-active { border-left: 1px dashed ${tokens.gold}55; }
+        }
+        h1, h2, h3, h4 { font-variant-ligatures: none; -webkit-font-variant-ligatures: none; }
         @media (prefers-reduced-motion: reduce) {
           .fade-up { transition: none; opacity: 1; transform: none; }
         }
       `}</style>
 
       {/* NAV */}
-      <nav className="flex items-center justify-between px-6 md:px-14 py-5" style={{ borderBottom: `1px solid ${tokens.line}` }}>
-        <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: 20, color: tokens.navy }}>
+      <nav className="flex items-center justify-between px-6 md:px-14 py-5 flex-wrap gap-3" style={{ borderBottom: `1px solid ${tokens.line}` }}>
+        <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: 26, color: tokens.navy }}>
           PetPassGo
         </div>
-        <a
-          href="/login"
-          style={{
-            fontFamily: "'Inter', sans-serif",
-            fontSize: 14,
-            fontWeight: 500,
-            color: tokens.navy,
-            textDecoration: "none",
-            marginRight: 16,
-          }}
-        >
-          Log in
-        </a>
-        <a
-          href="/signup"
-          style={{
-            fontFamily: "'Inter', sans-serif",
-            fontSize: 14,
-            fontWeight: 500,
-            color: tokens.navy,
-            textDecoration: "none",
-            marginRight: 16,
-          }}
-        >
-          Sign up
-        </a>
-        <a
-          href="/assessment"
-          style={{
-            background: tokens.navy,
-            color: tokens.sky,
-            fontFamily: "'Inter', sans-serif",
-            fontSize: 14,
-            fontWeight: 500,
-            textDecoration: "none",
-          }}
-          className="rounded-full px-5 py-2 hover:opacity-90 transition"
-        >
-          Get your Travel Pass
-        </a>
+        <div className="flex items-center gap-5">
+          <a
+            href="/login"
+            style={{
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 14,
+              fontWeight: 500,
+              color: tokens.navy,
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Log in
+          </a>
+          <a
+            href="/signup"
+            style={{
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 14,
+              fontWeight: 500,
+              color: tokens.navy,
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Sign up
+          </a>
+          <a
+            href="/assessment"
+            style={{
+              background: tokens.navy,
+              color: tokens.sky,
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 14,
+              fontWeight: 500,
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+            className="rounded-full px-5 py-2 hover:opacity-90 transition"
+          >
+            Get your Travel Pass
+          </a>
+        </div>
       </nav>
 
       {/* HERO */}
@@ -308,12 +316,10 @@ export default function PetPassGoLanding() {
             TRAVEL WITH CONFIDENCE
           </div>
           <h1
-            style={{ fontFamily: "'Fraunces', serif", color: tokens.navy, lineHeight: 1.05 }}
-            className="text-[42px] md:text-[56px] font-semibold mb-6"
+            style={{ fontFamily: "'Fraunces', serif", color: tokens.navy, lineHeight: 1.1 }}
+            className="text-[34px] sm:text-[42px] md:text-[56px] font-semibold mb-6"
           >
-            Know what your trip needs.
-            <br />
-            Before you need it.
+            Know what your trip needs — before you need it.
           </h1>
           <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 17, color: tokens.ink, opacity: 0.8 }} className="max-w-md mb-8">
             PetPassGo turns scattered airline rules, forms, and deadlines into one
@@ -326,7 +332,7 @@ export default function PetPassGoLanding() {
               style={{ background: tokens.stamp, color: "#fff", fontFamily: "'Inter', sans-serif", fontWeight: 600, textDecoration: "none", display: "inline-block" }}
               className="rounded-full px-7 py-3.5 text-[15px] hover:opacity-90 transition"
             >
-              Start your Travel Pass — $49.99
+              Start your Travel Pass
             </a>
             <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, opacity: 0.55 }}>
               takes ~3 minutes
@@ -352,10 +358,7 @@ export default function PetPassGoLanding() {
             {steps.map((s, i) => (
               <div
                 key={s.n}
-                className="px-0 md:px-8 py-6 md:py-0"
-                style={{
-                  borderLeft: i > 0 ? `1px dashed ${tokens.gold}55` : "none",
-                }}
+                className={`step-divider px-0 md:px-8 py-6 md:py-0 ${i > 0 ? "step-divider-active" : ""}`}
               >
                 <div style={{ fontFamily: "'Fraunces', serif", color: tokens.gold, fontSize: 34 }}>{s.n}</div>
                 <h3 style={{ fontFamily: "'Fraunces', serif", color: "#fff", fontSize: 22 }} className="mt-2 mb-2">
