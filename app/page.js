@@ -252,6 +252,19 @@ export default function PetPassGoLanding() {
           PetPassGo
         </div>
         <a
+          href="/login"
+          style={{
+            fontFamily: "'Inter', sans-serif",
+            fontSize: 14,
+            fontWeight: 500,
+            color: tokens.navy,
+            textDecoration: "none",
+            marginRight: 16,
+          }}
+        >
+          Log in
+        </a>
+        <a
           href="/assessment"
           style={{
             background: tokens.navy,
