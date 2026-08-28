@@ -130,23 +130,21 @@ function ProgressStub({ step }) {
   );
 }
 
-function OptionCard({ label, sub, selected, onClick, icon }) {
+function OptionCard({ label, sub, selected, onClick, icon, compact }) {
   return (
     <button
       onClick={onClick}
-      className="text-left rounded-xl px-5 py-4 w-full transition"
+      className={`text-left rounded-xl transition flex items-center gap-3 ${compact ? "px-4 py-3.5 min-h-[64px]" : "px-5 py-4"} w-full`}
       style={{
         border: `2px solid ${selected ? tokens.navy : tokens.line}`,
         background: selected ? tokens.navy : "#fff",
         color: selected ? "#fff" : tokens.ink,
       }}
     >
-      <div className="flex items-center gap-3">
-        {icon && <span className="text-xl">{icon}</span>}
-        <div>
-          <div style={{ fontFamily: font.body, fontWeight: 600, fontSize: 15 }}>{label}</div>
-          {sub && <div style={{ fontFamily: font.body, fontSize: 12.5, opacity: 0.7 }}>{sub}</div>}
-        </div>
+      {icon && <span className="text-xl flex-shrink-0">{icon}</span>}
+      <div>
+        <div style={{ fontFamily: font.body, fontWeight: 600, fontSize: 15, lineHeight: 1.3 }}>{label}</div>
+        {sub && <div style={{ fontFamily: font.body, fontSize: 12.5, opacity: 0.7 }}>{sub}</div>}
       </div>
     </button>
   );
@@ -250,6 +248,7 @@ export default function PetPassGoQuiz() {
   const [step, setStep] = useState(0);
   const [isMember, setIsMember] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
+  const [addMembership, setAddMembership] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [answers, setAnswers] = useState({
     animal: "",
@@ -405,8 +404,17 @@ export default function PetPassGoQuiz() {
                 type="date"
                 value={answers.date}
                 onChange={(e) => set("date", e.target.value)}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }}
-                className="rounded-xl px-4 py-3 outline-none w-full"
+                style={{
+                  fontFamily: font.body,
+                  border: `2px solid ${tokens.line}`,
+                  fontSize: 15,
+                  background: "#fff",
+                  color: tokens.ink,
+                  height: 52,
+                  WebkitAppearance: "none",
+                  appearance: "none",
+                }}
+                className="rounded-xl px-4 outline-none w-full"
               />
               <NavRow onBack={back} onNext={next} nextDisabled={!answers.date} />
             </>
@@ -422,7 +430,7 @@ export default function PetPassGoQuiz() {
               </p>
               <div className="grid grid-cols-2 gap-3">
                 {AIRLINES.map((a) => (
-                  <OptionCard key={a} label={a} selected={answers.airline === a} onClick={() => set("airline", a)} />
+                  <OptionCard key={a} label={a} compact selected={answers.airline === a} onClick={() => set("airline", a)} />
                 ))}
               </div>
               <NavRow onBack={back} onNext={next} nextDisabled={!answers.airline} nextLabel="See my plan" />
@@ -537,13 +545,31 @@ export default function PetPassGoQuiz() {
                     <div style={{ fontFamily: font.body, fontSize: 12.5, opacity: 0.7, textAlign: "center" }} className="mt-3">
                       Includes this trip's full plan, your pet's profile, document vault, and Digital Pet ID.
                     </div>
-                    <div style={{ fontFamily: font.body, fontSize: 12.5, opacity: 0.7, textAlign: "center" }} className="mt-1">
-                      Then <strong>$4.99/mo</strong> keeps the profile free to update — and drops future trip refreshes to <strong>$19.99</strong>.
-                    </div>
+
+                    <label
+                      className="flex items-start gap-3 mt-4 rounded-xl p-4 cursor-pointer"
+                      style={{ background: "#fff", border: `1.5px solid ${addMembership ? tokens.navy : tokens.line}` }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={addMembership}
+                        onChange={(e) => setAddMembership(e.target.checked)}
+                        className="mt-1"
+                      />
+                      <div>
+                        <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy }}>
+                          Also add PetPassGo Membership — $4.99/mo
+                        </div>
+                        <div style={{ fontFamily: font.body, fontSize: 12.5, opacity: 0.7 }} className="mt-1">
+                          Optional. Keeps your pet's profile free to update anytime, and drops future trip refreshes to $19.99 instead of $49.99.
+                        </div>
+                      </div>
+                    </label>
+
                     <button
                       onClick={() => setShowDetails((v) => !v)}
                       style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.navy, textAlign: "center" }}
-                      className="w-full mt-2 underline"
+                      className="w-full mt-3 underline"
                     >
                       {showDetails ? "Hide" : "See"} what each price includes
                     </button>
