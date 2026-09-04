@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { supabase } from "../../lib/supabaseClient";
 
 const tokens = {
   navy: "#152238",
@@ -249,7 +250,7 @@ export default function PetPassGoQuiz() {
   const [isMember, setIsMember] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const [addMembership, setAddMembership] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
+  const [showDetails, setShowDetails] = useState(true);
   const [answers, setAnswers] = useState({
     animal: "",
     role: "",
@@ -258,72 +259,65 @@ export default function PetPassGoQuiz() {
     date: "",
     airline: "",
   });
+  const [results, setResults] = useState([]);
+  const [loadingResults, setLoadingResults] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
 
   const set = (k, v) => setAnswers((a) => ({ ...a, [k]: v }));
   const next = () => setStep((s) => Math.min(s + 1, TOTAL_STEPS));
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
-  const mockResults =
-    answers.role === "Service animal"
-      ? [
-          {
-            category: "REQUIRED FORM",
-            what: "DOT Service Animal Air Transportation Form",
-            why: `Required by ${answers.airline || "most U.S. airlines"} before boarding with a service animal.`,
-            deadline: "48 hrs before departure",
-            status: "attention",
-          },
-          {
-            category: "OWNER ATTESTATION",
-            what: "Behavior & training attestation",
-            why: "Confirms your animal can behave appropriately in a public cabin setting.",
-            deadline: "At check-in",
-            status: "verify",
-          },
-          {
-            category: "HEALTH DOCUMENTATION",
-            what: "Health certificate (international only)",
-            why: `Not required for domestic ${answers.origin || "→"} ${answers.destination || "trips"} — skip this one.`,
-            deadline: "N/A",
-            status: "complete",
-          },
-        ]
-      : [
-          {
-            category: "BOOKING REQUIREMENT",
-            what: "Airline pet travel booking",
-            why: `${answers.airline || "Your airline"} requires pets booked in-cabin or cargo to be added to your reservation in advance.`,
-            deadline: "At booking",
-            status: "attention",
-          },
-          {
-            category: "HEALTH DOCUMENTATION",
-            what: "Health certificate from vet",
-            why: "Most carriers require this within 10 days of travel for pets in cargo or on longer routes.",
-            deadline: "10 days before departure",
-            status: "verify",
-          },
-          {
-            category: "CARRIER REQUIREMENT",
-            what: "Carrier size requirements",
-            why: `${answers.airline || "Your airline"}'s under-seat carrier dimensions — shown once you pick a carrier.`,
-            deadline: "Before you pack",
-            status: "complete",
-          },
-        ];
+  function guessStatus(category) {
+    if (category.includes("WHAT HAPPENS")) return "complete";
+    if (category.includes("HEALTH") || category.includes("VACCINATION")) return "verify";
+    return "attention";
+  }
+
+  useEffect(() => {
+    if (step !== TOTAL_STEPS) return;
+
+    setLoadingResults(true);
+    setFetchError(false);
+
+    supabase
+      .from("airline_requirements")
+      .select("*")
+      .in("airline", [answers.airline, "Any"])
+      .in("animal_type", [answers.animal, "Any"])
+      .in("role", [answers.role, "Any"])
+      .eq("trip_type", "domestic")
+      .then(({ data, error }) => {
+        if (error) {
+          setFetchError(true);
+          setResults([]);
+        } else {
+          setResults(
+            (data || []).map((row) => ({
+              category: row.category,
+              what: row.title,
+              why: row.description,
+              deadline: row.deadline_description,
+              status: guessStatus(row.category),
+            }))
+          );
+        }
+        setLoadingResults(false);
+      });
+  }, [step]);
 
   const readiness = unlocked
-    ? Math.round((mockResults.filter((r) => r.status === "complete").length / mockResults.length) * 100) || 33
+    ? Math.round((results.filter((r) => r.status === "complete").length / (results.length || 1)) * 100) || 33
     : null;
 
-  const needsAction = mockResults.filter((r) => r.status === "attention").length;
-  const needsVerify = mockResults.filter((r) => r.status === "verify").length;
+  const needsAction = results.filter((r) => r.status === "attention").length;
+  const needsVerify = results.filter((r) => r.status === "verify").length;
 
   return (
     <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full flex justify-center px-4 py-10">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;700&display=swap');
         * { box-sizing: border-box; }
+        h1, h2, h3, h4 { font-variant-ligatures: none; -webkit-font-variant-ligatures: none; }
       `}</style>
 
       <div className="w-full max-w-[540px]">
@@ -452,7 +446,9 @@ export default function PetPassGoQuiz() {
               </div>
 
               <div className="rounded-xl p-4 mb-5" style={{ background: tokens.navy }}>
-                {unlocked ? (
+                {loadingResults ? (
+                  <div style={{ fontFamily: font.body, fontSize: 13.5, color: "#fff" }}>Looking up requirements…</div>
+                ) : unlocked ? (
                   <div className="flex items-center justify-between">
                     <div>
                       <div style={{ fontFamily: font.mono, fontSize: 10, color: tokens.sky, opacity: 0.7, letterSpacing: "0.1em" }}>
@@ -466,14 +462,24 @@ export default function PetPassGoQuiz() {
                   </div>
                 ) : (
                   <div style={{ fontFamily: font.body, fontSize: 13.5, color: "#fff" }}>
-                    <span style={{ fontWeight: 700 }}>{mockResults.length} requirements found</span> for this trip —{" "}
+                    <span style={{ fontWeight: 700 }}>{results.length} requirements found</span> for this trip —{" "}
                     <span style={{ color: tokens.stamp === tokens.stamp ? "#F2A79A" : "" }}>{needsAction} need action</span>,{" "}
                     {needsVerify} need verification.
                   </div>
                 )}
               </div>
 
-              {mockResults.map((r) => (
+              {!loadingResults && results.length === 0 && (
+                <div
+                  className="rounded-xl p-4 mb-4 text-center"
+                  style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 13.5, opacity: 0.75 }}
+                >
+                  We haven't researched verified requirements for {answers.airline || "this airline"} yet — Delta is
+                  currently the only airline with confirmed data. Try the assessment again and select Delta to see real results.
+                </div>
+              )}
+
+              {results.map((r) => (
                 <ResultRow key={r.what} {...r} unlocked={unlocked} />
               ))}
 
@@ -515,26 +521,46 @@ export default function PetPassGoQuiz() {
                     >
                       Refresh this trip — $19.99
                     </button>
-                    <button
-                      onClick={() => setShowDetails((v) => !v)}
-                      style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.navy, textAlign: "center" }}
-                      className="w-full mt-2 underline"
+                    <ul
+                      style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.ink, opacity: 0.75 }}
+                      className="mt-3 rounded-lg p-3 list-disc pl-5 space-y-1"
                     >
-                      {showDetails ? "Hide" : "See"} what's included
-                    </button>
-                    {showDetails && (
-                      <ul
-                        style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.ink, opacity: 0.75 }}
-                        className="mt-2 rounded-lg p-3 list-disc pl-5 space-y-1"
-                      >
-                        <li>This trip's full requirement list, deadlines, and submission steps</li>
-                        <li>Your existing pet profile and documents carried over automatically</li>
-                        <li>Updated Digital Pet ID for this itinerary</li>
-                      </ul>
-                    )}
+                      <li>This trip's full requirement list, deadlines, and submission steps</li>
+                      <li>Your existing pet profile and documents carried over automatically</li>
+                      <li>Updated Digital Pet ID for this itinerary</li>
+                    </ul>
                   </div>
                 ) : (
                   <div className="mt-5">
+                    <div
+                      className="rounded-xl p-4 mb-4"
+                      style={{ background: "#fff", border: `1.5px solid ${tokens.navy}` }}
+                    >
+                      <div style={{ fontFamily: font.mono, fontSize: 10.5, color: tokens.stamp, letterSpacing: "0.08em" }} className="mb-2">
+                        EXAMPLE OF WHAT YOU'LL GET
+                      </div>
+                      <div className="mb-3 pb-3" style={{ borderBottom: `1px dashed ${tokens.line}` }}>
+                        <div style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, color: tokens.navy }}>
+                          Delta — DOT Service Animal Form
+                        </div>
+                        <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.8 }} className="mt-1">
+                          Submit through Delta's Accessibility Desk at least 48 hours before departure. We link you straight to the form and the exact submission page.
+                        </div>
+                      </div>
+                      <div>
+                        <div style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, color: tokens.navy }}>
+                          United — Carrier requirements
+                        </div>
+                        <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.8 }} className="mt-1">
+                          Soft-sided carrier, max 17.5" × 12" × 7.5", must fit under the seat. Confirmed at check-in — we tell you exactly where.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.7 }} className="mb-4 text-center px-2">
+                      That's the level of detail your $49.99 unlocks — plus your pet's saved profile, document vault, and Digital Pet ID.
+                    </div>
+
                     <button
                       onClick={() => setUnlocked(true)}
                       style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}
@@ -542,8 +568,8 @@ export default function PetPassGoQuiz() {
                     >
                       Get the full Travel Pass — $49.99
                     </button>
-                    <div style={{ fontFamily: font.body, fontSize: 12.5, opacity: 0.7, textAlign: "center" }} className="mt-3">
-                      Includes this trip's full plan, your pet's profile, document vault, and Digital Pet ID.
+                    <div style={{ fontFamily: font.body, fontSize: 12, opacity: 0.55, textAlign: "center" }} className="mt-2">
+                      One-time. Not a subscription.
                     </div>
 
                     <label
@@ -566,32 +592,6 @@ export default function PetPassGoQuiz() {
                       </div>
                     </label>
 
-                    <button
-                      onClick={() => setShowDetails((v) => !v)}
-                      style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.navy, textAlign: "center" }}
-                      className="w-full mt-3 underline"
-                    >
-                      {showDetails ? "Hide" : "See"} what each price includes
-                    </button>
-                    {showDetails && (
-                      <div className="mt-2 rounded-lg p-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-                        <div style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 600, color: tokens.navy }}>$49.99 — Travel Pass</div>
-                        <ul style={{ fontFamily: font.body, fontSize: 12.5, opacity: 0.75 }} className="list-disc pl-5 mb-2">
-                          <li>Full requirement list + deadlines for this trip</li>
-                          <li>Pet profile + document vault setup</li>
-                          <li>Digital Pet ID with QR code</li>
-                        </ul>
-                        <div style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 600, color: tokens.navy }}>$4.99/mo — Membership</div>
-                        <ul style={{ fontFamily: font.body, fontSize: 12.5, opacity: 0.75 }} className="list-disc pl-5 mb-2">
-                          <li>Keep the profile and documents updated, free</li>
-                          <li>Unlocks $19.99 trip refreshes instead of $49.99</li>
-                        </ul>
-                        <div style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 600, color: tokens.navy }}>$19.99 — Trip refresh</div>
-                        <ul style={{ fontFamily: font.body, fontSize: 12.5, opacity: 0.75 }} className="list-disc pl-5">
-                          <li>New trip's requirements, using your existing profile</li>
-                        </ul>
-                      </div>
-                    )}
                   </div>
                 )
               ) : (
