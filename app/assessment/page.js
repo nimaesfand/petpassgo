@@ -360,6 +360,30 @@ export default function PetPassGoQuiz() {
     }
   }
 
+  async function handlePurchase() {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) {
+      localStorage.setItem("petpassgo_pending_trip", JSON.stringify(answers));
+      window.location.href = "/signup";
+      return;
+    }
+
+    await supabase.from("trips").insert({
+      user_id: data.user.id,
+      origin: answers.origin,
+      destination: answers.destination,
+      airline: answers.airline,
+      travel_date: answers.date || null,
+      animal_type: answers.animal,
+      role: answers.role,
+      status: "ready",
+      paid: true,
+    });
+
+    localStorage.setItem("petpassgo_open_flight_tab", "1");
+    window.location.href = "/account";
+  }
+
   function guessStatus(category) {
     if (category.includes("WHAT HAPPENS")) return "complete";
     if (category.includes("HEALTH") || category.includes("VACCINATION")) return "verify";
@@ -644,7 +668,7 @@ export default function PetPassGoQuiz() {
                 isMember ? (
                   <div className="mt-5">
                     <button
-                      onClick={() => setUnlocked(true)}
+                      onClick={handlePurchase}
                       style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}
                       className="w-full rounded-full py-3.5 text-[15px] hover:opacity-90 transition"
                     >
@@ -679,7 +703,7 @@ export default function PetPassGoQuiz() {
                     </div>
 
                     <button
-                      onClick={() => setUnlocked(true)}
+                      onClick={handlePurchase}
                       style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}
                       className="w-full rounded-full py-3.5 text-[15px] hover:opacity-90 transition"
                     >
