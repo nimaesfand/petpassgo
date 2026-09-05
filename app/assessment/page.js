@@ -275,8 +275,8 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
         </span>
       </div>
       {unlocked ? (
-        <div className="flex items-center justify-between mt-3">
-          <div style={{ fontFamily: font.mono, fontSize: 11, color: tokens.ink, opacity: 0.5 }}>
+        <div className="flex items-center justify-between gap-3 mt-3 flex-wrap">
+          <div style={{ fontFamily: font.mono, fontSize: 11, color: tokens.ink, opacity: 0.5 }} className="flex-1 min-w-0">
             DUE {deadline}
           </div>
           {link && link !== "https://www.delta.com/us/en/pet-travel/overview" && (
@@ -291,6 +291,8 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
                 color: "#fff",
                 background: tokens.navy,
                 textDecoration: "none",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
               }}
               className="rounded-full px-4 py-1.5 hover:opacity-90 transition"
             >
