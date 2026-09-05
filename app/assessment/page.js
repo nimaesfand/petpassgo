@@ -185,8 +185,61 @@ const STATUS_META = {
   complete: { color: tokens.green, label: "READY" },
 };
 
+const INSIGHT_CATEGORIES = new Set(["KENNEL REQUIREMENT", "AGE REQUIREMENT", "PET FEE", "BREED RESTRICTION", "VACCINATION"]);
+const INSIGHT_ICONS = {
+  "KENNEL REQUIREMENT": "🧳",
+  "AGE REQUIREMENT": "🎂",
+  "PET FEE": "💵",
+  "BREED RESTRICTION": "🐾",
+  VACCINATION: "💉",
+};
+
 function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
   const meta = STATUS_META[status];
+  const isInsight = INSIGHT_CATEGORIES.has(category);
+
+  if (isInsight) {
+    return (
+      <div
+        className="rounded-xl p-5 mb-3 flex items-start gap-4"
+        style={{ background: tokens.sky, border: `1px solid ${tokens.line}` }}
+      >
+        <div
+          className="rounded-full flex items-center justify-center flex-shrink-0"
+          style={{ width: 40, height: 40, background: "#fff", fontSize: 19 }}
+        >
+          {INSIGHT_ICONS[category] || "ℹ️"}
+        </div>
+        <div className="flex-1">
+          <div style={{ fontFamily: font.mono, fontSize: 9.5, color: tokens.navy, opacity: 0.5, letterSpacing: "0.08em" }} className="mb-1">
+            GOOD TO KNOW
+          </div>
+          {unlocked ? (
+            <>
+              <div style={{ fontFamily: font.display, fontSize: 16.5, color: tokens.navy }} className="mb-1">
+                {what}
+              </div>
+              <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.ink, opacity: 0.75 }}>{why}</div>
+            </>
+          ) : (
+            <div
+              style={{
+                fontFamily: font.body,
+                fontSize: 14,
+                color: tokens.ink,
+                opacity: 0.45,
+                filter: "blur(3px)",
+                userSelect: "none",
+              }}
+            >
+              {what}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-xl p-5 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
       <div className="flex items-start justify-between gap-4">
@@ -237,7 +290,7 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
           <div style={{ fontFamily: font.mono, fontSize: 11, color: tokens.ink, opacity: 0.5 }}>
             DUE {deadline}
           </div>
-          {link && (
+          {link && link !== "https://www.delta.com/us/en/pet-travel/overview" && (
             <a
               href={link}
               target="_blank"
@@ -677,17 +730,31 @@ export default function PetPassGoQuiz() {
                               </div>
                             </div>
                           </div>
-                          <div
-                            className="rounded mx-auto"
-                            style={{
-                              width: 40,
-                              height: 40,
-                              backgroundImage:
-                                "repeating-linear-gradient(45deg, #152238 0 2.5px, transparent 2.5px 5px), repeating-linear-gradient(-45deg, #152238 0 2.5px, transparent 2.5px 5px)",
-                              backgroundBlendMode: "multiply",
-                              border: `1px solid ${tokens.line}`,
-                            }}
-                          />
+                          <svg
+                            viewBox="0 0 29 29"
+                            className="mx-auto"
+                            style={{ width: 40, height: 40, border: `1px solid ${tokens.line}` }}
+                          >
+                            <rect width="29" height="29" fill="#fff" />
+                            {/* corner finder squares, like a real QR code */}
+                            {[[1, 1], [22, 1], [1, 22]].map(([x, y]) => (
+                              <g key={`${x}-${y}`}>
+                                <rect x={x} y={y} width="6" height="6" fill={tokens.navy} />
+                                <rect x={x + 1.3} y={y + 1.3} width="3.4" height="3.4" fill="#fff" />
+                                <rect x={x + 2} y={y + 2} width="2" height="2" fill={tokens.navy} />
+                              </g>
+                            ))}
+                            {/* scattered data dots */}
+                            {[
+                              [10, 2], [13, 3], [16, 1], [19, 4], [10, 5], [15, 6],
+                              [2, 10], [5, 12], [3, 15], [7, 16], [1, 18], [5, 19],
+                              [10, 10], [13, 11], [11, 14], [16, 12], [14, 16], [18, 9],
+                              [22, 10], [25, 12], [23, 15], [26, 17], [21, 18], [24, 20],
+                              [10, 22], [13, 24], [16, 21], [11, 26], [18, 23], [15, 27],
+                            ].map(([x, y], i) => (
+                              <rect key={i} x={x} y={y} width="1.3" height="1.3" fill={tokens.navy} />
+                            ))}
+                          </svg>
                         </div>
                       </div>
 
