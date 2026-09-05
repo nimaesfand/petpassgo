@@ -383,9 +383,9 @@ export default function AccountPage() {
 
       <div className="w-full max-w-[620px]">
         <div className="flex items-center justify-between mb-6">
-          <span style={{ fontFamily: font.display, fontWeight: 600, fontSize: 22, color: tokens.navy }}>
+          <a href="/" style={{ fontFamily: font.display, fontWeight: 600, fontSize: 22, color: tokens.navy, textDecoration: "none" }}>
             PetPassGo
-          </span>
+          </a>
           <button
             onClick={handleLogout}
             style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink, opacity: 0.6 }}
