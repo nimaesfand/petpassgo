@@ -276,8 +276,19 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
       </div>
       {unlocked ? (
         <div className="flex items-center justify-between gap-3 mt-3 flex-wrap">
-          <div style={{ fontFamily: font.mono, fontSize: 11, color: tokens.ink, opacity: 0.5 }} className="flex-1 min-w-0">
-            DUE {deadline}
+          <div className="flex-1 min-w-0">
+            <span
+              style={{
+                fontFamily: font.mono,
+                fontSize: 11,
+                color: tokens.navy,
+                background: tokens.sky,
+                padding: "3px 8px",
+                borderRadius: 6,
+              }}
+            >
+              DUE {deadline}
+            </span>
           </div>
           {link && link !== "https://www.delta.com/us/en/pet-travel/overview" && (
             <a
