@@ -273,7 +273,7 @@ export default function PetPassGoQuiz() {
       try {
         const savedAnswers = JSON.parse(pending);
         setAnswers(savedAnswers);
-        setStep(TOTAL_STEPS);
+        setStep(5);
       } catch (e) {
         // ignore corrupted storage
       }
@@ -303,7 +303,7 @@ export default function PetPassGoQuiz() {
   }
 
   useEffect(() => {
-    if (step !== TOTAL_STEPS) return;
+    if (step !== 5) return;
 
     setLoadingResults(true);
     setFetchError(false);
@@ -355,7 +355,7 @@ export default function PetPassGoQuiz() {
             <a href="/" style={{ fontFamily: font.display, fontWeight: 600, fontSize: 20, color: tokens.navy, textDecoration: "none" }}>PetPassGo</a>
             <span style={{ fontFamily: font.mono, fontSize: 10, color: tokens.gold, letterSpacing: "0.1em" }}>TRIP ASSESSMENT</span>
           </div>
-          {step === TOTAL_STEPS && (
+          {step === 5 && (
             <label className="flex items-center gap-2 cursor-pointer" style={{ fontFamily: font.mono, fontSize: 10, color: tokens.ink, opacity: 0.6 }}>
               <input type="checkbox" checked={isMember} onChange={(e) => setIsMember(e.target.checked)} />
               PREVIEW AS $4.99 MEMBER
