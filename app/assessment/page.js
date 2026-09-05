@@ -200,42 +200,31 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
 
   if (isInsight) {
     return (
-      <div
-        className="rounded-xl p-5 mb-3 flex items-start gap-4"
-        style={{ background: tokens.sky, border: `1px solid ${tokens.line}` }}
-      >
-        <div
-          className="rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ width: 40, height: 40, background: "#fff", fontSize: 19 }}
-        >
-          {INSIGHT_ICONS[category] || "ℹ️"}
+      <div className="rounded-xl p-5 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+        <div style={{ fontFamily: font.mono, fontSize: 10.5, color: tokens.ink, opacity: 0.45, letterSpacing: "0.08em" }} className="mb-1">
+          {category}
         </div>
-        <div className="flex-1">
-          <div style={{ fontFamily: font.mono, fontSize: 9.5, color: tokens.navy, opacity: 0.5, letterSpacing: "0.08em" }} className="mb-1">
-            GOOD TO KNOW
-          </div>
-          {unlocked ? (
-            <>
-              <div style={{ fontFamily: font.display, fontSize: 16.5, color: tokens.navy }} className="mb-1">
-                {what}
-              </div>
-              <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.ink, opacity: 0.75 }}>{why}</div>
-            </>
-          ) : (
-            <div
-              style={{
-                fontFamily: font.body,
-                fontSize: 14,
-                color: tokens.ink,
-                opacity: 0.45,
-                filter: "blur(3px)",
-                userSelect: "none",
-              }}
-            >
+        {unlocked ? (
+          <>
+            <div style={{ fontFamily: font.display, fontSize: 17, color: tokens.navy }} className="mb-1">
               {what}
             </div>
-          )}
-        </div>
+            <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink, opacity: 0.75 }}>{why}</div>
+          </>
+        ) : (
+          <div
+            style={{
+              fontFamily: font.body,
+              fontSize: 14,
+              color: tokens.ink,
+              opacity: 0.45,
+              filter: "blur(3px)",
+              userSelect: "none",
+            }}
+          >
+            {what}
+          </div>
+        )}
       </div>
     );
   }
@@ -416,6 +405,7 @@ export default function PetPassGoQuiz() {
 
   const eligibilityNotes = results.filter((r) => r.category === "ELIGIBILITY NOTE");
   const normalResults = results.filter((r) => r.category !== "ELIGIBILITY NOTE");
+  const hasRealForms = normalResults.some((r) => ["REQUIRED FORM", "SUBMISSION"].includes(r.category));
 
   const readiness = unlocked
     ? Math.round((normalResults.filter((r) => r.status === "complete").length / (normalResults.length || 1)) * 100) || 33
@@ -607,6 +597,12 @@ export default function PetPassGoQuiz() {
                 >
                   We haven't researched verified requirements for {answers.airline || "this airline"} yet — Delta is
                   currently the only airline with confirmed data. Try the assessment again and select Delta to see real results.
+                </div>
+              )}
+
+              {unlocked && !hasRealForms && normalResults.length > 0 && (
+                <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink, opacity: 0.75 }} className="mb-4">
+                  No forms needed for this trip — {answers.airline}, {answers.origin || "—"} → {answers.destination || "—"}, domestic. Here's what to know:
                 </div>
               )}
 
