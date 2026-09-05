@@ -264,8 +264,37 @@ export default function PetPassGoQuiz() {
   const [fetchError, setFetchError] = useState(false);
 
   const set = (k, v) => setAnswers((a) => ({ ...a, [k]: v }));
-  const next = () => setStep((s) => Math.min(s + 1, TOTAL_STEPS));
   const back = () => setStep((s) => Math.max(s - 1, 0));
+
+  // Resume a trip that was in progress if the person just came back from signup/login
+  useEffect(() => {
+    const pending = localStorage.getItem("petpassgo_pending_trip");
+    if (pending) {
+      try {
+        const savedAnswers = JSON.parse(pending);
+        setAnswers(savedAnswers);
+        setStep(TOTAL_STEPS);
+      } catch (e) {
+        // ignore corrupted storage
+      }
+      localStorage.removeItem("petpassgo_pending_trip");
+    }
+  }, []);
+
+  const next = () => setStep((s) => Math.min(s + 1, TOTAL_STEPS));
+
+  // Special handler for the last question (airline) — this is the signup gate.
+  // Logged-in users go straight to results. New visitors save their answers and
+  // are sent to create an account first, then land right back on their results.
+  async function handleSeePlan() {
+    const { data } = await supabase.auth.getUser();
+    if (data.user) {
+      next();
+    } else {
+      localStorage.setItem("petpassgo_pending_trip", JSON.stringify(answers));
+      window.location.href = "/signup";
+    }
+  }
 
   function guessStatus(category) {
     if (category.includes("WHAT HAPPENS")) return "complete";
@@ -323,7 +352,7 @@ export default function PetPassGoQuiz() {
       <div className="w-full max-w-[540px]">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <span style={{ fontFamily: font.display, fontWeight: 600, fontSize: 20, color: tokens.navy }}>PetPassGo</span>
+            <a href="/" style={{ fontFamily: font.display, fontWeight: 600, fontSize: 20, color: tokens.navy, textDecoration: "none" }}>PetPassGo</a>
             <span style={{ fontFamily: font.mono, fontSize: 10, color: tokens.gold, letterSpacing: "0.1em" }}>TRIP ASSESSMENT</span>
           </div>
           {step === TOTAL_STEPS && (
@@ -427,7 +456,7 @@ export default function PetPassGoQuiz() {
                   <OptionCard key={a} label={a} compact selected={answers.airline === a} onClick={() => set("airline", a)} />
                 ))}
               </div>
-              <NavRow onBack={back} onNext={next} nextDisabled={!answers.airline} nextLabel="See my plan" />
+              <NavRow onBack={back} onNext={handleSeePlan} nextDisabled={!answers.airline} nextLabel="See my plan" />
             </>
           )}
 
@@ -533,32 +562,17 @@ export default function PetPassGoQuiz() {
                 ) : (
                   <div className="mt-5">
                     <div
-                      className="rounded-xl p-4 mb-4"
-                      style={{ background: "#fff", border: `1.5px solid ${tokens.navy}` }}
+                      className="rounded-xl p-5 mb-4"
+                      style={{ background: tokens.navy }}
                     >
-                      <div style={{ fontFamily: font.mono, fontSize: 10.5, color: tokens.stamp, letterSpacing: "0.08em" }} className="mb-2">
-                        EXAMPLE OF WHAT YOU'LL GET
+                      <div style={{ fontFamily: font.display, fontSize: 18, color: "#fff" }} className="mb-2">
+                        We already know exactly what {answers.airline || "your airline"} requires for your {(answers.animal || "pet").toLowerCase()}.
                       </div>
-                      <div className="mb-3 pb-3" style={{ borderBottom: `1px dashed ${tokens.line}` }}>
-                        <div style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, color: tokens.navy }}>
-                          Delta — DOT Service Animal Form
-                        </div>
-                        <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.8 }} className="mt-1">
-                          Submit through Delta's Accessibility Desk at least 48 hours before departure. We link you straight to the form and the exact submission page.
-                        </div>
+                      <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.sky, opacity: 0.85 }}>
+                        Every document, every form, the exact cost, and precisely where to send it — verified and
+                        ready the moment you unlock it below. No guessing, no outdated blog posts, no calling the
+                        airline and getting a different answer every time.
                       </div>
-                      <div>
-                        <div style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, color: tokens.navy }}>
-                          United — Carrier requirements
-                        </div>
-                        <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.8 }} className="mt-1">
-                          Soft-sided carrier, max 17.5" × 12" × 7.5", must fit under the seat. Confirmed at check-in — we tell you exactly where.
-                        </div>
-                      </div>
-                    </div>
-
-                    <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.7 }} className="mb-4 text-center px-2">
-                      That's the level of detail your $49.99 unlocks — plus your pet's saved profile, document vault, and Digital Pet ID.
                     </div>
 
                     <button
@@ -570,6 +584,93 @@ export default function PetPassGoQuiz() {
                     </button>
                     <div style={{ fontFamily: font.body, fontSize: 12, opacity: 0.55, textAlign: "center" }} className="mt-2">
                       One-time. Not a subscription.
+                    </div>
+
+                    <div style={{ fontFamily: font.body, fontSize: 13, fontWeight: 600, color: tokens.navy }} className="mt-6 mb-3 text-center">
+                      Every Travel Pass includes these two things, free:
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      {/* Mini Digital Pet ID preview */}
+                      <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${tokens.line}` }}>
+                        <div style={{ background: tokens.navy }} className="px-3 py-2">
+                          <div style={{ fontFamily: font.mono, fontSize: 8, color: tokens.gold, letterSpacing: "0.1em" }}>
+                            DIGITAL PET ID
+                          </div>
+                        </div>
+                        <div style={{ background: "#fff" }} className="p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div
+                              className="rounded-full flex items-center justify-center flex-shrink-0"
+                              style={{ width: 28, height: 28, background: tokens.sky, fontSize: 14 }}
+                            >
+                              🐾
+                            </div>
+                            <div style={{ fontFamily: font.display, fontSize: 13, color: tokens.navy }}>
+                              {answers.animal || "Pet"}'s ID
+                            </div>
+                          </div>
+                          <div
+                            className="rounded flex items-center justify-center mx-auto"
+                            style={{ width: 32, height: 32, background: tokens.ink, opacity: 0.85 }}
+                          >
+                            <span style={{ fontFamily: font.mono, fontSize: 7, color: "#fff" }}>QR</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Mini Travel Mode preview */}
+                      <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${tokens.line}` }}>
+                        <div style={{ background: tokens.navy }} className="px-3 py-2">
+                          <div style={{ fontFamily: font.mono, fontSize: 8, color: tokens.gold, letterSpacing: "0.1em" }}>
+                            TRAVEL MODE
+                          </div>
+                        </div>
+                        <div style={{ background: "#fff" }} className="p-3">
+                          <div style={{ fontFamily: font.body, fontSize: 10.5, color: tokens.ink, opacity: 0.5 }} className="mb-1">
+                            Day of your flight:
+                          </div>
+                          <div style={{ fontFamily: font.body, fontSize: 11, fontWeight: 600, color: tokens.navy }}>
+                            Only what you need, right now
+                          </div>
+                          <div style={{ fontFamily: font.body, fontSize: 9.5, opacity: 0.6 }} className="mt-1">
+                            Works with no signal
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      className="rounded-xl p-4 mb-1"
+                      style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}
+                    >
+                      <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 600, color: tokens.navy }} className="mb-2">
+                        Membership keeps all of this saved and up to date:
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          "Vaccination records",
+                          "Vet contact info",
+                          "Medications & allergies",
+                          "Microchip number",
+                          "Emergency contact",
+                          "Insurance policy info",
+                        ].map((item) => (
+                          <span
+                            key={item}
+                            style={{
+                              fontFamily: font.body,
+                              fontSize: 11.5,
+                              color: tokens.navy,
+                              background: "#fff",
+                              border: `1px solid ${tokens.line}`,
+                            }}
+                            className="rounded-full px-3 py-1"
+                          >
+                            {item}
+                          </span>
+                        ))}
+                      </div>
                     </div>
 
                     <label
@@ -584,10 +685,10 @@ export default function PetPassGoQuiz() {
                       />
                       <div>
                         <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy }}>
-                          Also add PetPassGo Membership — $4.99/mo
+                          🔥 Save on every future trip — Membership, $4.99/mo
                         </div>
                         <div style={{ fontFamily: font.body, fontSize: 12.5, opacity: 0.7 }} className="mt-1">
-                          Optional. Keeps your pet's profile free to update anytime, and drops future trip refreshes to $19.99 instead of $49.99.
+                          Your next trip refresh drops from $49.99 to just $19.99 — a $30 savings — and your pet's profile stays free to update, always.
                         </div>
                       </div>
                     </label>
