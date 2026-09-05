@@ -185,7 +185,7 @@ const STATUS_META = {
   complete: { color: tokens.green, label: "READY" },
 };
 
-function ResultRow({ category, what, why, deadline, status, unlocked }) {
+function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
   const meta = STATUS_META[status];
   return (
     <div className="rounded-xl p-5 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
@@ -233,8 +233,28 @@ function ResultRow({ category, what, why, deadline, status, unlocked }) {
         </span>
       </div>
       {unlocked ? (
-        <div style={{ fontFamily: font.mono, fontSize: 11, color: tokens.ink, opacity: 0.5 }} className="mt-3">
-          DUE {deadline}
+        <div className="flex items-center justify-between mt-3">
+          <div style={{ fontFamily: font.mono, fontSize: 11, color: tokens.ink, opacity: 0.5 }}>
+            DUE {deadline}
+          </div>
+          {link && (
+            <a
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontFamily: font.body,
+                fontSize: 12.5,
+                fontWeight: 600,
+                color: "#fff",
+                background: tokens.navy,
+                textDecoration: "none",
+              }}
+              className="rounded-full px-4 py-1.5 hover:opacity-90 transition"
+            >
+              Go here →
+            </a>
+          )}
         </div>
       ) : (
         <div style={{ fontFamily: font.mono, fontSize: 11, color: tokens.stamp, opacity: 0.8 }} className="mt-3">
@@ -320,13 +340,20 @@ export default function PetPassGoQuiz() {
           setFetchError(true);
           setResults([]);
         } else {
+          const destLower = (answers.destination || "").toLowerCase();
+          const filtered = (data || []).filter((row) => {
+            if (!row.destination_match) return true;
+            const keywords = row.destination_match.split(",").map((k) => k.trim());
+            return keywords.some((k) => destLower.includes(k));
+          });
           setResults(
-            (data || []).map((row) => ({
+            filtered.map((row) => ({
               category: row.category,
               what: row.title,
               why: row.description,
               deadline: row.deadline_description,
-              status: guessStatus(row.category),
+              link: row.submission_link,
+              status: row.status || guessStatus(row.category),
             }))
           );
         }
@@ -334,12 +361,15 @@ export default function PetPassGoQuiz() {
       });
   }, [step]);
 
+  const eligibilityNotes = results.filter((r) => r.category === "ELIGIBILITY NOTE");
+  const normalResults = results.filter((r) => r.category !== "ELIGIBILITY NOTE");
+
   const readiness = unlocked
-    ? Math.round((results.filter((r) => r.status === "complete").length / (results.length || 1)) * 100) || 33
+    ? Math.round((normalResults.filter((r) => r.status === "complete").length / (normalResults.length || 1)) * 100) || 33
     : null;
 
-  const needsAction = results.filter((r) => r.status === "attention").length;
-  const needsVerify = results.filter((r) => r.status === "verify").length;
+  const needsAction = normalResults.filter((r) => r.status === "attention").length;
+  const needsVerify = normalResults.filter((r) => r.status === "verify").length;
 
   return (
     <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full flex justify-center px-4 py-10">
@@ -474,6 +504,25 @@ export default function PetPassGoQuiz() {
                 </div>
               </div>
 
+              {!loadingResults && eligibilityNotes.length > 0 && (
+                <div className="mb-4">
+                  {eligibilityNotes.map((note) => (
+                    <div
+                      key={note.what}
+                      className="rounded-xl p-4 mb-3"
+                      style={{ background: "#FFF9EC", border: `1.5px solid ${tokens.gold}` }}
+                    >
+                      <div style={{ fontFamily: font.display, fontSize: 15.5, color: tokens.navy }} className="mb-1">
+                        {note.what}
+                      </div>
+                      <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.ink, opacity: 0.8 }}>
+                        {note.why}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="rounded-xl p-4 mb-5" style={{ background: tokens.navy }}>
                 {loadingResults ? (
                   <div style={{ fontFamily: font.body, fontSize: 13.5, color: "#fff" }}>Looking up requirements…</div>
@@ -491,14 +540,14 @@ export default function PetPassGoQuiz() {
                   </div>
                 ) : (
                   <div style={{ fontFamily: font.body, fontSize: 13.5, color: "#fff" }}>
-                    <span style={{ fontWeight: 700 }}>{results.length} requirements found</span> for this trip —{" "}
+                    <span style={{ fontWeight: 700 }}>{normalResults.length} requirements found</span> for this trip —{" "}
                     <span style={{ color: tokens.stamp === tokens.stamp ? "#F2A79A" : "" }}>{needsAction} need action</span>,{" "}
                     {needsVerify} need verification.
                   </div>
                 )}
               </div>
 
-              {!loadingResults && results.length === 0 && (
+              {!loadingResults && normalResults.length === 0 && eligibilityNotes.length === 0 && (
                 <div
                   className="rounded-xl p-4 mb-4 text-center"
                   style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 13.5, opacity: 0.75 }}
@@ -508,7 +557,7 @@ export default function PetPassGoQuiz() {
                 </div>
               )}
 
-              {results.map((r) => (
+              {normalResults.map((r) => (
                 <ResultRow key={r.what} {...r} unlocked={unlocked} />
               ))}
 
@@ -565,8 +614,11 @@ export default function PetPassGoQuiz() {
                       className="rounded-xl p-5 mb-4"
                       style={{ background: tokens.navy }}
                     >
+                      <div style={{ fontFamily: font.mono, fontSize: 10.5, color: tokens.gold, letterSpacing: "0.1em" }} className="mb-2">
+                        READY TO FLY WITH {(answers.airline || "YOUR AIRLINE").toUpperCase()}
+                      </div>
                       <div style={{ fontFamily: font.display, fontSize: 18, color: "#fff" }} className="mb-2">
-                        We already know exactly what {answers.airline || "your airline"} requires for your {(answers.animal || "pet").toLowerCase()}.
+                        Everything you need for your trip is ready and waiting.
                       </div>
                       <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.sky, opacity: 0.85 }}>
                         Every document, every form, the exact cost, and precisely where to send it — verified and
@@ -593,29 +645,49 @@ export default function PetPassGoQuiz() {
                     <div className="grid grid-cols-2 gap-3 mb-4">
                       {/* Mini Digital Pet ID preview */}
                       <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${tokens.line}` }}>
-                        <div style={{ background: tokens.navy }} className="px-3 py-2">
+                        <div style={{ background: tokens.navy }} className="px-3 py-2 flex items-center justify-between">
                           <div style={{ fontFamily: font.mono, fontSize: 8, color: tokens.gold, letterSpacing: "0.1em" }}>
                             DIGITAL PET ID
                           </div>
+                          <div
+                            style={{
+                              fontFamily: font.mono,
+                              fontSize: 7,
+                              color: tokens.sky,
+                              opacity: 0.6,
+                            }}
+                          >
+                            PPG
+                          </div>
                         </div>
                         <div style={{ background: "#fff" }} className="p-3">
-                          <div className="flex items-center gap-2 mb-2">
+                          <div className="flex items-center gap-2 mb-2.5">
                             <div
                               className="rounded-full flex items-center justify-center flex-shrink-0"
-                              style={{ width: 28, height: 28, background: tokens.sky, fontSize: 14 }}
+                              style={{ width: 30, height: 30, background: tokens.sky, fontSize: 15 }}
                             >
-                              🐾
+                              {answers.animal === "Dog" ? "🐕" : answers.animal === "Cat" ? "🐈" : "🐾"}
                             </div>
-                            <div style={{ fontFamily: font.display, fontSize: 13, color: tokens.navy }}>
-                              {answers.animal || "Pet"}'s ID
+                            <div>
+                              <div style={{ fontFamily: font.display, fontSize: 13, color: tokens.navy, lineHeight: 1.1 }}>
+                                {answers.animal || "Pet"}
+                              </div>
+                              <div style={{ fontFamily: font.mono, fontSize: 7.5, color: tokens.ink, opacity: 0.5, letterSpacing: "0.05em" }}>
+                                VERIFIED PROFILE
+                              </div>
                             </div>
                           </div>
                           <div
-                            className="rounded flex items-center justify-center mx-auto"
-                            style={{ width: 32, height: 32, background: tokens.ink, opacity: 0.85 }}
-                          >
-                            <span style={{ fontFamily: font.mono, fontSize: 7, color: "#fff" }}>QR</span>
-                          </div>
+                            className="rounded mx-auto"
+                            style={{
+                              width: 40,
+                              height: 40,
+                              backgroundImage:
+                                "repeating-linear-gradient(45deg, #152238 0 2.5px, transparent 2.5px 5px), repeating-linear-gradient(-45deg, #152238 0 2.5px, transparent 2.5px 5px)",
+                              backgroundBlendMode: "multiply",
+                              border: `1px solid ${tokens.line}`,
+                            }}
+                          />
                         </div>
                       </div>
 
