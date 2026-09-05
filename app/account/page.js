@@ -45,6 +45,156 @@ function ComingSoon({ title, blurb }) {
   );
 }
 
+function PetCard({ pet, userId }) {
+  const [measurements, setMeasurements] = useState([]);
+  const [loadingLog, setLoadingLog] = useState(true);
+  const [showLog, setShowLog] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newValue, setNewValue] = useState("");
+  const [newDate, setNewDate] = useState(new Date().toISOString().slice(0, 10));
+  const [saving, setSaving] = useState(false);
+
+  async function loadMeasurements() {
+    setLoadingLog(true);
+    const { data } = await supabase
+      .from("pet_measurements")
+      .select("*")
+      .eq("pet_id", pet.id)
+      .eq("metric_type", "weight")
+      .order("recorded_date", { ascending: false });
+    setMeasurements(data || []);
+    setLoadingLog(false);
+  }
+
+  useEffect(() => {
+    loadMeasurements();
+  }, []);
+
+  async function handleAddWeight(e) {
+    e.preventDefault();
+    setSaving(true);
+    const { error } = await supabase.from("pet_measurements").insert({
+      user_id: userId,
+      pet_id: pet.id,
+      metric_type: "weight",
+      value: parseFloat(newValue),
+      recorded_date: newDate,
+    });
+    setSaving(false);
+    if (!error) {
+      setNewValue("");
+      setShowAddForm(false);
+      loadMeasurements();
+    }
+  }
+
+  const current = measurements[0];
+  const previous = measurements[1];
+  const delta = current && previous ? current.value - previous.value : null;
+
+  return (
+    <div className="rounded-xl p-5 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+      <div className="flex items-center gap-4">
+        <div
+          className="rounded-full flex items-center justify-center flex-shrink-0"
+          style={{ width: 48, height: 48, background: tokens.sky, fontSize: 22 }}
+        >
+          {pet.animal_type === "Dog" ? "🐕" : pet.animal_type === "Cat" ? "🐈" : "🐾"}
+        </div>
+        <div>
+          <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.navy }}>{pet.name}</div>
+          <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.65 }}>
+            {pet.breed ? `${pet.breed} · ` : ""}
+            {pet.role}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${tokens.line}` }}>
+        {loadingLog ? (
+          <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.5 }}>Loading weight…</div>
+        ) : current ? (
+          <button onClick={() => setShowLog((v) => !v)} className="flex items-center justify-between w-full text-left">
+            <div>
+              <span style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.6 }}>Weight: </span>
+              <span style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 600, color: tokens.navy }}>
+                {current.value} {current.unit || "lbs"}
+              </span>
+              {delta !== null && delta !== 0 && (
+                <span
+                  style={{ fontFamily: font.body, fontSize: 12.5, color: delta > 0 ? tokens.stamp : "#3E7A4B" }}
+                  className="ml-2"
+                >
+                  {delta > 0 ? "↗" : "↘"} {delta > 0 ? "+" : ""}
+                  {delta} since {previous.recorded_date}
+                </span>
+              )}
+            </div>
+            <span style={{ fontFamily: font.body, fontSize: 12, color: tokens.navy, opacity: 0.6 }}>
+              {showLog ? "Hide log" : "View log"}
+            </span>
+          </button>
+        ) : (
+          <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.6 }}>No weight logged yet</div>
+        )}
+
+        {showLog && measurements.length > 0 && (
+          <div className="mt-3 flex flex-col gap-1.5">
+            {measurements.map((m) => (
+              <div key={m.id} className="flex justify-between" style={{ fontFamily: font.body, fontSize: 13 }}>
+                <span style={{ opacity: 0.6 }}>{m.recorded_date}</span>
+                <span style={{ color: tokens.navy, fontWeight: 600 }}>
+                  {m.value} {m.unit || "lbs"}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!showAddForm ? (
+          <button
+            onClick={() => setShowAddForm(true)}
+            style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.navy, fontWeight: 600 }}
+            className="mt-3 underline"
+          >
+            + Log weight
+          </button>
+        ) : (
+          <form onSubmit={handleAddWeight} className="mt-3 flex gap-2 items-end">
+            <div className="flex-1">
+              <input
+                required
+                type="number"
+                step="0.1"
+                placeholder="Weight (lbs)"
+                value={newValue}
+                onChange={(e) => setNewValue(e.target.value)}
+                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+                className="rounded-lg px-3 py-2 outline-none w-full"
+              />
+            </div>
+            <input
+              type="date"
+              value={newDate}
+              onChange={(e) => setNewDate(e.target.value)}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              className="rounded-lg px-3 py-2 outline-none"
+            />
+            <button
+              type="submit"
+              disabled={saving}
+              style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, fontSize: 13 }}
+              className="rounded-lg px-4 py-2 hover:opacity-90 transition"
+            >
+              {saving ? "…" : "Save"}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function PetProfileTab({ userId }) {
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -110,25 +260,7 @@ function PetProfileTab({ userId }) {
       ) : (
         <>
           {pets.map((pet) => (
-            <div
-              key={pet.id}
-              className="rounded-xl p-5 mb-3 flex items-center gap-4"
-              style={{ background: "#fff", border: `1px solid ${tokens.line}` }}
-            >
-              <div
-                className="rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ width: 48, height: 48, background: tokens.sky, fontSize: 22 }}
-              >
-                {pet.animal_type === "Dog" ? "🐕" : pet.animal_type === "Cat" ? "🐈" : "🐾"}
-              </div>
-              <div>
-                <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.navy }}>{pet.name}</div>
-                <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.65 }}>
-                  {pet.breed ? `${pet.breed} · ` : ""}
-                  {pet.role}
-                </div>
-              </div>
-            </div>
+            <PetCard key={pet.id} pet={pet} userId={userId} />
           ))}
           {!showForm && (
             <button
