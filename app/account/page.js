@@ -105,6 +105,7 @@ function PetCard({ pet, userId }) {
           <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.navy }}>{pet.name}</div>
           <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.65 }}>
             {pet.breed ? `${pet.breed} · ` : ""}
+            {pet.sex ? `${pet.sex} · ` : ""}
             {pet.role}
           </div>
         </div>
@@ -200,7 +201,7 @@ function PetProfileTab({ userId }) {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ name: "", animal_type: "Dog", role: "Pet", breed: "" });
+  const [form, setForm] = useState({ name: "", animal_type: "Dog", role: "Pet", breed: "", sex: "" });
 
   async function loadPets() {
     setLoading(true);
@@ -225,10 +226,11 @@ function PetProfileTab({ userId }) {
       animal_type: form.animal_type,
       role: form.role,
       breed: form.breed || null,
+      sex: form.sex || null,
     });
     setSaving(false);
     if (!error) {
-      setForm({ name: "", animal_type: "Dog", role: "Pet", breed: "" });
+      setForm({ name: "", animal_type: "Dog", role: "Pet", breed: "", sex: "" });
       setShowForm(false);
       loadPets();
     }
@@ -320,6 +322,16 @@ function PetProfileTab({ userId }) {
               style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }}
               className="rounded-xl px-4 py-3 outline-none"
             />
+            <select
+              value={form.sex}
+              onChange={(e) => setForm((f) => ({ ...f, sex: e.target.value }))}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }}
+              className="rounded-xl px-4 py-3 outline-none"
+            >
+              <option value="">Sex (optional)</option>
+              <option>Male</option>
+              <option>Female</option>
+            </select>
           </div>
           <div className="flex gap-3 mt-4">
             <button
@@ -438,9 +450,18 @@ function CurrentFlightTab({ userId }) {
               {r.description}
             </div>
             <div className="flex items-center justify-between">
-              <div style={{ fontFamily: font.mono, fontSize: 11, color: tokens.ink, opacity: 0.5 }}>
+              <span
+                style={{
+                  fontFamily: font.mono,
+                  fontSize: 11,
+                  color: tokens.navy,
+                  background: tokens.sky,
+                  padding: "3px 8px",
+                  borderRadius: 6,
+                }}
+              >
                 DUE {r.deadline_description}
-              </div>
+              </span>
               {r.submission_link && (
                 <a
                   href={r.submission_link}
