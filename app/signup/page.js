@@ -44,9 +44,9 @@ export default function SignupPage() {
     <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full flex justify-center px-4 py-16">
       <div className="w-full max-w-[440px]">
         <div className="flex items-center gap-2 mb-8 justify-center">
-          <span style={{ fontFamily: font.display, fontWeight: 600, fontSize: 22, color: tokens.navy }}>
+          <a href="/" style={{ fontFamily: font.display, fontWeight: 600, fontSize: 22, color: tokens.navy, textDecoration: "none" }}>
             PetPassGo
-          </span>
+          </a>
         </div>
 
         <div className="rounded-2xl p-8" style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}>
@@ -56,7 +56,14 @@ export default function SignupPage() {
                 Check your email
               </div>
               <p style={{ fontFamily: font.body, fontSize: 14, opacity: 0.7 }}>
-                We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, then come back to log in.
+                We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account.
+              </p>
+              <p style={{ fontFamily: font.body, fontSize: 14, opacity: 0.7 }} className="mt-3">
+                Then come back and{" "}
+                <a href="/login" style={{ color: tokens.navy, fontWeight: 600, textDecoration: "underline" }}>
+                  log in
+                </a>{" "}
+                — we'll take you straight to your trip results.
               </p>
             </div>
           ) : (
