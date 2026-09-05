@@ -36,7 +36,8 @@ export default function LoginPage() {
       setStatus("error");
       setErrorMsg(error.message);
     } else {
-      window.location.href = "/account";
+      const hasPendingTrip = localStorage.getItem("petpassgo_pending_trip");
+      window.location.href = hasPendingTrip ? "/assessment" : "/account";
     }
   }
 
@@ -44,9 +45,9 @@ export default function LoginPage() {
     <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full flex justify-center px-4 py-16">
       <div className="w-full max-w-[440px]">
         <div className="flex items-center gap-2 mb-8 justify-center">
-          <span style={{ fontFamily: font.display, fontWeight: 600, fontSize: 22, color: tokens.navy }}>
+          <a href="/" style={{ fontFamily: font.display, fontWeight: 600, fontSize: 22, color: tokens.navy, textDecoration: "none" }}>
             PetPassGo
-          </span>
+          </a>
         </div>
 
         <div className="rounded-2xl p-8" style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}>
