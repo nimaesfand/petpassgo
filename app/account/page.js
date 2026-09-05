@@ -344,6 +344,129 @@ function PetProfileTab({ userId }) {
   );
 }
 
+function CurrentFlightTab({ userId }) {
+  const [trip, setTrip] = useState(null);
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      setLoading(true);
+      const { data: trips } = await supabase
+        .from("trips")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      const currentTrip = trips && trips[0];
+      setTrip(currentTrip || null);
+
+      if (currentTrip) {
+        const { data: reqs } = await supabase
+          .from("airline_requirements")
+          .select("*")
+          .in("airline", [currentTrip.airline, "Any"])
+          .in("animal_type", [currentTrip.animal_type, "Any"])
+          .in("role", [currentTrip.role, "Any"])
+          .eq("trip_type", "domestic");
+
+        const destLower = (currentTrip.destination || "").toLowerCase();
+        const filtered = (reqs || []).filter((row) => {
+          if (!row.destination_match) return true;
+          const keywords = row.destination_match.split(",").map((k) => k.trim());
+          return keywords.some((k) => destLower.includes(k));
+        });
+        setResults(filtered.filter((r) => r.category !== "ELIGIBILITY NOTE"));
+      }
+      setLoading(false);
+    }
+    load();
+  }, []);
+
+  if (loading) {
+    return <div style={{ fontFamily: font.body, opacity: 0.6, fontSize: 14 }}>Loading your trip…</div>;
+  }
+
+  if (!trip) {
+    return (
+      <div className="rounded-xl p-8 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}` }}>
+        <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-2">
+          No trip yet
+        </div>
+        <div style={{ fontFamily: font.body, fontSize: 14, opacity: 0.7 }} className="mb-4">
+          Complete the trip assessment to get your Travel Pass, and it'll show up here.
+        </div>
+        <a
+          href="/assessment"
+          style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}
+          className="rounded-full px-6 py-2.5 text-[14px] hover:opacity-90 transition inline-block"
+        >
+          Start your Travel Pass
+        </a>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="rounded-xl p-5 mb-4" style={{ background: tokens.navy }}>
+        <div style={{ fontFamily: font.mono, fontSize: 10, color: tokens.gold, letterSpacing: "0.1em" }} className="mb-1">
+          YOUR TRAVEL PASS
+        </div>
+        <div style={{ fontFamily: font.display, fontSize: 20, color: "#fff" }}>
+          {trip.animal_type} · {trip.origin} → {trip.destination}
+        </div>
+        <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.sky, opacity: 0.8 }} className="mt-1">
+          {trip.airline} · {trip.travel_date || "date pending"} · {trip.role}
+        </div>
+      </div>
+
+      {results.length === 0 ? (
+        <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 13.5, opacity: 0.7 }}>
+          No requirements found for this exact combination yet.
+        </div>
+      ) : (
+        results.map((r) => (
+          <div key={r.title} className="rounded-xl p-5 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+            <div style={{ fontFamily: font.mono, fontSize: 10.5, color: tokens.ink, opacity: 0.45, letterSpacing: "0.08em" }} className="mb-1">
+              {r.category}
+            </div>
+            <div style={{ fontFamily: font.display, fontSize: 16.5, color: tokens.navy }} className="mb-1">
+              {r.title}
+            </div>
+            <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink, opacity: 0.75 }} className="mb-2">
+              {r.description}
+            </div>
+            <div className="flex items-center justify-between">
+              <div style={{ fontFamily: font.mono, fontSize: 11, color: tokens.ink, opacity: 0.5 }}>
+                DUE {r.deadline_description}
+              </div>
+              {r.submission_link && (
+                <a
+                  href={r.submission_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    fontFamily: font.body,
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    color: "#fff",
+                    background: tokens.navy,
+                    textDecoration: "none",
+                  }}
+                  className="rounded-full px-4 py-1.5 hover:opacity-90 transition"
+                >
+                  Go here →
+                </a>
+              )}
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
 export default function AccountPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -358,6 +481,11 @@ export default function AccountPage() {
       }
       setLoading(false);
     });
+
+    if (localStorage.getItem("petpassgo_open_flight_tab")) {
+      setActiveTab("flight");
+      localStorage.removeItem("petpassgo_open_flight_tab");
+    }
   }, []);
 
   async function handleLogout() {
@@ -420,12 +548,7 @@ export default function AccountPage() {
 
         {activeTab === "profile" && <PetProfileTab userId={user?.id} />}
 
-        {activeTab === "flight" && (
-          <ComingSoon
-            title="Current Flight"
-            blurb="Once you've booked a trip, this is where you'll answer a few more precise questions and get your exact, matched requirements."
-          />
-        )}
+        {activeTab === "flight" && <CurrentFlightTab userId={user?.id} />}
 
         {activeTab === "history" && (
           <ComingSoon
