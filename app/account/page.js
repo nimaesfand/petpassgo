@@ -817,7 +817,7 @@ function RequirementItem({ req, checked, onToggle }) {
         </div>
         {req.submission_link && req.category === "REQUIRED FORM" && (
           <div style={{ fontFamily: font.body, fontSize: 11.5, color: tokens.ink, opacity: 0.6 }} className="mb-2">
-            📥 Download and fill this out first — you'll submit it using the separate "Submission" step below.
+            📥 Download and fill this out first. Then look for the card labeled "SUBMISSION" further down this list — that's where you actually send it in.
           </div>
         )}
         {req.submission_link && req.category === "SUBMISSION" && (
