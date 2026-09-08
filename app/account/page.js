@@ -815,29 +815,26 @@ function RequirementItem({ req, checked, onToggle }) {
         <div style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.ink, opacity: 0.7 }} className="mb-2">
           {req.description}
         </div>
-        {req.submission_link && req.category === "REQUIRED FORM" && (
-          <div style={{ fontFamily: font.body, fontSize: 11.5, color: tokens.ink, opacity: 0.6 }} className="mb-2">
-            📥 Download and fill this out first. Then look for the card labeled "SUBMISSION" further down this list — that's where you actually send it in.
-          </div>
-        )}
-        {req.submission_link && req.category === "SUBMISSION" && (
-          <div style={{ fontFamily: font.body, fontSize: 11.5, color: tokens.ink, opacity: 0.6 }} className="mb-2">
-            📤 This is where you actually send your completed form — use the button below.
-          </div>
-        )}
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <span
-            style={{
-              fontFamily: font.mono,
-              fontSize: 10.5,
-              color: tokens.navy,
-              background: tokens.sky,
-              padding: "3px 8px",
-              borderRadius: 6,
-            }}
-          >
-            DUE {req.deadline_description}
-          </span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span
+              style={{
+                fontFamily: font.mono,
+                fontSize: 10.5,
+                color: tokens.navy,
+                background: tokens.sky,
+                padding: "3px 8px",
+                borderRadius: 6,
+              }}
+            >
+              DUE {req.deadline_description}
+            </span>
+            {req.category === "REQUIRED FORM" && (
+              <span style={{ fontFamily: font.body, fontSize: 10.5, color: tokens.stamp, fontWeight: 600 }}>
+                ↓ Submit via "Submission" card below
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             {req.submission_link && !NO_LINK_CATEGORIES.has(req.category) && (
               <a
