@@ -20,8 +20,8 @@ const font = {
 };
 
 const TABS = [
-  { key: "profile", label: "Pet Profile" },
   { key: "flight", label: "Current Flight" },
+  { key: "profile", label: "Pet Profile" },
   { key: "history", label: "Flight History" },
   { key: "billing", label: "Billing" },
 ];
@@ -732,17 +732,35 @@ function RequirementItem({ req, checked, onToggle }) {
             )}
             <button
               onClick={onToggle}
-              className="rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200"
+              className="rounded-full flex items-center gap-1.5 flex-shrink-0 transition-all duration-200"
               style={{
-                width: 26,
-                height: 26,
-                border: `2px solid ${checked ? tokens.green : tokens.line}`,
-                background: checked ? tokens.green : "#fff",
-                boxShadow: checked ? `0 0 0 4px rgba(62,122,75,0.18)` : "none",
-                transform: checked ? "scale(1.08)" : "scale(1)",
+                padding: "5px 12px 5px 6px",
+                border: `2px solid ${checked ? "#2F6FED" : tokens.line}`,
+                background: checked ? "#2F6FED" : "#fff",
+                boxShadow: checked ? `0 0 0 4px rgba(47,111,237,0.18)` : "none",
               }}
             >
-              {checked && <span style={{ color: "#fff", fontSize: 15, fontWeight: 900 }}>✓</span>}
+              <span
+                className="rounded-full flex items-center justify-center flex-shrink-0"
+                style={{
+                  width: 18,
+                  height: 18,
+                  background: checked ? "#fff" : tokens.paper,
+                  border: checked ? "none" : `1.5px solid ${tokens.line}`,
+                }}
+              >
+                {checked && <span style={{ color: "#2F6FED", fontSize: 11, fontWeight: 900 }}>✓</span>}
+              </span>
+              <span
+                style={{
+                  fontFamily: font.body,
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                  color: checked ? "#fff" : tokens.ink,
+                }}
+              >
+                {checked ? "Done" : "Mark as done"}
+              </span>
             </button>
           </div>
         </div>
@@ -912,6 +930,19 @@ function CurrentFlightTab({ userId }) {
         </div>
       ) : (
         <>
+          {trackedTotal > 0 && trackedDone === trackedTotal && (
+            <div
+              className="rounded-xl p-5 mb-4 text-center"
+              style={{ background: "#EAF6EE", border: `1.5px solid ${tokens.green}` }}
+            >
+              <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.green }} className="mb-1">
+                🎉 You're all set for this trip
+              </div>
+              <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.ink, opacity: 0.75 }}>
+                Everything that needed action or verification is checked off. Review "Good to know" below before you fly.
+              </div>
+            </div>
+          )}
           <RequirementGroup title="Needs action" items={actionItems} statusMap={statusMap} onToggle={handleToggle} defaultOpen={true} />
           <RequirementGroup title="Needs verification" items={verifyItems} statusMap={statusMap} onToggle={handleToggle} defaultOpen={false} />
           <RequirementGroup title="Good to know" items={goodToKnow} statusMap={statusMap} onToggle={handleToggle} defaultOpen={false} />
@@ -924,7 +955,7 @@ function CurrentFlightTab({ userId }) {
 export default function AccountPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("profile");
+  const [activeTab, setActiveTab] = useState("flight");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
