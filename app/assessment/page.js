@@ -278,7 +278,7 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
         <>
           {link && category === "REQUIRED FORM" && (
             <div style={{ fontFamily: font.body, fontSize: 12, color: tokens.ink, opacity: 0.65 }} className="mb-2">
-              📥 Download and fill this out first — you'll submit it using the separate "Submission" step below.
+              📥 Download and fill this out first. Then look for the card labeled "SUBMISSION" further down this list — that's where you actually send it in.
             </div>
           )}
           {link && category === "SUBMISSION" && (
