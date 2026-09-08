@@ -652,6 +652,10 @@ const STATUS_ACCENT = {
   complete: tokens.green,
 };
 
+// Pure facts (kennel size, age, fee, breed rule, vaccination timing) never get a "Go here"
+// button — there's no real destination for a fact, only for an actual form or booking action.
+const NO_LINK_CATEGORIES = new Set(["KENNEL REQUIREMENT", "AGE REQUIREMENT", "PET FEE", "BREED RESTRICTION", "VACCINATION"]);
+
 function RequirementItem({ req, checked, onToggle }) {
   const accent = STATUS_ACCENT[req.status] || tokens.line;
   return (
@@ -706,7 +710,7 @@ function RequirementItem({ req, checked, onToggle }) {
             DUE {req.deadline_description}
           </span>
           <div className="flex items-center gap-2">
-            {req.submission_link && (
+            {req.submission_link && !NO_LINK_CATEGORIES.has(req.category) && (
               <a
                 href={req.submission_link}
                 target="_blank"
@@ -728,15 +732,17 @@ function RequirementItem({ req, checked, onToggle }) {
             )}
             <button
               onClick={onToggle}
-              className="rounded-full flex items-center justify-center flex-shrink-0 transition"
+              className="rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200"
               style={{
                 width: 26,
                 height: 26,
                 border: `2px solid ${checked ? tokens.green : tokens.line}`,
                 background: checked ? tokens.green : "#fff",
+                boxShadow: checked ? `0 0 0 4px rgba(62,122,75,0.18)` : "none",
+                transform: checked ? "scale(1.08)" : "scale(1)",
               }}
             >
-              {checked && <span style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>✓</span>}
+              {checked && <span style={{ color: "#fff", fontSize: 15, fontWeight: 900 }}>✓</span>}
             </button>
           </div>
         </div>
