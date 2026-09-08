@@ -276,18 +276,8 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
       </div>
       {unlocked ? (
         <>
-          {link && category === "REQUIRED FORM" && (
-            <div style={{ fontFamily: font.body, fontSize: 12, color: tokens.ink, opacity: 0.65 }} className="mb-2">
-              📥 Download and fill this out first. Then look for the card labeled "SUBMISSION" further down this list — that's where you actually send it in.
-            </div>
-          )}
-          {link && category === "SUBMISSION" && (
-            <div style={{ fontFamily: font.body, fontSize: 12, color: tokens.ink, opacity: 0.65 }} className="mb-2">
-              📤 This is where you actually send your completed form — use the button below.
-            </div>
-          )}
           <div className="flex items-center justify-between gap-3 mt-1 flex-wrap">
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
             <span
               style={{
                 fontFamily: font.mono,
@@ -300,6 +290,11 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
             >
               DUE {deadline}
             </span>
+            {category === "REQUIRED FORM" && (
+              <span style={{ fontFamily: font.body, fontSize: 11, color: tokens.stamp, fontWeight: 600 }}>
+                ↓ Submit via "Submission" card below
+              </span>
+            )}
           </div>
           {link && link !== "https://www.delta.com/us/en/pet-travel/overview" && (
             <a
