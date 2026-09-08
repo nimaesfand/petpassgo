@@ -45,7 +45,7 @@ function ComingSoon({ title, blurb }) {
   );
 }
 
-function PetCard({ pet, userId }) {
+function PetCard({ pet, userId, onPhotoUpdated }) {
   const [measurements, setMeasurements] = useState([]);
   const [loadingLog, setLoadingLog] = useState(true);
   const [showLog, setShowLog] = useState(false);
@@ -53,6 +53,76 @@ function PetCard({ pet, userId }) {
   const [newValue, setNewValue] = useState("");
   const [newDate, setNewDate] = useState(new Date().toISOString().slice(0, 10));
   const [saving, setSaving] = useState(false);
+
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  async function handlePhotoUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploadingPhoto(true);
+
+    const filePath = `${userId}/${pet.id}/profile-photo-${Date.now()}-${file.name}`;
+    const { error: uploadError } = await supabase.storage.from("pet-documents").upload(filePath, file);
+
+    if (!uploadError) {
+      const { data: urlData } = supabase.storage.from("pet-documents").getPublicUrl(filePath);
+      await supabase.from("pets").update({ photo_url: urlData.publicUrl }).eq("id", pet.id);
+      onPhotoUpdated();
+    }
+    setUploadingPhoto(false);
+  }
+
+  const [documents, setDocuments] = useState([]);
+  const [loadingDocs, setLoadingDocs] = useState(true);
+  const [showUploadForm, setShowUploadForm] = useState(false);
+  const [docType, setDocType] = useState("Vaccination record");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function loadDocuments() {
+    setLoadingDocs(true);
+    const { data } = await supabase
+      .from("documents")
+      .select("*")
+      .eq("pet_id", pet.id)
+      .order("uploaded_at", { ascending: false });
+    setDocuments(data || []);
+    setLoadingDocs(false);
+  }
+
+  useEffect(() => {
+    loadDocuments();
+  }, []);
+
+  async function handleUpload(e) {
+    e.preventDefault();
+    if (!selectedFile) return;
+    setUploading(true);
+
+    const filePath = `${userId}/${pet.id}/${Date.now()}-${selectedFile.name}`;
+    const { error: uploadError } = await supabase.storage
+      .from("pet-documents")
+      .upload(filePath, selectedFile);
+
+    if (!uploadError) {
+      const { data: urlData } = supabase.storage.from("pet-documents").getPublicUrl(filePath);
+      await supabase.from("documents").insert({
+        user_id: userId,
+        pet_id: pet.id,
+        document_type: docType,
+        file_url: urlData.publicUrl,
+      });
+      setSelectedFile(null);
+      setShowUploadForm(false);
+      loadDocuments();
+    }
+    setUploading(false);
+  }
+
+  async function handleDeleteDocument(doc) {
+    await supabase.from("documents").delete().eq("id", doc.id);
+    loadDocuments();
+  }
 
   async function loadMeasurements() {
     setLoadingLog(true);
@@ -95,11 +165,48 @@ function PetCard({ pet, userId }) {
   return (
     <div className="rounded-xl p-5 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
       <div className="flex items-center gap-4">
-        <div
-          className="rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ width: 48, height: 48, background: tokens.sky, fontSize: 22 }}
-        >
-          {pet.animal_type === "Dog" ? "🐕" : pet.animal_type === "Cat" ? "🐈" : "🐾"}
+        <div className="relative flex-shrink-0">
+          {pet.photo_url ? (
+            <img
+              src={pet.photo_url}
+              alt={pet.name}
+              className="rounded-full object-cover"
+              style={{ width: 48, height: 48 }}
+            />
+          ) : (
+            <div
+              className="rounded-full flex items-center justify-center"
+              style={{ width: 48, height: 48, background: tokens.sky, fontSize: 22 }}
+            >
+              {pet.animal_type === "Dog" ? "🐕" : pet.animal_type === "Cat" ? "🐈" : "🐾"}
+            </div>
+          )}
+          <label
+            style={{
+              position: "absolute",
+              bottom: -2,
+              right: -2,
+              width: 18,
+              height: 18,
+              background: tokens.navy,
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 10,
+              cursor: "pointer",
+              border: "2px solid #fff",
+            }}
+          >
+            📷
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handlePhotoUpload}
+              style={{ display: "none" }}
+            />
+          </label>
         </div>
         <div>
           <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.navy }}>{pet.name}</div>
@@ -108,6 +215,76 @@ function PetCard({ pet, userId }) {
             {pet.sex ? `${pet.sex} · ` : ""}
             {pet.role}
           </div>
+        </div>
+      </div>
+
+      {!pet.photo_url && (
+        <div
+          style={{ fontFamily: font.body, fontSize: 12, color: tokens.stamp, opacity: 0.85 }}
+          className="mt-2"
+        >
+          {uploadingPhoto ? "Uploading photo…" : "No photo yet — tap the camera icon above. For best results: a bright, clear headshot works better than a full-body or action shot."}
+        </div>
+      )}
+
+      {/* Digital Pet ID */}
+      <div className="rounded-xl overflow-hidden mt-4" style={{ border: `1px solid ${tokens.line}` }}>
+        <div style={{ background: tokens.navy }} className="px-4 py-2.5 flex items-center justify-between">
+          <div style={{ fontFamily: font.mono, fontSize: 9.5, color: tokens.gold, letterSpacing: "0.1em" }}>
+            DIGITAL PET ID
+          </div>
+          <div style={{ fontFamily: font.mono, fontSize: 8.5, color: tokens.sky, opacity: 0.6 }}>PETPASSGO</div>
+        </div>
+        <div className="p-4 flex items-center gap-4" style={{ background: "#fff" }}>
+          {pet.photo_url ? (
+            <img src={pet.photo_url} alt={pet.name} className="rounded-lg object-cover flex-shrink-0" style={{ width: 56, height: 56 }} />
+          ) : (
+            <div
+              className="rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{ width: 56, height: 56, background: tokens.sky, fontSize: 26 }}
+            >
+              {pet.animal_type === "Dog" ? "🐕" : pet.animal_type === "Cat" ? "🐈" : "🐾"}
+            </div>
+          )}
+          <div className="flex-1">
+            <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.navy }}>{pet.name}</div>
+            <div style={{ fontFamily: font.body, fontSize: 12, opacity: 0.65 }}>
+              {[pet.breed, pet.sex, pet.animal_type].filter(Boolean).join(" · ")}
+            </div>
+            <div
+              style={{
+                fontFamily: font.mono,
+                fontSize: 9.5,
+                color: pet.role === "Service animal" ? tokens.stamp : tokens.navy,
+                border: `1px solid ${pet.role === "Service animal" ? tokens.stamp : tokens.navy}`,
+                borderRadius: 999,
+                padding: "2px 8px",
+                display: "inline-block",
+              }}
+              className="mt-1"
+            >
+              {pet.role.toUpperCase()}
+            </div>
+          </div>
+          <svg viewBox="0 0 29 29" style={{ width: 44, height: 44 }} className="flex-shrink-0">
+            <rect width="29" height="29" fill="#fff" />
+            {[[1, 1], [22, 1], [1, 22]].map(([x, y]) => (
+              <g key={`${x}-${y}`}>
+                <rect x={x} y={y} width="6" height="6" fill={tokens.navy} />
+                <rect x={x + 1.3} y={y + 1.3} width="3.4" height="3.4" fill="#fff" />
+                <rect x={x + 2} y={y + 2} width="2" height="2" fill={tokens.navy} />
+              </g>
+            ))}
+            {[
+              [10, 2], [13, 3], [16, 1], [19, 4], [10, 5], [15, 6],
+              [2, 10], [5, 12], [3, 15], [7, 16], [1, 18], [5, 19],
+              [10, 10], [13, 11], [11, 14], [16, 12], [14, 16], [18, 9],
+              [22, 10], [25, 12], [23, 15], [26, 17], [21, 18], [24, 20],
+              [10, 22], [13, 24], [16, 21], [11, 26], [18, 23], [15, 27],
+            ].map(([x, y], i) => (
+              <rect key={i} x={x} y={y} width="1.3" height="1.3" fill={tokens.navy} />
+            ))}
+          </svg>
         </div>
       </div>
 
@@ -192,6 +369,97 @@ function PetCard({ pet, userId }) {
           </form>
         )}
       </div>
+
+      <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${tokens.line}` }}>
+        <div style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, color: tokens.navy }} className="mb-2">
+          Documents
+        </div>
+
+        {loadingDocs ? (
+          <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.5 }}>Loading documents…</div>
+        ) : documents.length === 0 ? (
+          <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.6 }} className="mb-2">
+            No documents uploaded yet
+          </div>
+        ) : (
+          documents.map((doc) => (
+            <div
+              key={doc.id}
+              className="flex items-center justify-between py-2"
+              style={{ borderTop: `1px solid ${tokens.line}` }}
+            >
+              <a
+                href={doc.file_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.navy, textDecoration: "underline" }}
+              >
+                {doc.document_type}
+              </a>
+              <button
+                onClick={() => handleDeleteDocument(doc)}
+                style={{ fontFamily: font.body, fontSize: 12, color: tokens.stamp, opacity: 0.7 }}
+              >
+                Remove
+              </button>
+            </div>
+          ))
+        )}
+
+        {!showUploadForm ? (
+          <button
+            onClick={() => setShowUploadForm(true)}
+            style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.navy, fontWeight: 600 }}
+            className="mt-2 underline"
+          >
+            + Upload a document
+          </button>
+        ) : (
+          <form onSubmit={handleUpload} className="mt-3 flex flex-col gap-2">
+            <select
+              value={docType}
+              onChange={(e) => setDocType(e.target.value)}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              className="rounded-lg px-3 py-2 outline-none"
+            >
+              <option>Vaccination record</option>
+              <option>Health certificate</option>
+              <option>Training documentation</option>
+              <option>Microchip registration</option>
+              <option>Insurance policy</option>
+              <option>Pet photo</option>
+              <option>Other</option>
+            </select>
+            <input
+              type="file"
+              accept="image/*,application/pdf"
+              capture="environment"
+              onChange={(e) => setSelectedFile(e.target.files[0])}
+              style={{ fontFamily: font.body, fontSize: 13 }}
+            />
+            <div style={{ fontFamily: font.body, fontSize: 11.5, opacity: 0.55 }}>
+              On your phone, this lets you choose "Take Photo" or pick an existing file.
+            </div>
+            <div className="flex gap-2 mt-1">
+              <button
+                type="submit"
+                disabled={uploading || !selectedFile}
+                style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, fontSize: 13 }}
+                className="rounded-lg px-4 py-2 hover:opacity-90 transition"
+              >
+                {uploading ? "Uploading…" : "Upload"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowUploadForm(false)}
+                style={{ fontFamily: font.body, fontSize: 13, opacity: 0.6 }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
     </div>
   );
 }
@@ -262,7 +530,7 @@ function PetProfileTab({ userId }) {
       ) : (
         <>
           {pets.map((pet) => (
-            <PetCard key={pet.id} pet={pet} userId={userId} />
+            <PetCard key={pet.id} pet={pet} userId={userId} onPhotoUpdated={loadPets} />
           ))}
           {!showForm && (
             <button
@@ -356,44 +624,179 @@ function PetProfileTab({ userId }) {
   );
 }
 
+function RequirementItem({ req, checked, onToggle }) {
+  return (
+    <div
+      className="rounded-xl p-4 mb-2.5 flex items-start gap-3"
+      style={{
+        background: checked ? tokens.paper : "#fff",
+        border: `1px solid ${tokens.line}`,
+        opacity: checked ? 0.65 : 1,
+      }}
+    >
+      <button
+        onClick={onToggle}
+        className="rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 transition"
+        style={{
+          width: 22,
+          height: 22,
+          border: `2px solid ${checked ? tokens.green : tokens.line}`,
+          background: checked ? tokens.green : "#fff",
+        }}
+      >
+        {checked && <span style={{ color: "#fff", fontSize: 12, fontWeight: 700 }}>✓</span>}
+      </button>
+      <div className="flex-1">
+        <div style={{ fontFamily: font.mono, fontSize: 10, color: tokens.ink, opacity: 0.45, letterSpacing: "0.08em" }} className="mb-1">
+          {req.category}
+        </div>
+        <div
+          style={{
+            fontFamily: font.display,
+            fontSize: 16,
+            color: tokens.navy,
+            textDecoration: checked ? "line-through" : "none",
+          }}
+          className="mb-1"
+        >
+          {req.title}
+        </div>
+        <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.ink, opacity: 0.75 }} className="mb-2">
+          {req.description}
+        </div>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <span
+            style={{
+              fontFamily: font.mono,
+              fontSize: 10.5,
+              color: tokens.navy,
+              background: tokens.sky,
+              padding: "3px 8px",
+              borderRadius: 6,
+            }}
+          >
+            DUE {req.deadline_description}
+          </span>
+          {req.submission_link && (
+            <a
+              href={req.submission_link}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontFamily: font.body,
+                fontSize: 12,
+                fontWeight: 600,
+                color: "#fff",
+                background: tokens.navy,
+                textDecoration: "none",
+                flexShrink: 0,
+                whiteSpace: "nowrap",
+              }}
+              className="rounded-full px-3.5 py-1.5 hover:opacity-90 transition"
+            >
+              Go here →
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RequirementGroup({ title, items, statusMap, onToggle, defaultOpen }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const doneCount = items.filter((r) => statusMap[r.id]).length;
+
+  if (items.length === 0) return null;
+
+  return (
+    <div className="mb-4">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center justify-between w-full py-2"
+      >
+        <span style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, color: tokens.navy }}>
+          {title} ({doneCount}/{items.length})
+        </span>
+        <span style={{ fontFamily: font.body, fontSize: 12, color: tokens.ink, opacity: 0.5 }}>
+          {open ? "Hide" : "Show"}
+        </span>
+      </button>
+      {open &&
+        items.map((r) => (
+          <RequirementItem key={r.id} req={r} checked={!!statusMap[r.id]} onToggle={() => onToggle(r.id)} />
+        ))}
+    </div>
+  );
+}
+
 function CurrentFlightTab({ userId }) {
   const [trip, setTrip] = useState(null);
   const [results, setResults] = useState([]);
+  const [statusMap, setStatusMap] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function load() {
-      setLoading(true);
-      const { data: trips } = await supabase
-        .from("trips")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(1);
-
-      const currentTrip = trips && trips[0];
-      setTrip(currentTrip || null);
-
-      if (currentTrip) {
-        const { data: reqs } = await supabase
-          .from("airline_requirements")
-          .select("*")
-          .in("airline", [currentTrip.airline, "Any"])
-          .in("animal_type", [currentTrip.animal_type, "Any"])
-          .in("role", [currentTrip.role, "Any"])
-          .eq("trip_type", "domestic");
-
-        const destLower = (currentTrip.destination || "").toLowerCase();
-        const filtered = (reqs || []).filter((row) => {
-          if (!row.destination_match) return true;
-          const keywords = row.destination_match.split(",").map((k) => k.trim());
-          return keywords.some((k) => destLower.includes(k));
-        });
-        setResults(filtered.filter((r) => r.category !== "ELIGIBILITY NOTE"));
-      }
-      setLoading(false);
-    }
     load();
   }, []);
+
+  async function load() {
+    setLoading(true);
+    const { data: trips } = await supabase
+      .from("trips")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    const currentTrip = trips && trips[0];
+    setTrip(currentTrip || null);
+
+    if (currentTrip) {
+      const { data: reqs } = await supabase
+        .from("airline_requirements")
+        .select("*")
+        .in("airline", [currentTrip.airline, "Any"])
+        .in("animal_type", [currentTrip.animal_type, "Any"])
+        .in("role", [currentTrip.role, "Any"])
+        .eq("trip_type", "domestic");
+
+      const destLower = (currentTrip.destination || "").toLowerCase();
+      const filtered = (reqs || []).filter((row) => {
+        if (!row.destination_match) return true;
+        const keywords = row.destination_match.split(",").map((k) => k.trim());
+        return keywords.some((k) => destLower.includes(k));
+      });
+      const finalResults = filtered.filter((r) => r.category !== "ELIGIBILITY NOTE");
+      setResults(finalResults);
+
+      const { data: statusRows } = await supabase
+        .from("trip_requirement_status")
+        .select("*")
+        .eq("trip_id", currentTrip.id);
+
+      const map = {};
+      (statusRows || []).forEach((s) => {
+        map[s.requirement_id] = s.completed;
+      });
+      setStatusMap(map);
+    }
+    setLoading(false);
+  }
+
+  async function handleToggle(requirementId) {
+    const newValue = !statusMap[requirementId];
+    setStatusMap((m) => ({ ...m, [requirementId]: newValue }));
+
+    await supabase.from("trip_requirement_status").upsert(
+      {
+        user_id: userId,
+        trip_id: trip.id,
+        requirement_id: requirementId,
+        completed: newValue,
+      },
+      { onConflict: "trip_id,requirement_id" }
+    );
+  }
 
   if (loading) {
     return <div style={{ fontFamily: font.body, opacity: 0.6, fontSize: 14 }}>Loading your trip…</div>;
@@ -419,17 +822,39 @@ function CurrentFlightTab({ userId }) {
     );
   }
 
+  const actionItems = results.filter((r) => r.status === "attention");
+  const verifyItems = results.filter((r) => r.status === "verify");
+  const goodToKnow = results.filter((r) => r.status === "complete");
+
+  const trackedTotal = actionItems.length + verifyItems.length;
+  const trackedDone = [...actionItems, ...verifyItems].filter((r) => statusMap[r.id]).length;
+  const progressPct = trackedTotal > 0 ? Math.round((trackedDone / trackedTotal) * 100) : 100;
+
   return (
     <div>
       <div className="rounded-xl p-5 mb-4" style={{ background: tokens.navy }}>
         <div style={{ fontFamily: font.mono, fontSize: 10, color: tokens.gold, letterSpacing: "0.1em" }} className="mb-1">
           YOUR TRAVEL PASS
         </div>
-        <div style={{ fontFamily: font.display, fontSize: 20, color: "#fff" }}>
+        <div style={{ fontFamily: font.display, fontSize: 20, color: "#fff" }} className="mb-1">
           {trip.animal_type} · {trip.origin} → {trip.destination}
         </div>
-        <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.sky, opacity: 0.8 }} className="mt-1">
+        <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.sky, opacity: 0.8 }} className="mb-3">
           {trip.airline} · {trip.travel_date || "date pending"} · {trip.role}
+        </div>
+        <div className="flex items-center justify-between mb-1.5">
+          <span style={{ fontFamily: font.mono, fontSize: 10, color: tokens.sky, opacity: 0.7, letterSpacing: "0.08em" }}>
+            TRIP READINESS
+          </span>
+          <span style={{ fontFamily: font.mono, fontSize: 10, color: tokens.gold }}>
+            {trackedDone}/{trackedTotal} DONE
+          </span>
+        </div>
+        <div className="w-full h-[6px] rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.15)" }}>
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{ width: `${progressPct}%`, background: tokens.stamp }}
+          />
         </div>
       </div>
 
@@ -438,51 +863,11 @@ function CurrentFlightTab({ userId }) {
           No requirements found for this exact combination yet.
         </div>
       ) : (
-        results.map((r) => (
-          <div key={r.title} className="rounded-xl p-5 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-            <div style={{ fontFamily: font.mono, fontSize: 10.5, color: tokens.ink, opacity: 0.45, letterSpacing: "0.08em" }} className="mb-1">
-              {r.category}
-            </div>
-            <div style={{ fontFamily: font.display, fontSize: 16.5, color: tokens.navy }} className="mb-1">
-              {r.title}
-            </div>
-            <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink, opacity: 0.75 }} className="mb-2">
-              {r.description}
-            </div>
-            <div className="flex items-center justify-between">
-              <span
-                style={{
-                  fontFamily: font.mono,
-                  fontSize: 11,
-                  color: tokens.navy,
-                  background: tokens.sky,
-                  padding: "3px 8px",
-                  borderRadius: 6,
-                }}
-              >
-                DUE {r.deadline_description}
-              </span>
-              {r.submission_link && (
-                <a
-                  href={r.submission_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    fontFamily: font.body,
-                    fontSize: 12.5,
-                    fontWeight: 600,
-                    color: "#fff",
-                    background: tokens.navy,
-                    textDecoration: "none",
-                  }}
-                  className="rounded-full px-4 py-1.5 hover:opacity-90 transition"
-                >
-                  Go here →
-                </a>
-              )}
-            </div>
-          </div>
-        ))
+        <>
+          <RequirementGroup title="Needs action" items={actionItems} statusMap={statusMap} onToggle={handleToggle} defaultOpen={true} />
+          <RequirementGroup title="Needs verification" items={verifyItems} statusMap={statusMap} onToggle={handleToggle} defaultOpen={false} />
+          <RequirementGroup title="Good to know" items={goodToKnow} statusMap={statusMap} onToggle={handleToggle} defaultOpen={false} />
+        </>
       )}
     </div>
   );
