@@ -56,6 +56,36 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
 
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: pet.name || "",
+    animal_type: pet.animal_type || "Dog",
+    role: pet.role || "Pet",
+    breed: pet.breed || "",
+    sex: pet.sex || "",
+    date_of_birth: pet.date_of_birth || "",
+  });
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  async function handleSaveEdit(e) {
+    e.preventDefault();
+    setSavingEdit(true);
+    await supabase
+      .from("pets")
+      .update({
+        name: editForm.name,
+        animal_type: editForm.animal_type,
+        role: editForm.role,
+        breed: editForm.breed || null,
+        sex: editForm.sex || null,
+        date_of_birth: editForm.date_of_birth || null,
+      })
+      .eq("id", pet.id);
+    setSavingEdit(false);
+    setShowEditForm(false);
+    onPhotoUpdated();
+  }
+
   async function handlePhotoUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -208,7 +238,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
             />
           </label>
         </div>
-        <div>
+        <div className="flex-1">
           <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.navy }}>{pet.name}</div>
           <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.65 }}>
             {pet.breed ? `${pet.breed} · ` : ""}
@@ -216,7 +246,96 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
             {pet.role}
           </div>
         </div>
+        <button
+          onClick={() => setShowEditForm((v) => !v)}
+          style={{ fontFamily: font.body, fontSize: 12, color: tokens.navy, fontWeight: 600 }}
+        >
+          Edit
+        </button>
       </div>
+
+      {showEditForm && (
+        <form
+          onSubmit={handleSaveEdit}
+          className="rounded-xl p-4 mt-3"
+          style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}
+        >
+          <div className="flex flex-col gap-2">
+            <input
+              required
+              placeholder="Name"
+              value={editForm.name}
+              onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              className="rounded-lg px-3 py-2 outline-none"
+            />
+            <div className="flex gap-2">
+              <select
+                value={editForm.animal_type}
+                onChange={(e) => setEditForm((f) => ({ ...f, animal_type: e.target.value }))}
+                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+                className="rounded-lg px-3 py-2 outline-none flex-1"
+              >
+                <option>Dog</option>
+                <option>Cat</option>
+                <option>Other</option>
+              </select>
+              <select
+                value={editForm.role}
+                onChange={(e) => setEditForm((f) => ({ ...f, role: e.target.value }))}
+                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+                className="rounded-lg px-3 py-2 outline-none flex-1"
+              >
+                <option>Pet</option>
+                <option>Service animal</option>
+              </select>
+            </div>
+            <input
+              placeholder="Breed (optional)"
+              value={editForm.breed}
+              onChange={(e) => setEditForm((f) => ({ ...f, breed: e.target.value }))}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              className="rounded-lg px-3 py-2 outline-none"
+            />
+            <div className="flex gap-2">
+              <select
+                value={editForm.sex}
+                onChange={(e) => setEditForm((f) => ({ ...f, sex: e.target.value }))}
+                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+                className="rounded-lg px-3 py-2 outline-none flex-1"
+              >
+                <option value="">Sex (optional)</option>
+                <option>Male</option>
+                <option>Female</option>
+              </select>
+              <input
+                type="date"
+                value={editForm.date_of_birth}
+                onChange={(e) => setEditForm((f) => ({ ...f, date_of_birth: e.target.value }))}
+                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+                className="rounded-lg px-3 py-2 outline-none flex-1"
+              />
+            </div>
+          </div>
+          <div className="flex gap-2 mt-3">
+            <button
+              type="submit"
+              disabled={savingEdit}
+              style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, fontSize: 13 }}
+              className="rounded-lg px-4 py-2 hover:opacity-90 transition"
+            >
+              {savingEdit ? "Saving…" : "Save changes"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowEditForm(false)}
+              style={{ fontFamily: font.body, fontSize: 13, opacity: 0.6 }}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
 
       {!pet.photo_url && (
         <div
@@ -696,6 +815,11 @@ function RequirementItem({ req, checked, onToggle }) {
         <div style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.ink, opacity: 0.7 }} className="mb-2">
           {req.description}
         </div>
+        {req.submission_link && (req.category === "REQUIRED FORM" || req.category === "SUBMISSION") && !NO_LINK_CATEGORIES.has(req.category) && (
+          <div style={{ fontFamily: font.body, fontSize: 11.5, color: tokens.ink, opacity: 0.6 }} className="mb-2">
+            📥 Download it, fill it out, then submit it using the button below.
+          </div>
+        )}
         <div className="flex items-center justify-between flex-wrap gap-2">
           <span
             style={{
