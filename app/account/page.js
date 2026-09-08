@@ -815,9 +815,14 @@ function RequirementItem({ req, checked, onToggle }) {
         <div style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.ink, opacity: 0.7 }} className="mb-2">
           {req.description}
         </div>
-        {req.submission_link && (req.category === "REQUIRED FORM" || req.category === "SUBMISSION") && !NO_LINK_CATEGORIES.has(req.category) && (
+        {req.submission_link && req.category === "REQUIRED FORM" && (
           <div style={{ fontFamily: font.body, fontSize: 11.5, color: tokens.ink, opacity: 0.6 }} className="mb-2">
-            📥 Download it, fill it out, then submit it using the button below.
+            📥 Download and fill this out first — you'll submit it using the separate "Submission" step below.
+          </div>
+        )}
+        {req.submission_link && req.category === "SUBMISSION" && (
+          <div style={{ fontFamily: font.body, fontSize: 11.5, color: tokens.ink, opacity: 0.6 }} className="mb-2">
+            📤 This is where you actually send your completed form — use the button below.
           </div>
         )}
         <div className="flex items-center justify-between flex-wrap gap-2">
