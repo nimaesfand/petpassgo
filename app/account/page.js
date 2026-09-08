@@ -624,44 +624,72 @@ function PetProfileTab({ userId }) {
   );
 }
 
+const CATEGORY_ICONS = {
+  "BOOKING REQUIREMENT": "📞",
+  "KENNEL REQUIREMENT": "🧳",
+  "PET FEE": "💵",
+  "AGE REQUIREMENT": "🗓️",
+  "WEIGHT LIMIT": "⚖️",
+  "BREED RESTRICTION": "🐾",
+  "REQUIRED FORM": "📄",
+  SUBMISSION: "📤",
+  "HEALTH DOCUMENTATION": "🩺",
+  VACCINATION: "💉",
+  "ROUTE RESTRICTION": "🚫",
+  "PHONE SUPPORT": "☎️",
+};
+
+function categoryIcon(category) {
+  if (CATEGORY_ICONS[category]) return CATEGORY_ICONS[category];
+  if (category.includes("CARGO") || category.includes("FIT IN THE CABIN")) return "📦";
+  if (category.includes("MISS A STEP")) return "⚠️";
+  return "📌";
+}
+
+const STATUS_ACCENT = {
+  attention: tokens.stamp,
+  verify: tokens.gold,
+  complete: tokens.green,
+};
+
 function RequirementItem({ req, checked, onToggle }) {
+  const accent = STATUS_ACCENT[req.status] || tokens.line;
   return (
     <div
       className="rounded-xl p-4 mb-2.5 flex items-start gap-3"
       style={{
         background: checked ? tokens.paper : "#fff",
-        border: `1px solid ${tokens.line}`,
-        opacity: checked ? 0.65 : 1,
+        borderLeft: `4px solid ${checked ? tokens.line : accent}`,
+        borderTop: `1px solid ${tokens.line}`,
+        borderRight: `1px solid ${tokens.line}`,
+        borderBottom: `1px solid ${tokens.line}`,
+        opacity: checked ? 0.6 : 1,
       }}
     >
-      <button
-        onClick={onToggle}
-        className="rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 transition"
-        style={{
-          width: 22,
-          height: 22,
-          border: `2px solid ${checked ? tokens.green : tokens.line}`,
-          background: checked ? tokens.green : "#fff",
-        }}
+      <div
+        className="rounded-lg flex items-center justify-center flex-shrink-0"
+        style={{ width: 34, height: 34, background: tokens.sky, fontSize: 16 }}
       >
-        {checked && <span style={{ color: "#fff", fontSize: 12, fontWeight: 700 }}>✓</span>}
-      </button>
+        {categoryIcon(req.category)}
+      </div>
       <div className="flex-1">
-        <div style={{ fontFamily: font.mono, fontSize: 10, color: tokens.ink, opacity: 0.45, letterSpacing: "0.08em" }} className="mb-1">
+        <div style={{ fontFamily: font.mono, fontSize: 9.5, color: tokens.ink, opacity: 0.4, letterSpacing: "0.08em" }} className="mb-0.5">
           {req.category}
         </div>
         <div
           style={{
-            fontFamily: font.display,
-            fontSize: 16,
+            fontFamily: font.body,
+            fontWeight: 700,
+            fontSize: 15.5,
             color: tokens.navy,
             textDecoration: checked ? "line-through" : "none",
+            lineHeight: 1.25,
           }}
           className="mb-1"
         >
           {req.title}
         </div>
-        <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.ink, opacity: 0.75 }} className="mb-2">
+        <div style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.ink, opacity: 0.7 }} className="mb-2">
           {req.description}
         </div>
         <div className="flex items-center justify-between flex-wrap gap-2">
@@ -677,26 +705,40 @@ function RequirementItem({ req, checked, onToggle }) {
           >
             DUE {req.deadline_description}
           </span>
-          {req.submission_link && (
-            <a
-              href={req.submission_link}
-              target="_blank"
-              rel="noopener noreferrer"
+          <div className="flex items-center gap-2">
+            {req.submission_link && (
+              <a
+                href={req.submission_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  fontFamily: font.body,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#fff",
+                  background: tokens.navy,
+                  textDecoration: "none",
+                  flexShrink: 0,
+                  whiteSpace: "nowrap",
+                }}
+                className="rounded-full px-3.5 py-1.5 hover:opacity-90 transition"
+              >
+                Go here →
+              </a>
+            )}
+            <button
+              onClick={onToggle}
+              className="rounded-full flex items-center justify-center flex-shrink-0 transition"
               style={{
-                fontFamily: font.body,
-                fontSize: 12,
-                fontWeight: 600,
-                color: "#fff",
-                background: tokens.navy,
-                textDecoration: "none",
-                flexShrink: 0,
-                whiteSpace: "nowrap",
+                width: 26,
+                height: 26,
+                border: `2px solid ${checked ? tokens.green : tokens.line}`,
+                background: checked ? tokens.green : "#fff",
               }}
-              className="rounded-full px-3.5 py-1.5 hover:opacity-90 transition"
             >
-              Go here →
-            </a>
-          )}
+              {checked && <span style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>✓</span>}
+            </button>
+          </div>
         </div>
       </div>
     </div>
