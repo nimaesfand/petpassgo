@@ -276,9 +276,14 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
       </div>
       {unlocked ? (
         <>
-          {link && (category === "REQUIRED FORM" || category === "SUBMISSION") && (
+          {link && category === "REQUIRED FORM" && (
             <div style={{ fontFamily: font.body, fontSize: 12, color: tokens.ink, opacity: 0.65 }} className="mb-2">
-              📥 Download it, fill it out, then submit it using the button below.
+              📥 Download and fill this out first — you'll submit it using the separate "Submission" step below.
+            </div>
+          )}
+          {link && category === "SUBMISSION" && (
+            <div style={{ fontFamily: font.body, fontSize: 12, color: tokens.ink, opacity: 0.65 }} className="mb-2">
+              📤 This is where you actually send your completed form — use the button below.
             </div>
           )}
           <div className="flex items-center justify-between gap-3 mt-1 flex-wrap">
