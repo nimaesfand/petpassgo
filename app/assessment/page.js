@@ -275,7 +275,13 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
         </span>
       </div>
       {unlocked ? (
-        <div className="flex items-center justify-between gap-3 mt-3 flex-wrap">
+        <>
+          {link && (category === "REQUIRED FORM" || category === "SUBMISSION") && (
+            <div style={{ fontFamily: font.body, fontSize: 12, color: tokens.ink, opacity: 0.65 }} className="mb-2">
+              📥 Download it, fill it out, then submit it using the button below.
+            </div>
+          )}
+          <div className="flex items-center justify-between gap-3 mt-1 flex-wrap">
           <div className="flex-1 min-w-0">
             <span
               style={{
@@ -310,7 +316,8 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
               Go here →
             </a>
           )}
-        </div>
+          </div>
+        </>
       ) : (
         <div style={{ fontFamily: font.mono, fontSize: 11, color: tokens.stamp, opacity: 0.8 }} className="mt-3">
           🔒 UNLOCK TO SEE DEADLINE &amp; INSTRUCTIONS
