@@ -178,22 +178,25 @@ function BoardingCard() {
             90%
           </div>
         </div>
-        <div
-          className="rounded-md flex items-center justify-center"
-          style={{
-            width: 64,
-            height: 64,
-            background: tokens.ink,
-            backgroundImage:
-              "repeating-linear-gradient(45deg, #fff 0 3px, transparent 3px 6px), repeating-linear-gradient(-45deg, #fff 0 3px, transparent 3px 6px)",
-            backgroundBlendMode: "screen",
-          }}
-          title="QR placeholder"
-        >
-          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: "#fff" }}>
-            QR
-          </span>
-        </div>
+        <svg viewBox="0 0 29 29" style={{ width: 64, height: 64 }} className="rounded-md">
+          <rect width="29" height="29" fill={tokens.ink} />
+          {[[1, 1], [22, 1], [1, 22]].map(([x, y]) => (
+            <g key={`${x}-${y}`}>
+              <rect x={x} y={y} width="6" height="6" fill="#fff" />
+              <rect x={x + 1.3} y={y + 1.3} width="3.4" height="3.4" fill={tokens.ink} />
+              <rect x={x + 2} y={y + 2} width="2" height="2" fill="#fff" />
+            </g>
+          ))}
+          {[
+            [10, 2], [13, 3], [16, 1], [19, 4], [10, 5], [15, 6],
+            [2, 10], [5, 12], [3, 15], [7, 16], [1, 18], [5, 19],
+            [10, 10], [13, 11], [11, 14], [16, 12], [14, 16], [18, 9],
+            [22, 10], [25, 12], [23, 15], [26, 17], [21, 18], [24, 20],
+            [10, 22], [13, 24], [16, 21], [11, 26], [18, 23], [15, 27],
+          ].map(([x, y], i) => (
+            <rect key={i} x={x} y={y} width="1.3" height="1.3" fill="#fff" />
+          ))}
+        </svg>
       </div>
     </div>
   );
@@ -208,7 +211,7 @@ const steps = [
   {
     n: "02",
     title: "Keep it organized",
-    body: "Your pet's records, forms, and confirmations live in one vault, tied to their profile — not scattered across email and photos.",
+    body: "Your pet's medical records, contacts, and identification live in one vault, tied to their profile — not scattered across email and photos.",
   },
   {
     n: "03",
@@ -219,7 +222,7 @@ const steps = [
 
 const features = [
   ["🧭", "Personalized trip plan", "Built from your animal, route, and airline — not a generic checklist."],
-  ["📁", "Document vault", "Vaccination records, DOT forms, airline confirmations, all in one place."],
+  ["📁", "Document vault", "Vaccination records, vet contacts, microchip info, and emergency contacts, all in one place."],
   ["🪪", "Digital Pet ID", "A QR-linked profile for your animal that travels with you."],
   ["✅", "Readiness tracker", "Complete, missing, or needs verification — always visible."],
   ["🛫", "Travel Mode", "The day you fly, PetPassGo shows only what matters right now."],
@@ -399,6 +402,89 @@ export default function PetPassGoLanding() {
         </div>
       </section>
 
+      {/* WHAT WE ACTUALLY TRACK — data points cloud */}
+      <section style={{ background: tokens.navy }} className="py-16">
+        <div className="max-w-4xl mx-auto px-6 md:px-14 text-center">
+          <div style={{ fontFamily: "'IBM Plex Mono', monospace", color: tokens.gold, fontSize: 12, letterSpacing: "0.14em" }} className="mb-3">
+            WHAT WE ACTUALLY TRACK
+          </div>
+          <h2 style={{ fontFamily: "'Fraunces', serif", color: "#fff", fontSize: 30 }} className="mb-3">
+            Every detail, verified against the source
+          </h2>
+          <p style={{ fontFamily: "'Inter', sans-serif", color: tokens.sky, opacity: 0.8, fontSize: 15 }} className="mb-8 max-w-xl mx-auto">
+            Not scraped from blogs. Every requirement below is checked directly against the airline
+            and the government agencies that set the rules.
+          </p>
+          <div className="flex flex-wrap justify-center gap-2.5">
+            {[
+              "in-cabin pet fee", "kennel dimensions", "reservation phone line", "DOT service animal form",
+              "relief attestation", "cabin pet limits", "minimum pet age", "combined weight limit",
+              "rabies vaccination timing", "breed restrictions", "cargo availability", "submission portal",
+              "48-hour deadlines", "health certificate window", "state import rules", "FAVN blood test",
+              "quarantine risk", "carrier type", "CDC import form", "ESA eligibility",
+            ].map((tag, i) => (
+              <span
+                key={tag}
+                style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: i % 3 === 0 ? 15 : i % 3 === 1 ? 13 : 14,
+                  color: i % 4 === 0 ? tokens.gold : tokens.sky,
+                  border: `1px solid rgba(234,240,246,0.2)`,
+                  borderRadius: 999,
+                  padding: "6px 14px",
+                  opacity: i % 5 === 0 ? 1 : 0.82,
+                }}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* AIRLINE COVERAGE GRID */}
+      <section className="max-w-5xl mx-auto px-6 md:px-14 py-20">
+        <div className="text-center mb-10">
+          <div style={{ fontFamily: "'IBM Plex Mono', monospace", color: tokens.stamp, fontSize: 12, letterSpacing: "0.14em" }} className="mb-3">
+            AIRLINE COVERAGE
+          </div>
+          <h2 style={{ fontFamily: "'Fraunces', serif", color: tokens.navy, fontSize: 30 }} className="mb-2">
+            Researched airline by airline
+          </h2>
+          <p style={{ fontFamily: "'Inter', sans-serif", opacity: 0.7, fontSize: 15 }}>
+            Each one verified individually — because every airline's rules are genuinely different.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          {["Delta", "American Airlines", "United", "Southwest", "JetBlue", "Alaska Airlines"].map((airline) => (
+            <div
+              key={airline}
+              className="rounded-xl px-5 py-4 flex items-center gap-3"
+              style={{ background: "#fff", border: `1px solid ${tokens.line}` }}
+            >
+              <span style={{ color: "#3E7A4B", fontSize: 15 }}>✓</span>
+              <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 14.5, color: tokens.navy }}>
+                {airline}
+              </span>
+            </div>
+          ))}
+          {["Spirit", "Frontier", "Hawaiian", "Allegiant", "Sun Country"].map((airline) => (
+            <div
+              key={airline}
+              className="rounded-xl px-5 py-4 flex items-center gap-3"
+              style={{ background: tokens.paper, border: `1px dashed ${tokens.line}`, opacity: 0.6 }}
+            >
+              <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: tokens.ink, opacity: 0.6 }}>
+                SOON
+              </span>
+              <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 14.5, color: tokens.ink, opacity: 0.7 }}>
+                {airline}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* PRICING STRIP */}
       <section className="px-6 md:px-14 pb-24">
         <div
@@ -423,10 +509,26 @@ export default function PetPassGoLanding() {
               <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, opacity: 0.7 }}>Profile & vault</div>
             </div>
             <div>
-              <div style={{ fontFamily: "'Fraunces', serif", fontSize: 28 }}>$19</div>
+              <div style={{ fontFamily: "'Fraunces', serif", fontSize: 28 }}>$19.99</div>
               <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, opacity: 0.7 }}>Per-trip refresh</div>
             </div>
           </div>
+        </div>
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row gap-3 justify-center mt-6">
+          <a
+            href="/assessment"
+            style={{ background: tokens.stamp, color: "#fff", fontFamily: "'Inter', sans-serif", fontWeight: 600, textDecoration: "none", textAlign: "center" }}
+            className="rounded-full px-7 py-3.5 text-[15px] hover:opacity-90 transition"
+          >
+            Start your Travel Pass
+          </a>
+          <a
+            href="/signup"
+            style={{ background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, fontFamily: "'Inter', sans-serif", fontWeight: 600, textDecoration: "none", textAlign: "center" }}
+            className="rounded-full px-7 py-3.5 text-[15px] hover:opacity-90 transition"
+          >
+            Just create your pet's profile
+          </a>
         </div>
       </section>
 
