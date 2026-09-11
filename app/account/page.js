@@ -45,6 +45,21 @@ function ComingSoon({ title, blurb }) {
   );
 }
 
+function calculateAge(dob) {
+  if (!dob) return null;
+  const birth = new Date(dob);
+  const now = new Date();
+  let years = now.getFullYear() - birth.getFullYear();
+  let months = now.getMonth() - birth.getMonth();
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+  if (years < 1) return `${months} month${months === 1 ? "" : "s"} old`;
+  if (months === 0) return `${years} year${years === 1 ? "" : "s"} old`;
+  return `${years}y ${months}m old`;
+}
+
 function PetCard({ pet, userId, onPhotoUpdated }) {
   const [measurements, setMeasurements] = useState([]);
   const [loadingLog, setLoadingLog] = useState(true);
@@ -64,8 +79,14 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
     breed: pet.breed || "",
     sex: pet.sex || "",
     date_of_birth: pet.date_of_birth || "",
+    vet_name: pet.vet_name || "",
+    vet_phone: pet.vet_phone || "",
+    emergency_contact_name: pet.emergency_contact_name || "",
+    emergency_contact_phone: pet.emergency_contact_phone || "",
+    microchip_number: pet.microchip_number || "",
   });
   const [savingEdit, setSavingEdit] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   async function handleSaveEdit(e) {
     e.preventDefault();
@@ -79,11 +100,53 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         breed: editForm.breed || null,
         sex: editForm.sex || null,
         date_of_birth: editForm.date_of_birth || null,
+        vet_name: editForm.vet_name || null,
+        vet_phone: editForm.vet_phone || null,
+        emergency_contact_name: editForm.emergency_contact_name || null,
+        emergency_contact_phone: editForm.emergency_contact_phone || null,
+        microchip_number: editForm.microchip_number || null,
       })
       .eq("id", pet.id);
     setSavingEdit(false);
     setShowEditForm(false);
     onPhotoUpdated();
+  }
+
+  async function handleDeletePet() {
+    if (!window.confirm(`Remove ${pet.name}'s profile? This can't be undone.`)) return;
+    setDeleting(true);
+    await supabase.from("pets").delete().eq("id", pet.id);
+    onPhotoUpdated();
+  }
+
+  const [justCopied, setJustCopied] = useState(false);
+
+  async function handleShare() {
+    const age = calculateAge(pet.date_of_birth);
+    const lines = [
+      `🐾 ${pet.name}'s Info (via PetPassGo)`,
+      pet.breed ? `Breed: ${pet.breed}` : null,
+      pet.sex ? `Sex: ${pet.sex}` : null,
+      age ? `Age: ${age}` : null,
+      pet.vet_name ? `Vet: ${pet.vet_name}${pet.vet_phone ? " - " + pet.vet_phone : ""}` : null,
+      pet.emergency_contact_name
+        ? `Emergency Contact: ${pet.emergency_contact_name}${pet.emergency_contact_phone ? " - " + pet.emergency_contact_phone : ""}`
+        : null,
+      pet.microchip_number ? `Microchip: ${pet.microchip_number}` : null,
+    ].filter(Boolean);
+    const text = lines.join("\n");
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `${pet.name}'s Info`, text });
+      } catch (e) {
+        // user canceled the share sheet — no action needed
+      }
+    } else {
+      await navigator.clipboard.writeText(text);
+      setJustCopied(true);
+      setTimeout(() => setJustCopied(false), 2000);
+    }
   }
 
   async function handlePhotoUpload(e) {
@@ -243,15 +306,31 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
           <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.65 }}>
             {pet.breed ? `${pet.breed} · ` : ""}
             {pet.sex ? `${pet.sex} · ` : ""}
+            {calculateAge(pet.date_of_birth) ? `${calculateAge(pet.date_of_birth)} · ` : ""}
             {pet.role}
           </div>
         </div>
-        <button
-          onClick={() => setShowEditForm((v) => !v)}
-          style={{ fontFamily: font.body, fontSize: 12, color: tokens.navy, fontWeight: 600 }}
-        >
-          Edit
-        </button>
+        <div className="flex flex-col items-end gap-1">
+          <button
+            onClick={handleShare}
+            style={{ fontFamily: font.body, fontSize: 12, color: "#2F6FED", fontWeight: 600 }}
+          >
+            {justCopied ? "Copied!" : "📤 Share"}
+          </button>
+          <button
+            onClick={() => setShowEditForm((v) => !v)}
+            style={{ fontFamily: font.body, fontSize: 12, color: tokens.navy, fontWeight: 600 }}
+          >
+            Edit
+          </button>
+          <button
+            onClick={handleDeletePet}
+            disabled={deleting}
+            style={{ fontFamily: font.body, fontSize: 11, color: tokens.stamp, opacity: 0.7 }}
+          >
+            {deleting ? "Removing…" : "Remove"}
+          </button>
+        </div>
       </div>
 
       {showEditForm && (
@@ -316,6 +395,45 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
                 className="rounded-lg px-3 py-2 outline-none flex-1"
               />
             </div>
+
+            <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 600, color: tokens.navy }} className="mt-2">
+              Vet & Emergency Info (optional)
+            </div>
+            <input
+              placeholder="Vet's name"
+              value={editForm.vet_name}
+              onChange={(e) => setEditForm((f) => ({ ...f, vet_name: e.target.value }))}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              className="rounded-lg px-3 py-2 outline-none"
+            />
+            <input
+              placeholder="Vet's phone"
+              value={editForm.vet_phone}
+              onChange={(e) => setEditForm((f) => ({ ...f, vet_phone: e.target.value }))}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              className="rounded-lg px-3 py-2 outline-none"
+            />
+            <input
+              placeholder="Emergency contact name"
+              value={editForm.emergency_contact_name}
+              onChange={(e) => setEditForm((f) => ({ ...f, emergency_contact_name: e.target.value }))}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              className="rounded-lg px-3 py-2 outline-none"
+            />
+            <input
+              placeholder="Emergency contact phone"
+              value={editForm.emergency_contact_phone}
+              onChange={(e) => setEditForm((f) => ({ ...f, emergency_contact_phone: e.target.value }))}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              className="rounded-lg px-3 py-2 outline-none"
+            />
+            <input
+              placeholder="Microchip number"
+              value={editForm.microchip_number}
+              onChange={(e) => setEditForm((f) => ({ ...f, microchip_number: e.target.value }))}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              className="rounded-lg px-3 py-2 outline-none"
+            />
           </div>
           <div className="flex gap-2 mt-3">
             <button
@@ -343,6 +461,26 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
           className="mt-2"
         >
           {uploadingPhoto ? "Uploading photo…" : "No photo yet — tap the camera icon above. For best results: a bright, clear headshot works better than a full-body or action shot."}
+        </div>
+      )}
+
+      {(pet.vet_name || pet.emergency_contact_name || pet.microchip_number) && (
+        <div className="rounded-xl p-3 mt-3" style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}>
+          {pet.vet_name && (
+            <div style={{ fontFamily: font.body, fontSize: 12, opacity: 0.75 }}>
+              🩺 Vet: {pet.vet_name}{pet.vet_phone ? ` · ${pet.vet_phone}` : ""}
+            </div>
+          )}
+          {pet.emergency_contact_name && (
+            <div style={{ fontFamily: font.body, fontSize: 12, opacity: 0.75 }}>
+              📞 Emergency: {pet.emergency_contact_name}{pet.emergency_contact_phone ? ` · ${pet.emergency_contact_phone}` : ""}
+            </div>
+          )}
+          {pet.microchip_number && (
+            <div style={{ fontFamily: font.body, fontSize: 12, opacity: 0.75 }}>
+              🔖 Microchip: {pet.microchip_number}
+            </div>
+          )}
         </div>
       )}
 
@@ -438,11 +576,22 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         {showLog && measurements.length > 0 && (
           <div className="mt-3 flex flex-col gap-1.5">
             {measurements.map((m) => (
-              <div key={m.id} className="flex justify-between" style={{ fontFamily: font.body, fontSize: 13 }}>
+              <div key={m.id} className="flex justify-between items-center" style={{ fontFamily: font.body, fontSize: 13 }}>
                 <span style={{ opacity: 0.6 }}>{m.recorded_date}</span>
-                <span style={{ color: tokens.navy, fontWeight: 600 }}>
-                  {m.value} {m.unit || "lbs"}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span style={{ color: tokens.navy, fontWeight: 600 }}>
+                    {m.value} {m.unit || "lbs"}
+                  </span>
+                  <button
+                    onClick={async () => {
+                      await supabase.from("pet_measurements").delete().eq("id", m.id);
+                      loadMeasurements();
+                    }}
+                    style={{ fontFamily: font.body, fontSize: 11, color: tokens.stamp, opacity: 0.6 }}
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
             ))}
           </div>
