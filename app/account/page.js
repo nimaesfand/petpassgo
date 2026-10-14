@@ -11,6 +11,7 @@ const tokens = {
   ink: "#1C2733",
   stamp: "#B23A2E",
   line: "#D9E1E8",
+  green: "#3E7A4B",
 };
 
 const font = {
@@ -457,7 +458,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
 
       {!pet.photo_url && (
         <div
-          style={{ fontFamily: font.body, fontSize: 12, color: tokens.stamp, opacity: 0.85 }}
+          style={{ fontFamily: font.body, fontSize: 12, color: tokens.ink, opacity: 0.6 }}
           className="mt-2"
         >
           {uploadingPhoto ? "Uploading photo…" : "No photo yet — tap the camera icon above. For best results: a bright, clear headshot works better than a full-body or action shot."}
