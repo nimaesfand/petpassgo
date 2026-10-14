@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
-import { SignedImg } from "../../../lib/storage";
 
 const tokens = { navy: "#152238", gold: "#C9A227", sky: "#EAF0F6", paper: "#F6F8FA", ink: "#1C2733", stamp: "#B23A2E", line: "#D9E1E8" };
 const font = { display: "'Fraunces', serif", mono: "'IBM Plex Mono', monospace", body: "'Inter', sans-serif" };
@@ -12,6 +11,7 @@ export default function PublicPetId({ params }) {
   const petId = params.petId;
   const [pet, setPet] = useState(null);
   const [state, setState] = useState("loading");
+  const [photoFailed, setPhotoFailed] = useState(false);
 
   useEffect(() => {
     if (!UUID.test(petId)) return setState("notfound");
@@ -41,8 +41,8 @@ export default function PublicPetId({ params }) {
         {state === "ok" && pet && (
           <div className="p-6">
             <div className="flex items-center gap-4 mb-5">
-              {pet.photo_path ? (
-                <SignedImg value={pet.photo_path} alt={pet.name} className="rounded-xl object-cover" style={{ width: 88, height: 88 }} />
+              {pet.photo_path && !photoFailed ? (
+                <img src={`/api/pet-photo/${pet.id}`} onError={() => setPhotoFailed(true)} alt={pet.name} className="rounded-xl object-cover" style={{ width: 88, height: 88 }} />
               ) : (
                 <div className="rounded-xl flex items-center justify-center" style={{ width: 88, height: 88, background: tokens.sky, fontSize: 40 }}>
                   {pet.animal_type === "Dog" ? "🐕" : pet.animal_type === "Cat" ? "🐈" : "🐾"}
