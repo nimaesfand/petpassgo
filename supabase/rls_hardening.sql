@@ -1,4 +1,4 @@
--- PetPassGo RLS hardening (NOT APPLIED). Review, then run in the Supabase SQL Editor.
+-- PetPassGo RLS hardening Applied 2026-10-14 as migration "rls_hardening".
 -- Audit 2026-10-14: RLS is ON for pets, documents, pet_measurements, trips,
 -- trip_requirement_status; every SELECT/INSERT/UPDATE/DELETE policy is scoped to
 -- auth.uid() = user_id. Gaps found:
@@ -26,6 +26,5 @@ alter policy "Users can insert their own documents" on public.documents
 alter policy "Users can insert their own pet measurements" on public.pet_measurements
   with check (auth.uid() = user_id
     and exists (select 1 from public.pets p where p.id = pet_id and p.user_id = auth.uid()));
--- trip_requirement_status: check its trip column name before enabling, e.g.
--- alter policy "Users can insert their own requirement status" on public.trip_requirement_status
---   with check (auth.uid() = user_id and exists (select 1 from public.trips t where t.id = trip_id and t.user_id = auth.uid()));
+alter policy "Users can insert their own requirement status" on public.trip_requirement_status
+  with check (auth.uid() = user_id and exists (select 1 from public.trips t where t.id = trip_id and t.user_id = auth.uid()));
