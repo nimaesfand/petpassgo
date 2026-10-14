@@ -153,6 +153,15 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
     }
   }
 
+  const [savingContactToggle, setSavingContactToggle] = useState(false);
+  async function togglePublicContact(value) {
+    setSavingContactToggle(true);
+    // RLS ("Users can update their own pets") limits this to the owner's own row.
+    await supabase.from("pets").update({ show_contact_on_public_id: value }).eq("id", pet.id).eq("user_id", userId);
+    setSavingContactToggle(false);
+    onPhotoUpdated();
+  }
+
   async function handlePhotoUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -530,6 +539,25 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
           </div>
           <PetQr petId={pet.id} size={64} color={tokens.navy} />
         </div>
+        <label
+          className="px-4 py-3 flex items-start gap-3 cursor-pointer"
+          style={{ background: tokens.paper, borderTop: `1px solid ${tokens.line}` }}
+        >
+          <input
+            type="checkbox"
+            className="mt-0.5"
+            checked={!!pet.show_contact_on_public_id}
+            disabled={savingContactToggle}
+            onChange={(e) => togglePublicContact(e.target.checked)}
+          />
+          <span style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.ink }}>
+            Show my emergency contact on the public Pet ID
+            <span style={{ display: "block", opacity: 0.6, fontSize: 11.5 }}>
+              Off by default. When on, anyone who scans this QR code sees the emergency contact name and phone.
+              Name, species, breed and photo are always shown.
+            </span>
+          </span>
+        </label>
       </div>
 
       <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${tokens.line}` }}>
