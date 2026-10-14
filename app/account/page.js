@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
+import PetQr from "../../lib/PetQr";
 import { BUCKET, SignedImg, getSignedUrl, toStoragePath } from "../../lib/storage";
 
 const tokens = {
@@ -526,25 +527,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
               {pet.role.toUpperCase()}
             </div>
           </div>
-          <svg viewBox="0 0 29 29" style={{ width: 44, height: 44 }} className="flex-shrink-0">
-            <rect width="29" height="29" fill="#fff" />
-            {[[1, 1], [22, 1], [1, 22]].map(([x, y]) => (
-              <g key={`${x}-${y}`}>
-                <rect x={x} y={y} width="6" height="6" fill={tokens.navy} />
-                <rect x={x + 1.3} y={y + 1.3} width="3.4" height="3.4" fill="#fff" />
-                <rect x={x + 2} y={y + 2} width="2" height="2" fill={tokens.navy} />
-              </g>
-            ))}
-            {[
-              [10, 2], [13, 3], [16, 1], [19, 4], [10, 5], [15, 6],
-              [2, 10], [5, 12], [3, 15], [7, 16], [1, 18], [5, 19],
-              [10, 10], [13, 11], [11, 14], [16, 12], [14, 16], [18, 9],
-              [22, 10], [25, 12], [23, 15], [26, 17], [21, 18], [24, 20],
-              [10, 22], [13, 24], [16, 21], [11, 26], [18, 23], [15, 27],
-            ].map(([x, y], i) => (
-              <rect key={i} x={x} y={y} width="1.3" height="1.3" fill={tokens.navy} />
-            ))}
-          </svg>
+          <PetQr petId={pet.id} size={64} color={tokens.navy} />
         </div>
       </div>
 
