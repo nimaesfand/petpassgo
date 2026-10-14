@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabaseClient";
+import { AIRLINES, requirementAirline } from "../../lib/airlines";
 
 const tokens = {
   navy: "#152238",
@@ -21,15 +22,6 @@ const font = {
   body: "'Inter', sans-serif",
 };
 
-const AIRLINES = [
-  "Delta",
-  "American Airlines",
-  "United",
-  "Southwest",
-  "JetBlue",
-  "Alaska Airlines",
-  "Other / not sure yet",
-];
 
 const AIRPORTS = [
   { code: "LAX", city: "Los Angeles", name: "Los Angeles Intl" },
@@ -417,7 +409,7 @@ export default function PetPassGoQuiz() {
     supabase
       .from("airline_requirements")
       .select("*")
-      .in("airline", [answers.airline, "Any"])
+      .in("airline", [requirementAirline(answers.airline), "Any"])
       .in("animal_type", [answers.animal, "Any"])
       .in("role", [answers.role, "Any"])
       .eq("trip_type", "domestic")

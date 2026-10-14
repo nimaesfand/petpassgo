@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { AIRLINES } from "../lib/airlines";
 
 const tokens = {
   navy: "#152238",
@@ -456,7 +457,7 @@ export default function PetPassGoLanding() {
           </p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {["Delta", "American Airlines", "United", "Southwest", "JetBlue", "Alaska Airlines"].map((airline) => (
+          {AIRLINES.filter((a) => !a.startsWith("Other")).map((airline) => (
             <div
               key={airline}
               className="rounded-xl px-5 py-4 flex items-center gap-3"
