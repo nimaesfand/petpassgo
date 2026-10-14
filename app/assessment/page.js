@@ -631,8 +631,8 @@ export default function PetPassGoQuiz() {
                   className="rounded-xl p-4 mb-4 text-center"
                   style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 13.5, opacity: 0.75 }}
                 >
-                  We haven't researched verified requirements for {answers.airline || "this airline"} yet — Delta is
-                  currently the only airline with confirmed data. Try the assessment again and select Delta to see real results.
+                  We haven't researched verified requirements for {answers.airline || "this airline"} yet. We currently have
+                  verified data for Delta, American, United, Southwest, JetBlue, and Alaska — try the assessment again with one of those airlines to see your results.
                 </div>
               )}
 

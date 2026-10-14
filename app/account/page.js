@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { requirementAirline } from "../../lib/airlines";
+import PetQr from "../../lib/PetQr";
+import { BUCKET, SignedImg, getSignedUrl, toStoragePath } from "../../lib/storage";
 
 const tokens = {
   navy: "#152238",
@@ -12,6 +14,7 @@ const tokens = {
   ink: "#1C2733",
   stamp: "#B23A2E",
   line: "#D9E1E8",
+  green: "#3E7A4B",
 };
 
 const font = {
@@ -156,11 +159,11 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
     setUploadingPhoto(true);
 
     const filePath = `${userId}/${pet.id}/profile-photo-${Date.now()}-${file.name}`;
-    const { error: uploadError } = await supabase.storage.from("pet-documents").upload(filePath, file);
+    const { error: uploadError } = await supabase.storage.from(BUCKET).upload(filePath, file);
 
     if (!uploadError) {
-      const { data: urlData } = supabase.storage.from("pet-documents").getPublicUrl(filePath);
-      await supabase.from("pets").update({ photo_url: urlData.publicUrl }).eq("id", pet.id);
+      // Store the storage path; a short-lived signed URL is created when displaying.
+      await supabase.from("pets").update({ photo_url: filePath }).eq("id", pet.id);
       onPhotoUpdated();
     }
     setUploadingPhoto(false);
@@ -199,12 +202,11 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
       .upload(filePath, selectedFile);
 
     if (!uploadError) {
-      const { data: urlData } = supabase.storage.from("pet-documents").getPublicUrl(filePath);
       await supabase.from("documents").insert({
         user_id: userId,
         pet_id: pet.id,
         document_type: docType,
-        file_url: urlData.publicUrl,
+        file_url: filePath, // storage path, not a public URL
       });
       setSelectedFile(null);
       setShowUploadForm(false);
@@ -214,6 +216,8 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
   }
 
   async function handleDeleteDocument(doc) {
+    const path = toStoragePath(doc.file_url);
+    if (path) await supabase.storage.from(BUCKET).remove([path]);
     await supabase.from("documents").delete().eq("id", doc.id);
     loadDocuments();
   }
@@ -261,8 +265,8 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
       <div className="flex items-center gap-4">
         <div className="relative flex-shrink-0">
           {pet.photo_url ? (
-            <img
-              src={pet.photo_url}
+            <SignedImg
+              value={pet.photo_url}
               alt={pet.name}
               className="rounded-full object-cover"
               style={{ width: 48, height: 48 }}
@@ -458,7 +462,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
 
       {!pet.photo_url && (
         <div
-          style={{ fontFamily: font.body, fontSize: 12, color: tokens.stamp, opacity: 0.85 }}
+          style={{ fontFamily: font.body, fontSize: 12, color: tokens.ink, opacity: 0.6 }}
           className="mt-2"
         >
           {uploadingPhoto ? "Uploading photo…" : "No photo yet — tap the camera icon above. For best results: a bright, clear headshot works better than a full-body or action shot."}
@@ -495,7 +499,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         </div>
         <div className="p-4 flex items-center gap-4" style={{ background: "#fff" }}>
           {pet.photo_url ? (
-            <img src={pet.photo_url} alt={pet.name} className="rounded-lg object-cover flex-shrink-0" style={{ width: 56, height: 56 }} />
+            <SignedImg value={pet.photo_url} alt={pet.name} className="rounded-lg object-cover flex-shrink-0" style={{ width: 56, height: 56 }} />
           ) : (
             <div
               className="rounded-lg flex items-center justify-center flex-shrink-0"
@@ -524,25 +528,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
               {pet.role.toUpperCase()}
             </div>
           </div>
-          <svg viewBox="0 0 29 29" style={{ width: 44, height: 44 }} className="flex-shrink-0">
-            <rect width="29" height="29" fill="#fff" />
-            {[[1, 1], [22, 1], [1, 22]].map(([x, y]) => (
-              <g key={`${x}-${y}`}>
-                <rect x={x} y={y} width="6" height="6" fill={tokens.navy} />
-                <rect x={x + 1.3} y={y + 1.3} width="3.4" height="3.4" fill="#fff" />
-                <rect x={x + 2} y={y + 2} width="2" height="2" fill={tokens.navy} />
-              </g>
-            ))}
-            {[
-              [10, 2], [13, 3], [16, 1], [19, 4], [10, 5], [15, 6],
-              [2, 10], [5, 12], [3, 15], [7, 16], [1, 18], [5, 19],
-              [10, 10], [13, 11], [11, 14], [16, 12], [14, 16], [18, 9],
-              [22, 10], [25, 12], [23, 15], [26, 17], [21, 18], [24, 20],
-              [10, 22], [13, 24], [16, 21], [11, 26], [18, 23], [15, 27],
-            ].map(([x, y], i) => (
-              <rect key={i} x={x} y={y} width="1.3" height="1.3" fill={tokens.navy} />
-            ))}
-          </svg>
+          <PetQr petId={pet.id} size={64} color={tokens.navy} />
         </div>
       </div>
 
@@ -658,9 +644,14 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
               style={{ borderTop: `1px solid ${tokens.line}` }}
             >
               <a
-                href={doc.file_url}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  const win = window.open("", "_blank");
+                  const url = await getSignedUrl(doc.file_url);
+                  if (url && win) win.location.href = url;
+                  else if (win) win.close();
+                }}
                 style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.navy, textDecoration: "underline" }}
               >
                 {doc.document_type}
