@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
+import { requirementAirline } from "../../lib/airlines";
 
 const tokens = {
   navy: "#152238",
@@ -1096,7 +1097,7 @@ function CurrentFlightTab({ userId }) {
       const { data: reqs } = await supabase
         .from("airline_requirements")
         .select("*")
-        .in("airline", [currentTrip.airline, "Any"])
+        .in("airline", [requirementAirline(currentTrip.airline), "Any"])
         .in("animal_type", [currentTrip.animal_type, "Any"])
         .in("role", [currentTrip.role, "Any"])
         .eq("trip_type", "domestic");
