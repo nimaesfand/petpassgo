@@ -312,7 +312,7 @@ export default function PetPassGoQuiz() {
     const { data: s } = await supabase.auth.getSession();
     const r = await fetch("/api/stripe/checkout", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${s?.session?.access_token || ""}` },
+      headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" },
       body: JSON.stringify({ plan: stripePlan, trip_id: trip.id }),
     });
     const j = await r.json().catch(() => ({}));
