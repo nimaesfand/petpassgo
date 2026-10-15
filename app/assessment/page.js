@@ -321,6 +321,13 @@ export default function PetPassGoQuiz() {
   const [unlocked, setUnlocked] = useState(false);
   const [addMembership, setAddMembership] = useState(false);
   const [showDetails, setShowDetails] = useState(true);
+  // Real membership status (read-only; only the server/Stripe can set it). The checkbox
+  // further down is a pre-launch preview only and is hidden when NEXT_PUBLIC_SITE_LAUNCHED=true.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data?.session) supabase.rpc("my_membership").then(({ data: m }) => { if (m) setIsMember(true); });
+    });
+  }, []);
   const [answers, setAnswers] = useState({
     animal: "",
     role: "",
@@ -679,7 +686,7 @@ export default function PetPassGoQuiz() {
                       style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}
                       className="w-full rounded-full py-3.5 text-[15px] hover:opacity-90 transition"
                     >
-                      Refresh this trip — $19.99
+                      Refresh this trip — free with membership
                     </button>
                     <ul
                       style={{ fontFamily: font.body, fontSize: 14, color: tokens.ink, opacity: 0.75 }}
@@ -813,16 +820,13 @@ export default function PetPassGoQuiz() {
                       style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}
                     >
                       <div style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, color: tokens.navy }} className="mb-2">
-                        Membership keeps all of this saved and up to date:
+                        Membership ($4.99/mo) adds:
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {[
-                          "Vaccination records",
-                          "Vet contact info",
-                          "Medications & allergies",
-                          "Microchip number",
-                          "Emergency contact",
-                          "Insurance policy info",
+                          "Free trip refreshes",
+                          "Unlimited pets",
+                          "Document expiry reminders",
                         ].map((item) => (
                           <span
                             key={item}
@@ -853,10 +857,10 @@ export default function PetPassGoQuiz() {
                       />
                       <div>
                         <div style={{ fontFamily: font.body, fontSize: 15.5, fontWeight: 600, color: tokens.navy }}>
-                          🔥 Save on every future trip — Membership, $4.99/mo
+                          Add Membership — $4.99/mo
                         </div>
                         <div style={{ fontFamily: font.body, fontSize: 14, opacity: 0.7 }} className="mt-1">
-                          Your next trip refresh drops from $49.99 to just $19.99 — a $30 savings — and your pet's profile stays free to update, always.
+                          Every future trip refresh is free. Cancel anytime.
                         </div>
                       </div>
                     </label>
