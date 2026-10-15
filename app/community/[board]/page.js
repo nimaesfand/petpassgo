@@ -4,6 +4,8 @@ import { useParams, useSearchParams } from "next/navigation";
 import SiteHeader from "../../../components/SiteHeader";
 import CommunityNotice from "../../../components/CommunityNotice";
 import CommunityPaywall from "../../../components/CommunityPaywall";
+import WinBack from "../../../components/WinBack";
+import { lapsedPreview } from "../../../lib/access";
 import { supabase } from "../../../lib/supabaseClient";
 import { boardBySlug, textProblem, friendly } from "../../../lib/community";
 import { tokens, font } from "../../../lib/theme";
@@ -123,8 +125,9 @@ export default function BoardPage() {
       const s = data?.session || null; setSession(s);
       if (!s) { setLoading(false); setAccess(false); return; }
       const { data: ok } = await supabase.rpc("can_use_community");
-      setAccess(!!ok);
-      if (!ok) { setLoading(false); return; }
+      const allowed = !!ok && !lapsedPreview();
+      setAccess(allowed);
+      if (!allowed) { setLoading(false); return; }
       load();
       supabase.from("community_profiles").select("display_name").maybeSingle().then(({ data: p }) => setDisplayName(p?.display_name || ""));
       supabase.rpc("is_community_moderator").then(({ data: m }) => setIsMod(!!m));
@@ -169,7 +172,7 @@ export default function BoardPage() {
         <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.muted }} className="mb-6">{board.blurb}</p>
         <CommunityNotice />
 
-        {access === false && <CommunityPaywall boardName={board.name} signedIn={!!session} />}
+        {access === false && (session ? <WinBack area="community" /> : <CommunityPaywall boardName={board.name} signedIn={false} />)}
 
         {access && displayName === "" && <DisplayNameSetup onDone={setDisplayName} />}
         {access && displayName && <Composer board={slug} lostPets={lostPets} defaultPet={search.get("pet") || ""} onPosted={load} />}
