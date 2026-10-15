@@ -1,8 +1,8 @@
 export const metadata = {
-  title: "Free pet travel assessment",
-  description: "Answer a few questions about your trip and your animal to see what your flight will require — free, in about two minutes.",
+  title: "Plan your pet's trip",
+  description: "Answer a few questions about your trip and your animal to see what your flight will require. Takes about three minutes.",
   alternates: { canonical: "/assessment" },
-  openGraph: { title: "Free pet travel assessment | PetPassGo", description: "Answer a few questions about your trip and your animal to see what your flight will require — free, in about two minutes.", url: "/assessment" },
+  openGraph: { title: "Plan your pet's trip | PetPassGo", description: "Answer a few questions about your trip and your animal to see what your flight will require. Takes about three minutes.", url: "/assessment" },
 };
 export default function Layout({ children }) {
   return children;

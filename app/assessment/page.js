@@ -459,7 +459,7 @@ export default function PetPassGoQuiz() {
       <div className="w-full max-w-[720px]">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <h1 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 28, color: tokens.navy }}>Trip assessment</h1>
+            <h1 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 28, color: tokens.navy }}>Plan your trip</h1>
           </div>
           {step === 5 && process.env.NEXT_PUBLIC_SITE_LAUNCHED !== "true" && (
             <label className="flex items-center gap-2 cursor-pointer" style={{ fontFamily: font.mono, fontSize: 12, color: tokens.muted }}>
@@ -629,7 +629,7 @@ export default function PetPassGoQuiz() {
                   style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 15, opacity: 0.75 }}
                 >
                   We haven't researched verified requirements for {answers.airline || "this airline"} yet. We currently have
-                  verified data for Delta, American, United, Southwest, JetBlue, and Alaska — try the assessment again with one of those airlines to see your results.
+                  verified data for Delta, American, United, Southwest, JetBlue, and Alaska — start planning again with one of those airlines to see your results.
                 </div>
               )}
 

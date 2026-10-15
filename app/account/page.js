@@ -1173,7 +1173,7 @@ function CurrentFlightTab({ userId }) {
           No trip yet
         </div>
         <div style={{ fontFamily: font.body, fontSize: 15.5, opacity: 0.7 }} className="mb-4">
-          Complete the trip assessment to get your Travel Pass, and it'll show up here.
+          Plan your trip to get your Travel Pass, and it'll show up here.
         </div>
         <a
           href="/assessment"

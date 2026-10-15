@@ -51,8 +51,8 @@ export default function AirlineGuide({ params }) {
         </p>
         <div className="rounded-2xl p-6" style={{ background: "#14213D", color: "#F3F5F9" }}>
           <div style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: 22 }} className="mb-2">Get your {a.name} checklist</div>
-          <p className="mb-4" style={{ opacity: 0.85 }}>Start with the free assessment, then unlock a verified, step-by-step Travel Pass for your exact trip.</p>
-          <a href="/assessment" className="btn-primary inline-block rounded-full px-6 py-3" style={{ background: "#C2410C", color: "#fff", fontWeight: 600, textDecoration: "none" }}>Take the free assessment</a>
+          <p className="mb-4" style={{ opacity: 0.85 }}>Answer a few questions about your trip, then unlock a verified, step-by-step Travel Pass for your exact trip.</p>
+          <a href="/assessment" className="btn-primary inline-block rounded-full px-6 py-3" style={{ background: "#C2410C", color: "#fff", fontWeight: 600, textDecoration: "none" }}>Plan your trip</a>
         </div>
       </Prose>
     </>

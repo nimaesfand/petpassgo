@@ -202,12 +202,12 @@ const D = "var(--font-display), system-ui, sans-serif";
 const B = "var(--font-body), system-ui, sans-serif";
 
 const STEPS = [
-  { n: "1", title: "Answer 6 questions", body: "Airline, route, animal. Free, about 3 minutes.", icon: "M4 6h16M4 12h10M4 18h7" },
+  { n: "1", title: "Answer 6 questions", body: "Airline, route, animal. About 3 minutes.", icon: "M4 6h16M4 12h10M4 18h7" },
   { n: "2", title: "Get your Travel Pass", body: "Every requirement for your exact trip, in order.", icon: "M5 4h14v16H5zM8 9h8M8 13h8M8 17h5" },
   { n: "3", title: "Check it off and fly", body: "Reminders before each deadline. Docs in one vault.", icon: "M5 13l4 4L19 7" },
 ];
 
-const HOME_FAQ = [FAQ[1], FAQ[6], FAQ[7]];
+const HOME_FAQ = [FAQ[2], FAQ[6], FAQ[7]];
 
 function Eyebrow({ children, color = tokens.stamp }) {
   return <div style={{ fontFamily: B, color, fontSize: 13, fontWeight: 700, letterSpacing: "0.14em" }} className="mb-3">{children}</div>;
@@ -215,7 +215,7 @@ function Eyebrow({ children, color = tokens.stamp }) {
 function H2({ children, light }) {
   return <h2 style={{ fontFamily: D, color: light ? "#fff" : tokens.navy, lineHeight: 1.1 }} className="text-[32px] md:text-[42px] font-bold mb-4">{children}</h2>;
 }
-function Cta({ children = "Take the free quiz", href = "/assessment" }) {
+function Cta({ children = "Plan your trip", href = "/assessment" }) {
   return (
     <a href={href} style={{ background: tokens.stamp, color: "#fff", fontFamily: B, fontWeight: 600, textDecoration: "none", display: "inline-block" }} className="btn-primary rounded-full px-8 py-4 text-[16px]">
       {children} →
@@ -395,10 +395,10 @@ export default function PetPassGoLanding() {
       {/* 5. PRICING */}
       <section className="max-w-[1240px] mx-auto px-6 md:px-14 py-20">
         <Eyebrow>PRICING</Eyebrow>
-        <H2>The quiz is free.</H2>
+        <H2>Planning is free. Pay when you're ready.</H2>
         <div className="grid md:grid-cols-3 gap-5 mt-10">
           {[
-            ["Travel Pass", "$49.99", "per trip", "Your full checklist, deadlines and reminders.", true],
+            ["Travel Pass", "$49.99", "per trip", "Your full checklist, deadlines, reminders and a Digital Pet ID with QR code.", true],
             ["Membership", "$4.99", "per month", "Keep your pet's vault and Digital Pet ID.", false],
             ["Refresh", "$19.99", "per new trip", "Members: rebuild your pass for the next trip.", false],
           ].map(([n, p, u, d, hi]) => (
@@ -432,8 +432,8 @@ export default function PetPassGoLanding() {
       <section className="px-6 md:px-14 pb-24">
         <div className="max-w-[1240px] mx-auto rounded-3xl px-8 py-14 md:py-16 text-center" style={{ background: tokens.navy }}>
           <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.1 }} className="text-[32px] md:text-[44px] font-bold mb-3">Where are you two flying?</h2>
-          <p style={{ fontFamily: B, color: "#C9D3E3", fontSize: 17 }} className="mb-8">Find out what your trip needs in 3 minutes.</p>
-          <Cta />
+          <p style={{ fontFamily: B, color: "#C9D3E3", fontSize: 17 }} className="mb-8">A few trip questions. Three minutes. Your plan.</p>
+          <Cta>Start planning</Cta>
         </div>
       </section>
 

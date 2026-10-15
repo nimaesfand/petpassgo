@@ -6,7 +6,7 @@ const ENABLED = process.env.NEXT_PUBLIC_CHAT_ENABLED === "true";
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
-  const [msgs, setMsgs] = useState([{ role: "assistant", content: "Hi! I can answer general questions about PetPassGo and flying with pets. For your exact airline requirements, take the free assessment." }]);
+  const [msgs, setMsgs] = useState([{ role: "assistant", content: "Hi! I can answer general questions about PetPassGo and flying with pets. For your exact airline requirements, start planning your trip." }]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [handoff, setHandoff] = useState(false);
