@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { usePetAccess } from "../../lib/access";
+import WinBack from "../../components/WinBack";
 import { PRICES as P } from "../../lib/pricing";
 import { requirementAirline } from "../../lib/airlines";
 import SiteHeader from "../../components/SiteHeader";
@@ -821,7 +822,25 @@ function PetProfileTab({ userId }) {
     }
   }
 
-  if (!access.loading && !access.allowed) return <AccessGate />;
+  // Lapsed (only when launched, or with ?preview=lapsed pre-launch): lost-pet tools stay
+  // free; vault and full Pet ID show a win-back message. Nothing is deleted.
+  if (!access.loading && !access.allowed) return (
+    <div className="space-y-6">
+      {loading ? <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading your pets…</div> : pets.map((pet) => (
+        <div key={pet.id} className="rounded-2xl p-5 space-y-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+          <div className="flex items-center gap-3">
+            <PetIllustration type={pet.animal_type} size={48} />
+            <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }}>{pet.name}</div>
+          </div>
+          <WinBack area="vault" petName={pet.name} compact />
+          <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>Lost-pet tools stay free, always:</div>
+          <LostPanel pet={pet} userId={userId} />
+        </div>
+      ))}
+      {pets.length > 1 && <WinBack area="pets" compact />}
+      <a href="/lost-flyer" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, color: tokens.navy }}>Make a printable lost pet flyer →</a>
+    </div>
+  );
   return (
     <div>
       {loading ? (
@@ -864,7 +883,7 @@ function PetProfileTab({ userId }) {
               + Add another pet
             </button>
           ) : limitHit ? (
-            <MemberUpsell />
+            access.member === false && access.allowed === false ? <WinBack area="pets" compact /> : <MemberUpsell />
           ) : (
             <button
               onClick={() => setLimitHit(true)}

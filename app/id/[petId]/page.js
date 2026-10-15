@@ -7,6 +7,9 @@ import FinderMessageForm from "../../../components/FinderMessageForm";
 import ShareButtons from "../../../components/ShareButtons";
 import usePublicPet from "../../../lib/usePublicPet";
 import { fmtDate } from "../../../lib/lost";
+import { supabase } from "../../../lib/supabaseClient";
+import { SITE_LAUNCHED } from "../../../lib/pricing";
+import { lapsedPreview } from "../../../lib/access";
 
 function ContactBox({ pet }) {
   const phone = pet.emergency_contact_phone;
@@ -67,6 +70,15 @@ function LostPoster({ pet, lost }) {
 
 export default function PublicPetId({ params }) {
   const { status, pet, lost } = usePublicPet(params.petId);
+  // Owner's membership/trip lapsed (enforced only after launch; ?preview=lapsed pre-launch):
+  // show a basic page with name, photo and the message relay instead of the full ID.
+  const [basic, setBasic] = useState(false);
+  useEffect(() => {
+    if (status !== "ok") return;
+    if (lapsedPreview()) return setBasic(true);
+    if (!SITE_LAUNCHED) return;
+    supabase.rpc("pet_owner_has_access", { pet_id: pet.id }).then(({ data }) => setBasic(data === false));
+  }, [status, pet?.id]);
 
   // Log a coarse scan only while the pet is lost (server checks again).
   useEffect(() => {
@@ -88,7 +100,15 @@ export default function PublicPetId({ params }) {
           </div>
         )}
         {status === "ok" && lost && <LostPoster pet={pet} lost={lost} />}
-        {status === "ok" && !lost && (
+        {status === "ok" && !lost && basic && (
+          <div className="rounded-2xl p-7 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+            <div className="flex justify-center mb-3">{pet.photo_path ? <Photo pet={pet} size={128} /> : <PetIllustration type={pet.animal_type} size={128} />}</div>
+            <div style={{ fontFamily: font.display, fontSize: 34, fontWeight: 700, color: tokens.navy }} className="mb-1">{pet.name}</div>
+            <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-5">Found this pet, or need to reach the owner? Send a message. Your note goes straight to them.</p>
+            <div className="text-left"><FinderMessageForm petId={pet.id} petName={pet.name} /></div>
+          </div>
+        )}
+        {status === "ok" && !lost && !basic && (
           <>
             <PetIdCard pet={pet} showQr={false} photo={pet.photo_path ? <Photo pet={pet} size={104} /> : null} />
             <div className="mt-4">
