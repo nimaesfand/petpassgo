@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { requirementAirline } from "../../lib/airlines";
 import SiteHeader from "../../components/SiteHeader";
+import LostPanel from "../../components/LostPanel";
 import PetIdCard, { PetIllustration } from "../../components/PetIdCard";
 import TripTimeline from "../../components/TripTimeline";
 import ServiceAnimalTrack from "../../components/ServiceAnimalTrack";
@@ -517,6 +518,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
           </span>
         </label>
       </PetIdCard>
+      <LostPanel pet={pet} userId={userId} />
       </div>
 
       <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${tokens.line}` }}>
