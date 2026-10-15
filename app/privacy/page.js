@@ -1,0 +1,78 @@
+import { LegalPage, H, P, UL, O } from "../../components/LegalPage";
+
+export const metadata = {
+  title: "Privacy Policy",
+  description: "How PetPassGo collects, uses and protects your information.",
+  alternates: { canonical: "/privacy" },
+};
+
+export default function PrivacyPage() {
+  return (
+    <LegalPage title="Privacy Policy" updated="October 14, 2026">
+      <P>This policy explains what information PetPassGo, operated by <O>legal business entity name</O> ("we", "us"), collects, how we use it, and the choices you have. Questions: <O>contact email</O>.</P>
+
+      <H>1. Information we collect</H>
+      <UL>
+        <li><strong>Account information:</strong> your email address and password. Accounts are managed by our hosting and authentication provider, Supabase. We do not see your password in plain text.</li>
+        <li><strong>Pet and trip information:</strong> pet profiles (name, species, breed, weight, photos, microchip and health details you enter), trips (airline, route, dates), checklist progress and weight logs.</li>
+        <li><strong>Documents:</strong> files you upload, such as vaccination records and health certificates.</li>
+        <li><strong>Lost-pet messages:</strong> when someone who finds your pet uses the contact form on its Pet ID page, we collect the message and any contact details they choose to include.</li>
+        <li><strong>Pet ID page views while a pet is lost:</strong> while your pet is marked lost, when its Pet ID page is viewed or its QR code is scanned we record the time and an approximate area (city/region, derived by our host from the visitor's network). We do not store the visitor's IP address or precise location, and these view records are deleted when you mark the pet as reunited.</li>
+        <li><strong>AI feature inputs:</strong> if you use the optional AI document check or chat, the documents and messages you submit to it.</li>
+        <li><strong>Payment information (when payments launch):</strong> handled by Stripe. We receive payment status and limited details (for example, the last four card digits), not your full card number.</li>
+        <li><strong>Technical data:</strong> standard logs from our hosting providers (Vercel and Supabase), such as IP address, browser type and request times, used for security and reliability.</li>
+      </UL>
+
+      <H>2. How we use it</H>
+      <UL>
+        <li>To provide the Service: build your checklist, store your records, and show your trip status.</li>
+        <li>To send reminder emails about upcoming deadlines (delivered through our email provider, Resend), and messages about your account.</li>
+        <li>To forward finder messages to you when your pet is marked lost.</li>
+        <li>To run optional AI features you choose to use.</li>
+        <li>To process payments, prevent fraud, secure the Service and fix problems.</li>
+      </UL>
+      <P>We do not sell your personal information, and we do not use it for third-party advertising.</P>
+
+      <H>3. What is private and what is public</H>
+      <UL>
+        <li><strong>Private by default:</strong> your account, trips, documents and full pet records are visible only to you. Uploaded documents are kept in private storage and opened only through short-lived, signed links generated for you.</li>
+        <li><strong>Public Pet ID page:</strong> if you share it, anyone with the link or QR code can see the information shown on that page. You choose what appears there.</li>
+        <li><strong>Lost-pet relay:</strong> finders contact you through a relay form. Your email address is not shown to them. If you reply directly, they will see the address you reply from.</li>
+      </UL>
+
+      <H>4. Who we share it with</H>
+      <P>We share information only with service providers that help us run PetPassGo, and only as needed:</P>
+      <UL>
+        <li>Supabase: database, authentication and file storage.</li>
+        <li>Vercel: website hosting.</li>
+        <li>Resend: email delivery.</li>
+        <li>Stripe: payment processing, once payments launch.</li>
+        <li>An AI model provider <O>name of AI provider</O>: only for content you submit to the optional AI features.</li>
+      </UL>
+      <P>We may also disclose information if the law requires it, to protect people's safety or rights, or as part of a merger or sale of the business, subject to this policy.</P>
+
+      <H>5. How long we keep it</H>
+      <P>We keep your information while your account is active. If you delete your account, we delete your account data and uploaded documents within <O>retention period</O>, except where we must keep records (for example, payment records) for legal or accounting reasons.</P>
+
+      <H>6. Your choices and rights</H>
+      <UL>
+        <li>You can view and edit your pet and trip information, and delete documents, in the app.</li>
+        <li>You can turn off a pet's lost status, or stop sharing its Pet ID link, at any time.</li>
+        <li>You can ask us for a copy of your data, or ask us to correct or delete it, by emailing <O>contact email</O>.</li>
+        <li>Depending on where you live (for example California, under the CCPA/CPRA), you may have additional rights. We will not discriminate against you for using them.</li>
+      </UL>
+
+      <H>7. Security</H>
+      <P>We use access controls (database row-level security), private storage, signed links and encryption in transit to protect your information. No system is perfectly secure, so we cannot guarantee absolute security.</P>
+
+      <H>8. Children</H>
+      <P>PetPassGo is not directed to children under 13, and we do not knowingly collect their personal information.</P>
+
+      <H>9. Changes</H>
+      <P>If we change this policy in a material way, we will notify you by email or in the app before the change takes effect.</P>
+
+      <H>10. Contact</H>
+      <P><O>legal business entity name</O>, <O>business mailing address</O>, <O>contact email</O>.</P>
+    </LegalPage>
+  );
+}

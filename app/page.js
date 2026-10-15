@@ -464,6 +464,7 @@ export default function PetPassGoLanding() {
 
       <footer className="px-6 md:px-14 py-8 text-center" style={{ borderTop: `1px solid ${tokens.line}`, fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 13, color: tokens.muted }}>
         PetPassGo is a preparation tool, not a certifying authority. Requirements are set by airlines and government agencies.
+        <div className="mt-2"><a href="/terms" style={{ color: tokens.navy, textDecoration: "underline" }}>Terms of Service</a>{" · "}<a href="/privacy" style={{ color: tokens.navy, textDecoration: "underline" }}>Privacy Policy</a></div>
       </footer>
     </div>
   );

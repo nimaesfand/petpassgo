@@ -284,7 +284,7 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
               </span>
             )}
           </div>
-          {link && link !== "https://www.delta.com/us/en/pet-travel/overview" && (
+          {link && (
             <a
               href={link}
               target="_blank"
