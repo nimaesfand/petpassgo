@@ -7,6 +7,7 @@ export const NAV_LINKS = [
   { href: "/airlines", label: "Airlines" },
   { href: "/faq", label: "FAQ" },
   { href: "/blog", label: "Blog" },
+  ...(process.env.NEXT_PUBLIC_COMMUNITY_ENABLED === "true" ? [{ href: "/community", label: "Community" }] : []),
 ];
 
 const link = { fontFamily: font.body, fontSize: 15, fontWeight: 500, color: tokens.navy, textDecoration: "none", whiteSpace: "nowrap" };

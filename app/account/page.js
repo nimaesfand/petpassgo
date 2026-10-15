@@ -174,6 +174,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [docType, setDocType] = useState("Vaccination record");
   const [selectedFile, setSelectedFile] = useState(null);
+  const [expiresOn, setExpiresOn] = useState("");
   const [uploading, setUploading] = useState(false);
 
   async function loadDocuments() {
@@ -207,8 +208,10 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         pet_id: pet.id,
         document_type: docType,
         file_url: filePath, // storage path, not a public URL
+        expires_on: expiresOn || null,
       });
       setSelectedFile(null);
+      setExpiresOn("");
       setShowUploadForm(false);
       loadDocuments();
     }
@@ -645,6 +648,11 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
               >
                 {doc.document_type}
               </a>
+              {doc.expires_on && (
+                <span style={{ fontFamily: font.body, fontSize: 13, color: doc.expires_on < new Date().toISOString().slice(0, 10) ? tokens.stamp : tokens.muted }} className="ml-auto mr-3">
+                  {doc.expires_on < new Date().toISOString().slice(0, 10) ? "Expired" : "Expires"} {new Date(doc.expires_on + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                </span>
+              )}
               <button
                 onClick={() => handleDeleteDocument(doc)}
                 style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.stamp, opacity: 0.7 }}
@@ -689,6 +697,11 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
             <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.55 }}>
               On your phone, this lets you choose "Take Photo" or pick an existing file.
             </div>
+            <label style={{ fontFamily: font.body, fontSize: 14, color: tokens.navy }} className="flex items-center gap-2 flex-wrap">
+              Expires on (optional)
+              <input type="date" value={expiresOn} onChange={(e) => setExpiresOn(e.target.value)} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }} className="rounded-lg px-3 py-1.5 outline-none" />
+              <span style={{ fontSize: 12.5, color: tokens.muted }}>Members get an email before it expires.</span>
+            </label>
             <div className="flex gap-2 mt-1">
               <button
                 type="submit"
@@ -713,12 +726,27 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
   );
 }
 
+function MemberUpsell() {
+  return (
+    <div className="rounded-xl p-5 mt-3" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
+      <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }} className="mb-1">Traveling with more than one animal?</div>
+      <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted, lineHeight: 1.55 }} className="mb-3">
+        Free accounts include one pet. Membership ($4.99/mo) adds unlimited pets, free trip refreshes and reminders before your documents expire.
+      </p>
+      <span className="inline-block rounded-full px-4 py-2" style={{ background: tokens.sky, fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy }}>Membership is coming soon</span>
+    </div>
+  );
+}
+
 function PetProfileTab({ userId }) {
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ name: "", animal_type: "Dog", role: "Pet", breed: "", sex: "" });
+  const [isMember, setIsMember] = useState(false);
+  const [limitHit, setLimitHit] = useState(false);
+  useEffect(() => { supabase.rpc("my_membership").then(({ data }) => setIsMember(!!data)); }, [userId]);
 
   const [loadError, setLoadError] = useState(false);
   const loadSeq = React.useRef(0);
@@ -767,6 +795,7 @@ function PetProfileTab({ userId }) {
       sex: form.sex || null,
     });
     setSaving(false);
+    if (error && /PET_LIMIT/.test(error.message || "")) { setShowForm(false); setLimitHit(true); return; }
     if (!error) {
       setForm({ name: "", animal_type: "Dog", role: "Pet", breed: "", sex: "" });
       setShowForm(false);
@@ -807,7 +836,7 @@ function PetProfileTab({ userId }) {
           {pets.map((pet) => (
             <PetCard key={pet.id} pet={pet} userId={userId} onPhotoUpdated={loadPets} />
           ))}
-          {!showForm && (
+          {!showForm && (isMember ? (
             <button
               onClick={() => setShowForm(true)}
               style={{ fontFamily: font.body, fontSize: 15, color: tokens.navy, fontWeight: 600 }}
@@ -815,7 +844,17 @@ function PetProfileTab({ userId }) {
             >
               + Add another pet
             </button>
-          )}
+          ) : limitHit ? (
+            <MemberUpsell />
+          ) : (
+            <button
+              onClick={() => setLimitHit(true)}
+              style={{ fontFamily: font.body, fontSize: 15, color: tokens.navy, fontWeight: 600 }}
+              className="mt-1 underline"
+            >
+              + Add another pet
+            </button>
+          ))}
         </>
       )}
 

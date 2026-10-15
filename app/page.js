@@ -399,8 +399,8 @@ export default function PetPassGoLanding() {
         <div className="grid md:grid-cols-3 gap-5 mt-10">
           {[
             ["Travel Pass", "$49.99", "per trip", "Your full checklist, deadlines, reminders and a Digital Pet ID with QR code.", true],
-            ["Membership", "$4.99", "per month", "Keep your pet's vault and Digital Pet ID.", false],
-            ["Refresh", "$19.99", "per new trip", "Members: rebuild your pass for the next trip.", false],
+            ["Membership", "$4.99", "per month", "Free trip refreshes, unlimited pets and reminders before documents expire.", false],
+            ["Free account", "$0", "always", "Pet vault, Digital Pet ID and lost-pet mode for one pet.", false],
           ].map(([n, p, u, d, hi]) => (
             <div key={n} className="rounded-2xl p-7" style={{ background: hi ? tokens.navy : "#fff", border: `1px solid ${hi ? tokens.navy : tokens.line}`, color: hi ? "#fff" : tokens.navy }}>
               <div style={{ fontFamily: B, fontWeight: 700, fontSize: 13, letterSpacing: "0.12em", color: hi ? tokens.gold : tokens.stamp }} className="mb-4">{n.toUpperCase()}</div>

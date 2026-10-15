@@ -40,10 +40,10 @@ export default function TermsPage() {
       <P>Some features may require payment. Payments will be processed by Stripe; we do not store your full card number. Planned prices (in U.S. dollars, before any applicable taxes):</P>
       <UL>
         <li>Trip pass: $49.99, one-time, per trip.</li>
-        <li>Membership: $4.99 per month, renewing automatically until you cancel.</li>
-        <li>Requirements refresh: $19.99, one-time.</li>
+        <li>Membership: $4.99 per month, renewing automatically until you cancel. Members get free trip refreshes (an updated Travel Pass for a new trip), more than one pet on their account, and reminder emails before uploaded documents expire.</li>
+        <li>Free accounts: one pet, with a document vault, Digital Pet ID and lost-pet mode, at no charge.</li>
       </UL>
-      <P>You can cancel a membership at any time; cancellation takes effect at the end of the current billing period. Prices may change; we will show the current price before you pay.</P>
+      <P>You can cancel a membership at any time; cancellation takes effect at the end of the current billing period. If you cancel, pets you already added stay on your account, but you can't add more until you rejoin. Prices may change; we will show the current price before you pay.</P>
       <P><strong>Refunds.</strong> You can get a full refund within 7 days of purchase, but only if you have never opened the details of the paid Travel Pass. Once those details have been opened, the digital product has been delivered and is not refundable. To request a refund, email <Email /> from the address on your account.</P>
       <P><strong>Exception for inaccurate information.</strong> At PetPassGo's sole discretion, we may issue a refund if information we showed you was inaccurate and directly caused a documented problem, such as being denied boarding. To ask for this, email <Email /> within 14 days of your travel date and include:</P>
       <UL>
@@ -55,28 +55,37 @@ export default function TermsPage() {
       <P>This exception does not apply if the information was correct when we showed it but the airline or authority changed its rules later, or if you did not follow the information we provided.</P>
       <P>Approved refunds are paid to the original payment method, and your access to that trip is removed.</P>
 
-      <H>7. Acceptable use</H>
+      <H>7. Community boards</H>
+      <UL>
+        <li>When the community boards are available, signed-in users can post tips, questions and replies under a display name. Your email address is never shown.</li>
+        <li>Community posts come from travelers and are not verified by PetPassGo. Always follow your PetPassGo checklist and your airline's rules.</li>
+        <li>Don't post links, email addresses, phone numbers, offensive language, or anything illegal, harassing or misleading. We may limit how often you post.</li>
+        <li>Anyone can report a post. We may hide or delete posts, and suspend accounts that break these rules, at our discretion.</li>
+        <li>You keep ownership of your posts and give us permission to display them on the Service, including publicly.</li>
+      </UL>
+
+      <H>8. Acceptable use</H>
       <P>Do not misuse the Service. That includes: breaking the law; uploading content you have no right to share; uploading malware; trying to access other users' data; scraping or reselling our content; or interfering with the Service's security or operation.</P>
 
-      <H>8. Our content</H>
+      <H>9. Our content</H>
       <P>The Service's software, design, checklists and written guidance belong to PetPassGo or its licensors. Except for your own content, you may not copy or redistribute them without our permission.</P>
 
-      <H>9. Disclaimers</H>
+      <H>10. Disclaimers</H>
       <P>The Service is provided "as is" and "as available". To the fullest extent permitted by law, we disclaim all warranties, express or implied, including warranties of accuracy, fitness for a particular purpose and non-infringement. We are not responsible for decisions made by airlines, airports, government agencies or veterinarians, including denied boarding, quarantine, or travel delays.</P>
 
-      <H>10. Limitation of liability</H>
+      <H>11. Limitation of liability</H>
       <P>To the fullest extent permitted by law, PetPassGo will not be liable for indirect, incidental, special or consequential damages, or for lost travel costs. Our total liability for any claim relating to the Service is limited to the amount you paid us in the 12 months before the claim. Some jurisdictions do not allow these limits, so they may not apply to you.</P>
 
-      <H>11. Ending your use</H>
+      <H>12. Ending your use</H>
       <P>You can stop using the Service and ask us to delete your account at any time by emailing <Email />. We may suspend or end accounts that break these Terms.</P>
 
-      <H>12. Changes to these Terms</H>
+      <H>13. Changes to these Terms</H>
       <P>We may update these Terms. If a change is material, we will notify you by email or in the app before it takes effect. If you keep using the Service after that, you accept the updated Terms.</P>
 
-      <H>13. Governing law</H>
+      <H>14. Governing law</H>
       <P>These Terms are governed by the laws of the State of California, without regard to its conflict-of-law rules.</P>
 
-      <H>14. Contact</H>
+      <H>15. Contact</H>
       <P>Questions about these Terms: <Email />.</P>
     </LegalPage>
   );

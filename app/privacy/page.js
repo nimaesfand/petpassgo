@@ -18,6 +18,8 @@ export default function PrivacyPage() {
         <li><strong>Documents:</strong> files you upload, such as vaccination records and health certificates.</li>
         <li><strong>Lost-pet messages:</strong> when someone who finds your pet uses the contact form on its Pet ID page, we collect the message and any contact details they choose to include.</li>
         <li><strong>Pet ID page views while a pet is lost:</strong> while your pet is marked lost, when its Pet ID page is viewed or its QR code is scanned we record the time and an approximate area (city/region, derived by our host from the visitor's network). We do not store the visitor's IP address or precise location, and these view records are deleted when you mark the pet as reunited.</li>
+        <li><strong>Community posts:</strong> if you use the community boards, your display name and the posts, replies and reports you submit. Posts are stored with your account so we can enforce limits and moderate, but your email and account ID are never shown.</li>
+        <li><strong>Document expiry dates:</strong> if you add one to an uploaded document, so members can get a reminder before it expires.</li>
         <li><strong>AI feature inputs:</strong> if you use the optional AI document check or chat, the documents and messages you submit to it.</li>
         <li><strong>Payment information (when payments launch):</strong> handled by Stripe. We receive payment status and limited details (for example, the last four card digits), not your full card number.</li>
         <li><strong>Technical data:</strong> standard logs from our hosting providers (Vercel and Supabase), such as IP address, browser type and request times, used for security and reliability.</li>
@@ -37,6 +39,7 @@ export default function PrivacyPage() {
       <UL>
         <li><strong>Private by default:</strong> your account, trips, documents and full pet records are visible only to you. Uploaded documents are kept in private storage and opened only through short-lived, signed links generated for you.</li>
         <li><strong>Public Pet ID page:</strong> if you share it, anyone with the link or QR code can see the information shown on that page. You choose what appears there.</li>
+        <li><strong>Community boards:</strong> your display name and posts are visible to other signed-in users and, once the boards open publicly, to anyone. A Lost &amp; found post can link to your pet's public Pet ID page if you choose.</li>
         <li><strong>Lost-pet relay:</strong> finders contact you through a relay form. Your email address is not shown to them. If you reply directly, they will see the address you reply from.</li>
       </UL>
 

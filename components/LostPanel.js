@@ -167,6 +167,12 @@ export default function LostPanel({ pet, userId }) {
               )}
             </div>
 
+            {process.env.NEXT_PUBLIC_COMMUNITY_ENABLED === "true" && (
+              <a href={`/community/lost-and-found?pet=${pet.id}`} className="rounded-xl p-4 block" style={{ background: "#fff", border: `1px solid ${tokens.line}`, textDecoration: "none", fontFamily: font.body }}>
+                <div style={{ fontWeight: 700, color: tokens.navy, fontSize: 15.5 }}>Post on the Lost &amp; found board →</div>
+                <div style={{ fontSize: 14, color: tokens.muted }}>Other travelers can see it and open {pet.name}'s poster. Your contact details stay hidden.</div>
+              </a>
+            )}
             {err && <div style={{ color: "#B42318", fontSize: 14 }}>{err}</div>}
             <button disabled={busy} onClick={reunited} className="rounded-full px-6 py-3" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16 }}>
               {pet.name} is home: mark reunited
