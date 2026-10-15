@@ -260,7 +260,12 @@ export default function PetPassGoLanding() {
         <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: 26, color: tokens.navy }}>
           PetPassGo
         </div>
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-5 flex-wrap">
+          {[["/airlines", "Airlines"], ["/faq", "FAQ"], ["/blog", "Blog"]].map(([href, label]) => (
+            <a key={href} href={href} style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 500, color: tokens.navy, textDecoration: "none", whiteSpace: "nowrap" }}>
+              {label}
+            </a>
+          ))}
           <a
             href="/login"
             style={{
