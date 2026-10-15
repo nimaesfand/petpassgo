@@ -474,20 +474,6 @@ export default function PetPassGoLanding() {
               </span>
             </div>
           ))}
-          {["Spirit", "Frontier", "Hawaiian", "Allegiant", "Sun Country"].map((airline) => (
-            <div
-              key={airline}
-              className="rounded-xl px-5 py-4 flex items-center gap-3"
-              style={{ background: tokens.paper, border: `1px dashed ${tokens.line}`, opacity: 0.6 }}
-            >
-              <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: tokens.ink, opacity: 0.6 }}>
-                SOON
-              </span>
-              <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 14.5, color: tokens.ink, opacity: 0.7 }}>
-                {airline}
-              </span>
-            </div>
-          ))}
         </div>
       </section>
 

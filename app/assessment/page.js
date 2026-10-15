@@ -408,7 +408,8 @@ export default function PetPassGoQuiz() {
 
     supabase
       .from("airline_requirements")
-      .select("*")
+      // Explicit columns: source links/verified dates are paid-dashboard only.
+      .select("id,airline,animal_type,role,trip_type,category,title,description,deadline_description,submission_link,destination_match,status")
       .in("airline", [requirementAirline(answers.airline), "Any"])
       .in("animal_type", [answers.animal, "Any"])
       .in("role", [answers.role, "Any"])

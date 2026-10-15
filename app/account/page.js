@@ -4,6 +4,9 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { requirementAirline } from "../../lib/airlines";
 import PetQr from "../../lib/PetQr";
+import TripTimeline from "../../components/TripTimeline";
+import ServiceAnimalTrack from "../../components/ServiceAnimalTrack";
+import DocCheck from "../../components/DocCheck";
 import { BUCKET, SignedImg, getSignedUrl, toStoragePath } from "../../lib/storage";
 
 const tokens = {
@@ -983,6 +986,16 @@ function RequirementItem({ req, checked, onToggle }) {
         </div>
         <div style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.ink, opacity: 0.7 }} className="mb-2">
           {req.description}
+          {req.source_url && req.verified_at && (
+            <div style={{ fontFamily: font.mono, fontSize: 10.5, opacity: 0.55, marginTop: 4 }}>
+              Source:{" "}
+              <a href={req.source_url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "underline" }}>
+                {(() => { try { return new URL(req.source_url).hostname.replace(/^www\./, ""); } catch { return "official page"; } })()}
+              </a>
+              {" · last verified "}
+              {new Date(req.verified_at + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+            </div>
+          )}
         </div>
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2 flex-wrap">
@@ -1127,7 +1140,10 @@ function CurrentFlightTab({ userId }) {
         const keywords = row.destination_match.split(",").map((k) => k.trim());
         return keywords.some((k) => destLower.includes(k));
       });
-      const finalResults = filtered.filter((r) => r.category !== "ELIGIBILITY NOTE");
+      // Official source citations are a paid feature: strip them unless this trip is paid.
+      const finalResults = filtered
+        .filter((r) => r.category !== "ELIGIBILITY NOTE")
+        .map((r) => (currentTrip.paid ? r : { ...r, source_url: null, verified_at: null }));
       setResults(finalResults);
 
       const { data: statusRows } = await supabase
@@ -1184,6 +1200,7 @@ function CurrentFlightTab({ userId }) {
   }
 
   const actionItems = results.filter((r) => r.status === "attention");
+  const showTrack = trip.paid && /service|psychiatric/i.test(trip.role || "");
   const verifyItems = results.filter((r) => r.status === "verify");
   const goodToKnow = results.filter((r) => r.status === "complete");
 
@@ -1218,6 +1235,10 @@ function CurrentFlightTab({ userId }) {
           />
         </div>
       </div>
+
+      {trip.paid && <TripTimeline trip={trip} />}
+      {showTrack && <ServiceAnimalTrack trip={trip} />}
+      {trip.paid && <DocCheck trip={trip} />}
 
       {results.length === 0 ? (
         <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 13.5, opacity: 0.7 }}>
