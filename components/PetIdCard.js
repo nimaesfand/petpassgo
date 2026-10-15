@@ -33,8 +33,6 @@ export function PetIllustration({ type, size = 96 }) {
  */
 export default function PetIdCard({ pet, photo, showQr = true, children }) {
   const details = [
-    ["Species", pet.animal_type],
-    ["Breed", pet.breed],
     ["Sex", pet.sex],
   ].filter(([, v]) => v);
   return (
@@ -53,7 +51,12 @@ export default function PetIdCard({ pet, photo, showQr = true, children }) {
           </div>
           <div className="min-w-0">
             <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 11, letterSpacing: "0.14em", color: tokens.muted }}>NAME</div>
-            <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 30, lineHeight: 1.1, color: tokens.navy }} className="mb-2 break-words">{pet.name}</div>
+            <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 30, lineHeight: 1.1, color: tokens.navy }} className="mb-1 break-words">{pet.name}</div>
+            {(pet.breed || pet.animal_type) && (
+              <div style={{ fontFamily: font.body, fontSize: 16, fontWeight: 600, color: tokens.ink }} className="mb-1">
+                {[pet.breed, pet.animal_type].filter(Boolean).join(" · ")}
+              </div>
+            )}
             <dl className="grid gap-x-4 gap-y-1" style={{ gridTemplateColumns: "auto 1fr", fontFamily: font.body, fontSize: 15 }}>
               {details.map(([k, v]) => (
                 <div key={k} className="contents">
