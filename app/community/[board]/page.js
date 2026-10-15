@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import SiteHeader from "../../../components/SiteHeader";
 import CommunityNotice from "../../../components/CommunityNotice";
+import CommunityPaywall from "../../../components/CommunityPaywall";
 import { supabase } from "../../../lib/supabaseClient";
 import { boardBySlug, textProblem, friendly } from "../../../lib/community";
 import { tokens, font } from "../../../lib/theme";
@@ -106,6 +107,7 @@ export default function BoardPage() {
   const [lostPets, setLostPets] = useState([]);
   const [openReply, setOpenReply] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [access, setAccess] = useState(null);
 
   async function load() {
     const { data } = await supabase.from("community_posts").select("id,board,parent_id,author_name,title,body,pet_id,is_hidden,created_at").eq("board", slug).order("created_at", { ascending: false }).limit(300);
@@ -119,7 +121,10 @@ export default function BoardPage() {
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
       const s = data?.session || null; setSession(s);
-      if (!s) { setLoading(false); return; }
+      if (!s) { setLoading(false); setAccess(false); return; }
+      const { data: ok } = await supabase.rpc("can_use_community");
+      setAccess(!!ok);
+      if (!ok) { setLoading(false); return; }
       load();
       supabase.from("community_profiles").select("display_name").maybeSingle().then(({ data: p }) => setDisplayName(p?.display_name || ""));
       supabase.rpc("is_community_moderator").then(({ data: m }) => setIsMod(!!m));
@@ -164,16 +169,12 @@ export default function BoardPage() {
         <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.muted }} className="mb-6">{board.blurb}</p>
         <CommunityNotice />
 
-        {session === null && (
-          <div className="rounded-xl p-5" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body }}>
-            <a href="/login" style={{ color: tokens.navy, fontWeight: 700 }}>Log in</a> or <a href="/signup" style={{ color: tokens.navy, fontWeight: 700 }}>create a free account</a> to read and post.
-          </div>
-        )}
+        {access === false && <CommunityPaywall boardName={board.name} signedIn={!!session} />}
 
-        {session && displayName === "" && <DisplayNameSetup onDone={setDisplayName} />}
-        {session && displayName && <Composer board={slug} lostPets={lostPets} defaultPet={search.get("pet") || ""} onPosted={load} />}
+        {access && displayName === "" && <DisplayNameSetup onDone={setDisplayName} />}
+        {access && displayName && <Composer board={slug} lostPets={lostPets} defaultPet={search.get("pet") || ""} onPosted={load} />}
 
-        {session && (loading ? <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div> : threads.length === 0 ? (
+        {access && (loading ? <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div> : threads.length === 0 ? (
           <div className="rounded-xl p-8 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, color: tokens.muted }}>No posts yet. Start the first thread.</div>
         ) : (
           <div className="space-y-4">

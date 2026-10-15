@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { tokens, font } from "../lib/theme";
 import SiteHeader from "../components/SiteHeader";
+import { PlanCards, CompareTable } from "../components/PricingPlans";
+import { PRICES } from "../lib/pricing";
 import { PetIllustration } from "../components/PetIdCard";
 import PetQr from "../lib/PetQr";
 import { AIRLINE_GUIDES } from "../lib/airlineGuides";
@@ -315,22 +317,29 @@ export default function PetPassGoLanding() {
 
       <SiteHeader />
 
-      {/* 1. HERO — the promise */}
-      <section className="px-6 md:px-14 pt-14 md:pt-24 pb-20 md:pb-28 grid lg:grid-cols-[1.15fr_1fr] gap-12 lg:gap-16 items-center max-w-[1240px] mx-auto">
+      {/* 1. HERO — two paths */}
+      <section className="max-w-[1240px] mx-auto px-6 md:px-14 pt-14 md:pt-20 pb-20 text-center">
         <div className={`fade-up ${loaded ? "in" : ""}`}>
-          <h1 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[40px] sm:text-[52px] lg:text-[66px] font-bold mb-6">
-            Fly with your pet. Skip the guesswork.
-          </h1>
-          <p style={{ fontFamily: B, fontSize: 19, color: tokens.muted, lineHeight: 1.55 }} className="max-w-lg mb-9">
-            One checklist for your airline, your route and your animal.
-          </p>
-          <div className="flex items-center gap-4 flex-wrap">
-            <Cta />
-            <span style={{ fontFamily: B, fontSize: 14, color: tokens.muted }}>Free · about 3 minutes</span>
-          </div>
+          <h1 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[40px] sm:text-[52px] lg:text-[64px] font-bold mb-5">Fly with your pet. Skip the guesswork.</h1>
+          <p style={{ fontFamily: B, fontSize: 19, color: tokens.muted }} className="mb-10">Two ways to start.</p>
         </div>
-        <div className={`fade-up flex justify-center lg:justify-end ${loaded ? "in" : ""}`} style={{ transitionDelay: "120ms" }}>
-          <BoardingCard />
+        <div className={`fade-up grid md:grid-cols-2 gap-5 max-w-[900px] mx-auto text-left ${loaded ? "in" : ""}`} style={{ transitionDelay: "120ms" }}>
+          {[
+            ["Flying soon?", "Answer a few trip questions and see every step you'll need.", "Plan your trip", "/assessment", "Free · no account needed", false],
+            ["Want peace of mind?", "Pet vault, a Digital Pet ID with QR code, and lost-pet alerts.", "Get your pet's ID", "/signup?plan=member", `Membership · ${PRICES.member}/mo`, true],
+          ].map(([t, b, c, href, sub, dark]) => (
+            <div key={t} className="rounded-2xl p-7 flex flex-col" style={{ background: dark ? tokens.navy : "#fff", border: `1px solid ${dark ? tokens.navy : tokens.line}`, color: dark ? "#fff" : tokens.navy }}>
+              <span aria-hidden="true" className="inline-flex items-center justify-center rounded-full mb-4" style={{ width: 48, height: 48, background: dark ? tokens.gold : tokens.sky }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={tokens.navy} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{dark ? <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M14 10h4M14 14h3" /><circle cx="8.5" cy="11" r="2" /><path d="M5.5 16c.6-1.6 1.7-2.4 3-2.4s2.4.8 3 2.4" /></> : <path d="M2 16l20-6-20-6 3 6-3 6zM5 10h7" />}</svg>
+              </span>
+              <div style={{ fontFamily: D, fontSize: 25, fontWeight: 700 }} className="mb-2">{t}</div>
+              <p style={{ fontFamily: B, fontSize: 16.5, opacity: 0.8, lineHeight: 1.5 }} className="mb-6 flex-1">{b}</p>
+              <div className="flex items-center gap-3 flex-wrap">
+                <a href={href} className="btn-primary rounded-full px-7 py-3.5" style={{ background: dark ? tokens.gold : tokens.primary, color: dark ? tokens.navy : "#fff", fontFamily: B, fontWeight: 700, textDecoration: "none" }}>{c} →</a>
+                <span style={{ fontFamily: B, fontSize: 13.5, opacity: 0.75 }}>{sub}</span>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -393,25 +402,11 @@ export default function PetPassGoLanding() {
       </section>
 
       {/* 5. PRICING */}
-      <section className="max-w-[1240px] mx-auto px-6 md:px-14 py-20">
+      <section id="pricing" className="max-w-[1240px] mx-auto px-6 md:px-14 py-20">
         <Eyebrow>PRICING</Eyebrow>
-        <H2>Planning is free. Pay when you're ready.</H2>
-        <div className="grid md:grid-cols-3 gap-5 mt-10">
-          {[
-            ["Travel Pass", "$49.99", "per trip", "Your full checklist, deadlines, reminders and a Digital Pet ID with QR code.", true],
-            ["Membership", "$4.99", "per month", "Free trip refreshes, unlimited pets and reminders before documents expire.", false],
-            ["Free account", "$0", "always", "Pet vault, Digital Pet ID and lost-pet mode for one pet.", false],
-          ].map(([n, p, u, d, hi]) => (
-            <div key={n} className="rounded-2xl p-7" style={{ background: hi ? tokens.navy : "#fff", border: `1px solid ${hi ? tokens.navy : tokens.line}`, color: hi ? "#fff" : tokens.navy }}>
-              <div style={{ fontFamily: B, fontWeight: 700, fontSize: 13, letterSpacing: "0.12em", color: hi ? tokens.gold : tokens.stamp }} className="mb-4">{n.toUpperCase()}</div>
-              <div className="flex items-baseline gap-2 mb-3">
-                <span style={{ fontFamily: D, fontSize: 40, fontWeight: 700 }}>{p}</span>
-                <span style={{ fontFamily: B, fontSize: 15, opacity: 0.7 }}>{u}</span>
-              </div>
-              <p style={{ fontFamily: B, fontSize: 15.5, lineHeight: 1.5, opacity: hi ? 0.85 : 1, color: hi ? "#fff" : tokens.muted }}>{d}</p>
-            </div>
-          ))}
-        </div>
+        <H2>Start free. Pay when you fly.</H2>
+        <div className="mt-10"><PlanCards /></div>
+        <CompareTable />
       </section>
 
       {/* 6. FAQ TEASER */}
@@ -439,7 +434,7 @@ export default function PetPassGoLanding() {
 
       <footer className="px-6 md:px-14 py-8 text-center" style={{ borderTop: `1px solid ${tokens.line}`, fontFamily: B, fontSize: 13, color: tokens.muted }}>
         PetPassGo is a preparation tool, not a certifying authority. Requirements are set by airlines and government agencies.
-        <div className="mt-2"><a href="/terms" style={{ color: tokens.navy, textDecoration: "underline" }}>Terms of Service</a>{" · "}<a href="/privacy" style={{ color: tokens.navy, textDecoration: "underline" }}>Privacy Policy</a></div>
+        <div className="mt-2"><a href="/lost-flyer" style={{ color: tokens.navy, textDecoration: "underline" }}>Free lost pet flyer</a>{" · "}<a href="/terms" style={{ color: tokens.navy, textDecoration: "underline" }}>Terms of Service</a>{" · "}<a href="/privacy" style={{ color: tokens.navy, textDecoration: "underline" }}>Privacy Policy</a></div>
       </footer>
     </div>
   );

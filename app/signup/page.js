@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { PRICES as P } from "../../lib/pricing";
 import { supabase } from "../../lib/supabaseClient";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
@@ -12,12 +13,20 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("idle"); // idle, loading, success, error
   const [errorMsg, setErrorMsg] = useState("");
+  const [plan, setPlan] = useState("member");
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("plan");
+    if (q === "pass" || q === "member") setPlan(q);
+    else if (localStorage.getItem("petpassgo_pending_trip")) setPlan("pass");
+  }, []);
 
   async function handleSignup(e) {
     e.preventDefault();
     setStatus("loading");
     setErrorMsg("");
 
+    // Remember the chosen plan; checkout happens after the email is confirmed (Stripe phase).
+    localStorage.setItem("petpassgo_plan", plan);
     const { error } = await supabase.auth.signUp({ email, password });
 
     if (error) {
@@ -32,7 +41,7 @@ export default function SignupPage() {
     <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full">
       <SiteHeader />
       <div className="w-full flex justify-center px-4 py-12 md:py-20">
-      <div className="w-full max-w-[460px]">
+      <div className="w-full max-w-[520px]">
 
         <div className="rounded-2xl p-8" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.06)" }}>
           {status === "success" ? (
@@ -54,11 +63,33 @@ export default function SignupPage() {
           ) : (
             <>
               <h1 style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700, color: tokens.navy }} className="mb-1 text-center">
-                Create your account
+                Choose your plan
               </h1>
               <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-6 text-center">
-                This is where your pet's profile and travel plans will live.
+                You can switch later.
               </p>
+              <div role="radiogroup" aria-label="Plan" className="mb-6">
+                {[
+                  ["member", "Membership", `${P.member}/mo`, `Pet vault, Digital Pet ID, lost-pet alerts, community. Travel Passes ${P.memberPass}.`],
+                  ["pass", "Travel Pass only", `${P.pass} per trip`, "One trip's checklist, deadlines and reminders. Pet ID until the trip ends."],
+                ].map(([k, n, price, d]) => {
+                  const sel = plan === k;
+                  return (
+                    <label key={k} className="flex gap-3 items-start rounded-2xl p-4 mb-3 cursor-pointer" style={{ border: `2px solid ${sel ? tokens.primary : tokens.line}`, background: sel ? "#FFF7F2" : "#fff" }}>
+                      <input type="radio" name="plan" value={k} checked={sel} onChange={() => setPlan(k)} className="mt-1.5" style={{ accentColor: tokens.primary }} />
+                      <span className="flex-1">
+                        <span className="flex justify-between gap-2 flex-wrap">
+                          <span style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }}>
+                            {n}{k === "member" && <span className="ml-2 rounded-full px-2 py-0.5 align-middle" style={{ background: tokens.gold, fontFamily: font.body, fontSize: 10.5, fontWeight: 800 }}>BEST VALUE</span>}
+                          </span>
+                          <span style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy, fontSize: 15 }}>{price}</span>
+                        </span>
+                        <span style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>{d}</span>
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
 
               <form onSubmit={handleSignup} className="flex flex-col gap-3">
                 <input
@@ -91,10 +122,10 @@ export default function SignupPage() {
                   style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}
                   className="btn-primary rounded-full py-3.5 text-[16px] mt-2"
                 >
-                  {status === "loading" ? "Creating account…" : "Create account"}
+                  {status === "loading" ? "Creating account…" : plan === "member" ? `Create account · Membership ${P.member}/mo` : "Create account · Travel Pass"}
                 </button>
                 <p style={{ fontFamily: font.body, fontSize: 13, opacity: 0.7 }} className="text-center">
-                  By creating an account you agree to our{" "}
+                  {plan === "member" ? "Monthly, cancel anytime. " : ""}You'll confirm your email, then pay. By creating an account you agree to our{" "}
                   <a href="/terms" style={{ color: tokens.navy, textDecoration: "underline" }}>Terms of Service</a> and{" "}
                   <a href="/privacy" style={{ color: tokens.navy, textDecoration: "underline" }}>Privacy Policy</a>.
                 </p>
