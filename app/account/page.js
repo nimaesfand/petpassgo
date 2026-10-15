@@ -12,6 +12,7 @@ import PetIdCard, { PetIllustration } from "../../components/PetIdCard";
 import TripTimeline from "../../components/TripTimeline";
 import ServiceAnimalTrack from "../../components/ServiceAnimalTrack";
 import DocCheck from "../../components/DocCheck";
+import VetGuidance from "../../components/VetGuidance";
 import { BUCKET, SignedImg, getSignedUrl, toStoragePath } from "../../lib/storage";
 import { tokens, font } from "../../lib/theme";
 
@@ -1300,7 +1301,8 @@ function CurrentFlightTab({ userId }) {
         </div>
       </div>
 
-      {trip.paid && <TripTimeline trip={trip} />}
+      {trip.paid && <TripTimeline trip={trip} requirements={results} statusMap={statusMap} />}
+      <VetGuidance trip={trip} requirements={results} paid={!!trip.paid} />
       {showTrack && <ServiceAnimalTrack trip={trip} />}
       {trip.paid && <DocCheck trip={trip} />}
 
