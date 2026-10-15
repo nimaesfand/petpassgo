@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { PRICES as P } from "../../lib/pricing";
 import { supabase } from "../../lib/supabaseClient";
 import { AIRLINES, requirementAirline } from "../../lib/airlines";
 import SiteHeader from "../../components/SiteHeader";
@@ -360,24 +361,17 @@ export default function PetPassGoQuiz() {
 
   const next = () => setStep((s) => Math.min(s + 1, TOTAL_STEPS));
 
-  // Special handler for the last question (airline) — this is the signup gate.
-  // Logged-in users go straight to results. New visitors save their answers and
-  // are sent to create an account first, then land right back on their results.
+  // The locked preview is free for everyone, no account needed. Signup happens only
+  // when someone chooses to buy (handlePurchase saves the answers and sends them to /signup).
   async function handleSeePlan() {
-    const { data } = await supabase.auth.getUser();
-    if (data.user) {
-      next();
-    } else {
-      localStorage.setItem("petpassgo_pending_trip", JSON.stringify(answers));
-      window.location.href = "/signup";
-    }
+    next();
   }
 
-  async function handlePurchase() {
+  async function handlePurchase(plan = "pass") {
     const { data } = await supabase.auth.getUser();
     if (!data.user) {
       localStorage.setItem("petpassgo_pending_trip", JSON.stringify(answers));
-      window.location.href = "/signup";
+      window.location.href = `/signup?plan=${plan === "member" ? "member" : "pass"}`;
       return;
     }
 
@@ -471,7 +465,7 @@ export default function PetPassGoQuiz() {
           {step === 5 && process.env.NEXT_PUBLIC_SITE_LAUNCHED !== "true" && (
             <label className="flex items-center gap-2 cursor-pointer" style={{ fontFamily: font.mono, fontSize: 12, color: tokens.muted }}>
               <input type="checkbox" checked={isMember} onChange={(e) => setIsMember(e.target.checked)} />
-              PREVIEW AS $4.99 MEMBER
+              PREVIEW AS MEMBER
             </label>
           )}
         </div>
@@ -686,7 +680,7 @@ export default function PetPassGoQuiz() {
                       style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}
                       className="w-full rounded-full py-3.5 text-[15px] hover:opacity-90 transition"
                     >
-                      Refresh this trip — free with membership
+                      Unlock this trip — {P.memberPass} member price
                     </button>
                     <ul
                       style={{ fontFamily: font.body, fontSize: 14, color: tokens.ink, opacity: 0.75 }}
@@ -694,7 +688,7 @@ export default function PetPassGoQuiz() {
                     >
                       <li>This trip's full requirement list, deadlines, and submission steps</li>
                       <li>Your existing pet profile and documents carried over automatically</li>
-                      <li>Updated Digital Pet ID for this itinerary</li>
+                      <li>Reminders before each deadline</li>
                     </ul>
                   </div>
                 ) : (
@@ -716,154 +710,26 @@ export default function PetPassGoQuiz() {
                       </div>
                     </div>
 
-                    <button
-                      onClick={handlePurchase}
-                      style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}
-                      className="w-full rounded-full py-3.5 text-[15px] hover:opacity-90 transition"
-                    >
-                      Get the full Travel Pass — $49.99
-                    </button>
-                    <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.55, textAlign: "center" }} className="mt-2">
-                      One-time. Not a subscription.
-                    </div>
-
-                    <div style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 600, color: tokens.navy }} className="mt-6 mb-3 text-center">
-                      Every Travel Pass includes these two things, free:
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-                      {/* Mini Digital Pet ID preview */}
-                      <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${tokens.line}` }}>
-                        <div style={{ background: tokens.navy }} className="px-3 py-2 flex items-center justify-between">
-                          <div style={{ fontFamily: font.mono, fontSize: 8, color: tokens.gold, letterSpacing: "0.1em" }}>
-                            DIGITAL PET ID
-                          </div>
-                          <div
-                            style={{
-                              fontFamily: font.mono,
-                              fontSize: 7,
-                              color: tokens.sky,
-                              opacity: 0.6,
-                            }}
-                          >
-                            PPG
-                          </div>
-                        </div>
-                        <div style={{ background: "#fff" }} className="p-3">
-                          <div className="flex items-center gap-2 mb-2.5">
-                            <div
-                              className="rounded-full flex items-center justify-center flex-shrink-0"
-                              style={{ width: 30, height: 30, background: tokens.sky, fontSize: 16 }}
-                            >
-                              {answers.animal === "Dog" ? "🐕" : answers.animal === "Cat" ? "🐈" : "🐾"}
-                            </div>
-                            <div>
-                              <div style={{ fontFamily: font.display, fontSize: 14.5, color: tokens.navy, lineHeight: 1.1 }}>
-                                {answers.animal || "Pet"}
-                              </div>
-                              <div style={{ fontFamily: font.mono, fontSize: 7.5, color: tokens.ink, opacity: 0.5, letterSpacing: "0.05em" }}>
-                                VERIFIED PROFILE
-                              </div>
-                            </div>
-                          </div>
-                          <svg
-                            viewBox="0 0 29 29"
-                            className="mx-auto"
-                            style={{ width: 40, height: 40, border: `1px solid ${tokens.line}` }}
-                          >
-                            <rect width="29" height="29" fill="#fff" />
-                            {/* corner finder squares, like a real QR code */}
-                            {[[1, 1], [22, 1], [1, 22]].map(([x, y]) => (
-                              <g key={`${x}-${y}`}>
-                                <rect x={x} y={y} width="6" height="6" fill={tokens.navy} />
-                                <rect x={x + 1.3} y={y + 1.3} width="3.4" height="3.4" fill="#fff" />
-                                <rect x={x + 2} y={y + 2} width="2" height="2" fill={tokens.navy} />
-                              </g>
-                            ))}
-                            {/* scattered data dots */}
-                            {[
-                              [10, 2], [13, 3], [16, 1], [19, 4], [10, 5], [15, 6],
-                              [2, 10], [5, 12], [3, 15], [7, 16], [1, 18], [5, 19],
-                              [10, 10], [13, 11], [11, 14], [16, 12], [14, 16], [18, 9],
-                              [22, 10], [25, 12], [23, 15], [26, 17], [21, 18], [24, 20],
-                              [10, 22], [13, 24], [16, 21], [11, 26], [18, 23], [15, 27],
-                            ].map(([x, y], i) => (
-                              <rect key={i} x={x} y={y} width="1.3" height="1.3" fill={tokens.navy} />
-                            ))}
-                          </svg>
-                        </div>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="rounded-2xl p-5 relative flex flex-col" style={{ background: tokens.navy, color: "#fff", border: `2px solid ${tokens.gold}` }}>
+                        <span className="absolute -top-3 left-5 rounded-full px-3 py-0.5" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 11 }}>SAVE {P.savings} ON THIS TRIP</span>
+                        <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 12.5, letterSpacing: ".12em", color: tokens.gold }} className="mb-1 mt-1">JOIN + PASS</div>
+                        <div style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700 }}>{P.memberPass} <span style={{ fontSize: 15, fontWeight: 500, opacity: 0.75 }}>+ {P.member}/mo</span></div>
+                        <p style={{ fontFamily: font.body, fontSize: 14, opacity: 0.8 }} className="mb-4 flex-1">This trip, plus Pet ID, lost-pet alerts, community and every future pass at {P.memberPass}.</p>
+                        <button onClick={() => { setAddMembership(true); handlePurchase("member"); }} className="w-full rounded-full py-3 hover:opacity-90 transition" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, fontSize: 15 }}>
+                          Join and unlock · {P.joinToday} today
+                        </button>
                       </div>
-
-                      {/* Mini Travel Mode preview */}
-                      <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${tokens.line}` }}>
-                        <div style={{ background: tokens.navy }} className="px-3 py-2">
-                          <div style={{ fontFamily: font.mono, fontSize: 8, color: tokens.gold, letterSpacing: "0.1em" }}>
-                            TRAVEL MODE
-                          </div>
-                        </div>
-                        <div style={{ background: "#fff" }} className="p-3">
-                          <div style={{ fontFamily: font.body, fontSize: 12, color: tokens.ink, color: tokens.muted }} className="mb-1">
-                            Day of your flight:
-                          </div>
-                          <div style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 600, color: tokens.navy }}>
-                            Only what you need, right now
-                          </div>
-                          <div style={{ fontFamily: font.body, fontSize: 11.5, color: tokens.muted }} className="mt-1">
-                            Works with no signal
-                          </div>
-                        </div>
+                      <div className="rounded-2xl p-5 flex flex-col" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+                        <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 12.5, letterSpacing: ".12em", color: tokens.primary }} className="mb-1 mt-1">THIS TRIP ONLY</div>
+                        <div style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700, color: tokens.navy }}>{P.pass}</div>
+                        <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-4 flex-1">Full checklist, deadlines, sources and reminders. Pet ID and vault until your trip ends.</p>
+                        <button onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3 hover:opacity-90 transition" style={{ background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, fontFamily: font.body, fontWeight: 600, fontSize: 15 }}>
+                          Buy Travel Pass
+                        </button>
                       </div>
                     </div>
-
-                    <div
-                      className="rounded-xl p-4 mb-1"
-                      style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}
-                    >
-                      <div style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, color: tokens.navy }} className="mb-2">
-                        Membership ($4.99/mo) adds:
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          "Free trip refreshes",
-                          "Unlimited pets",
-                          "Document expiry reminders",
-                        ].map((item) => (
-                          <span
-                            key={item}
-                            style={{
-                              fontFamily: font.body,
-                              fontSize: 13,
-                              color: tokens.navy,
-                              background: "#fff",
-                              border: `1px solid ${tokens.line}`,
-                            }}
-                            className="rounded-full px-3 py-1"
-                          >
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <label
-                      className="flex items-start gap-3 mt-4 rounded-xl p-4 cursor-pointer"
-                      style={{ background: "#fff", border: `1.5px solid ${addMembership ? tokens.navy : tokens.line}` }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={addMembership}
-                        onChange={(e) => setAddMembership(e.target.checked)}
-                        className="mt-1"
-                      />
-                      <div>
-                        <div style={{ fontFamily: font.body, fontSize: 15.5, fontWeight: 600, color: tokens.navy }}>
-                          Add Membership — $4.99/mo
-                        </div>
-                        <div style={{ fontFamily: font.body, fontSize: 14, opacity: 0.7 }} className="mt-1">
-                          Every future trip refresh is free. Cancel anytime.
-                        </div>
-                      </div>
-                    </label>
+                    <p style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }} className="mt-3 text-center">Membership is monthly. Cancel anytime.</p>
 
                   </div>
                 )

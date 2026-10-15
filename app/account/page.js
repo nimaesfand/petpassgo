@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
+import { usePetAccess } from "../../lib/access";
+import { PRICES as P } from "../../lib/pricing";
 import { requirementAirline } from "../../lib/airlines";
 import SiteHeader from "../../components/SiteHeader";
 import LostPanel from "../../components/LostPanel";
@@ -726,12 +728,27 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
   );
 }
 
+function AccessGate() {
+  return (
+    <div className="rounded-2xl p-7 text-center" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
+      <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-2">Your pet vault and Digital Pet ID are paused</div>
+      <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted, lineHeight: 1.55 }} className="mb-5 max-w-lg mx-auto">
+        They're included with Membership, or with a Travel Pass until your trip ends. Your pets and documents are kept safe and come back as soon as you rejoin.
+      </p>
+      <div className="flex gap-3 justify-center flex-wrap">
+        <a href="/signup?plan=member" className="btn-primary rounded-full px-6 py-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Join for {P.member}/mo</a>
+        <a href="/assessment" className="rounded-full px-6 py-3" style={{ border: `2px solid ${tokens.navy}`, color: tokens.navy, fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Buy a Travel Pass</a>
+      </div>
+    </div>
+  );
+}
+
 function MemberUpsell() {
   return (
     <div className="rounded-xl p-5 mt-3" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
       <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }} className="mb-1">Traveling with more than one animal?</div>
       <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted, lineHeight: 1.55 }} className="mb-3">
-        Free accounts include one pet. Membership ($4.99/mo) adds unlimited pets, free trip refreshes and reminders before your documents expire.
+        Your plan includes one pet. Membership ({P.member}/mo) adds unlimited pets, {P.memberPass} Travel Passes and reminders before your documents expire.
       </p>
       <span className="inline-block rounded-full px-4 py-2" style={{ background: tokens.sky, fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy }}>Membership is coming soon</span>
     </div>
@@ -746,6 +763,7 @@ function PetProfileTab({ userId }) {
   const [form, setForm] = useState({ name: "", animal_type: "Dog", role: "Pet", breed: "", sex: "" });
   const [isMember, setIsMember] = useState(false);
   const [limitHit, setLimitHit] = useState(false);
+  const access = usePetAccess(userId);
   useEffect(() => { supabase.rpc("my_membership").then(({ data }) => setIsMember(!!data)); }, [userId]);
 
   const [loadError, setLoadError] = useState(false);
@@ -803,6 +821,7 @@ function PetProfileTab({ userId }) {
     }
   }
 
+  if (!access.loading && !access.allowed) return <AccessGate />;
   return (
     <div>
       {loading ? (
