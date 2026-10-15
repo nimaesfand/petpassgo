@@ -376,6 +376,8 @@ export default function PetPassGoQuiz() {
     ? Math.round((normalResults.filter((r) => r.status === "complete").length / (normalResults.length || 1)) * 100) || 33
     : null;
 
+  const noMatch = step === 5 && !loadingResults && !fetchError && normalResults.length === 0;
+  const notSureAirline = /not sure/i.test(answers.airline || "");
   const needsAction = normalResults.filter((r) => r.status === "attention").length;
   const needsVerify = normalResults.filter((r) => r.status === "verify").length;
 
@@ -531,7 +533,7 @@ export default function PetPassGoQuiz() {
                 </div>
               )}
 
-              <div className="rounded-xl p-4 mb-5" style={{ background: tokens.navy }}>
+              {!noMatch && <div className="rounded-xl p-4 mb-5" style={{ background: tokens.navy }}>
                 {loadingResults ? (
                   <div style={{ fontFamily: font.body, fontSize: 15, color: "#fff" }}>Looking up requirements…</div>
                 ) : unlocked ? (
@@ -553,15 +555,18 @@ export default function PetPassGoQuiz() {
                     {needsVerify} need verification.
                   </div>
                 )}
-              </div>
+              </div>}
 
-              {!loadingResults && normalResults.length === 0 && eligibilityNotes.length === 0 && (
-                <div
-                  className="rounded-xl p-4 mb-4 text-center"
-                  style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 15, opacity: 0.75 }}
-                >
-                  We haven't researched verified requirements for {answers.airline || "this airline"} yet. We currently have
-                  verified data for the airlines in our list. Try another airline, or pick "Other / not sure yet" only if you have not chosen yet.
+              {noMatch && (
+                <div className="rounded-xl p-5 mb-4 text-center" style={{ background: "#FFF9EC", border: `1.5px solid ${tokens.gold}`, fontFamily: font.body, fontSize: 15.5, color: tokens.ink }}>
+                  <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.navy }} className="mb-1">🐾 We're not there yet</div>
+                  {notSureAirline ? (
+                    <p className="mb-3">Pick your airline to see your Travel Pass. Requirements change a lot by carrier, so we need it to build your plan.</p>
+                  ) : null}
+                  <p>We don't cover this airline or trip yet. Email <a href="mailto:support@petpassgo.com" style={{ color: tokens.primary, fontWeight: 600 }}>support@petpassgo.com</a> and we'll look into adding it.</p>
+                  {notSureAirline && (
+                    <button onClick={() => setStep(4)} className="mt-4 rounded-full px-6 py-2.5" style={{ background: tokens.navy, color: "#fff", fontWeight: 600 }}>Choose my airline</button>
+                  )}
                 </div>
               )}
 
@@ -603,7 +608,7 @@ export default function PetPassGoQuiz() {
                 </div>
               )}
 
-              {!unlocked ? (
+              {noMatch ? null : !unlocked ? (
                 isMember ? (
                   <div className="mt-5">
                     <button
