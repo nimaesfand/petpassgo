@@ -7,7 +7,7 @@ const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["500", "600",
 const body = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-body", display: "swap" });
 
 const description =
-  "PetPassGo helps travelers prepare for flights with pets and service animals — a free assessment, then a personalized, airline-specific Travel Pass with every requirement organized and tracked.";
+  "PetPassGo helps travelers prepare for flights with pets and service animals — answer a few trip questions, then get a personalized, airline-specific Travel Pass with every requirement organized and tracked.";
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),

@@ -23,7 +23,7 @@ export default function FaqPage() {
             <p className="mt-3" style={{ lineHeight: 1.6, opacity: 0.85 }}>{f.a}</p>
           </details>
         ))}
-        <p className="mt-10"><a href="/assessment" style={{ color: "#14213D", fontWeight: 600 }}>Take the free assessment →</a></p>
+        <p className="mt-10"><a href="/assessment" style={{ color: "#14213D", fontWeight: 600 }}>Start planning your trip →</a></p>
       </Prose>
     </>
   );
