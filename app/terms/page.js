@@ -1,4 +1,4 @@
-import { LegalPage, H, P, UL, O } from "../../components/LegalPage";
+import { LegalPage, H, P, UL, Email } from "../../components/LegalPage";
 
 export const metadata = {
   title: "Terms of Service",
@@ -9,7 +9,7 @@ export const metadata = {
 export default function TermsPage() {
   return (
     <LegalPage title="Terms of Service" updated="October 14, 2026">
-      <P>These Terms of Service ("Terms") govern your use of PetPassGo (the "Service"), operated by <O>legal business entity name</O>, <O>business mailing address</O> ("PetPassGo", "we", "us"). By creating an account or using the Service, you agree to these Terms.</P>
+      <P>These Terms of Service ("Terms") govern your use of PetPassGo (the "Service"), operated by PetPassGo ("PetPassGo", "we", "us"). By creating an account or using the Service, you agree to these Terms.</P>
 
       <H>1. What PetPassGo is, and what it is not</H>
       <P>PetPassGo helps you prepare to fly with a pet or service animal. It organizes airline and government requirements into a checklist, stores your pet's records, and sends reminders.</P>
@@ -18,7 +18,7 @@ export default function TermsPage() {
       <H>2. Your account</H>
       <UL>
         <li>Accounts are created and authenticated through our hosting provider, Supabase. You must give accurate information and keep your password secure.</li>
-        <li>You are responsible for activity on your account. Tell us promptly at <O>contact email</O> if you believe it has been accessed without permission.</li>
+        <li>You are responsible for activity on your account. Tell us promptly at <Email /> if you believe it has been accessed without permission.</li>
         <li>You must be at least 18 years old, or the age of majority where you live, to create an account.</li>
       </UL>
 
@@ -44,7 +44,7 @@ export default function TermsPage() {
         <li>Requirements refresh: $19.99, one-time.</li>
       </UL>
       <P>You can cancel a membership at any time; cancellation takes effect at the end of the current billing period. Prices may change; we will show the current price before you pay.</P>
-      <P><strong>Refunds:</strong> <O>refund policy — e.g. eligibility, time window, how to request a refund</O></P>
+      <P><strong>Refunds:</strong> If you have not yet used the trip details you purchased, you can get a full refund within 7 days of purchase. To request one, email <Email /> from the address on your account.</P>
 
       <H>7. Acceptable use</H>
       <P>Do not misuse the Service. That includes: breaking the law; uploading content you have no right to share; uploading malware; trying to access other users' data; scraping or reselling our content; or interfering with the Service's security or operation.</P>
@@ -59,16 +59,16 @@ export default function TermsPage() {
       <P>To the fullest extent permitted by law, PetPassGo will not be liable for indirect, incidental, special or consequential damages, or for lost travel costs. Our total liability for any claim relating to the Service is limited to the amount you paid us in the 12 months before the claim. Some jurisdictions do not allow these limits, so they may not apply to you.</P>
 
       <H>11. Ending your use</H>
-      <P>You can stop using the Service and ask us to delete your account at any time by contacting <O>contact email</O>. We may suspend or end accounts that break these Terms.</P>
+      <P>You can stop using the Service and ask us to delete your account at any time by emailing <Email />. We may suspend or end accounts that break these Terms.</P>
 
       <H>12. Changes to these Terms</H>
       <P>We may update these Terms. If a change is material, we will notify you by email or in the app before it takes effect. If you keep using the Service after that, you accept the updated Terms.</P>
 
       <H>13. Governing law</H>
-      <P>These Terms are governed by the laws of the State of <O>governing-law state</O>, without regard to its conflict-of-law rules.</P>
+      <P>These Terms are governed by the laws of the State of California, without regard to its conflict-of-law rules.</P>
 
       <H>14. Contact</H>
-      <P><O>legal business entity name</O>, <O>business mailing address</O>, <O>contact email</O>.</P>
+      <P>Questions about these Terms: <Email />.</P>
     </LegalPage>
   );
 }

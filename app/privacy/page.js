@@ -1,4 +1,4 @@
-import { LegalPage, H, P, UL, O } from "../../components/LegalPage";
+import { LegalPage, H, P, UL, Email } from "../../components/LegalPage";
 
 export const metadata = {
   title: "Privacy Policy",
@@ -9,7 +9,7 @@ export const metadata = {
 export default function PrivacyPage() {
   return (
     <LegalPage title="Privacy Policy" updated="October 14, 2026">
-      <P>This policy explains what information PetPassGo, operated by <O>legal business entity name</O> ("we", "us"), collects, how we use it, and the choices you have. Questions: <O>contact email</O>.</P>
+      <P>This policy explains what information PetPassGo, operated by PetPassGo ("we", "us"), collects, how we use it, and the choices you have. Questions: <Email />.</P>
 
       <H>1. Information we collect</H>
       <UL>
@@ -47,32 +47,46 @@ export default function PrivacyPage() {
         <li>Vercel: website hosting.</li>
         <li>Resend: email delivery.</li>
         <li>Stripe: payment processing, once payments launch.</li>
-        <li>An AI model provider <O>name of AI provider</O>: only for content you submit to the optional AI features.</li>
+        <li>A third-party AI provider: only for content you submit to the optional AI features.</li>
       </UL>
       <P>We may also disclose information if the law requires it, to protect people's safety or rights, or as part of a merger or sale of the business, subject to this policy.</P>
 
       <H>5. How long we keep it</H>
-      <P>We keep your information while your account is active. If you delete your account, we delete your account data and uploaded documents within <O>retention period</O>, except where we must keep records (for example, payment records) for legal or accounting reasons.</P>
+      <P>We keep your information while your account is active. If you delete your account, we delete your account data and uploaded documents within 30 days, except where we must keep records (for example, payment records) for legal or accounting reasons.</P>
 
       <H>6. Your choices and rights</H>
       <UL>
         <li>You can view and edit your pet and trip information, and delete documents, in the app.</li>
         <li>You can turn off a pet's lost status, or stop sharing its Pet ID link, at any time.</li>
-        <li>You can ask us for a copy of your data, or ask us to correct or delete it, by emailing <O>contact email</O>.</li>
-        <li>Depending on where you live (for example California, under the CCPA/CPRA), you may have additional rights. We will not discriminate against you for using them.</li>
+        <li>You can ask us for a copy of your data, or ask us to correct or delete it, by emailing <Email />.</li>
+        <li>Depending on where you live, you may have additional rights. California residents, see the next section.</li>
       </UL>
 
-      <H>7. Security</H>
+      <H>7. Your California privacy rights</H>
+      <P>If you are a California resident, the California Consumer Privacy Act, as amended by the California Privacy Rights Act (CCPA), gives you the following rights:</P>
+      <UL>
+        <li><strong>Right to know:</strong> to ask what personal information we have collected about you, the categories of sources, why we collect it, and the categories of third parties we disclose it to.</li>
+        <li><strong>Right to access:</strong> to get a copy of the specific personal information we hold about you.</li>
+        <li><strong>Right to delete:</strong> to ask us to delete your personal information, subject to legal exceptions.</li>
+        <li><strong>Right to correct:</strong> to ask us to correct inaccurate personal information.</li>
+        <li><strong>Right to opt out of sale or sharing:</strong> we do not sell your personal information and do not share it for cross-context behavioral advertising, so there is nothing to opt out of.</li>
+        <li><strong>Right to limit use of sensitive personal information:</strong> we use your account login details only to provide the Service, as the CCPA permits.</li>
+        <li><strong>Non-discrimination:</strong> we will not deny you service, charge you a different price, or give you a lower level of service for using these rights.</li>
+      </UL>
+      <P>Categories of personal information we collect: identifiers (such as email address); account login details; content you upload (pet records and documents); internet activity on our Service (technical logs); approximate location of Pet ID page views while a pet is marked lost; and commercial information (purchase records, once payments launch). The sources, purposes and recipients are described in sections 1, 2 and 4 above. We keep each category for as long as described in section 5.</P>
+      <P>To use these rights, email <Email /> from the address on your account. We will verify your request by confirming it with that email address, and respond within 45 days. You can also use an authorized agent; we may ask for proof that the agent is authorized and confirm your identity directly.</P>
+
+      <H>8. Security</H>
       <P>We use access controls (database row-level security), private storage, signed links and encryption in transit to protect your information. No system is perfectly secure, so we cannot guarantee absolute security.</P>
 
-      <H>8. Children</H>
+      <H>9. Children</H>
       <P>PetPassGo is not directed to children under 13, and we do not knowingly collect their personal information.</P>
 
-      <H>9. Changes</H>
+      <H>10. Changes</H>
       <P>If we change this policy in a material way, we will notify you by email or in the app before the change takes effect.</P>
 
-      <H>10. Contact</H>
-      <P><O>legal business entity name</O>, <O>business mailing address</O>, <O>contact email</O>.</P>
+      <H>11. Contact</H>
+      <P>Questions about this policy or your data: <Email />.</P>
     </LegalPage>
   );
 }
