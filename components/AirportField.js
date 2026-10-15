@@ -8,7 +8,9 @@ export default function AirportField({ label, value, onSelect }) {
   const [open, setOpen] = useState(false);
   const q = foldAscii(query.trim());
   const matches = q.length > 0
-    ? AIRPORTS.filter((a) => foldAscii(a.city).includes(q) || foldAscii(a.code).includes(q) || foldAscii(a.name).includes(q)).slice(0, 12)
+    ? AIRPORTS.filter((a) => foldAscii(a.city).includes(q) || foldAscii(a.code).includes(q) || foldAscii(a.name).includes(q))
+        .sort((a, b) => (a.rank || 999) - (b.rank || 999))
+        .slice(0, 12)
     : [];
 
   return (
