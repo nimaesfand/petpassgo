@@ -40,7 +40,7 @@ export default function TermsPage() {
       <P>Some features may require payment. Payments will be processed by Stripe; we do not store your full card number. Planned prices (in U.S. dollars, before any applicable taxes):</P>
       <UL>
         <li>Free for everyone, no account needed: the trip questions with a locked preview of the steps you'll need, and the lost-pet flyer maker with sharing.</li>
-        <li>Membership: $6.99 per month, billed monthly. Includes the pet vault, Digital Pet ID with QR code, lost-pet alerts and finder messages, the community boards, document expiry reminders, unlimited pets, and Travel Passes at the member price of $19.99 per trip.</li>
+        <li>Membership: $6.99 per month, billed monthly. Includes the pet vault, Digital Pet ID with QR code, lost-pet alerts and finder messages, posting on the community boards, document expiry reminders, unlimited pets, and Travel Passes at the member price of $19.99 per trip. Any signed-in account can read the community boards; posting and replies require membership.</li>
         <li>Travel Pass without membership: $49.99, one-time, per trip. Includes that trip's checklist, deadlines, sources and reminders, plus the pet vault and Digital Pet ID until the trip's travel date has passed.</li>
       </UL>
       <P>You can cancel your membership at any time. You keep access until the end of the billing period you've paid for; after that, member features stop, and we don't give partial refunds for unused time. Your pets and documents are kept, not deleted, and come back if you rejoin; a Travel Pass you bought stays available for its trip. Lost-pet tools stay free after your membership or trip ends: you can still report a pet lost, share its poster and flyer, and receive finder messages, and its QR code shows a basic page with its name, photo and a button to message you. Prices may change; we will show the current price before you pay, and we will tell you before a membership price change takes effect.</P>
@@ -57,7 +57,7 @@ export default function TermsPage() {
 
       <H>7. Community boards</H>
       <UL>
-        <li>When the community boards are available, signed-in users can post tips, questions and replies under a display name. Your email address is never shown.</li>
+        <li>When the community boards are available, any signed-in account can read posts. Members can post tips, experiences, questions and replies under a display name. Your email address is never shown.</li>
         <li>Community posts come from travelers and are not verified by PetPassGo. Always follow your PetPassGo checklist and your airline's rules.</li>
         <li>Don't post links, email addresses, phone numbers, offensive language, or anything illegal, harassing or misleading. We may limit how often you post.</li>
         <li>Anyone can report a post. We may hide or delete posts, and suspend accounts that break these rules, at our discretion.</li>

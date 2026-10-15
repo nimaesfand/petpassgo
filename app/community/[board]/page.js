@@ -6,12 +6,12 @@ import CommunityNotice from "../../../components/CommunityNotice";
 import CommunityPaywall from "../../../components/CommunityPaywall";
 import WinBack from "../../../components/WinBack";
 import { lapsedPreview } from "../../../lib/access";
+import { PRICES as P } from "../../../lib/pricing";
 import { supabase } from "../../../lib/supabaseClient";
-import { boardBySlug, textProblem, friendly } from "../../../lib/community";
+import { BOARDS, boardBySlug, textProblem, friendly, formatPostWhen, POST_TYPES, postTypeLabel } from "../../../lib/community";
 import { tokens, font } from "../../../lib/theme";
 
 const input = { fontFamily: font.body, fontSize: 15.5, border: `2px solid ${tokens.line}`, background: "#fff" };
-const when = (iso) => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
 function DisplayNameSetup({ onDone }) {
   const [name, setName] = useState(""); const [err, setErr] = useState(""); const [busy, setBusy] = useState(false);
@@ -33,20 +33,64 @@ function DisplayNameSetup({ onDone }) {
   );
 }
 
+function JoinToPost() {
+  return (
+    <div className="rounded-2xl p-5 mb-6 flex items-center justify-between gap-4 flex-wrap" style={{ background: tokens.navy, color: "#fff" }}>
+      <div>
+        <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700 }}>Join to post</div>
+        <div style={{ fontFamily: font.body, fontSize: 14.5, color: "#C9D3E3" }}>You can read every board with your account. Membership {P.member}/mo unlocks posting and replies.</div>
+      </div>
+      <a href="/signup?plan=member" className="rounded-full px-5 py-2.5" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Join for {P.member}/mo</a>
+    </div>
+  );
+}
+
 function Composer({ board, parentId, lostPets, defaultPet, onPosted, compact }) {
   const [title, setTitle] = useState(""); const [body, setBody] = useState(""); const [petId, setPetId] = useState(defaultPet || "");
+  const [postType, setPostType] = useState("tip");
   const [err, setErr] = useState(""); const [busy, setBusy] = useState(false);
   async function submit(e) {
     e.preventDefault(); setErr("");
     const p = textProblem(body) || textProblem(title); if (p) return setErr(p);
+    if (!parentId && !postType) return setErr("Choose a post type.");
     setBusy(true);
-    const { error } = await supabase.rpc("create_community_post", { board, body, title: parentId ? null : title, parent_id: parentId || null, pet_id: petId || null });
+    const { error } = await supabase.rpc("create_community_post", {
+      board,
+      body,
+      title: parentId ? null : title,
+      parent_id: parentId || null,
+      pet_id: petId || null,
+      post_type: parentId ? null : postType,
+    });
     setBusy(false);
     if (error) return setErr(friendly(error));
     setTitle(""); setBody(""); setPetId(""); onPosted();
   }
   return (
     <form onSubmit={submit} className={compact ? "mt-3" : "rounded-2xl p-5 mb-8"} style={compact ? {} : { background: "#fff", border: `1px solid ${tokens.line}` }}>
+      {!parentId && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {POST_TYPES.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setPostType(t.id)}
+              className="rounded-full px-3 py-1.5"
+              style={{
+                fontFamily: font.body,
+                fontSize: 13.5,
+                fontWeight: 600,
+                border: `2px solid ${postType === t.id ? tokens.navy : tokens.line}`,
+                background: postType === t.id ? tokens.navy : "#fff",
+                color: postType === t.id ? "#fff" : tokens.navy,
+                cursor: "pointer",
+              }}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
       {!parentId && <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} placeholder={board === "lost-and-found" ? "e.g. Lost beagle near Terminal 2" : "Your tip or question, in one line"} className="w-full rounded-lg px-3 py-2 mb-2" style={input} aria-label="Title" />}
       <textarea value={body} onChange={(e) => setBody(e.target.value)} maxLength={2000} rows={compact ? 2 : 4} placeholder={parentId ? "Write a reply…" : "Share the details. No links, emails or phone numbers."} className="w-full rounded-lg px-3 py-2" style={input} aria-label={parentId ? "Reply" : "Post"} />
       {board === "lost-and-found" && !parentId && lostPets.length > 0 && (
@@ -109,10 +153,17 @@ export default function BoardPage() {
   const [lostPets, setLostPets] = useState([]);
   const [openReply, setOpenReply] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [access, setAccess] = useState(null);
+  const [canRead, setCanRead] = useState(null);
+  const [canPost, setCanPost] = useState(false);
+  const [recentOnly, setRecentOnly] = useState(false);
 
   async function load() {
-    const { data } = await supabase.from("community_posts").select("id,board,parent_id,author_name,title,body,pet_id,is_hidden,created_at").eq("board", slug).order("created_at", { ascending: false }).limit(300);
+    const { data } = await supabase
+      .from("community_posts")
+      .select("id,board,parent_id,author_name,title,body,pet_id,is_hidden,created_at,post_type")
+      .eq("board", slug)
+      .order("created_at", { ascending: false })
+      .limit(300);
     const rows = data || []; setPosts(rows); setLoading(false);
     const ids = rows.map((r) => r.id);
     if (ids.length) supabase.rpc("my_community_post_ids", { ids }).then(({ data: m }) => setMine(new Set((m || []).map((x) => (typeof x === "string" ? x : Object.values(x)[0])))));
@@ -123,34 +174,44 @@ export default function BoardPage() {
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
       const s = data?.session || null; setSession(s);
-      if (!s) { setLoading(false); setAccess(false); return; }
+      if (!s) { setLoading(false); setCanRead(false); setCanPost(false); return; }
+      setCanRead(true);
       const { data: ok } = await supabase.rpc("can_use_community");
-      const allowed = !!ok && !lapsedPreview();
-      setAccess(allowed);
-      if (!allowed) { setLoading(false); return; }
+      const postOk = !!ok && !lapsedPreview();
+      setCanPost(postOk);
       load();
-      supabase.from("community_profiles").select("display_name").maybeSingle().then(({ data: p }) => setDisplayName(p?.display_name || ""));
-      supabase.rpc("is_community_moderator").then(({ data: m }) => setIsMod(!!m));
-      if (slug === "lost-and-found") {
-        const { data: reps } = await supabase.from("pet_lost_reports").select("pet_id").eq("status", "lost");
-        const ids = (reps || []).map((r) => r.pet_id);
-        if (ids.length) { const { data: pets } = await supabase.from("pets").select("id,name").in("id", ids); setLostPets(pets || []); }
+      if (postOk) {
+        supabase.from("community_profiles").select("display_name").maybeSingle().then(({ data: p }) => setDisplayName(p?.display_name || ""));
+        supabase.rpc("is_community_moderator").then(({ data: m }) => setIsMod(!!m));
+        if (slug === "lost-and-found") {
+          const { data: reps } = await supabase.from("pet_lost_reports").select("pet_id").eq("status", "lost");
+          const ids = (reps || []).map((r) => r.pet_id);
+          if (ids.length) { const { data: pets } = await supabase.from("pets").select("id,name").in("id", ids); setLostPets(pets || []); }
+        }
+      } else {
+        setLoading(false);
       }
     });
   }, [slug]);
 
   const threads = useMemo(() => {
-    const top = posts.filter((p) => !p.parent_id);
+    const cutoff = recentOnly ? Date.now() - 90 * 86400000 : 0;
+    const top = posts.filter((p) => !p.parent_id && (!recentOnly || new Date(p.created_at).getTime() >= cutoff));
     const replies = posts.filter((p) => p.parent_id).sort((a, b) => a.created_at.localeCompare(b.created_at));
     return top.map((t) => ({ ...t, replies: replies.filter((r) => r.parent_id === t.id) }));
-  }, [posts]);
+  }, [posts, recentOnly]);
 
   if (!board) return (<><SiteHeader /><main className="max-w-3xl mx-auto px-6 py-16" style={{ fontFamily: font.body }}>That board doesn't exist. <a href="/community" style={{ color: tokens.navy, fontWeight: 600 }}>See all boards</a></main></>);
 
   const Post = ({ p, reply }) => (
     <div style={{ opacity: p.is_hidden ? 0.5 : 1 }}>
-      <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mb-1">
-        <strong style={{ color: tokens.navy }}>{p.author_name}</strong> · {when(p.created_at)}{p.is_hidden && " · HIDDEN"}
+      <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mb-1 flex flex-wrap items-center gap-2">
+        <strong style={{ color: tokens.navy }}>{p.author_name}</strong>
+        {!reply && p.post_type && (
+          <span className="rounded-full px-2 py-0.5" style={{ background: tokens.sky, color: tokens.navy, fontSize: 12, fontWeight: 700 }}>{postTypeLabel(p.post_type)}</span>
+        )}
+        <span>· {formatPostWhen(p.created_at)}</span>
+        {p.is_hidden && " · HIDDEN"}
       </div>
       {!reply && <h2 style={{ fontFamily: font.display, fontSize: 21, fontWeight: 700, color: tokens.navy }} className="mb-1">{p.title}</h2>}
       <p style={{ fontFamily: font.body, fontSize: reply ? 15 : 16, color: tokens.ink, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{p.body}</p>
@@ -159,7 +220,7 @@ export default function BoardPage() {
           {stillLost.has(p.pet_id) ? "Still lost: see poster & message owner →" : "Reunited ✓"}
         </a>
       )}
-      {session && <PostActions post={p} mine={mine.has(p.id)} isMod={isMod} onChange={load} />}
+      {canPost && <PostActions post={p} mine={mine.has(p.id)} isMod={isMod} onChange={load} />}
     </div>
   );
 
@@ -168,17 +229,68 @@ export default function BoardPage() {
       <SiteHeader />
       <main className="max-w-[860px] mx-auto px-6 py-12">
         <a href="/community" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.navy }}>← All boards</a>
-        <h1 style={{ fontFamily: font.display, fontSize: 38, fontWeight: 700, color: tokens.navy }} className="mt-3 mb-2">{board.name}</h1>
-        <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.muted }} className="mb-6">{board.blurb}</p>
+
+        <div className="flex flex-wrap gap-2 mt-4 mb-5 overflow-x-auto">
+          {BOARDS.filter((b) => b.airline).map((b) => (
+            <a
+              key={b.slug}
+              href={`/community/${b.slug}`}
+              className="rounded-full px-3 py-1.5 whitespace-nowrap"
+              style={{
+                fontFamily: font.body,
+                fontSize: 13,
+                fontWeight: 600,
+                textDecoration: "none",
+                background: b.slug === slug ? tokens.navy : "#fff",
+                color: b.slug === slug ? "#fff" : tokens.navy,
+                border: `1px solid ${b.slug === slug ? tokens.navy : tokens.line}`,
+              }}
+            >
+              {b.name}
+            </a>
+          ))}
+          <a
+            href="/community/lost-and-found"
+            className="rounded-full px-3 py-1.5 whitespace-nowrap"
+            style={{
+              fontFamily: font.body,
+              fontSize: 13,
+              fontWeight: 600,
+              textDecoration: "none",
+              background: slug === "lost-and-found" ? tokens.navy : "#fff",
+              color: slug === "lost-and-found" ? "#fff" : tokens.navy,
+              border: `1px solid ${slug === "lost-and-found" ? tokens.navy : tokens.line}`,
+            }}
+          >
+            Lost & found
+          </a>
+        </div>
+
+        <h1 style={{ fontFamily: font.display, fontSize: 38, fontWeight: 700, color: tokens.navy }} className="mt-1 mb-2">{board.name}</h1>
+        <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.muted }} className="mb-4">{board.blurb}</p>
         <CommunityNotice />
 
-        {access === false && (session ? <WinBack area="community" /> : <CommunityPaywall boardName={board.name} signedIn={false} />)}
+        {canRead === false && <CommunityPaywall boardName={board.name} signedIn={!!session} />}
+        {canRead && !canPost && <JoinToPost />}
+        {canPost && lapsedPreview() && <WinBack area="community" />}
 
-        {access && displayName === "" && <DisplayNameSetup onDone={setDisplayName} />}
-        {access && displayName && <Composer board={slug} lostPets={lostPets} defaultPet={search.get("pet") || ""} onPosted={load} />}
+        {canPost && displayName === "" && <DisplayNameSetup onDone={setDisplayName} />}
+        {canPost && displayName && <Composer board={slug} lostPets={lostPets} defaultPet={search.get("pet") || ""} onPosted={load} />}
 
-        {access && (loading ? <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div> : threads.length === 0 ? (
-          <div className="rounded-xl p-8 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, color: tokens.muted }}>No posts yet. Start the first thread.</div>
+        {canRead && (
+          <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+            <label style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.navy, display: "flex", alignItems: "center", gap: 8 }}>
+              <input type="checkbox" checked={recentOnly} onChange={(e) => setRecentOnly(e.target.checked)} />
+              Recent only (last 90 days)
+            </label>
+            <span style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>Newest first</span>
+          </div>
+        )}
+
+        {canRead && (loading ? <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div> : threads.length === 0 ? (
+          <div className="rounded-xl p-8 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, color: tokens.muted }}>
+            {recentOnly ? "No posts in the last 90 days." : "No posts yet. Start the first thread."}
+          </div>
         ) : (
           <div className="space-y-4">
             {threads.map((t) => (
@@ -189,9 +301,14 @@ export default function BoardPage() {
                     {t.replies.map((r) => <Post key={r.id} p={r} reply />)}
                   </div>
                 )}
-                {displayName && (openReply === t.id
+                {canPost && displayName && (openReply === t.id
                   ? <Composer board={slug} parentId={t.id} lostPets={[]} onPosted={() => { setOpenReply(null); load(); }} compact />
                   : <button onClick={() => setOpenReply(t.id)} className="mt-3" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy, background: "none", border: "none", cursor: "pointer", padding: 0 }}>Reply</button>)}
+                {canRead && !canPost && (
+                  <div className="mt-3" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>
+                    <a href="/signup?plan=member" style={{ color: tokens.navy, fontWeight: 600 }}>Join to post</a> a reply
+                  </div>
+                )}
               </article>
             ))}
           </div>

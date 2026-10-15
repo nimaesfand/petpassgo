@@ -16,13 +16,24 @@ export default function CommunityPaywall({ boardName, signedIn }) {
       </div>
       <div className="absolute inset-0 flex items-center justify-center p-5" style={{ background: "rgba(243,245,249,.55)" }}>
         <div className="rounded-2xl p-7 text-center max-w-md" style={{ background: "#fff", boxShadow: "0 18px 40px rgba(20,33,61,.18)", border: `1px solid ${tokens.line}` }}>
-          <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-2">Join the conversation</div>
+          <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-2">
+            {signedIn ? "Join to post" : "Sign in to read"}
+          </div>
           <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-5">
-            Community boards are for members. Read tips from people who flew {boardName || "your airline"} with their pet, and ask your own.
+            {signedIn
+              ? `Browse is free with your account. Membership unlocks posting on the ${boardName || "airline"} board.`
+              : `Sign in with a free account to read tips from people who flew ${boardName || "your airline"} with their pet. Members can post and reply.`}
           </p>
-          <a href="/signup?plan=member" className="btn-primary block rounded-full py-3.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Join for {P.member}/mo</a>
+          {signedIn ? (
+            <a href="/signup?plan=member" className="btn-primary block rounded-full py-3.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Join for {P.member}/mo</a>
+          ) : (
+            <>
+              <a href="/login" className="btn-primary block rounded-full py-3.5 mb-2" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Log in</a>
+              <a href="/signup" className="block rounded-full py-3" style={{ fontFamily: font.body, fontWeight: 600, color: tokens.navy, textDecoration: "none" }}>Create a free account</a>
+            </>
+          )}
           <p style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }} className="mt-3">
-            Includes Pet ID, lost-pet alerts and {P.memberPass} Travel Passes.{!signedIn && <> Already a member? <a href="/login" style={{ color: tokens.navy, fontWeight: 600 }}>Log in</a></>}
+            Membership also includes Pet ID, lost-pet alerts and {P.memberPass} Travel Passes.
           </p>
         </div>
       </div>
