@@ -6,6 +6,7 @@ import { usePetAccess } from "../../lib/access";
 import WinBack from "../../components/WinBack";
 import { PRICES as P } from "../../lib/pricing";
 import { requirementAirline } from "../../lib/airlines";
+import { tripTypeForRoute, isMexicoAirport } from "../../lib/airports";
 import SiteHeader from "../../components/SiteHeader";
 import LostPanel from "../../components/LostPanel";
 import PetIdCard, { PetIllustration } from "../../components/PetIdCard";
@@ -1194,7 +1195,7 @@ function CurrentFlightTab({ userId }) {
         .in("airline", [requirementAirline(currentTrip.airline), "Any"])
         .in("animal_type", [currentTrip.animal_type, "Any"])
         .in("role", [currentTrip.role, "Any"])
-        .eq("trip_type", "domestic");
+        .in("trip_type", tripTypeForRoute(currentTrip.origin, currentTrip.destination) === "international" ? ["international", "domestic"] : ["domestic"]);
 
       const destLower = (currentTrip.destination || "").toLowerCase();
       const filtered = (reqs || []).filter((row) => {
@@ -1283,7 +1284,7 @@ function CurrentFlightTab({ userId }) {
           {trip.animal_type} · {trip.origin} → {trip.destination}
         </div>
         <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, opacity: 0.8 }} className="mb-3">
-          {trip.airline} · {trip.travel_date || "date pending"} · {trip.role}
+          {trip.airline} · {trip.travel_date || "date pending"} · {trip.role}{isMexicoAirport(trip.destination) || isMexicoAirport(trip.origin) ? " · International (Mexico)" : ""}
         </div>
         <div className="flex items-center justify-between mb-1.5">
           <span style={{ fontFamily: font.mono, fontSize: 12, color: tokens.sky, opacity: 0.7, letterSpacing: "0.08em" }}>

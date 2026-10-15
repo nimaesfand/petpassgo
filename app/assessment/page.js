@@ -4,94 +4,14 @@ import React, { useState, useEffect } from "react";
 import { PRICES as P } from "../../lib/pricing";
 import { supabase } from "../../lib/supabaseClient";
 import { AIRLINES, requirementAirline } from "../../lib/airlines";
+import { tripTypeForRoute, isMexicoAirport } from "../../lib/airports";
+import AirportField from "../../components/AirportField";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
 
 
 
 
-const AIRPORTS = [
-  { code: "LAX", city: "Los Angeles", name: "Los Angeles Intl" },
-  { code: "BUR", city: "Los Angeles", name: "Hollywood Burbank" },
-  { code: "LGB", city: "Los Angeles", name: "Long Beach" },
-  { code: "SNA", city: "Los Angeles", name: "John Wayne (Orange County)" },
-  { code: "BOS", city: "Boston", name: "Logan Intl" },
-  { code: "JFK", city: "New York", name: "John F. Kennedy Intl" },
-  { code: "LGA", city: "New York", name: "LaGuardia" },
-  { code: "EWR", city: "New York", name: "Newark Liberty" },
-  { code: "ORD", city: "Chicago", name: "O'Hare Intl" },
-  { code: "MDW", city: "Chicago", name: "Midway Intl" },
-  { code: "MIA", city: "Miami", name: "Miami Intl" },
-  { code: "FLL", city: "Miami", name: "Fort Lauderdale-Hollywood" },
-  { code: "TPA", city: "Tampa", name: "Tampa Intl" },
-  { code: "ATL", city: "Atlanta", name: "Hartsfield-Jackson" },
-  { code: "AUS", city: "Austin", name: "Austin-Bergstrom" },
-  { code: "DFW", city: "Dallas", name: "Dallas/Fort Worth Intl" },
-  { code: "DAL", city: "Dallas", name: "Dallas Love Field" },
-  { code: "SEA", city: "Seattle", name: "Seattle-Tacoma Intl" },
-  { code: "SFO", city: "San Francisco", name: "San Francisco Intl" },
-  { code: "OAK", city: "San Francisco", name: "Oakland Intl" },
-  { code: "DEN", city: "Denver", name: "Denver Intl" },
-  { code: "PHX", city: "Phoenix", name: "Sky Harbor Intl" },
-  { code: "LAS", city: "Las Vegas", name: "Harry Reid Intl" },
-];
-
-function AirportField({ label, value, onSelect }) {
-  const [query, setQuery] = useState(value || "");
-  const [open, setOpen] = useState(false);
-
-  const matches =
-    query.trim().length > 0
-      ? AIRPORTS.filter(
-          (a) =>
-            a.city.toLowerCase().includes(query.toLowerCase()) ||
-            a.code.toLowerCase().includes(query.toLowerCase()) ||
-            a.name.toLowerCase().includes(query.toLowerCase())
-        ).slice(0, 6)
-      : [];
-
-  return (
-    <div className="relative">
-      <input
-        value={query}
-        onChange={(e) => {
-          setQuery(e.target.value);
-          setOpen(true);
-          onSelect("");
-        }}
-        onFocus={() => setOpen(true)}
-        placeholder={label}
-        style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
-        className="rounded-xl px-4 py-3 outline-none w-full"
-      />
-      {open && matches.length > 0 && (
-        <div
-          className="absolute left-0 right-0 mt-1 rounded-xl overflow-hidden z-10"
-          style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 8px 20px rgba(21,34,56,0.12)" }}
-        >
-          {matches.map((a) => (
-            <button
-              key={a.code}
-              onClick={() => {
-                const label = `${a.city} (${a.code})`;
-                setQuery(label);
-                onSelect(label);
-                setOpen(false);
-              }}
-              className="w-full text-left px-4 py-2.5 flex items-center justify-between hover:bg-black/5"
-              style={{ fontFamily: font.body, fontSize: 15.5 }}
-            >
-              <span>
-                {a.city} — <span style={{ color: tokens.muted }}>{a.name}</span>
-              </span>
-              <span style={{ fontFamily: font.mono, fontSize: 13.5, color: tokens.navy, fontWeight: 700 }}>{a.code}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 const TOTAL_STEPS = 6;
 
@@ -410,7 +330,7 @@ export default function PetPassGoQuiz() {
       .in("airline", [requirementAirline(answers.airline), "Any"])
       .in("animal_type", [answers.animal, "Any"])
       .in("role", [answers.role, "Any"])
-      .eq("trip_type", "domestic")
+      .in("trip_type", tripTypeForRoute(answers.origin, answers.destination) === "international" ? ["international", "domestic"] : ["domestic"])
       .then(({ data, error }) => {
         if (error) {
           setFetchError(true);
@@ -577,7 +497,7 @@ export default function PetPassGoQuiz() {
                   {answers.animal} · {answers.origin || "—"} → {answers.destination || "—"}
                 </h2>
                 <div style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mt-1">
-                  {answers.airline} · {answers.date || "date pending"} · {answers.role}
+                  {answers.airline} · {answers.date || "date pending"} · {answers.role}{isMexicoAirport(answers.destination) || isMexicoAirport(answers.origin) ? " · International (Mexico)" : ""}
                 </div>
               </div>
 
@@ -630,13 +550,13 @@ export default function PetPassGoQuiz() {
                   style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 15, opacity: 0.75 }}
                 >
                   We haven't researched verified requirements for {answers.airline || "this airline"} yet. We currently have
-                  verified data for Delta, American, United, Southwest, JetBlue, and Alaska — start planning again with one of those airlines to see your results.
+                  verified data for the airlines in our list. Try another airline, or pick "Other / not sure yet" only if you have not chosen yet.
                 </div>
               )}
 
               {unlocked && !hasRealForms && normalResults.length > 0 && (
                 <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, opacity: 0.75 }} className="mb-4">
-                  No forms needed for this trip — {answers.airline}, {answers.origin || "—"} → {answers.destination || "—"}, domestic. Here's what to know:
+                  No forms needed for this trip — {answers.airline}, {answers.origin || "—"} → {answers.destination || "—"}. Here's what to know:
                 </div>
               )}
 
