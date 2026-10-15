@@ -2,22 +2,10 @@
 
 import React, { useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
+import SiteHeader from "../../components/SiteHeader";
+import { tokens, font } from "../../lib/theme";
 
-const tokens = {
-  navy: "#152238",
-  gold: "#C9A227",
-  sky: "#EAF0F6",
-  paper: "#F6F8FA",
-  ink: "#1C2733",
-  stamp: "#B23A2E",
-  line: "#D9E1E8",
-};
 
-const font = {
-  display: "'Fraunces', serif",
-  mono: "'IBM Plex Mono', monospace",
-  body: "'Inter', sans-serif",
-};
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -41,24 +29,21 @@ export default function SignupPage() {
   }
 
   return (
-    <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full flex justify-center px-4 py-16">
-      <div className="w-full max-w-[440px]">
-        <div className="flex items-center gap-2 mb-8 justify-center">
-          <a href="/" style={{ fontFamily: font.display, fontWeight: 600, fontSize: 22, color: tokens.navy, textDecoration: "none" }}>
-            PetPassGo
-          </a>
-        </div>
+    <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full">
+      <SiteHeader />
+      <div className="w-full flex justify-center px-4 py-12 md:py-20">
+      <div className="w-full max-w-[460px]">
 
-        <div className="rounded-2xl p-8" style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}>
+        <div className="rounded-2xl p-8" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.06)" }}>
           {status === "success" ? (
             <div className="text-center">
               <div style={{ fontFamily: font.display, fontSize: 22, color: tokens.navy }} className="mb-2">
                 Check your email
               </div>
-              <p style={{ fontFamily: font.body, fontSize: 14, opacity: 0.7 }}>
+              <p style={{ fontFamily: font.body, fontSize: 15.5, opacity: 0.7 }}>
                 We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account.
               </p>
-              <p style={{ fontFamily: font.body, fontSize: 14, opacity: 0.7 }} className="mt-3">
+              <p style={{ fontFamily: font.body, fontSize: 15.5, opacity: 0.7 }} className="mt-3">
                 Then come back and{" "}
                 <a href="/login" style={{ color: tokens.navy, fontWeight: 600, textDecoration: "underline" }}>
                   log in
@@ -68,10 +53,10 @@ export default function SignupPage() {
             </div>
           ) : (
             <>
-              <h1 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1 text-center">
+              <h1 style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700, color: tokens.navy }} className="mb-1 text-center">
                 Create your account
               </h1>
-              <p style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.65 }} className="mb-6 text-center">
+              <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-6 text-center">
                 This is where your pet's profile and travel plans will live.
               </p>
 
@@ -82,7 +67,7 @@ export default function SignupPage() {
                   placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }}
+                  style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
                   className="rounded-xl px-4 py-3 outline-none"
                 />
                 <input
@@ -92,25 +77,25 @@ export default function SignupPage() {
                   placeholder="Password (6+ characters)"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }}
+                  style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
                   className="rounded-xl px-4 py-3 outline-none"
                 />
 
                 {status === "error" && (
-                  <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.stamp }}>{errorMsg}</div>
+                  <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.stamp }}>{errorMsg}</div>
                 )}
 
                 <button
                   type="submit"
                   disabled={status === "loading"}
                   style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}
-                  className="rounded-full py-3.5 text-[15px] hover:opacity-90 transition mt-2"
+                  className="btn-primary rounded-full py-3.5 text-[16px] mt-2"
                 >
                   {status === "loading" ? "Creating account…" : "Create account"}
                 </button>
               </form>
 
-              <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.65 }} className="text-center mt-5">
+              <div style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="text-center mt-5">
                 Already have an account?{" "}
                 <a href="/login" style={{ color: tokens.navy, fontWeight: 600, textDecoration: "underline" }}>
                   Log in
@@ -119,6 +104,7 @@ export default function SignupPage() {
             </>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

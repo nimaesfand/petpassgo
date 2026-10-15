@@ -2,17 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { AIRLINES } from "../lib/airlines";
+import { tokens, font } from "../lib/theme";
+import SiteHeader from "../components/SiteHeader";
 
-const tokens = {
-  navy: "#152238",
-  navyDeep: "#0D1626",
-  gold: "#C9A227",
-  sky: "#EAF0F6",
-  paper: "#F6F8FA",
-  ink: "#1C2733",
-  stamp: "#B23A2E",
-  line: "#D9E1E8",
-};
 
 function Perforation() {
   return (
@@ -39,7 +31,7 @@ function Stamp() {
         color: tokens.stamp,
         borderRadius: "9999px",
         padding: "6px 14px",
-        fontFamily: "'IBM Plex Mono', monospace",
+        fontFamily: "var(--font-body), system-ui, sans-serif",
         fontSize: "11px",
         letterSpacing: "0.12em",
         fontWeight: 700,
@@ -53,7 +45,7 @@ function Stamp() {
 function BoardingCard() {
   return (
     <div
-      className="relative rounded-2xl shadow-2xl overflow-hidden w-full max-w-[420px]"
+      className="relative rounded-2xl shadow-2xl overflow-hidden w-full max-w-[460px] mx-auto lg:mx-0"
       style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}
     >
       <div
@@ -62,13 +54,13 @@ function BoardingCard() {
       >
         <div>
           <div
-            style={{ fontFamily: "'Fraunces', serif", fontSize: "20px", fontWeight: 600 }}
+            style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: "20px", fontWeight: 600 }}
           >
             PetPassGo
           </div>
           <div
             style={{
-              fontFamily: "'IBM Plex Mono', monospace",
+              fontFamily: "var(--font-body), system-ui, sans-serif",
               fontSize: "10px",
               letterSpacing: "0.14em",
               color: tokens.gold,
@@ -79,7 +71,7 @@ function BoardingCard() {
         </div>
         <div
           style={{
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: "var(--font-body), system-ui, sans-serif",
             fontSize: "11px",
             color: tokens.sky,
             opacity: 0.7,
@@ -106,13 +98,13 @@ function BoardingCard() {
           </div>
           <div>
             <div
-              style={{ fontFamily: "'Fraunces', serif", fontSize: "22px", color: tokens.ink }}
+              style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: "22px", color: tokens.ink }}
             >
               Mochi
             </div>
             <div
               style={{
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: "var(--font-body), system-ui, sans-serif",
                 fontSize: "11px",
                 color: tokens.ink,
                 opacity: 0.6,
@@ -132,7 +124,7 @@ function BoardingCard() {
             <div key={label}>
               <div
                 style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: "var(--font-body), system-ui, sans-serif",
                   fontSize: "10px",
                   letterSpacing: "0.1em",
                   color: tokens.ink,
@@ -143,7 +135,7 @@ function BoardingCard() {
               </div>
               <div
                 style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: "var(--font-body), system-ui, sans-serif",
                   fontSize: "17px",
                   color: tokens.navy,
                   fontWeight: 700,
@@ -164,7 +156,7 @@ function BoardingCard() {
         <div>
           <div
             style={{
-              fontFamily: "'IBM Plex Mono', monospace",
+              fontFamily: "var(--font-body), system-ui, sans-serif",
               fontSize: "10px",
               letterSpacing: "0.1em",
               color: tokens.ink,
@@ -174,7 +166,7 @@ function BoardingCard() {
             TRIP READINESS
           </div>
           <div
-            style={{ fontFamily: "'Fraunces', serif", fontSize: "26px", color: tokens.navy }}
+            style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: "26px", color: tokens.navy }}
           >
             90%
           </div>
@@ -240,7 +232,6 @@ export default function PetPassGoLanding() {
   return (
     <div style={{ background: tokens.sky, color: tokens.ink }} className="min-h-screen w-full">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;700&display=swap');
         * { box-sizing: border-box; }
         body { margin: 0; }
         .fade-up { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
@@ -255,68 +246,15 @@ export default function PetPassGoLanding() {
         }
       `}</style>
 
-      {/* NAV */}
-      <nav className="flex items-center justify-between px-6 md:px-14 py-5 flex-wrap gap-3" style={{ borderBottom: `1px solid ${tokens.line}` }}>
-        <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: 26, color: tokens.navy }}>
-          PetPassGo
-        </div>
-        <div className="flex items-center gap-5 flex-wrap">
-          {[["/airlines", "Airlines"], ["/faq", "FAQ"], ["/blog", "Blog"]].map(([href, label]) => (
-            <a key={href} href={href} style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 500, color: tokens.navy, textDecoration: "none", whiteSpace: "nowrap" }}>
-              {label}
-            </a>
-          ))}
-          <a
-            href="/login"
-            style={{
-              fontFamily: "'Inter', sans-serif",
-              fontSize: 14,
-              fontWeight: 500,
-              color: tokens.navy,
-              textDecoration: "none",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Log in
-          </a>
-          <a
-            href="/signup"
-            style={{
-              fontFamily: "'Inter', sans-serif",
-              fontSize: 14,
-              fontWeight: 500,
-              color: tokens.navy,
-              textDecoration: "none",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Sign up
-          </a>
-          <a
-            href="/assessment"
-            style={{
-              background: tokens.navy,
-              color: tokens.sky,
-              fontFamily: "'Inter', sans-serif",
-              fontSize: 14,
-              fontWeight: 500,
-              textDecoration: "none",
-              whiteSpace: "nowrap",
-            }}
-            className="rounded-full px-5 py-2 hover:opacity-90 transition"
-          >
-            Get your Travel Pass
-          </a>
-        </div>
-      </nav>
+      <SiteHeader />
 
       {/* HERO */}
-      <section className="px-6 md:px-14 pt-14 pb-20 grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+      <section className="px-6 md:px-14 pt-16 md:pt-24 pb-20 md:pb-28 grid lg:grid-cols-[1.15fr_1fr] gap-12 lg:gap-16 items-center max-w-[1240px] mx-auto">
         <div className={`fade-up ${loaded ? "in" : ""}`}>
           <div
             style={{
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 12,
+              fontFamily: "var(--font-body), system-ui, sans-serif",
+              fontSize: 13, fontWeight: 700,
               letterSpacing: "0.14em",
               color: tokens.stamp,
             }}
@@ -325,40 +263,40 @@ export default function PetPassGoLanding() {
             TRAVEL WITH CONFIDENCE
           </div>
           <h1
-            style={{ fontFamily: "'Fraunces', serif", color: tokens.navy, lineHeight: 1.1 }}
-            className="text-[34px] sm:text-[42px] md:text-[56px] font-semibold mb-6"
+            style={{ fontFamily: "var(--font-display), system-ui, sans-serif", color: tokens.navy, lineHeight: 1.1 }}
+            className="text-[38px] sm:text-[48px] lg:text-[64px] font-bold mb-6"
           >
             Know what your trip needs — before you need it.
           </h1>
-          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 17, color: tokens.ink, opacity: 0.8 }} className="max-w-md mb-8">
+          <p style={{ fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 19, color: tokens.muted, lineHeight: 1.6 }} className="max-w-xl mb-9">
             PetPassGo turns scattered airline rules, forms, and deadlines into one
             personalized plan for you and your animal — organized, tracked, and
             ready when you are.
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <a
               href="/assessment"
-              style={{ background: tokens.stamp, color: "#fff", fontFamily: "'Inter', sans-serif", fontWeight: 600, textDecoration: "none", display: "inline-block" }}
-              className="rounded-full px-7 py-3.5 text-[15px] hover:opacity-90 transition"
+              style={{ background: tokens.stamp, color: "#fff", fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 600, textDecoration: "none", display: "inline-block" }}
+              className="btn-primary rounded-full px-8 py-4 text-[16px]"
             >
               Start your Travel Pass
             </a>
-            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, opacity: 0.55 }}>
+            <span style={{ fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 14, color: tokens.muted }}>
               takes ~3 minutes
             </span>
           </div>
         </div>
 
-        <div className={`fade-up flex justify-center md:justify-end ${loaded ? "in" : ""}`} style={{ transitionDelay: "120ms" }}>
+        <div className={`fade-up flex justify-center lg:justify-end ${loaded ? "in" : ""}`} style={{ transitionDelay: "120ms" }}>
           <BoardingCard />
         </div>
       </section>
 
       {/* STEPS — literal sequence, numbering justified */}
-      <section style={{ background: tokens.navy }} className="py-16">
-        <div className="max-w-6xl mx-auto px-6 md:px-14">
+      <section style={{ background: tokens.navy }} className="py-20">
+        <div className="max-w-[1240px] mx-auto px-6 md:px-14">
           <div
-            style={{ fontFamily: "'IBM Plex Mono', monospace", color: tokens.gold, fontSize: 12, letterSpacing: "0.14em" }}
+            style={{ fontFamily: "var(--font-body), system-ui, sans-serif", color: tokens.gold, fontSize: 13, fontWeight: 700, letterSpacing: "0.14em" }}
             className="mb-10"
           >
             KNOW · ORGANIZE · GO
@@ -367,13 +305,13 @@ export default function PetPassGoLanding() {
             {steps.map((s, i) => (
               <div
                 key={s.n}
-                className={`step-divider px-0 md:px-8 py-6 md:py-0 ${i > 0 ? "step-divider-active" : ""}`}
+                className={`step-divider py-6 md:py-0 ${i > 0 ? "step-divider-active md:pl-10" : ""} ${i < 2 ? "md:pr-10" : ""}`}
               >
-                <div style={{ fontFamily: "'Fraunces', serif", color: tokens.gold, fontSize: 34 }}>{s.n}</div>
-                <h3 style={{ fontFamily: "'Fraunces', serif", color: "#fff", fontSize: 22 }} className="mt-2 mb-2">
+                <div style={{ fontFamily: "var(--font-display), system-ui, sans-serif", color: tokens.gold, fontSize: 40, fontWeight: 700 }}>{s.n}</div>
+                <h3 style={{ fontFamily: "var(--font-display), system-ui, sans-serif", color: "#fff", fontSize: 24, fontWeight: 600 }} className="mt-2 mb-2">
                   {s.title}
                 </h3>
-                <p style={{ fontFamily: "'Inter', sans-serif", color: tokens.sky, opacity: 0.75, fontSize: 15 }}>
+                <p style={{ fontFamily: "var(--font-body), system-ui, sans-serif", color: "#C9D3E3", fontSize: 16.5, lineHeight: 1.6 }}>
                   {s.body}
                 </p>
               </div>
@@ -383,26 +321,26 @@ export default function PetPassGoLanding() {
       </section>
 
       {/* FEATURES */}
-      <section className="max-w-6xl mx-auto px-6 md:px-14 py-20">
-        <h2 style={{ fontFamily: "'Fraunces', serif", color: tokens.navy, fontSize: 32 }} className="mb-2">
+      <section className="max-w-[1240px] mx-auto px-6 md:px-14 py-20">
+        <h2 style={{ fontFamily: "var(--font-display), system-ui, sans-serif", color: tokens.navy, fontSize: 40, fontWeight: 700 }} className="mb-3">
           Everything for the trip, in one place
         </h2>
-        <p style={{ fontFamily: "'Inter', sans-serif", opacity: 0.7 }} className="mb-12 max-w-lg">
+        <p style={{ fontFamily: "var(--font-body), system-ui, sans-serif", color: tokens.muted, fontSize: 18 }} className="mb-12 max-w-xl">
           Not a static article. A profile that grows with your animal and gets
           smarter with every trip.
         </p>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map(([icon, title, body]) => (
             <div
               key={title}
-              className="rounded-xl p-6"
-              style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}
+              className="rounded-2xl p-7"
+              style={{ background: "#fff", border: `1px solid ${tokens.line}` }}
             >
               <div className="text-2xl mb-3">{icon}</div>
-              <h3 style={{ fontFamily: "'Fraunces', serif", color: tokens.navy, fontSize: 18 }} className="mb-2">
+              <h3 style={{ fontFamily: "var(--font-display), system-ui, sans-serif", color: tokens.navy, fontSize: 21, fontWeight: 600 }} className="mb-2">
                 {title}
               </h3>
-              <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, opacity: 0.75 }}>{body}</p>
+              <p style={{ fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 16, color: tokens.muted, lineHeight: 1.6 }}>{body}</p>
             </div>
           ))}
         </div>
@@ -410,14 +348,14 @@ export default function PetPassGoLanding() {
 
       {/* WHAT WE ACTUALLY TRACK — data points cloud */}
       <section style={{ background: tokens.navy }} className="py-16">
-        <div className="max-w-4xl mx-auto px-6 md:px-14 text-center">
-          <div style={{ fontFamily: "'IBM Plex Mono', monospace", color: tokens.gold, fontSize: 12, letterSpacing: "0.14em" }} className="mb-3">
+        <div className="max-w-5xl mx-auto px-6 md:px-14 text-center">
+          <div style={{ fontFamily: "var(--font-body), system-ui, sans-serif", color: tokens.gold, fontSize: 13, fontWeight: 700, letterSpacing: "0.14em" }} className="mb-3">
             WHAT WE ACTUALLY TRACK
           </div>
-          <h2 style={{ fontFamily: "'Fraunces', serif", color: "#fff", fontSize: 30 }} className="mb-3">
+          <h2 style={{ fontFamily: "var(--font-display), system-ui, sans-serif", color: "#fff", fontSize: 38, fontWeight: 700 }} className="mb-3">
             Every detail, verified against the source
           </h2>
-          <p style={{ fontFamily: "'Inter', sans-serif", color: tokens.sky, opacity: 0.8, fontSize: 15 }} className="mb-8 max-w-xl mx-auto">
+          <p style={{ fontFamily: "var(--font-body), system-ui, sans-serif", color: "#C9D3E3", fontSize: 17 }} className="mb-8 max-w-2xl mx-auto">
             Not scraped from blogs. Every requirement below is checked directly against the airline
             and the government agencies that set the rules.
           </p>
@@ -432,13 +370,13 @@ export default function PetPassGoLanding() {
               <span
                 key={tag}
                 style={{
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: i % 3 === 0 ? 15 : i % 3 === 1 ? 13 : 14,
+                  fontFamily: "var(--font-body), system-ui, sans-serif",
+                  fontSize: 15,
                   color: i % 4 === 0 ? tokens.gold : tokens.sky,
                   border: `1px solid rgba(234,240,246,0.2)`,
                   borderRadius: 999,
                   padding: "6px 14px",
-                  opacity: i % 5 === 0 ? 1 : 0.82,
+                  
                 }}
               >
                 {tag}
@@ -449,27 +387,27 @@ export default function PetPassGoLanding() {
       </section>
 
       {/* AIRLINE COVERAGE GRID */}
-      <section className="max-w-5xl mx-auto px-6 md:px-14 py-20">
+      <section className="max-w-[1240px] mx-auto px-6 md:px-14 py-20">
         <div className="text-center mb-10">
-          <div style={{ fontFamily: "'IBM Plex Mono', monospace", color: tokens.stamp, fontSize: 12, letterSpacing: "0.14em" }} className="mb-3">
+          <div style={{ fontFamily: "var(--font-body), system-ui, sans-serif", color: tokens.stamp, fontSize: 13, fontWeight: 700, letterSpacing: "0.14em" }} className="mb-3">
             AIRLINE COVERAGE
           </div>
-          <h2 style={{ fontFamily: "'Fraunces', serif", color: tokens.navy, fontSize: 30 }} className="mb-2">
+          <h2 style={{ fontFamily: "var(--font-display), system-ui, sans-serif", color: tokens.navy, fontSize: 38, fontWeight: 700 }} className="mb-2">
             Researched airline by airline
           </h2>
-          <p style={{ fontFamily: "'Inter', sans-serif", opacity: 0.7, fontSize: 15 }}>
+          <p style={{ fontFamily: "var(--font-body), system-ui, sans-serif", color: tokens.muted, fontSize: 17 }}>
             Each one verified individually — because every airline's rules are genuinely different.
           </p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
           {AIRLINES.filter((a) => !a.startsWith("Other")).map((airline) => (
             <div
               key={airline}
               className="rounded-xl px-5 py-4 flex items-center gap-3"
               style={{ background: "#fff", border: `1px solid ${tokens.line}` }}
             >
-              <span style={{ color: "#3E7A4B", fontSize: 15 }}>✓</span>
-              <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 14.5, color: tokens.navy }}>
+              <span style={{ color: tokens.green, fontSize: 16, fontWeight: 700 }}>✓</span>
+              <span style={{ fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 600, fontSize: 16, color: tokens.navy }}>
                 {airline}
               </span>
             </div>
@@ -480,51 +418,51 @@ export default function PetPassGoLanding() {
       {/* PRICING STRIP */}
       <section className="px-6 md:px-14 pb-24">
         <div
-          className="max-w-6xl mx-auto rounded-2xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8"
+          className="max-w-[1240px] mx-auto rounded-2xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8"
           style={{ background: tokens.navy }}
         >
           <div>
-            <div style={{ fontFamily: "'IBM Plex Mono', monospace", color: tokens.gold, fontSize: 12, letterSpacing: "0.12em" }} className="mb-3">
+            <div style={{ fontFamily: "var(--font-body), system-ui, sans-serif", color: tokens.gold, fontSize: 13, fontWeight: 700, letterSpacing: "0.12em" }} className="mb-3">
               SIMPLE, TRIP-BASED PRICING
             </div>
-            <h3 style={{ fontFamily: "'Fraunces', serif", color: "#fff", fontSize: 26 }}>
+            <h3 style={{ fontFamily: "var(--font-display), system-ui, sans-serif", color: "#fff", fontSize: 30, fontWeight: 700 }}>
               Pay for the trip. Keep the profile.
             </h3>
           </div>
-          <div className="flex gap-8 text-white">
+          <div className="flex gap-8 flex-wrap justify-center text-white">
             <div>
-              <div style={{ fontFamily: "'Fraunces', serif", fontSize: 28 }}>$49.99</div>
-              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, opacity: 0.7 }}>Travel Pass</div>
+              <div style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: 28 }}>$49.99</div>
+              <div style={{ fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 14, color: "#C9D3E3" }}>Travel Pass</div>
             </div>
             <div>
-              <div style={{ fontFamily: "'Fraunces', serif", fontSize: 28 }}>$4.99/mo</div>
-              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, opacity: 0.7 }}>Profile & vault</div>
+              <div style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: 28 }}>$4.99/mo</div>
+              <div style={{ fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 14, color: "#C9D3E3" }}>Profile & vault</div>
             </div>
             <div>
-              <div style={{ fontFamily: "'Fraunces', serif", fontSize: 28 }}>$19.99</div>
-              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, opacity: 0.7 }}>Per-trip refresh</div>
+              <div style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: 28 }}>$19.99</div>
+              <div style={{ fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 14, color: "#C9D3E3" }}>Per-trip refresh</div>
             </div>
           </div>
         </div>
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row gap-3 justify-center mt-6">
+        <div className="max-w-[1240px] mx-auto flex flex-col sm:flex-row gap-3 justify-center mt-6">
           <a
             href="/assessment"
-            style={{ background: tokens.stamp, color: "#fff", fontFamily: "'Inter', sans-serif", fontWeight: 600, textDecoration: "none", textAlign: "center" }}
-            className="rounded-full px-7 py-3.5 text-[15px] hover:opacity-90 transition"
+            style={{ background: tokens.stamp, color: "#fff", fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 600, textDecoration: "none", textAlign: "center" }}
+            className="btn-primary rounded-full px-8 py-4 text-[16px]"
           >
             Start your Travel Pass
           </a>
           <a
             href="/signup"
-            style={{ background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, fontFamily: "'Inter', sans-serif", fontWeight: 600, textDecoration: "none", textAlign: "center" }}
-            className="rounded-full px-7 py-3.5 text-[15px] hover:opacity-90 transition"
+            style={{ background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 600, textDecoration: "none", textAlign: "center" }}
+            className="btn-secondary rounded-full px-8 py-4 text-[16px]"
           >
             Just create your pet's profile
           </a>
         </div>
       </section>
 
-      <footer className="px-6 md:px-14 py-8 text-center" style={{ borderTop: `1px solid ${tokens.line}`, fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, opacity: 0.5 }}>
+      <footer className="px-6 md:px-14 py-8 text-center" style={{ borderTop: `1px solid ${tokens.line}`, fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 13, color: tokens.muted }}>
         PetPassGo is a preparation tool, not a certifying authority. Requirements are set by airlines and government agencies.
       </footer>
     </div>

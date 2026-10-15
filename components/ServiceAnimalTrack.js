@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { tokens } from "../lib/theme";
 import { supabase } from "../lib/supabaseClient";
 import { serviceFormDeadline, daysUntil, fmt } from "../lib/travelDates";
 
@@ -81,36 +82,36 @@ export default function ServiceAnimalTrack({ trip }) {
     } finally { setBusy(false); }
   }
 
-  const input = { border: "1px solid #E5E0D5", borderRadius: 8, padding: "6px 10px", fontSize: 13, width: "100%" };
+  const input = { border: "1px solid #E5E0D5", borderRadius: 8, padding: "6px 10px", fontSize: 14.5, width: "100%" };
   return (
-    <div className="rounded-xl p-4 mb-4" style={{ background: "#fff", border: "1.5px solid #2F6FED" }}>
-      <div style={{ fontFamily: "monospace", fontSize: 10, letterSpacing: "0.1em", color: "#2F6FED" }} className="mb-1">SERVICE ANIMAL TRACK</div>
+    <div className="rounded-xl p-4 mb-4" style={{ background: "#fff", border: `1.5px solid ${tokens.navy}` }}>
+      <div style={{ fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 12, letterSpacing: "0.1em", color: tokens.green }} className="mb-1">SERVICE ANIMAL TRACK</div>
       {deadline && (
-        <div style={{ fontSize: 14, fontWeight: 700 }} className="mb-1">
+        <div style={{ fontSize: 15.5, fontWeight: 700 }} className="mb-1">
           Submit your DOT form to {trip.airline || "your airline"} by {fmt(deadline)}{left >= 0 ? ` (${left} day${left === 1 ? "" : "s"} left)` : " (deadline passed — contact your airline)"}
         </div>
       )}
-      <div style={{ fontSize: 12.5, opacity: 0.7 }} className="mb-3">
+      <div style={{ fontSize: 14, opacity: 0.7 }} className="mb-3">
         US airlines may require the official DOT forms up to 48 hours before departure (if you booked more than 48 hours ahead). We pre-fill what we know. Review every field, check each attestation box yourself, then sign and date. Only you can make these attestations.
       </div>
       <div className="grid gap-2 mb-3" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))" }}>
-        <label style={{ fontSize: 12 }}>Handler full name<input style={input} value={extra.handler} onChange={set("handler")} /></label>
-        <label style={{ fontSize: 12 }}>Handler phone<input style={input} value={extra.phone} onChange={set("phone")} /></label>
-        <label style={{ fontSize: 12 }}>Rabies vaccination expires<input type="date" style={input} value={extra.rabiesExp} onChange={set("rabiesExp")} /></label>
-        <label style={{ fontSize: 12 }}>Longest flight (hours)<input type="number" min="0" step="0.5" style={input} value={extra.hours} onChange={set("hours")} /></label>
+        <label style={{ fontSize: 13.5 }}>Handler full name<input style={input} value={extra.handler} onChange={set("handler")} /></label>
+        <label style={{ fontSize: 13.5 }}>Handler phone<input style={input} value={extra.phone} onChange={set("phone")} /></label>
+        <label style={{ fontSize: 13.5 }}>Rabies vaccination expires<input type="date" style={input} value={extra.rabiesExp} onChange={set("rabiesExp")} /></label>
+        <label style={{ fontSize: 13.5 }}>Longest flight (hours)<input type="number" min="0" step="0.5" style={input} value={extra.hours} onChange={set("hours")} /></label>
       </div>
       <div className="flex flex-wrap gap-2">
-        <button disabled={busy} onClick={airForm} className="rounded-full px-4 py-2" style={{ background: "#16233F", color: "#fff", fontSize: 13, fontWeight: 600 }}>
+        <button disabled={busy} onClick={airForm} className="rounded-full px-4 py-2" style={{ background: tokens.primary, color: "#fff", fontSize: 14.5, fontWeight: 600 }}>
           Download pre-filled Air Transportation Form
         </button>
         {longFlight && (
-          <button disabled={busy} onClick={reliefForm} className="rounded-full px-4 py-2" style={{ background: "#16233F", color: "#fff", fontSize: 13, fontWeight: 600 }}>
+          <button disabled={busy} onClick={reliefForm} className="rounded-full px-4 py-2" style={{ background: tokens.primary, color: "#fff", fontSize: 14.5, fontWeight: 600 }}>
             Download pre-filled Relief Attestation Form
           </button>
         )}
       </div>
-      {longFlight && <div style={{ fontSize: 12, opacity: 0.7 }} className="mt-2">Your flight is 8 hours or longer, so airlines may also require the Relief Attestation Form.</div>}
-      <div style={{ fontSize: 11, opacity: 0.5 }} className="mt-2">Official US DOT forms (September 2024 versions, OMB 2105-0576), from transportation.gov.</div>
+      {longFlight && <div style={{ fontSize: 13.5, opacity: 0.7 }} className="mt-2">Your flight is 8 hours or longer, so airlines may also require the Relief Attestation Form.</div>}
+      <div style={{ fontSize: 12.5, color: tokens.muted }} className="mt-2">Official US DOT forms (September 2024 versions, OMB 2105-0576), from transportation.gov.</div>
     </div>
   );
 }
