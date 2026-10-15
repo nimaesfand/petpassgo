@@ -1342,7 +1342,7 @@ function BillingTab({ userId }) {
   async function go(path, body) {
     setBusy(true); setErr("");
     const { data: s } = await supabase.auth.getSession();
-    const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${s?.session?.access_token || ""}` }, body: JSON.stringify(body || {}) });
+    const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify(body || {}) });
     const j = await r.json().catch(() => ({}));
     if (r.ok && j.url) window.location.href = j.url; else { setErr(j.error || "Something went wrong. Please try again."); setBusy(false); }
   }
