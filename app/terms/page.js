@@ -44,7 +44,16 @@ export default function TermsPage() {
         <li>Requirements refresh: $19.99, one-time.</li>
       </UL>
       <P>You can cancel a membership at any time; cancellation takes effect at the end of the current billing period. Prices may change; we will show the current price before you pay.</P>
-      <P><strong>Refunds:</strong> If you have not yet used the trip details you purchased, you can get a full refund within 7 days of purchase. To request one, email <Email /> from the address on your account.</P>
+      <P><strong>Refunds.</strong> You can get a full refund within 7 days of purchase, but only if you have never opened the details of the paid Travel Pass. Once those details have been opened, the digital product has been delivered and is not refundable. To request a refund, email <Email /> from the address on your account.</P>
+      <P><strong>Exception for inaccurate information.</strong> At PetPassGo's sole discretion, we may issue a refund if information we showed you was inaccurate and directly caused a documented problem, such as being denied boarding. To ask for this, email <Email /> within 14 days of your travel date and include:</P>
+      <UL>
+        <li>your booking confirmation or itinerary;</li>
+        <li>the specific PetPassGo information you relied on;</li>
+        <li>written proof from the airline or authority showing the actual requirement or the denial (for example, a denial notice, a written statement from the airline, or a receipt); and</li>
+        <li>a description of what happened.</li>
+      </UL>
+      <P>This exception does not apply if the information was correct when we showed it but the airline or authority changed its rules later, or if you did not follow the information we provided.</P>
+      <P>Approved refunds are paid to the original payment method, and your access to that trip is removed.</P>
 
       <H>7. Acceptable use</H>
       <P>Do not misuse the Service. That includes: breaking the law; uploading content you have no right to share; uploading malware; trying to access other users' data; scraping or reselling our content; or interfering with the Service's security or operation.</P>

@@ -1127,6 +1127,9 @@ function CurrentFlightTab({ userId }) {
       // Official source citations are a paid feature: strip them unless this trip is paid.
       const finalResults = filtered
         .filter((r) => r.category !== "ELIGIBILITY NOTE")
+        // TODO(Stripe phase): refund policy depends on whether paid Travel Pass details were ever opened.
+        // When paid details are first shown, set trips.details_first_viewed_at server-side (once, never overwritten).
+        // Column plan: supabase/stripe_phase_details_first_viewed.sql (not applied yet).
         .map((r) => (currentTrip.paid ? r : { ...r, source_url: null, verified_at: null }));
       setResults(finalResults);
 
