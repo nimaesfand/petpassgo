@@ -3,28 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { requirementAirline } from "../../lib/airlines";
-import PetQr from "../../lib/PetQr";
+import SiteHeader from "../../components/SiteHeader";
+import PetIdCard, { PetIllustration } from "../../components/PetIdCard";
 import TripTimeline from "../../components/TripTimeline";
 import ServiceAnimalTrack from "../../components/ServiceAnimalTrack";
 import DocCheck from "../../components/DocCheck";
 import { BUCKET, SignedImg, getSignedUrl, toStoragePath } from "../../lib/storage";
+import { tokens, font } from "../../lib/theme";
 
-const tokens = {
-  navy: "#152238",
-  gold: "#C9A227",
-  sky: "#EAF0F6",
-  paper: "#F6F8FA",
-  ink: "#1C2733",
-  stamp: "#B23A2E",
-  line: "#D9E1E8",
-  green: "#3E7A4B",
-};
 
-const font = {
-  display: "'Fraunces', serif",
-  mono: "'IBM Plex Mono', monospace",
-  body: "'Inter', sans-serif",
-};
 
 const TABS = [
   { key: "flight", label: "Current Flight" },
@@ -39,13 +26,13 @@ function ComingSoon({ title, blurb }) {
       className="rounded-xl p-8 text-center"
       style={{ background: "#fff", border: `1px dashed ${tokens.line}` }}
     >
-      <div style={{ fontFamily: font.mono, fontSize: 10.5, color: tokens.stamp, letterSpacing: "0.1em" }} className="mb-2">
+      <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.stamp, letterSpacing: "0.1em" }} className="mb-2">
         COMING SOON
       </div>
       <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-2">
         {title}
       </div>
-      <div style={{ fontFamily: font.body, fontSize: 14, opacity: 0.7, maxWidth: 380 }} className="mx-auto">
+      <div style={{ fontFamily: font.body, fontSize: 15.5, opacity: 0.7, maxWidth: 380 }} className="mx-auto">
         {blurb}
       </div>
     </div>
@@ -303,7 +290,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 10,
+              fontSize: 12,
               cursor: "pointer",
               border: "2px solid #fff",
             }}
@@ -320,7 +307,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         </div>
         <div className="flex-1">
           <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.navy }}>{pet.name}</div>
-          <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.65 }}>
+          <div style={{ fontFamily: font.body, fontSize: 14.5, opacity: 0.65 }}>
             {pet.breed ? `${pet.breed} · ` : ""}
             {pet.sex ? `${pet.sex} · ` : ""}
             {calculateAge(pet.date_of_birth) ? `${calculateAge(pet.date_of_birth)} · ` : ""}
@@ -330,20 +317,20 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         <div className="flex flex-col items-end gap-1">
           <button
             onClick={handleShare}
-            style={{ fontFamily: font.body, fontSize: 12, color: "#2F6FED", fontWeight: 600 }}
+            style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.green, fontWeight: 600 }}
           >
             {justCopied ? "Copied!" : "📤 Share"}
           </button>
           <button
             onClick={() => setShowEditForm((v) => !v)}
-            style={{ fontFamily: font.body, fontSize: 12, color: tokens.navy, fontWeight: 600 }}
+            style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.navy, fontWeight: 600 }}
           >
             Edit
           </button>
           <button
             onClick={handleDeletePet}
             disabled={deleting}
-            style={{ fontFamily: font.body, fontSize: 11, color: tokens.stamp, opacity: 0.7 }}
+            style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.stamp, opacity: 0.7 }}
           >
             {deleting ? "Removing…" : "Remove"}
           </button>
@@ -362,14 +349,14 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
               placeholder="Name"
               value={editForm.name}
               onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
               className="rounded-lg px-3 py-2 outline-none"
             />
             <div className="flex gap-2">
               <select
                 value={editForm.animal_type}
                 onChange={(e) => setEditForm((f) => ({ ...f, animal_type: e.target.value }))}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
                 className="rounded-lg px-3 py-2 outline-none flex-1"
               >
                 <option>Dog</option>
@@ -379,7 +366,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
               <select
                 value={editForm.role}
                 onChange={(e) => setEditForm((f) => ({ ...f, role: e.target.value }))}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
                 className="rounded-lg px-3 py-2 outline-none flex-1"
               >
                 <option>Pet</option>
@@ -390,14 +377,14 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
               placeholder="Breed (optional)"
               value={editForm.breed}
               onChange={(e) => setEditForm((f) => ({ ...f, breed: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
               className="rounded-lg px-3 py-2 outline-none"
             />
             <div className="flex gap-2">
               <select
                 value={editForm.sex}
                 onChange={(e) => setEditForm((f) => ({ ...f, sex: e.target.value }))}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
                 className="rounded-lg px-3 py-2 outline-none flex-1"
               >
                 <option value="">Sex (optional)</option>
@@ -408,47 +395,47 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
                 type="date"
                 value={editForm.date_of_birth}
                 onChange={(e) => setEditForm((f) => ({ ...f, date_of_birth: e.target.value }))}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
                 className="rounded-lg px-3 py-2 outline-none flex-1"
               />
             </div>
 
-            <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 600, color: tokens.navy }} className="mt-2">
+            <div style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, color: tokens.navy }} className="mt-2">
               Vet & Emergency Info (optional)
             </div>
             <input
               placeholder="Vet's name"
               value={editForm.vet_name}
               onChange={(e) => setEditForm((f) => ({ ...f, vet_name: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
               className="rounded-lg px-3 py-2 outline-none"
             />
             <input
               placeholder="Vet's phone"
               value={editForm.vet_phone}
               onChange={(e) => setEditForm((f) => ({ ...f, vet_phone: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
               className="rounded-lg px-3 py-2 outline-none"
             />
             <input
               placeholder="Emergency contact name"
               value={editForm.emergency_contact_name}
               onChange={(e) => setEditForm((f) => ({ ...f, emergency_contact_name: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
               className="rounded-lg px-3 py-2 outline-none"
             />
             <input
               placeholder="Emergency contact phone"
               value={editForm.emergency_contact_phone}
               onChange={(e) => setEditForm((f) => ({ ...f, emergency_contact_phone: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
               className="rounded-lg px-3 py-2 outline-none"
             />
             <input
               placeholder="Microchip number"
               value={editForm.microchip_number}
               onChange={(e) => setEditForm((f) => ({ ...f, microchip_number: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
               className="rounded-lg px-3 py-2 outline-none"
             />
           </div>
@@ -456,7 +443,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
             <button
               type="submit"
               disabled={savingEdit}
-              style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, fontSize: 13 }}
+              style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, fontSize: 14.5 }}
               className="rounded-lg px-4 py-2 hover:opacity-90 transition"
             >
               {savingEdit ? "Saving…" : "Save changes"}
@@ -464,7 +451,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
             <button
               type="button"
               onClick={() => setShowEditForm(false)}
-              style={{ fontFamily: font.body, fontSize: 13, opacity: 0.6 }}
+              style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}
             >
               Cancel
             </button>
@@ -474,7 +461,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
 
       {!pet.photo_url && (
         <div
-          style={{ fontFamily: font.body, fontSize: 12, color: tokens.ink, opacity: 0.6 }}
+          style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink, color: tokens.muted }}
           className="mt-2"
         >
           {uploadingPhoto ? "Uploading photo…" : "No photo yet — tap the camera icon above. For best results: a bright, clear headshot works better than a full-body or action shot."}
@@ -484,17 +471,17 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
       {(pet.vet_name || pet.emergency_contact_name || pet.microchip_number) && (
         <div className="rounded-xl p-3 mt-3" style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}>
           {pet.vet_name && (
-            <div style={{ fontFamily: font.body, fontSize: 12, opacity: 0.75 }}>
+            <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.75 }}>
               🩺 Vet: {pet.vet_name}{pet.vet_phone ? ` · ${pet.vet_phone}` : ""}
             </div>
           )}
           {pet.emergency_contact_name && (
-            <div style={{ fontFamily: font.body, fontSize: 12, opacity: 0.75 }}>
+            <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.75 }}>
               📞 Emergency: {pet.emergency_contact_name}{pet.emergency_contact_phone ? ` · ${pet.emergency_contact_phone}` : ""}
             </div>
           )}
           {pet.microchip_number && (
-            <div style={{ fontFamily: font.body, fontSize: 12, opacity: 0.75 }}>
+            <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.75 }}>
               🔖 Microchip: {pet.microchip_number}
             </div>
           )}
@@ -502,80 +489,49 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
       )}
 
       {/* Digital Pet ID */}
-      <div className="rounded-xl overflow-hidden mt-4" style={{ border: `1px solid ${tokens.line}` }}>
-        <div style={{ background: tokens.navy }} className="px-4 py-2.5 flex items-center justify-between">
-          <div style={{ fontFamily: font.mono, fontSize: 9.5, color: tokens.gold, letterSpacing: "0.1em" }}>
-            DIGITAL PET ID
-          </div>
-          <div style={{ fontFamily: font.mono, fontSize: 8.5, color: tokens.sky, opacity: 0.6 }}>PETPASSGO</div>
-        </div>
-        <div className="p-4 flex items-center gap-4" style={{ background: "#fff" }}>
-          {pet.photo_url ? (
-            <SignedImg value={pet.photo_url} alt={pet.name} className="rounded-lg object-cover flex-shrink-0" style={{ width: 56, height: 56 }} />
-          ) : (
-            <div
-              className="rounded-lg flex items-center justify-center flex-shrink-0"
-              style={{ width: 56, height: 56, background: tokens.sky, fontSize: 26 }}
-            >
-              {pet.animal_type === "Dog" ? "🐕" : pet.animal_type === "Cat" ? "🐈" : "🐾"}
-            </div>
-          )}
-          <div className="flex-1">
-            <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.navy }}>{pet.name}</div>
-            <div style={{ fontFamily: font.body, fontSize: 12, opacity: 0.65 }}>
-              {[pet.breed, pet.sex, pet.animal_type].filter(Boolean).join(" · ")}
-            </div>
-            <div
-              style={{
-                fontFamily: font.mono,
-                fontSize: 9.5,
-                color: pet.role === "Service animal" ? tokens.stamp : tokens.navy,
-                border: `1px solid ${pet.role === "Service animal" ? tokens.stamp : tokens.navy}`,
-                borderRadius: 999,
-                padding: "2px 8px",
-                display: "inline-block",
-              }}
-              className="mt-1"
-            >
-              {pet.role.toUpperCase()}
-            </div>
-          </div>
-          <PetQr petId={pet.id} size={64} color={tokens.navy} />
-        </div>
+      <div className="mt-4">
+      <PetIdCard
+        pet={pet}
+        photo={pet.photo_url ? <SignedImg value={pet.photo_url} alt={pet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : null}
+      >
         <label
-          className="px-4 py-3 flex items-start gap-3 cursor-pointer"
+          className="px-5 py-4 flex items-start gap-3 cursor-pointer"
           style={{ background: tokens.paper, borderTop: `1px solid ${tokens.line}` }}
         >
           <input
             type="checkbox"
-            className="mt-0.5"
+            className="mt-1 w-5 h-5 flex-shrink-0"
+            style={{ accentColor: tokens.primary }}
             checked={!!pet.show_contact_on_public_id}
             disabled={savingContactToggle}
             onChange={(e) => togglePublicContact(e.target.checked)}
           />
-          <span style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.ink }}>
+          <span style={{ fontFamily: font.body, fontSize: 16, fontWeight: 600, color: tokens.ink }}>
             Show my emergency contact on the public Pet ID
-            <span style={{ display: "block", opacity: 0.6, fontSize: 11.5 }}>
-              Off by default. When on, anyone who scans this QR code sees the emergency contact name and phone.
+            <span style={{ display: "block", color: tokens.muted, fontWeight: 400, fontSize: 15, lineHeight: 1.5 }}>
+              {pet.show_contact_on_public_id
+                ? "On: anyone who scans this QR code sees your emergency contact's name and phone."
+                : "Off: your emergency contact stays private. Turn on so whoever finds your pet can reach you."}{" "}
               Name, species, breed and photo are always shown.
             </span>
           </span>
         </label>
+      </PetIdCard>
       </div>
 
       <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${tokens.line}` }}>
         {loadingLog ? (
-          <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.5 }}>Loading weight…</div>
+          <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>Loading weight…</div>
         ) : current ? (
           <button onClick={() => setShowLog((v) => !v)} className="flex items-center justify-between w-full text-left">
             <div>
-              <span style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.6 }}>Weight: </span>
-              <span style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 600, color: tokens.navy }}>
+              <span style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Weight: </span>
+              <span style={{ fontFamily: font.body, fontSize: 16, fontWeight: 600, color: tokens.navy }}>
                 {current.value} {current.unit || "lbs"}
               </span>
               {delta !== null && delta !== 0 && (
                 <span
-                  style={{ fontFamily: font.body, fontSize: 12.5, color: delta > 0 ? tokens.stamp : "#3E7A4B" }}
+                  style={{ fontFamily: font.body, fontSize: 14, color: delta > 0 ? tokens.stamp : "#3E7A4B" }}
                   className="ml-2"
                 >
                   {delta > 0 ? "↗" : "↘"} {delta > 0 ? "+" : ""}
@@ -583,19 +539,19 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
                 </span>
               )}
             </div>
-            <span style={{ fontFamily: font.body, fontSize: 12, color: tokens.navy, opacity: 0.6 }}>
+            <span style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.navy, color: tokens.muted }}>
               {showLog ? "Hide log" : "View log"}
             </span>
           </button>
         ) : (
-          <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.6 }}>No weight logged yet</div>
+          <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>No weight logged yet</div>
         )}
 
         {showLog && measurements.length > 0 && (
           <div className="mt-3 flex flex-col gap-1.5">
             {measurements.map((m) => (
-              <div key={m.id} className="flex justify-between items-center" style={{ fontFamily: font.body, fontSize: 13 }}>
-                <span style={{ opacity: 0.6 }}>{m.recorded_date}</span>
+              <div key={m.id} className="flex justify-between items-center" style={{ fontFamily: font.body, fontSize: 14.5 }}>
+                <span style={{ color: tokens.muted }}>{m.recorded_date}</span>
                 <div className="flex items-center gap-2">
                   <span style={{ color: tokens.navy, fontWeight: 600 }}>
                     {m.value} {m.unit || "lbs"}
@@ -605,7 +561,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
                       await supabase.from("pet_measurements").delete().eq("id", m.id);
                       loadMeasurements();
                     }}
-                    style={{ fontFamily: font.body, fontSize: 11, color: tokens.stamp, opacity: 0.6 }}
+                    style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.stamp, color: tokens.muted }}
                   >
                     ✕
                   </button>
@@ -618,7 +574,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         {!showAddForm ? (
           <button
             onClick={() => setShowAddForm(true)}
-            style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.navy, fontWeight: 600 }}
+            style={{ fontFamily: font.body, fontSize: 14, color: tokens.navy, fontWeight: 600 }}
             className="mt-3 underline"
           >
             + Log weight
@@ -633,7 +589,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
                 placeholder="Weight (lbs)"
                 value={newValue}
                 onChange={(e) => setNewValue(e.target.value)}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
                 className="rounded-lg px-3 py-2 outline-none w-full"
               />
             </div>
@@ -641,13 +597,13 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
               type="date"
               value={newDate}
               onChange={(e) => setNewDate(e.target.value)}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
               className="rounded-lg px-3 py-2 outline-none"
             />
             <button
               type="submit"
               disabled={saving}
-              style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, fontSize: 13 }}
+              style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, fontSize: 14.5 }}
               className="rounded-lg px-4 py-2 hover:opacity-90 transition"
             >
               {saving ? "…" : "Save"}
@@ -657,14 +613,14 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
       </div>
 
       <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${tokens.line}` }}>
-        <div style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, color: tokens.navy }} className="mb-2">
+        <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, color: tokens.navy }} className="mb-2">
           Documents
         </div>
 
         {loadingDocs ? (
-          <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.5 }}>Loading documents…</div>
+          <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>Loading documents…</div>
         ) : documents.length === 0 ? (
-          <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.6 }} className="mb-2">
+          <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-2">
             No documents uploaded yet
           </div>
         ) : (
@@ -683,13 +639,13 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
                   if (url && win) win.location.href = url;
                   else if (win) win.close();
                 }}
-                style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.navy, textDecoration: "underline" }}
+                style={{ fontFamily: font.body, fontSize: 15, color: tokens.navy, textDecoration: "underline" }}
               >
                 {doc.document_type}
               </a>
               <button
                 onClick={() => handleDeleteDocument(doc)}
-                style={{ fontFamily: font.body, fontSize: 12, color: tokens.stamp, opacity: 0.7 }}
+                style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.stamp, opacity: 0.7 }}
               >
                 Remove
               </button>
@@ -700,7 +656,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         {!showUploadForm ? (
           <button
             onClick={() => setShowUploadForm(true)}
-            style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.navy, fontWeight: 600 }}
+            style={{ fontFamily: font.body, fontSize: 14, color: tokens.navy, fontWeight: 600 }}
             className="mt-2 underline"
           >
             + Upload a document
@@ -710,7 +666,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
             <select
               value={docType}
               onChange={(e) => setDocType(e.target.value)}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 14 }}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
               className="rounded-lg px-3 py-2 outline-none"
             >
               <option>Vaccination record</option>
@@ -726,16 +682,16 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
               accept="image/*,application/pdf"
               capture="environment"
               onChange={(e) => setSelectedFile(e.target.files[0])}
-              style={{ fontFamily: font.body, fontSize: 13 }}
+              style={{ fontFamily: font.body, fontSize: 14.5 }}
             />
-            <div style={{ fontFamily: font.body, fontSize: 11.5, opacity: 0.55 }}>
+            <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.55 }}>
               On your phone, this lets you choose "Take Photo" or pick an existing file.
             </div>
             <div className="flex gap-2 mt-1">
               <button
                 type="submit"
                 disabled={uploading || !selectedFile}
-                style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, fontSize: 13 }}
+                style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, fontSize: 14.5 }}
                 className="rounded-lg px-4 py-2 hover:opacity-90 transition"
               >
                 {uploading ? "Uploading…" : "Upload"}
@@ -743,7 +699,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
               <button
                 type="button"
                 onClick={() => setShowUploadForm(false)}
-                style={{ fontFamily: font.body, fontSize: 13, opacity: 0.6 }}
+                style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}
               >
                 Cancel
               </button>
@@ -762,19 +718,40 @@ function PetProfileTab({ userId }) {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ name: "", animal_type: "Dog", role: "Pet", breed: "", sex: "" });
 
+  const [loadError, setLoadError] = useState(false);
+  const loadSeq = React.useRef(0);
+
+  // Race-safe loader: only the latest request may update state, the spinner always
+  // clears (try/finally), and a stalled request times out into a Retry state instead
+  // of leaving "Loading your pets…" up forever.
   async function loadPets() {
+    const seq = ++loadSeq.current;
     setLoading(true);
-    const { data } = await supabase
-      .from("pets")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setPets(data || []);
-    setLoading(false);
+    setLoadError(false);
+    try {
+      const query = supabase.from("pets").select("*").order("created_at", { ascending: false });
+      const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 12000));
+      const { data, error } = await Promise.race([query, timeout]);
+      if (seq !== loadSeq.current) return;
+      if (error) throw error;
+      setPets(data || []);
+    } catch {
+      if (seq === loadSeq.current) setLoadError(true);
+    } finally {
+      if (seq === loadSeq.current) setLoading(false);
+    }
   }
 
   useEffect(() => {
+    if (!userId) return;
     loadPets();
-  }, []);
+    // Re-run once auth finishes restoring/refreshing the session (the original race:
+    // the first query could fire before the session was ready).
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") setTimeout(loadPets, 0);
+    });
+    return () => sub?.subscription?.unsubscribe();
+  }, [userId]);
 
   async function handleAddPet(e) {
     e.preventDefault();
@@ -798,7 +775,12 @@ function PetProfileTab({ userId }) {
   return (
     <div>
       {loading ? (
-        <div style={{ fontFamily: font.body, opacity: 0.6, fontSize: 14 }}>Loading your pets…</div>
+        <div style={{ fontFamily: font.body, color: tokens.muted, fontSize: 16 }}>Loading your pets…</div>
+      ) : loadError ? (
+        <div className="rounded-xl p-6 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body, fontSize: 16 }}>
+          We couldn't load your pets.{" "}
+          <button onClick={loadPets} className="btn-primary rounded-full px-5 py-2 ml-2" style={{ background: tokens.primary, color: "#fff", fontWeight: 600 }}>Retry</button>
+        </div>
       ) : pets.length === 0 && !showForm ? (
         <div
           className="rounded-xl p-8 text-center"
@@ -807,7 +789,7 @@ function PetProfileTab({ userId }) {
           <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-2">
             No pets yet
           </div>
-          <div style={{ fontFamily: font.body, fontSize: 14, opacity: 0.7 }} className="mb-4">
+          <div style={{ fontFamily: font.body, fontSize: 15.5, opacity: 0.7 }} className="mb-4">
             Add your pet's info here — it'll carry over to every trip you plan.
           </div>
           <button
@@ -826,7 +808,7 @@ function PetProfileTab({ userId }) {
           {!showForm && (
             <button
               onClick={() => setShowForm(true)}
-              style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.navy, fontWeight: 600 }}
+              style={{ fontFamily: font.body, fontSize: 15, color: tokens.navy, fontWeight: 600 }}
               className="mt-1 underline"
             >
               + Add another pet
@@ -850,14 +832,14 @@ function PetProfileTab({ userId }) {
               placeholder="Name"
               value={form.name}
               onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
               className="rounded-xl px-4 py-3 outline-none"
             />
             <div className="flex gap-3">
               <select
                 value={form.animal_type}
                 onChange={(e) => setForm((f) => ({ ...f, animal_type: e.target.value }))}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }}
+                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
                 className="rounded-xl px-4 py-3 outline-none flex-1"
               >
                 <option>Dog</option>
@@ -867,7 +849,7 @@ function PetProfileTab({ userId }) {
               <select
                 value={form.role}
                 onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }}
+                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
                 className="rounded-xl px-4 py-3 outline-none flex-1"
               >
                 <option>Pet</option>
@@ -878,13 +860,13 @@ function PetProfileTab({ userId }) {
               placeholder="Breed (optional)"
               value={form.breed}
               onChange={(e) => setForm((f) => ({ ...f, breed: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
               className="rounded-xl px-4 py-3 outline-none"
             />
             <select
               value={form.sex}
               onChange={(e) => setForm((f) => ({ ...f, sex: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
               className="rounded-xl px-4 py-3 outline-none"
             >
               <option value="">Sex (optional)</option>
@@ -904,7 +886,7 @@ function PetProfileTab({ userId }) {
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              style={{ fontFamily: font.body, fontSize: 14, opacity: 0.6 }}
+              style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }}
             >
               Cancel
             </button>
@@ -968,14 +950,14 @@ function RequirementItem({ req, checked, onToggle }) {
         {categoryIcon(req.category)}
       </div>
       <div className="flex-1">
-        <div style={{ fontFamily: font.mono, fontSize: 9.5, color: tokens.ink, opacity: 0.4, letterSpacing: "0.08em" }} className="mb-0.5">
+        <div style={{ fontFamily: font.mono, fontSize: 11.5, color: tokens.ink, opacity: 0.4, letterSpacing: "0.08em" }} className="mb-0.5">
           {req.category}
         </div>
         <div
           style={{
             fontFamily: font.body,
             fontWeight: 700,
-            fontSize: 15.5,
+            fontSize: 16.5,
             color: tokens.navy,
             textDecoration: checked ? "line-through" : "none",
             lineHeight: 1.25,
@@ -984,10 +966,10 @@ function RequirementItem({ req, checked, onToggle }) {
         >
           {req.title}
         </div>
-        <div style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.ink, opacity: 0.7 }} className="mb-2">
+        <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.ink, opacity: 0.7 }} className="mb-2">
           {req.description}
           {req.source_url && req.verified_at && (
-            <div style={{ fontFamily: font.mono, fontSize: 10.5, opacity: 0.55, marginTop: 4 }}>
+            <div style={{ fontFamily: font.mono, fontSize: 12, opacity: 0.55, marginTop: 4 }}>
               Source:{" "}
               <a href={req.source_url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "underline" }}>
                 {(() => { try { return new URL(req.source_url).hostname.replace(/^www\./, ""); } catch { return "official page"; } })()}
@@ -1002,7 +984,7 @@ function RequirementItem({ req, checked, onToggle }) {
             <span
               style={{
                 fontFamily: font.mono,
-                fontSize: 10.5,
+                fontSize: 12,
                 color: tokens.navy,
                 background: tokens.sky,
                 padding: "3px 8px",
@@ -1012,7 +994,7 @@ function RequirementItem({ req, checked, onToggle }) {
               DUE {req.deadline_description}
             </span>
             {req.category === "REQUIRED FORM" && (
-              <span style={{ fontFamily: font.body, fontSize: 10.5, color: tokens.stamp, fontWeight: 600 }}>
+              <span style={{ fontFamily: font.body, fontSize: 12, color: tokens.stamp, fontWeight: 600 }}>
                 ↓ Submit via "Submission" card below
               </span>
             )}
@@ -1025,10 +1007,10 @@ function RequirementItem({ req, checked, onToggle }) {
                 rel="noopener noreferrer"
                 style={{
                   fontFamily: font.body,
-                  fontSize: 12,
+                  fontSize: 13.5,
                   fontWeight: 600,
                   color: "#fff",
-                  background: tokens.navy,
+                  background: tokens.primary,
                   textDecoration: "none",
                   flexShrink: 0,
                   whiteSpace: "nowrap",
@@ -1043,8 +1025,8 @@ function RequirementItem({ req, checked, onToggle }) {
               className="rounded-full flex items-center gap-1.5 flex-shrink-0 transition-all duration-200"
               style={{
                 padding: "5px 12px 5px 6px",
-                border: `2px solid ${checked ? "#2F6FED" : tokens.line}`,
-                background: checked ? "#2F6FED" : "#fff",
+                border: `2px solid ${checked ? tokens.green : tokens.line}`,
+                background: checked ? tokens.green : "#fff",
                 boxShadow: checked ? `0 0 0 4px rgba(47,111,237,0.18)` : "none",
               }}
             >
@@ -1057,12 +1039,12 @@ function RequirementItem({ req, checked, onToggle }) {
                   border: checked ? "none" : `1.5px solid ${tokens.line}`,
                 }}
               >
-                {checked && <span style={{ color: "#2F6FED", fontSize: 11, fontWeight: 900 }}>✓</span>}
+                {checked && <span style={{ color: tokens.green, fontSize: 12.5, fontWeight: 900 }}>✓</span>}
               </span>
               <span
                 style={{
                   fontFamily: font.body,
-                  fontSize: 11.5,
+                  fontSize: 13,
                   fontWeight: 700,
                   color: checked ? "#fff" : tokens.ink,
                 }}
@@ -1089,10 +1071,10 @@ function RequirementGroup({ title, items, statusMap, onToggle, defaultOpen }) {
         onClick={() => setOpen((o) => !o)}
         className="flex items-center justify-between w-full py-2"
       >
-        <span style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, color: tokens.navy }}>
+        <span style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, color: tokens.navy }}>
           {title} ({doneCount}/{items.length})
         </span>
-        <span style={{ fontFamily: font.body, fontSize: 12, color: tokens.ink, opacity: 0.5 }}>
+        <span style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink, color: tokens.muted }}>
           {open ? "Hide" : "Show"}
         </span>
       </button>
@@ -1176,7 +1158,7 @@ function CurrentFlightTab({ userId }) {
   }
 
   if (loading) {
-    return <div style={{ fontFamily: font.body, opacity: 0.6, fontSize: 14 }}>Loading your trip…</div>;
+    return <div style={{ fontFamily: font.body, opacity: 0.6, fontSize: 15.5 }}>Loading your trip…</div>;
   }
 
   if (!trip) {
@@ -1185,7 +1167,7 @@ function CurrentFlightTab({ userId }) {
         <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-2">
           No trip yet
         </div>
-        <div style={{ fontFamily: font.body, fontSize: 14, opacity: 0.7 }} className="mb-4">
+        <div style={{ fontFamily: font.body, fontSize: 15.5, opacity: 0.7 }} className="mb-4">
           Complete the trip assessment to get your Travel Pass, and it'll show up here.
         </div>
         <a
@@ -1211,20 +1193,20 @@ function CurrentFlightTab({ userId }) {
   return (
     <div>
       <div className="rounded-xl p-5 mb-4" style={{ background: tokens.navy }}>
-        <div style={{ fontFamily: font.mono, fontSize: 10, color: tokens.gold, letterSpacing: "0.1em" }} className="mb-1">
+        <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold, letterSpacing: "0.1em" }} className="mb-1">
           YOUR TRAVEL PASS
         </div>
         <div style={{ fontFamily: font.display, fontSize: 20, color: "#fff" }} className="mb-1">
           {trip.animal_type} · {trip.origin} → {trip.destination}
         </div>
-        <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.sky, opacity: 0.8 }} className="mb-3">
+        <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, opacity: 0.8 }} className="mb-3">
           {trip.airline} · {trip.travel_date || "date pending"} · {trip.role}
         </div>
         <div className="flex items-center justify-between mb-1.5">
-          <span style={{ fontFamily: font.mono, fontSize: 10, color: tokens.sky, opacity: 0.7, letterSpacing: "0.08em" }}>
+          <span style={{ fontFamily: font.mono, fontSize: 12, color: tokens.sky, opacity: 0.7, letterSpacing: "0.08em" }}>
             TRIP READINESS
           </span>
-          <span style={{ fontFamily: font.mono, fontSize: 10, color: tokens.gold }}>
+          <span style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold }}>
             {trackedDone}/{trackedTotal} DONE
           </span>
         </div>
@@ -1241,7 +1223,7 @@ function CurrentFlightTab({ userId }) {
       {trip.paid && <DocCheck trip={trip} />}
 
       {results.length === 0 ? (
-        <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 13.5, opacity: 0.7 }}>
+        <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 15, opacity: 0.7 }}>
           No requirements found for this exact combination yet.
         </div>
       ) : (
@@ -1254,7 +1236,7 @@ function CurrentFlightTab({ userId }) {
               <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.green }} className="mb-1">
                 🎉 You're all set for this trip
               </div>
-              <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.ink, opacity: 0.75 }}>
+              <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, opacity: 0.75 }}>
                 Everything that needed action or verification is checked off. Review "Good to know" below before you fly.
               </div>
             </div>
@@ -1274,14 +1256,14 @@ export default function AccountPage() {
   const [activeTab, setActiveTab] = useState("flight");
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) {
-        window.location.href = "/login";
-      } else {
-        setUser(data.user);
-      }
-      setLoading(false);
-    });
+    supabase.auth
+      .getUser()
+      .then(({ data }) => {
+        if (!data?.user) window.location.href = "/login";
+        else setUser(data.user);
+      })
+      .catch(() => (window.location.href = "/login"))
+      .finally(() => setLoading(false));
 
     if (localStorage.getItem("petpassgo_open_flight_tab")) {
       setActiveTab("flight");
@@ -1294,53 +1276,36 @@ export default function AccountPage() {
     window.location.href = "/";
   }
 
-  if (loading) {
-    return (
-      <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full flex items-center justify-center">
-        <span style={{ fontFamily: font.body, color: tokens.ink, opacity: 0.6 }}>Loading…</span>
-      </div>
-    );
-  }
-
   return (
-    <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full flex justify-center px-4 py-10">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;700&display=swap');
-        * { box-sizing: border-box; }
-        h1, h2, h3, h4 { font-variant-ligatures: none; -webkit-font-variant-ligatures: none; }
-      `}</style>
-
-      <div className="w-full max-w-[620px]">
-        <div className="flex items-center justify-between mb-6">
-          <a href="/" style={{ fontFamily: font.display, fontWeight: 600, fontSize: 22, color: tokens.navy, textDecoration: "none" }}>
-            PetPassGo
-          </a>
-          <button
-            onClick={handleLogout}
-            style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink, opacity: 0.6 }}
-          >
-            Log out
-          </button>
+    <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full">
+      <SiteHeader onLogout={handleLogout} />
+      {loading ? (
+        <div className="flex items-center justify-center py-24" style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div>
+      ) : (
+      <div className="w-full max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-12">
+        <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
+          <div>
+            <h1 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 34, color: tokens.navy, lineHeight: 1.1 }}>Your dashboard</h1>
+            <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mt-1">{user?.email}</div>
+          </div>
         </div>
 
-        <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.6 }} className="mb-4">
-          {user?.email}
-        </div>
-
-        <div className="flex gap-1 mb-6 overflow-x-auto">
+        <div role="tablist" className="inline-flex flex-wrap gap-1 mb-8 p-1 rounded-full" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           {TABS.map((tab) => (
             <button
               key={tab.key}
+              role="tab"
+              aria-selected={activeTab === tab.key}
               onClick={() => setActiveTab(tab.key)}
               style={{
                 fontFamily: font.body,
-                fontSize: 13.5,
+                fontSize: 16,
                 fontWeight: 600,
                 whiteSpace: "nowrap",
                 background: activeTab === tab.key ? tokens.navy : "transparent",
                 color: activeTab === tab.key ? "#fff" : tokens.ink,
               }}
-              className="rounded-full px-4 py-2 transition"
+              className="rounded-full px-5 py-2.5 transition"
             >
               {tab.label}
             </button>
@@ -1365,6 +1330,7 @@ export default function AccountPage() {
           />
         )}
       </div>
+      )}
     </div>
   );
 }

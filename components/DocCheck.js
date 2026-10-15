@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { tokens } from "../lib/theme";
 import { supabase } from "../lib/supabaseClient";
 
 export default function DocCheck({ trip }) {
@@ -27,13 +28,13 @@ export default function DocCheck({ trip }) {
 
   return (
     <div className="rounded-xl p-4 mb-4" style={{ background: "#fff", border: "1px solid #E5E0D5" }}>
-      <div style={{ fontFamily: "monospace", fontSize: 10, letterSpacing: "0.1em", opacity: 0.6 }} className="mb-1">DOCUMENT PRE-CHECK (BETA)</div>
-      <div style={{ fontSize: 12.5, opacity: 0.7 }} className="mb-2">Upload a photo of your vet certificate. We'll read the key details to help you prep. This is not a certification or approval. Your airline and vet have the final say.</div>
+      <div style={{ fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 12, letterSpacing: "0.1em", color: tokens.muted }} className="mb-1">DOCUMENT PRE-CHECK (BETA)</div>
+      <div style={{ fontSize: 14, opacity: 0.7 }} className="mb-2">Upload a photo of your vet certificate. We'll read the key details to help you prep. This is not a certification or approval. Your airline and vet have the final say.</div>
       <input type="file" accept="image/*" onChange={onFile} disabled={busy} />
-      {busy && <div style={{ fontSize: 13 }} className="mt-2">Reading your document…</div>}
-      {err && <div style={{ fontSize: 13, color: "#B42318" }} className="mt-2">{err}</div>}
+      {busy && <div style={{ fontSize: 14.5 }} className="mt-2">Reading your document…</div>}
+      {err && <div style={{ fontSize: 14.5, color: "#B42318" }} className="mt-2">{err}</div>}
       {res && (
-        <ul style={{ fontSize: 13 }} className="mt-2">
+        <ul style={{ fontSize: 14.5 }} className="mt-2">
           <li>Pet name: {res.pet_name || "not found"}</li>
           <li>Rabies vaccination date: {res.rabies_date || "not found"}{res.rabies_expires ? ` (expires ${res.rabies_expires})` : ""}</li>
           <li>Vet signature: {res.vet_signature_present ? "appears present" : "not detected"}</li>

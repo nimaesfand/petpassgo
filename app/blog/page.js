@@ -15,11 +15,11 @@ export default function BlogIndex() {
     <>
       <SiteHeader />
       <Prose>
-        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 40, color: "#152238" }} className="mb-8">Blog</h1>
+        <h1 style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: 40, color: "#14213D" }} className="mb-8">Blog</h1>
         {posts.length === 0 && <p style={{ opacity: 0.7 }}>New guides are on the way. In the meantime, check our <a href="/faq" style={{ textDecoration: "underline" }}>FAQ</a>.</p>}
         {posts.map((p) => (
           <article key={p.slug} className="mb-8">
-            <a href={`/blog/${p.slug}`} style={{ fontFamily: "'Fraunces', serif", fontSize: 24, color: "#152238", textDecoration: "none" }}>{p.title}</a>
+            <a href={`/blog/${p.slug}`} style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: 24, color: "#14213D", textDecoration: "none" }}>{p.title}</a>
             <div style={{ fontSize: 13, opacity: 0.6 }}>{p.date}</div>
             <p style={{ opacity: 0.85 }}>{p.description}</p>
           </article>

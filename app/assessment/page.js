@@ -3,24 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { AIRLINES, requirementAirline } from "../../lib/airlines";
+import SiteHeader from "../../components/SiteHeader";
+import { tokens, font } from "../../lib/theme";
 
-const tokens = {
-  navy: "#152238",
-  gold: "#C9A227",
-  sky: "#EAF0F6",
-  paper: "#F6F8FA",
-  ink: "#1C2733",
-  stamp: "#B23A2E",
-  line: "#D9E1E8",
-  green: "#3E7A4B",
-  amber: "#B8860B",
-};
 
-const font = {
-  display: "'Fraunces', serif",
-  mono: "'IBM Plex Mono', monospace",
-  body: "'Inter', sans-serif",
-};
 
 
 const AIRPORTS = [
@@ -74,7 +60,7 @@ function AirportField({ label, value, onSelect }) {
         }}
         onFocus={() => setOpen(true)}
         placeholder={label}
-        style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }}
+        style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
         className="rounded-xl px-4 py-3 outline-none w-full"
       />
       {open && matches.length > 0 && (
@@ -92,12 +78,12 @@ function AirportField({ label, value, onSelect }) {
                 setOpen(false);
               }}
               className="w-full text-left px-4 py-2.5 flex items-center justify-between hover:bg-black/5"
-              style={{ fontFamily: font.body, fontSize: 14 }}
+              style={{ fontFamily: font.body, fontSize: 15.5 }}
             >
               <span>
-                {a.city} — <span style={{ opacity: 0.6 }}>{a.name}</span>
+                {a.city} — <span style={{ color: tokens.muted }}>{a.name}</span>
               </span>
-              <span style={{ fontFamily: font.mono, fontSize: 12, color: tokens.navy, fontWeight: 700 }}>{a.code}</span>
+              <span style={{ fontFamily: font.mono, fontSize: 13.5, color: tokens.navy, fontWeight: 700 }}>{a.code}</span>
             </button>
           ))}
         </div>
@@ -112,7 +98,7 @@ function ProgressStub({ step }) {
   const pct = Math.round((step / TOTAL_STEPS) * 100);
   return (
     <div className="mb-8">
-      <div className="flex justify-between mb-2" style={{ fontFamily: font.mono, fontSize: 11, color: tokens.ink, opacity: 0.6, letterSpacing: "0.08em" }}>
+      <div className="flex justify-between mb-2" style={{ fontFamily: font.mono, fontSize: 12.5, color: tokens.ink, opacity: 0.6, letterSpacing: "0.08em" }}>
         <span>STEP {Math.min(step + 1, TOTAL_STEPS)} OF {TOTAL_STEPS}</span>
         <span>{pct}%</span>
       </div>
@@ -136,8 +122,8 @@ function OptionCard({ label, sub, selected, onClick, icon, compact }) {
     >
       {icon && <span className="text-xl flex-shrink-0">{icon}</span>}
       <div>
-        <div style={{ fontFamily: font.body, fontWeight: 600, fontSize: 15, lineHeight: 1.3 }}>{label}</div>
-        {sub && <div style={{ fontFamily: font.body, fontSize: 12.5, opacity: 0.7 }}>{sub}</div>}
+        <div style={{ fontFamily: font.body, fontWeight: 600, fontSize: 16, lineHeight: 1.3 }}>{label}</div>
+        {sub && <div style={{ fontFamily: font.body, fontSize: 14, opacity: 0.7 }}>{sub}</div>}
       </div>
     </button>
   );
@@ -147,7 +133,7 @@ function NavRow({ onBack, onNext, nextLabel = "Continue", nextDisabled }) {
   return (
     <div className="flex items-center justify-between mt-8">
       {onBack ? (
-        <button onClick={onBack} style={{ fontFamily: font.body, color: tokens.ink, opacity: 0.6, fontSize: 14 }} className="hover:opacity-90">
+        <button onClick={onBack} style={{ fontFamily: font.body, color: tokens.ink, opacity: 0.6, fontSize: 15.5 }} className="hover:opacity-90">
           ← Back
         </button>
       ) : (
@@ -159,7 +145,7 @@ function NavRow({ onBack, onNext, nextLabel = "Continue", nextDisabled }) {
         style={{
           fontFamily: font.body,
           fontWeight: 600,
-          fontSize: 14.5,
+          fontSize: 16,
           background: nextDisabled ? tokens.line : tokens.stamp,
           color: nextDisabled ? "#8a97a3" : "#fff",
         }}
@@ -193,7 +179,7 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
   if (isInsight) {
     return (
       <div className="rounded-xl p-5 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-        <div style={{ fontFamily: font.mono, fontSize: 10.5, color: tokens.ink, opacity: 0.45, letterSpacing: "0.08em" }} className="mb-1">
+        <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.ink, opacity: 0.45, letterSpacing: "0.08em" }} className="mb-1">
           {category}
         </div>
         {unlocked ? (
@@ -201,13 +187,13 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
             <div style={{ fontFamily: font.display, fontSize: 17, color: tokens.navy }} className="mb-1">
               {what}
             </div>
-            <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink, opacity: 0.75 }}>{why}</div>
+            <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, opacity: 0.75 }}>{why}</div>
           </>
         ) : (
           <div
             style={{
               fontFamily: font.body,
-              fontSize: 14,
+              fontSize: 15.5,
               color: tokens.ink,
               opacity: 0.45,
               filter: "blur(3px)",
@@ -225,7 +211,7 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
     <div className="rounded-xl p-5 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
-          <div style={{ fontFamily: font.mono, fontSize: 10.5, color: tokens.ink, opacity: 0.45, letterSpacing: "0.08em" }} className="mb-1">
+          <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.ink, opacity: 0.45, letterSpacing: "0.08em" }} className="mb-1">
             {category}
           </div>
           {unlocked ? (
@@ -233,13 +219,13 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
               <div style={{ fontFamily: font.display, fontSize: 17, color: tokens.navy }} className="mb-1">
                 {what}
               </div>
-              <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink, opacity: 0.75 }}>{why}</div>
+              <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, opacity: 0.75 }}>{why}</div>
             </>
           ) : (
             <div
               style={{
                 fontFamily: font.body,
-                fontSize: 14,
+                fontSize: 15.5,
                 color: tokens.ink,
                 opacity: 0.45,
                 filter: "blur(3px)",
@@ -254,7 +240,7 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
         <span
           style={{
             fontFamily: font.mono,
-            fontSize: 10,
+            fontSize: 12,
             letterSpacing: "0.08em",
             color: meta.color,
             border: `1px solid ${meta.color}`,
@@ -273,7 +259,7 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
             <span
               style={{
                 fontFamily: font.mono,
-                fontSize: 11,
+                fontSize: 12.5,
                 color: tokens.navy,
                 background: tokens.sky,
                 padding: "3px 8px",
@@ -283,7 +269,7 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
               DUE {deadline}
             </span>
             {category === "REQUIRED FORM" && (
-              <span style={{ fontFamily: font.body, fontSize: 11, color: tokens.stamp, fontWeight: 600 }}>
+              <span style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.stamp, fontWeight: 600 }}>
                 ↓ Submit via "Submission" card below
               </span>
             )}
@@ -295,10 +281,10 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
               rel="noopener noreferrer"
               style={{
                 fontFamily: font.body,
-                fontSize: 12.5,
+                fontSize: 14,
                 fontWeight: 600,
                 color: "#fff",
-                background: tokens.navy,
+                background: tokens.primary,
                 textDecoration: "none",
                 whiteSpace: "nowrap",
                 flexShrink: 0,
@@ -311,7 +297,7 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
           </div>
         </>
       ) : (
-        <div style={{ fontFamily: font.mono, fontSize: 11, color: tokens.stamp, opacity: 0.8 }} className="mt-3">
+        <div style={{ fontFamily: font.mono, fontSize: 12.5, color: tokens.stamp, opacity: 0.8 }} className="mt-3">
           🔒 UNLOCK TO SEE DEADLINE &amp; INSTRUCTIONS
         </div>
       )}
@@ -452,28 +438,28 @@ export default function PetPassGoQuiz() {
   const needsVerify = normalResults.filter((r) => r.status === "verify").length;
 
   return (
-    <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full flex justify-center px-4 py-10">
+    <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full">
+      <SiteHeader />
+      <div className="w-full flex justify-center px-4 py-10 md:py-14">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;700&display=swap');
         * { box-sizing: border-box; }
         h1, h2, h3, h4 { font-variant-ligatures: none; -webkit-font-variant-ligatures: none; }
       `}</style>
 
-      <div className="w-full max-w-[540px]">
+      <div className="w-full max-w-[720px]">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <a href="/" style={{ fontFamily: font.display, fontWeight: 600, fontSize: 20, color: tokens.navy, textDecoration: "none" }}>PetPassGo</a>
-            <span style={{ fontFamily: font.mono, fontSize: 10, color: tokens.gold, letterSpacing: "0.1em" }}>TRIP ASSESSMENT</span>
+            <h1 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 28, color: tokens.navy }}>Trip assessment</h1>
           </div>
           {step === 5 && (
-            <label className="flex items-center gap-2 cursor-pointer" style={{ fontFamily: font.mono, fontSize: 10, color: tokens.ink, opacity: 0.6 }}>
+            <label className="flex items-center gap-2 cursor-pointer" style={{ fontFamily: font.mono, fontSize: 12, color: tokens.ink, color: tokens.muted }}>
               <input type="checkbox" checked={isMember} onChange={(e) => setIsMember(e.target.checked)} />
               PREVIEW AS $4.99 MEMBER
             </label>
           )}
         </div>
 
-        <div className="rounded-2xl p-7" style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}>
+        <div className="rounded-2xl p-6 md:p-9" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.06)" }}>
           {step < TOTAL_STEPS && <ProgressStub step={step} />}
 
           {step === 0 && (
@@ -481,7 +467,7 @@ export default function PetPassGoQuiz() {
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
                 What are you traveling with?
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.65 }} className="mb-5">
+              <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-5">
                 This changes which requirements apply to your trip.
               </p>
               <div className="flex flex-col gap-3">
@@ -498,7 +484,7 @@ export default function PetPassGoQuiz() {
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
                 Pet, or service animal?
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.65 }} className="mb-5">
+              <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-5">
                 Service animals follow a different set of requirements than pets flying for companionship.
               </p>
               <div className="flex flex-col gap-3">
@@ -514,7 +500,7 @@ export default function PetPassGoQuiz() {
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
                 Where are you flying from and to?
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.65 }} className="mb-5">
+              <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-5">
                 City or airport code is fine.
               </p>
               <div className="flex flex-col gap-3" style={{ position: "relative", zIndex: 1 }}>
@@ -530,7 +516,7 @@ export default function PetPassGoQuiz() {
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
                 When are you traveling?
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.65 }} className="mb-5">
+              <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-5">
                 Deadlines for forms and health certificates are counted back from this date.
               </p>
               <input
@@ -540,7 +526,7 @@ export default function PetPassGoQuiz() {
                 style={{
                   fontFamily: font.body,
                   border: `2px solid ${tokens.line}`,
-                  fontSize: 15,
+                  fontSize: 16,
                   background: "#fff",
                   color: tokens.ink,
                   height: 52,
@@ -558,7 +544,7 @@ export default function PetPassGoQuiz() {
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
                 Which airline?
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.65 }} className="mb-5">
+              <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-5">
                 Requirements vary a lot by carrier — this is what makes your plan specific to you.
               </p>
               <div className="grid grid-cols-2 gap-3">
@@ -573,13 +559,13 @@ export default function PetPassGoQuiz() {
           {step === 5 && (
             <>
               <div className="text-center mb-6">
-                <div style={{ fontFamily: font.mono, fontSize: 11, color: tokens.stamp, letterSpacing: "0.12em" }} className="mb-2">
+                <div style={{ fontFamily: font.mono, fontSize: 12.5, color: tokens.stamp, letterSpacing: "0.12em" }} className="mb-2">
                   YOUR PERSONALIZED TRIP PLAN
                 </div>
                 <h2 style={{ fontFamily: font.display, fontSize: 26, color: tokens.navy }}>
                   {answers.animal} · {answers.origin || "—"} → {answers.destination || "—"}
                 </h2>
-                <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.65 }} className="mt-1">
+                <div style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mt-1">
                   {answers.airline} · {answers.date || "date pending"} · {answers.role}
                 </div>
               </div>
@@ -592,10 +578,10 @@ export default function PetPassGoQuiz() {
                       className="rounded-xl p-4 mb-3"
                       style={{ background: "#FFF9EC", border: `1.5px solid ${tokens.gold}` }}
                     >
-                      <div style={{ fontFamily: font.display, fontSize: 15.5, color: tokens.navy }} className="mb-1">
+                      <div style={{ fontFamily: font.display, fontSize: 16.5, color: tokens.navy }} className="mb-1">
                         {note.what}
                       </div>
-                      <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.ink, opacity: 0.8 }}>
+                      <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, opacity: 0.8 }}>
                         {note.why}
                       </div>
                     </div>
@@ -605,21 +591,21 @@ export default function PetPassGoQuiz() {
 
               <div className="rounded-xl p-4 mb-5" style={{ background: tokens.navy }}>
                 {loadingResults ? (
-                  <div style={{ fontFamily: font.body, fontSize: 13.5, color: "#fff" }}>Looking up requirements…</div>
+                  <div style={{ fontFamily: font.body, fontSize: 15, color: "#fff" }}>Looking up requirements…</div>
                 ) : unlocked ? (
                   <div className="flex items-center justify-between">
                     <div>
-                      <div style={{ fontFamily: font.mono, fontSize: 10, color: tokens.sky, opacity: 0.7, letterSpacing: "0.1em" }}>
+                      <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.sky, opacity: 0.7, letterSpacing: "0.1em" }}>
                         TRIP READINESS
                       </div>
                       <div style={{ fontFamily: font.display, fontSize: 30, color: "#fff" }}>{readiness}%</div>
                     </div>
-                    <div style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.sky, opacity: 0.8 }} className="max-w-[180px] text-right">
+                    <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.sky, opacity: 0.8 }} className="max-w-[180px] text-right">
                       Full plan unlocked — deadlines and instructions below.
                     </div>
                   </div>
                 ) : (
-                  <div style={{ fontFamily: font.body, fontSize: 13.5, color: "#fff" }}>
+                  <div style={{ fontFamily: font.body, fontSize: 15, color: "#fff" }}>
                     <span style={{ fontWeight: 700 }}>{normalResults.length} requirements found</span> for this trip —{" "}
                     <span style={{ color: tokens.stamp === tokens.stamp ? "#F2A79A" : "" }}>{needsAction} need action</span>,{" "}
                     {needsVerify} need verification.
@@ -630,7 +616,7 @@ export default function PetPassGoQuiz() {
               {!loadingResults && normalResults.length === 0 && eligibilityNotes.length === 0 && (
                 <div
                   className="rounded-xl p-4 mb-4 text-center"
-                  style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 13.5, opacity: 0.75 }}
+                  style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 15, opacity: 0.75 }}
                 >
                   We haven't researched verified requirements for {answers.airline || "this airline"} yet. We currently have
                   verified data for Delta, American, United, Southwest, JetBlue, and Alaska — try the assessment again with one of those airlines to see your results.
@@ -638,7 +624,7 @@ export default function PetPassGoQuiz() {
               )}
 
               {unlocked && !hasRealForms && normalResults.length > 0 && (
-                <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink, opacity: 0.75 }} className="mb-4">
+                <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, opacity: 0.75 }} className="mb-4">
                   No forms needed for this trip — {answers.airline}, {answers.origin || "—"} → {answers.destination || "—"}, domestic. Here's what to know:
                 </div>
               )}
@@ -649,19 +635,19 @@ export default function PetPassGoQuiz() {
 
               {unlocked && (
                 <div className="rounded-xl p-5 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-                  <div style={{ fontFamily: font.mono, fontSize: 10.5, color: tokens.ink, opacity: 0.45, letterSpacing: "0.08em" }} className="mb-2">
+                  <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.ink, opacity: 0.45, letterSpacing: "0.08em" }} className="mb-2">
                     DOCUMENT VAULT
                   </div>
-                  <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.7 }} className="mb-3">
+                  <div style={{ fontFamily: font.body, fontSize: 14.5, opacity: 0.7 }} className="mb-3">
                     Upload what you have — we'll match it to the right requirement automatically.
                   </div>
                   {["Vaccination record", "Pet photo for Digital ID", "Training documentation (if applicable)"].map((doc) => (
                     <div key={doc} className="flex items-center justify-between py-2" style={{ borderTop: `1px solid ${tokens.line}` }}>
-                      <span style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink }}>{doc}</span>
+                      <span style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{doc}</span>
                       <button
                         style={{
                           fontFamily: font.mono,
-                          fontSize: 11,
+                          fontSize: 12.5,
                           color: tokens.navy,
                           border: `1px solid ${tokens.navy}`,
                           borderRadius: 999,
@@ -686,7 +672,7 @@ export default function PetPassGoQuiz() {
                       Refresh this trip — $19.99
                     </button>
                     <ul
-                      style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.ink, opacity: 0.75 }}
+                      style={{ fontFamily: font.body, fontSize: 14, color: tokens.ink, opacity: 0.75 }}
                       className="mt-3 rounded-lg p-3 list-disc pl-5 space-y-1"
                     >
                       <li>This trip's full requirement list, deadlines, and submission steps</li>
@@ -700,13 +686,13 @@ export default function PetPassGoQuiz() {
                       className="rounded-xl p-5 mb-4"
                       style={{ background: tokens.navy }}
                     >
-                      <div style={{ fontFamily: font.mono, fontSize: 10.5, color: tokens.gold, letterSpacing: "0.1em" }} className="mb-2">
+                      <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold, letterSpacing: "0.1em" }} className="mb-2">
                         READY TO FLY WITH {(answers.airline || "YOUR AIRLINE").toUpperCase()}
                       </div>
                       <div style={{ fontFamily: font.display, fontSize: 18, color: "#fff" }} className="mb-2">
                         Everything you need for your trip is ready and waiting.
                       </div>
-                      <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.sky, opacity: 0.85 }}>
+                      <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.sky, opacity: 0.85 }}>
                         Every document, every form, the exact cost, and precisely where to send it — verified and
                         ready the moment you unlock it below. No guessing, no outdated blog posts, no calling the
                         airline and getting a different answer every time.
@@ -720,11 +706,11 @@ export default function PetPassGoQuiz() {
                     >
                       Get the full Travel Pass — $49.99
                     </button>
-                    <div style={{ fontFamily: font.body, fontSize: 12, opacity: 0.55, textAlign: "center" }} className="mt-2">
+                    <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.55, textAlign: "center" }} className="mt-2">
                       One-time. Not a subscription.
                     </div>
 
-                    <div style={{ fontFamily: font.body, fontSize: 13, fontWeight: 600, color: tokens.navy }} className="mt-6 mb-3 text-center">
+                    <div style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 600, color: tokens.navy }} className="mt-6 mb-3 text-center">
                       Every Travel Pass includes these two things, free:
                     </div>
 
@@ -750,12 +736,12 @@ export default function PetPassGoQuiz() {
                           <div className="flex items-center gap-2 mb-2.5">
                             <div
                               className="rounded-full flex items-center justify-center flex-shrink-0"
-                              style={{ width: 30, height: 30, background: tokens.sky, fontSize: 15 }}
+                              style={{ width: 30, height: 30, background: tokens.sky, fontSize: 16 }}
                             >
                               {answers.animal === "Dog" ? "🐕" : answers.animal === "Cat" ? "🐈" : "🐾"}
                             </div>
                             <div>
-                              <div style={{ fontFamily: font.display, fontSize: 13, color: tokens.navy, lineHeight: 1.1 }}>
+                              <div style={{ fontFamily: font.display, fontSize: 14.5, color: tokens.navy, lineHeight: 1.1 }}>
                                 {answers.animal || "Pet"}
                               </div>
                               <div style={{ fontFamily: font.mono, fontSize: 7.5, color: tokens.ink, opacity: 0.5, letterSpacing: "0.05em" }}>
@@ -799,13 +785,13 @@ export default function PetPassGoQuiz() {
                           </div>
                         </div>
                         <div style={{ background: "#fff" }} className="p-3">
-                          <div style={{ fontFamily: font.body, fontSize: 10.5, color: tokens.ink, opacity: 0.5 }} className="mb-1">
+                          <div style={{ fontFamily: font.body, fontSize: 12, color: tokens.ink, color: tokens.muted }} className="mb-1">
                             Day of your flight:
                           </div>
-                          <div style={{ fontFamily: font.body, fontSize: 11, fontWeight: 600, color: tokens.navy }}>
+                          <div style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 600, color: tokens.navy }}>
                             Only what you need, right now
                           </div>
-                          <div style={{ fontFamily: font.body, fontSize: 9.5, opacity: 0.6 }} className="mt-1">
+                          <div style={{ fontFamily: font.body, fontSize: 11.5, color: tokens.muted }} className="mt-1">
                             Works with no signal
                           </div>
                         </div>
@@ -816,7 +802,7 @@ export default function PetPassGoQuiz() {
                       className="rounded-xl p-4 mb-1"
                       style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}
                     >
-                      <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 600, color: tokens.navy }} className="mb-2">
+                      <div style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, color: tokens.navy }} className="mb-2">
                         Membership keeps all of this saved and up to date:
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -832,7 +818,7 @@ export default function PetPassGoQuiz() {
                             key={item}
                             style={{
                               fontFamily: font.body,
-                              fontSize: 11.5,
+                              fontSize: 13,
                               color: tokens.navy,
                               background: "#fff",
                               border: `1px solid ${tokens.line}`,
@@ -856,10 +842,10 @@ export default function PetPassGoQuiz() {
                         className="mt-1"
                       />
                       <div>
-                        <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy }}>
+                        <div style={{ fontFamily: font.body, fontSize: 15.5, fontWeight: 600, color: tokens.navy }}>
                           🔥 Save on every future trip — Membership, $4.99/mo
                         </div>
-                        <div style={{ fontFamily: font.body, fontSize: 12.5, opacity: 0.7 }} className="mt-1">
+                        <div style={{ fontFamily: font.body, fontSize: 14, opacity: 0.7 }} className="mt-1">
                           Your next trip refresh drops from $49.99 to just $19.99 — a $30 savings — and your pet's profile stays free to update, always.
                         </div>
                       </div>
@@ -870,7 +856,7 @@ export default function PetPassGoQuiz() {
               ) : (
                 <div
                   className="mt-5 rounded-xl p-4 text-center"
-                  style={{ background: "#fff", border: `1px dashed ${tokens.green}`, fontFamily: font.body, fontSize: 13, color: tokens.green }}
+                  style={{ background: "#fff", border: `1px dashed ${tokens.green}`, fontFamily: font.body, fontSize: 14.5, color: tokens.green }}
                 >
                   ✓ Unlocked — this is what the customer sees after paying.
                 </div>
@@ -881,7 +867,7 @@ export default function PetPassGoQuiz() {
                   setStep(0);
                   setUnlocked(false);
                 }}
-                style={{ fontFamily: font.body, color: tokens.ink, opacity: 0.5, fontSize: 13 }}
+                style={{ fontFamily: font.body, color: tokens.ink, opacity: 0.5, fontSize: 14.5 }}
                 className="w-full text-center mt-4"
               >
                 Start over
@@ -889,6 +875,7 @@ export default function PetPassGoQuiz() {
             </>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

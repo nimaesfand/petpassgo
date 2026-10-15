@@ -16,14 +16,14 @@ export default function FaqPage() {
       <SiteHeader />
       <Prose>
         <JsonLd data={{ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: FAQ.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) }} />
-        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 40, color: "#152238" }} className="mb-8">Frequently asked questions</h1>
+        <h1 style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: 40, color: "#14213D" }} className="mb-8">Frequently asked questions</h1>
         {FAQ.map((f) => (
-          <details key={f.q} className="mb-3 rounded-xl p-4" style={{ border: "1px solid #D9E1E8", background: "#fff" }}>
-            <summary className="cursor-pointer" style={{ fontWeight: 600, color: "#152238" }}>{f.q}</summary>
+          <details key={f.q} className="mb-3 rounded-xl p-4" style={{ border: "1px solid #DCE3EC", background: "#fff" }}>
+            <summary className="cursor-pointer" style={{ fontWeight: 600, color: "#14213D" }}>{f.q}</summary>
             <p className="mt-3" style={{ lineHeight: 1.6, opacity: 0.85 }}>{f.a}</p>
           </details>
         ))}
-        <p className="mt-10"><a href="/assessment" style={{ color: "#152238", fontWeight: 600 }}>Take the free assessment →</a></p>
+        <p className="mt-10"><a href="/assessment" style={{ color: "#14213D", fontWeight: 600 }}>Take the free assessment →</a></p>
       </Prose>
     </>
   );
