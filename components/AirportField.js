@@ -1,14 +1,14 @@
 "use client";
 import { useState } from "react";
-import { AIRPORTS, formatAirport } from "../lib/airports";
+import { AIRPORTS, formatAirport, foldAscii } from "../lib/airports";
 import { tokens, font } from "../lib/theme";
 
 export default function AirportField({ label, value, onSelect }) {
   const [query, setQuery] = useState(value || "");
   const [open, setOpen] = useState(false);
-  const q = query.trim().toLowerCase();
+  const q = foldAscii(query.trim());
   const matches = q.length > 0
-    ? AIRPORTS.filter((a) => a.city.toLowerCase().includes(q) || a.code.toLowerCase().includes(q) || a.name.toLowerCase().includes(q)).slice(0, 12)
+    ? AIRPORTS.filter((a) => foldAscii(a.city).includes(q) || foldAscii(a.code).includes(q) || foldAscii(a.name).includes(q)).slice(0, 12)
     : [];
 
   return (
