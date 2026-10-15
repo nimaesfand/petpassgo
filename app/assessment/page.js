@@ -102,7 +102,7 @@ function lockedPlaceholder(text) {
 }
 
 function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
-  const meta = STATUS_META[status];
+  const meta = STATUS_META[status] || STATUS_META.verify;
   const isInsight = INSIGHT_CATEGORIES.has(category);
 
   if (isInsight) {
@@ -322,6 +322,7 @@ export default function PetPassGoQuiz() {
   }
 
   function guessStatus(category) {
+    category = String(category || "");
     if (category.includes("WHAT HAPPENS")) return "complete";
     if (category.includes("HEALTH") || category.includes("VACCINATION")) return "verify";
     return "attention";
@@ -359,7 +360,7 @@ export default function PetPassGoQuiz() {
               why: row.description,
               deadline: row.deadline_description,
               link: row.submission_link,
-              status: row.status || guessStatus(row.category),
+              status: STATUS_META[row.status] ? row.status : guessStatus(row.category || ""),
             }))
           );
         }
