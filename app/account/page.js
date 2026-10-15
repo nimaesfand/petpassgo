@@ -1206,11 +1206,10 @@ function CurrentFlightTab({ userId }) {
       // Official source citations are a paid feature: strip them unless this trip is paid.
       const finalResults = filtered
         .filter((r) => r.category !== "ELIGIBILITY NOTE")
-        // TODO(Stripe phase): refund policy depends on whether paid Travel Pass details were ever opened.
-        // When paid details are first shown, set trips.details_first_viewed_at server-side (once, never overwritten).
-        // Column plan: supabase/stripe_phase_details_first_viewed.sql (not applied yet).
         .map((r) => (currentTrip.paid ? r : { ...r, source_url: null, verified_at: null }));
       setResults(finalResults);
+      // Refund rule: record (server-side, once) the first time paid details are opened.
+      if (currentTrip.paid && !currentTrip.details_first_viewed_at) supabase.rpc("mark_trip_details_viewed", { p_trip_id: currentTrip.id });
 
       const { data: statusRows } = await supabase
         .from("trip_requirement_status")
@@ -1335,6 +1334,54 @@ function CurrentFlightTab({ userId }) {
   );
 }
 
+function BillingTab({ userId }) {
+  const [isMember, setIsMember] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  useEffect(() => { if (userId) supabase.rpc("my_membership").then(({ data }) => setIsMember(!!data)); }, [userId]);
+  async function go(path, body) {
+    setBusy(true); setErr("");
+    const { data: s } = await supabase.auth.getSession();
+    const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${s?.session?.access_token || ""}` }, body: JSON.stringify(body || {}) });
+    const j = await r.json().catch(() => ({}));
+    if (r.ok && j.url) window.location.href = j.url; else { setErr(j.error || "Something went wrong. Please try again."); setBusy(false); }
+  }
+  const btn = { background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600 };
+  return (
+    <div className="rounded-xl p-8" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+      <div style={{ fontFamily: font.display, fontSize: 22, color: tokens.navy }} className="mb-2">Billing</div>
+      {isMember === null ? (
+        <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div>
+      ) : isMember ? (
+        <>
+          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-4">You're a PetPassGo member ({P.member}{P.memberUnit}). Update your card, see receipts or cancel anytime.</p>
+          <button disabled={busy} onClick={() => go("/api/stripe/portal")} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Manage or cancel membership</button>
+        </>
+      ) : (
+        <>
+          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-4">Membership is {P.member}{P.memberUnit}: Pet ID, vault, lost-pet alerts, community, unlimited pets and {P.memberPass} Travel Passes. Monthly, cancel anytime.</p>
+          <div className="flex flex-wrap gap-3">
+            <button disabled={busy} onClick={() => go("/api/stripe/checkout", { plan: "membership" })} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Become a member</button>
+            <button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts</button>
+          </div>
+        </>
+      )}
+      {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-3">{err}</div>}
+    </div>
+  );
+}
+
+function CheckoutBanner() {
+  const [msg, setMsg] = useState(null);
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("checkout");
+    if (q === "success") setMsg("Payment received. Thank you! Your trip unlocks in a few seconds. Refresh if it still looks locked.");
+    else if (q === "canceled") setMsg("Checkout canceled. You haven't been charged.");
+  }, []);
+  if (!msg) return null;
+  return <div className="rounded-xl p-4 mb-6" style={{ background: "#fff", border: `1px solid ${tokens.green}`, fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{msg}</div>;
+}
+
 export default function AccountPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1375,6 +1422,7 @@ export default function AccountPage() {
           </div>
         </div>
 
+        <CheckoutBanner />
         <div role="tablist" className="inline-flex flex-wrap gap-1 mb-8 p-1 rounded-full" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           {TABS.map((tab) => (
             <button
@@ -1408,12 +1456,7 @@ export default function AccountPage() {
           />
         )}
 
-        {activeTab === "billing" && (
-          <ComingSoon
-            title="Billing"
-            blurb="Manage your PetPassGo Membership and payment details here once it's live."
-          />
-        )}
+        {activeTab === "billing" && <BillingTab userId={user?.id} />}
       </div>
       )}
     </div>

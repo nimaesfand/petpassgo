@@ -295,7 +295,7 @@ export default function PetPassGoQuiz() {
       return;
     }
 
-    await supabase.from("trips").insert({
+    const { data: trip, error } = await supabase.from("trips").insert({
       user_id: data.user.id,
       origin: answers.origin,
       destination: answers.destination,
@@ -304,11 +304,21 @@ export default function PetPassGoQuiz() {
       animal_type: answers.animal,
       role: answers.role,
       status: "ready",
-      paid: true,
-    });
+    }).select("id").single();
+    if (error || !trip) { alert("Sorry, something went wrong saving your trip. Please try again."); return; }
 
+    // Payment happens on Stripe; only the Stripe webhook can mark the trip paid.
+    const stripePlan = plan === "member" ? "join" : isMember ? "member_pass" : "pass";
+    const { data: s } = await supabase.auth.getSession();
+    const r = await fetch("/api/stripe/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${s?.session?.access_token || ""}` },
+      body: JSON.stringify({ plan: stripePlan, trip_id: trip.id }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.url) { alert(j.error || "Checkout isn't available right now. Please try again."); return; }
     localStorage.setItem("petpassgo_open_flight_tab", "1");
-    window.location.href = "/account";
+    window.location.href = j.url;
   }
 
   function guessStatus(category) {
@@ -596,7 +606,7 @@ export default function PetPassGoQuiz() {
                 isMember ? (
                   <div className="mt-5">
                     <button
-                      onClick={handlePurchase}
+                      onClick={() => handlePurchase("pass")}
                       style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}
                       className="w-full rounded-full py-3.5 text-[15px] hover:opacity-90 transition"
                     >
