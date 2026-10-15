@@ -172,6 +172,14 @@ const INSIGHT_ICONS = {
   VACCINATION: "💉",
 };
 
+// Before payment the real requirement text never reaches the page (not even blurred):
+// we render neutral filler of a similar length under the blur.
+const FILLER = "Included in your Travel Pass with exact steps and timing ";
+function lockedPlaceholder(text) {
+  const n = Math.max(24, Math.min(90, (text || "").length));
+  return FILLER.repeat(3).slice(0, n);
+}
+
 function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
   const meta = STATUS_META[status];
   const isInsight = INSIGHT_CATEGORIES.has(category);
@@ -199,8 +207,9 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
               filter: "blur(3px)",
               userSelect: "none",
             }}
+            aria-hidden="true"
           >
-            {what}
+            {lockedPlaceholder(what)}
           </div>
         )}
       </div>
@@ -232,8 +241,9 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
                 userSelect: "none",
               }}
               className="mt-0.5"
+              aria-hidden="true"
             >
-              {what}
+              {lockedPlaceholder(what)}
             </div>
           )}
         </div>
@@ -270,7 +280,7 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
             </span>
             {category === "REQUIRED FORM" && (
               <span style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.stamp, fontWeight: 600 }}>
-                ↓ Submit via "Submission" card below
+                Submit it as shown in the "Submission" step
               </span>
             )}
           </div>
@@ -451,8 +461,8 @@ export default function PetPassGoQuiz() {
           <div className="flex items-center gap-2">
             <h1 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 28, color: tokens.navy }}>Trip assessment</h1>
           </div>
-          {step === 5 && (
-            <label className="flex items-center gap-2 cursor-pointer" style={{ fontFamily: font.mono, fontSize: 12, color: tokens.ink, color: tokens.muted }}>
+          {step === 5 && process.env.NEXT_PUBLIC_SITE_LAUNCHED !== "true" && (
+            <label className="flex items-center gap-2 cursor-pointer" style={{ fontFamily: font.mono, fontSize: 12, color: tokens.muted }}>
               <input type="checkbox" checked={isMember} onChange={(e) => setIsMember(e.target.checked)} />
               PREVIEW AS $4.99 MEMBER
             </label>
