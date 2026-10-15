@@ -66,7 +66,7 @@ begin
   if uid is null then raise exception 'Sign in to post.'; end if;
   select display_name into nm from public.community_profiles where user_id = uid;
   if nm is null then raise exception 'Choose a display name first.'; end if;
-  if board not in ('delta','american-airlines','united','southwest','jetblue','alaska-airlines','hawaiian-airlines','frontier','allegiant','sun-country','lost-and-found') then
+  if board not in ('delta','american-airlines','united','southwest','jetblue','alaska-airlines','hawaiian-airlines','frontier','allegiant','sun-country','aeromexico','volaris','viva-aerobus','lost-and-found') then
     raise exception 'Unknown board.';
   end if;
   if length(b) < 2 or length(b) > 2000 then raise exception 'Posts must be 2-2000 characters.'; end if;
