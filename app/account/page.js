@@ -997,7 +997,7 @@ function RequirementItem({ req, checked, onToggle }) {
             </span>
             {req.category === "REQUIRED FORM" && (
               <span style={{ fontFamily: font.body, fontSize: 12, color: tokens.stamp, fontWeight: 600 }}>
-                ↓ Submit via "Submission" card below
+                Submit it as shown in the "Submission" step
               </span>
             )}
           </div>
