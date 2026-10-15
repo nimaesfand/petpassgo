@@ -93,6 +93,11 @@ export default function SignupPage() {
                 >
                   {status === "loading" ? "Creating account…" : "Create account"}
                 </button>
+                <p style={{ fontFamily: font.body, fontSize: 13, opacity: 0.7 }} className="text-center">
+                  By creating an account you agree to our{" "}
+                  <a href="/terms" style={{ color: tokens.navy, textDecoration: "underline" }}>Terms of Service</a> and{" "}
+                  <a href="/privacy" style={{ color: tokens.navy, textDecoration: "underline" }}>Privacy Policy</a>.
+                </p>
               </form>
 
               <div style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="text-center mt-5">

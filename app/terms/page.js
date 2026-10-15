@@ -1,0 +1,74 @@
+import { LegalPage, H, P, UL, O } from "../../components/LegalPage";
+
+export const metadata = {
+  title: "Terms of Service",
+  description: "The terms that apply when you use PetPassGo.",
+  alternates: { canonical: "/terms" },
+};
+
+export default function TermsPage() {
+  return (
+    <LegalPage title="Terms of Service" updated="October 14, 2026">
+      <P>These Terms of Service ("Terms") govern your use of PetPassGo (the "Service"), operated by <O>legal business entity name</O>, <O>business mailing address</O> ("PetPassGo", "we", "us"). By creating an account or using the Service, you agree to these Terms.</P>
+
+      <H>1. What PetPassGo is, and what it is not</H>
+      <P>PetPassGo helps you prepare to fly with a pet or service animal. It organizes airline and government requirements into a checklist, stores your pet's records, and sends reminders.</P>
+      <P><strong>PetPassGo provides general guidance only. It is not legal advice and not veterinary advice.</strong> We are not an airline, a government agency, or a certifying authority, and we cannot guarantee that an airline or agency will accept your pet, your documents, or your travel plans. Airline and government rules change, sometimes without notice. Always confirm requirements directly with your airline and the relevant authorities before you travel, and ask a licensed veterinarian about your pet's health and fitness to fly.</P>
+
+      <H>2. Your account</H>
+      <UL>
+        <li>Accounts are created and authenticated through our hosting provider, Supabase. You must give accurate information and keep your password secure.</li>
+        <li>You are responsible for activity on your account. Tell us promptly at <O>contact email</O> if you believe it has been accessed without permission.</li>
+        <li>You must be at least 18 years old, or the age of majority where you live, to create an account.</li>
+      </UL>
+
+      <H>3. Your content</H>
+      <P>You keep ownership of the information and documents you upload (pet profiles, photos, health records, travel documents). You give us permission to store, process and display that content only as needed to run the Service for you, including showing the information you choose to publish on your pet's public Pet ID page. You confirm that you have the right to upload it and that it is accurate to the best of your knowledge.</P>
+
+      <H>4. Public Pet ID pages and lost-pet tools</H>
+      <UL>
+        <li>Each pet can have a public Pet ID page that anyone with the link or QR code can view. You control what appears on it.</li>
+        <li>If you mark a pet as lost, the page shows a lost-pet notice, and people who find your pet can send you a message through our relay form. Your email address is not shown to the finder.</li>
+        <li>We do not guarantee that a lost pet will be found or that messages from finders are genuine. Use caution when meeting anyone in person.</li>
+        <li>You must not use the finder message form to harass, spam or deceive anyone.</li>
+      </UL>
+
+      <H>5. Optional AI features</H>
+      <P>Where offered, the AI document check and chat assistant are optional. AI output can be wrong or incomplete. It does not replace the airline's or agency's own review, or a veterinarian's advice.</P>
+
+      <H>6. Payments</H>
+      <P>Some features may require payment. Payments will be processed by Stripe; we do not store your full card number. Planned prices (in U.S. dollars, before any applicable taxes):</P>
+      <UL>
+        <li>Trip pass: $49.99, one-time, per trip.</li>
+        <li>Membership: $4.99 per month, renewing automatically until you cancel.</li>
+        <li>Requirements refresh: $19.99, one-time.</li>
+      </UL>
+      <P>You can cancel a membership at any time; cancellation takes effect at the end of the current billing period. Prices may change; we will show the current price before you pay.</P>
+      <P><strong>Refunds:</strong> <O>refund policy — e.g. eligibility, time window, how to request a refund</O></P>
+
+      <H>7. Acceptable use</H>
+      <P>Do not misuse the Service. That includes: breaking the law; uploading content you have no right to share; uploading malware; trying to access other users' data; scraping or reselling our content; or interfering with the Service's security or operation.</P>
+
+      <H>8. Our content</H>
+      <P>The Service's software, design, checklists and written guidance belong to PetPassGo or its licensors. Except for your own content, you may not copy or redistribute them without our permission.</P>
+
+      <H>9. Disclaimers</H>
+      <P>The Service is provided "as is" and "as available". To the fullest extent permitted by law, we disclaim all warranties, express or implied, including warranties of accuracy, fitness for a particular purpose and non-infringement. We are not responsible for decisions made by airlines, airports, government agencies or veterinarians, including denied boarding, quarantine, or travel delays.</P>
+
+      <H>10. Limitation of liability</H>
+      <P>To the fullest extent permitted by law, PetPassGo will not be liable for indirect, incidental, special or consequential damages, or for lost travel costs. Our total liability for any claim relating to the Service is limited to the amount you paid us in the 12 months before the claim. Some jurisdictions do not allow these limits, so they may not apply to you.</P>
+
+      <H>11. Ending your use</H>
+      <P>You can stop using the Service and ask us to delete your account at any time by contacting <O>contact email</O>. We may suspend or end accounts that break these Terms.</P>
+
+      <H>12. Changes to these Terms</H>
+      <P>We may update these Terms. If a change is material, we will notify you by email or in the app before it takes effect. If you keep using the Service after that, you accept the updated Terms.</P>
+
+      <H>13. Governing law</H>
+      <P>These Terms are governed by the laws of the State of <O>governing-law state</O>, without regard to its conflict-of-law rules.</P>
+
+      <H>14. Contact</H>
+      <P><O>legal business entity name</O>, <O>business mailing address</O>, <O>contact email</O>.</P>
+    </LegalPage>
+  );
+}
