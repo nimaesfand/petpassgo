@@ -325,11 +325,11 @@ export default function PetPassGoLanding() {
         </div>
         <div className={`fade-up grid md:grid-cols-2 gap-5 max-w-[900px] mx-auto text-left ${loaded ? "in" : ""}`} style={{ transitionDelay: "120ms" }}>
           {[
-            ["Flying soon?", "Answer a few trip questions and see every step you'll need.", "Plan your trip", "/assessment", "Free · no account needed", false],
+            ["Flying soon?", "Answer a few trip questions and see every step you'll need.", "Plan your trip", "/assessment", "Start free · pay only to unlock your full pass", false],
             ["Want peace of mind?", "Pet vault, a Digital Pet ID with QR code, and lost-pet alerts.", "Get your pet's ID", "/signup?plan=member", `Membership · ${PRICES.member}/mo`, true],
           ].map(([t, b, c, href, sub, dark]) => (
             <div key={t} className="rounded-2xl p-7 flex flex-col" style={{ background: dark ? tokens.navy : "#fff", border: `1px solid ${dark ? tokens.navy : tokens.line}`, color: dark ? "#fff" : tokens.navy }}>
-              <span aria-hidden="true" className="inline-flex items-center justify-center rounded-full mb-4" style={{ width: 48, height: 48, background: dark ? tokens.gold : tokens.sky }}>
+              <span aria-hidden="true" className="inline-flex items-center justify-center rounded-full mb-4" style={{ width: 48, height: 48, background: tokens.gold }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={tokens.navy} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{dark ? <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M14 10h4M14 14h3" /><circle cx="8.5" cy="11" r="2" /><path d="M5.5 16c.6-1.6 1.7-2.4 3-2.4s2.4.8 3 2.4" /></> : <path d="M2 16l20-6-20-6 3 6-3 6zM5 10h7" />}</svg>
               </span>
               <div style={{ fontFamily: D, fontSize: 25, fontWeight: 700 }} className="mb-2">{t}</div>
