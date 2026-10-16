@@ -334,14 +334,14 @@ export default function PetPassGoQuiz() {
     setLoadingResults(true);
     setFetchError(false);
 
+    // Free preview: the server returns only categories/status/length, never requirement text.
     supabase
-      .from("airline_requirements")
-      // Explicit columns: source links/verified dates are paid-dashboard only.
-      .select("id,airline,animal_type,role,trip_type,category,title,description,deadline_description,submission_link,destination_match,status")
-      .in("airline", [requirementAirline(answers.airline), "Any"])
-      .in("animal_type", [answers.animal, "Any"])
-      .in("role", [answers.role, "Any"])
-      .in("trip_type", tripTypeForRoute(answers.origin, answers.destination) === "international" ? ["international", "domestic"] : ["domestic"])
+      .rpc("requirements_preview", {
+        p_airline: requirementAirline(answers.airline),
+        p_animal: answers.animal,
+        p_role: answers.role,
+        p_trip_types: tripTypeForRoute(answers.origin, answers.destination) === "international" ? ["international", "domestic"] : ["domestic"],
+      })
       .then(({ data, error }) => {
         if (error) {
           setFetchError(true);
@@ -355,11 +355,10 @@ export default function PetPassGoQuiz() {
           });
           setResults(
             filtered.map((row) => ({
+              id: row.id,
               category: row.category,
-              what: row.title,
-              why: row.description,
-              deadline: row.deadline_description,
-              link: row.submission_link,
+              what: row.title || "x".repeat(row.title_len || 40),
+              why: row.description || "",
               status: STATUS_META[row.status] ? row.status : guessStatus(row.category || ""),
             }))
           );
@@ -577,7 +576,7 @@ export default function PetPassGoQuiz() {
               )}
 
               {normalResults.map((r) => (
-                <ResultRow key={r.what} {...r} unlocked={unlocked} />
+                <ResultRow key={r.id || r.what} {...r} unlocked={unlocked} />
               ))}
 
               {unlocked && (
