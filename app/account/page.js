@@ -9,6 +9,7 @@ import { startStripe } from "../../lib/checkout";
 import { requirementAirline } from "../../lib/airlines";
 import { tripTypeForRoute, isMexicoAirport } from "../../lib/airports";
 import SiteHeader from "../../components/SiteHeader";
+import { useTripPet, isTravelDay, TripCountdown, DayOfMode, PetReliefCard, CommunityPulse } from "../../components/TripLive";
 import LostPanel from "../../components/LostPanel";
 import PetIdCard, { PetIllustration } from "../../components/PetIdCard";
 import TripTimeline from "../../components/TripTimeline";
@@ -625,7 +626,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
 
       <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${tokens.line}` }}>
         <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, color: tokens.navy }} className="mb-2">
-          Documents
+          {pet.name ? `${pet.name}'s documents` : "Documents"}
         </div>
 
         {loadingDocs ? (
@@ -1197,6 +1198,10 @@ function CurrentFlightTab({ userId }) {
   const [results, setResults] = useState([]);
   const [statusMap, setStatusMap] = useState({});
   const [loading, setLoading] = useState(true);
+  const [isMember, setIsMember] = useState(false);
+  const [showFull, setShowFull] = useState(false);
+  const petForTrip = useTripPet(trip);
+  useEffect(() => { supabase.rpc("my_membership").then(({ data }) => setIsMember(!!data)); }, []);
 
   useEffect(() => {
     load();
@@ -1294,12 +1299,18 @@ function CurrentFlightTab({ userId }) {
   const verifyItems = results.filter((r) => r.status === "verify");
   const goodToKnow = results.filter((r) => r.status === "complete");
 
+  const tripPet = petForTrip;
   const trackedTotal = actionItems.length + verifyItems.length;
   const trackedDone = [...actionItems, ...verifyItems].filter((r) => statusMap[r.id]).length;
   const progressPct = trackedTotal > 0 ? Math.round((trackedDone / trackedTotal) * 100) : 100;
 
+  if (trip.paid && isTravelDay(trip) && !showFull) {
+    return <DayOfMode trip={trip} pet={tripPet} actionItems={actionItems.filter((r) => !statusMap[r.id])} onShowFull={() => setShowFull(true)} />;
+  }
+
   return (
     <div>
+      {trip.paid && <TripCountdown trip={trip} pet={tripPet} done={trackedDone} total={trackedTotal} />}
       <div className="rounded-xl p-5 mb-4" style={{ background: tokens.navy }}>
         <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold, letterSpacing: "0.1em" }} className="mb-1">
           YOUR TRAVEL PASS
@@ -1330,6 +1341,9 @@ function CurrentFlightTab({ userId }) {
       <VetGuidance trip={trip} requirements={results} paid={!!trip.paid} />
       {showTrack && <ServiceAnimalTrack trip={trip} />}
       {trip.paid && <DocCheck trip={trip} />}
+      {trip.paid && <CommunityPulse trip={trip} isMember={isMember} />}
+      {trip.paid && <PetReliefCard airportLabel={trip.origin} />}
+      {trip.paid && <PetReliefCard airportLabel={trip.destination} title="When you land: pet relief" />}
 
       {!trip.paid ? (
         <UnlockTripCard trip={trip} />
