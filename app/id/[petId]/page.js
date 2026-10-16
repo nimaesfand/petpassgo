@@ -11,6 +11,29 @@ import { supabase } from "../../../lib/supabaseClient";
 import { SITE_LAUNCHED } from "../../../lib/pricing";
 import { lapsedPreview } from "../../../lib/access";
 
+function PublicHealth({ petId, petName }) {
+  const [rows, setRows] = useState([]);
+  useEffect(() => { supabase.rpc("get_public_pet_health", { pet_id: petId }).then(({ data }) => setRows(data || [])); }, [petId]);
+  if (!rows.length) return null;
+  const icon = { allergy: "⚠️", medication: "💊", vaccine: "💉", note: "📝" };
+  return <div className="mt-4 rounded-2xl p-5" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body }}>
+    <div style={{ fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Health notes {petName ? `for ${petName}` : ""}</div>
+    <div className="space-y-1">{rows.map((r, i) => <div key={i} style={{ fontSize: 14.5, color: tokens.ink }}>{icon[r.kind] || "•"} <b>{r.name}</b>{r.expires_on ? ` · expires ${fmtDate(r.expires_on)}` : ""}</div>)}</div>
+    <div style={{ fontSize: 12.5, color: tokens.muted }} className="mt-2">Owner-entered and shared by the owner. Not verified by PetPassGo.</div>
+  </div>;
+}
+
+function ChipLine({ pet }) {
+  if (!pet.microchipped) return null;
+  return <div className="mt-4 rounded-2xl p-4 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>🔖 <b>Microchipped.</b> Any vet or shelter can scan the chip for free. The registry contacts the owner — PetPassGo never shows the chip number.</div>;
+}
+
+function ScanHonesty({ lostMode }) {
+  return <div className="mt-4 rounded-2xl p-4" style={{ background: "#FFF9EC", border: `1px solid ${tokens.line}`, fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>
+    {lostMode ? <>🐾 <b>Found this pet?</b> Message the owner below. Opening this page while lost mode is on can alert the owner through PetPassGo right away. A vet scanning the implanted chip contacts the chip registry instead — PetPassGo can't see chip scans, and chips have no GPS.</> : <>Message the owner below if you found this pet. If they're ever marked lost here, opening this page can alert the owner through PetPassGo. A vet scanning an implanted chip contacts the chip registry — chips have no GPS.</>}
+  </div>;
+}
+
 function ContactBox({ pet }) {
   const phone = pet.emergency_contact_phone;
   if (!pet.emergency_contact_name && !phone) return null;
@@ -59,6 +82,9 @@ function LostPoster({ pet, lost }) {
         </div>
       </div>
       <div className="mt-4"><ContactBox pet={pet} /></div>
+      <div className="mt-4"><ScanHonesty lostMode /></div>
+      <div className="mt-4"><ChipLine pet={pet} /></div>
+      <PublicHealth petId={pet.id} petName={pet.name} />
       <div className="mt-4"><FinderMessageForm petId={pet.id} petName={pet.name} /></div>
       <div className="mt-4 rounded-2xl p-5" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
         <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, color: tokens.navy }} className="mb-3">Help {pet.name} get home: share this page</div>
@@ -105,12 +131,15 @@ export default function PublicPetId({ params }) {
             <div className="flex justify-center mb-3">{pet.photo_path ? <Photo pet={pet} size={128} /> : <PetIllustration type={pet.animal_type} size={128} />}</div>
             <div style={{ fontFamily: font.display, fontSize: 34, fontWeight: 700, color: tokens.navy }} className="mb-1">{pet.name}</div>
             <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-5">Found this pet, or need to reach the owner? Send a message. Your note goes straight to them.</p>
-            <div className="text-left"><FinderMessageForm petId={pet.id} petName={pet.name} /></div>
+            <div className="text-left"><ScanHonesty lostMode={false} /><div className="mt-4"><FinderMessageForm petId={pet.id} petName={pet.name} /></div></div>
           </div>
         )}
         {status === "ok" && !lost && !basic && (
           <>
             <PetIdCard pet={pet} showQr={false} photo={pet.photo_path ? <Photo pet={pet} size={104} /> : null} />
+            <ChipLine pet={pet} />
+            <PublicHealth petId={pet.id} petName={pet.name} />
+            <ScanHonesty lostMode={false} />
             <div className="mt-4">
               {pet.emergency_contact_name || pet.emergency_contact_phone ? <ContactBox pet={pet} /> : <FinderMessageForm petId={pet.id} petName={pet.name} />}
             </div>
