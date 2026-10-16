@@ -5,6 +5,7 @@ import { supabase } from "../../lib/supabaseClient";
 import { usePetAccess } from "../../lib/access";
 import WinBack from "../../components/WinBack";
 import { PRICES as P } from "../../lib/pricing";
+import { startStripe } from "../../lib/checkout";
 import { requirementAirline } from "../../lib/airlines";
 import { tripTypeForRoute, isMexicoAirport } from "../../lib/airports";
 import SiteHeader from "../../components/SiteHeader";
@@ -747,13 +748,16 @@ function AccessGate() {
 }
 
 function MemberUpsell() {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
   return (
     <div className="rounded-xl p-5 mt-3" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
       <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }} className="mb-1">Traveling with more than one animal?</div>
       <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted, lineHeight: 1.55 }} className="mb-3">
         Your plan includes one pet. Membership ({P.member}/mo) adds unlimited pets, {P.memberPass} Travel Passes and reminders before your documents expire.
       </p>
-      <span className="inline-block rounded-full px-4 py-2" style={{ background: tokens.sky, fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy }}>Membership is coming soon</span>
+      <button disabled={busy} onClick={async () => { setBusy(true); const e = await startStripe("/api/stripe/checkout", { plan: "membership" }); if (e) { setErr(e); setBusy(false); } }} className="rounded-full px-5 py-2.5 hover:opacity-90" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontSize: 14.5, fontWeight: 600 }}>Become a member · {P.member}/mo</button>
+      {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-2">{err}</div>}
     </div>
   );
 }
