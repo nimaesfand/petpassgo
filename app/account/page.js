@@ -1167,6 +1167,27 @@ function RequirementGroup({ title, items, statusMap, onToggle, defaultOpen }) {
   );
 }
 
+function UnlockTripCard({ trip }) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  async function unlock() {
+    setBusy(true); setErr("");
+    const { data: m } = await supabase.rpc("my_membership");
+    const { data: s } = await supabase.auth.getSession();
+    const r = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ plan: m ? "member_pass" : "pass", trip_id: trip.id }) });
+    const j = await r.json().catch(() => ({}));
+    if (r.ok && j.url) window.location.href = j.url; else { setErr(j.error || "Checkout isn't available right now. Please try again."); setBusy(false); }
+  }
+  return (
+    <div className="rounded-xl p-6 text-center" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
+      <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-1">🔒 This trip isn't unlocked yet</div>
+      <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, opacity: 0.8 }} className="mb-4">Your full checklist, deadlines and reminders are ready the moment you finish checkout.</p>
+      <button disabled={busy} onClick={unlock} className="rounded-full px-6 py-3" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}>Unlock this trip</button>
+      {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-3">{err}</div>}
+    </div>
+  );
+}
+
 function CurrentFlightTab({ userId }) {
   const [trip, setTrip] = useState(null);
   const [results, setResults] = useState([]);
@@ -1189,13 +1210,13 @@ function CurrentFlightTab({ userId }) {
     setTrip(currentTrip || null);
 
     if (currentTrip) {
-      const { data: reqs } = await supabase
-        .from("airline_requirements")
-        .select("*")
-        .in("airline", [requirementAirline(currentTrip.airline), "Any"])
-        .in("animal_type", [currentTrip.animal_type, "Any"])
-        .in("role", [currentTrip.role, "Any"])
-        .in("trip_type", tripTypeForRoute(currentTrip.origin, currentTrip.destination) === "international" ? ["international", "domestic"] : ["domestic"]);
+      // Facts only after payment: unpaid trips get nothing; paid owners read via a server function.
+      const { data: reqs } = currentTrip.paid
+        ? await supabase.rpc("get_trip_requirements", {
+            p_trip_id: currentTrip.id,
+            p_trip_types: tripTypeForRoute(currentTrip.origin, currentTrip.destination) === "international" ? ["international", "domestic"] : ["domestic"],
+          })
+        : { data: [] };
 
       const destLower = (currentTrip.destination || "").toLowerCase();
       const filtered = (reqs || []).filter((row) => {
@@ -1306,7 +1327,9 @@ function CurrentFlightTab({ userId }) {
       {showTrack && <ServiceAnimalTrack trip={trip} />}
       {trip.paid && <DocCheck trip={trip} />}
 
-      {results.length === 0 ? (
+      {!trip.paid ? (
+        <UnlockTripCard trip={trip} />
+      ) : results.length === 0 ? (
         <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 15, opacity: 0.7 }}>
           No requirements found for this exact combination yet.
         </div>
