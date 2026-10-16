@@ -3,14 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
 
-// Same provider approach as /api/chat. Keys stay server-side.
-function provider() {
-  if (process.env.AI_GATEWAY_API_KEY)
-    return { url: "https://ai-gateway.vercel.sh/v1/chat/completions", key: process.env.AI_GATEWAY_API_KEY, model: process.env.DOC_CHECK_MODEL || "openai/gpt-4o-mini" };
-  if (process.env.OPENAI_API_KEY)
-    return { url: "https://api.openai.com/v1/chat/completions", key: process.env.OPENAI_API_KEY, model: process.env.DOC_CHECK_MODEL || "gpt-4o-mini" };
-  return null;
-}
+import { aiProvider as provider } from "../../../lib/aiProvider";
 
 const PROMPT = `You read a pet health / vaccination document image. Return ONLY JSON:
 {"pet_name":string|null,"rabies_date":"YYYY-MM-DD"|null,"rabies_expires":"YYYY-MM-DD"|null,"vet_signature_present":boolean,"notes":string|null}

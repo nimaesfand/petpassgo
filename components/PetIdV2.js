@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
 import { PUBLIC_ID_BASE } from "../lib/PetQr";
+import VetImport from "./VetImport";
 
 const AAHA = "https://www.aahanet.org/searching-for-the-microchip/";
 const input = { fontFamily: font.body, fontSize: 15.5, border: `2px solid ${tokens.line}`, borderRadius: 10, padding: "9px 12px", width: "100%", background: "#fff" };
@@ -43,6 +44,7 @@ export function ChipVault({ pet, userId, onChanged }) {
   });
   const [saving, setSaving] = useState(false); const [saved, setSaved] = useState(false); const [checker, setChecker] = useState(false);
   const [trip, setTrip] = useState(null);
+  useEffect(() => { setForm({ microchip_number: pet.microchip_number || "", chip_brand: pet.chip_brand || "", chip_registry: pet.chip_registry || "", chip_registry_phone: pet.chip_registry_phone || "", chip_registry_url: pet.chip_registry_url || "", chip_verified_at: pet.chip_verified_at || "" }); }, [pet.id, pet.microchip_number, pet.chip_brand, pet.chip_registry, pet.chip_verified_at]);
   useEffect(() => { supabase.from("trips").select("travel_date,airline").eq("paid", true).gte("travel_date", todayISO()).order("travel_date").limit(1).then(({ data }) => setTrip(data?.[0] || null)); }, []);
   const due = useMemo(() => {
     if (!form.microchip_number) return null;
@@ -103,11 +105,11 @@ export function ChipVault({ pet, userId, onChanged }) {
 
 const KIND = [["vaccine", "💉 Vaccine"], ["medication", "💊 Medication"], ["allergy", "⚠️ Allergy"], ["note", "📝 Care note"]];
 
-export function HealthPassport({ pet, userId }) {
+export function HealthPassport({ pet, userId, refreshKey = 0 }) {
   const [rows, setRows] = useState([]); const [loading, setLoading] = useState(true); const [show, setShow] = useState(false);
   const [f, setF] = useState({ kind: "vaccine", name: "", date_given: "", expires_on: "", clinic: "", notes: "", show_to_finder: false });
   async function load() { const { data } = await supabase.from("pet_health_records").select("*").eq("pet_id", pet.id).order("expires_on", { ascending: true, nullsFirst: false }); setRows(data || []); setLoading(false); }
-  useEffect(() => { load(); }, [pet.id]);
+  useEffect(() => { load(); }, [pet.id, refreshKey]);
   async function add(e) { e.preventDefault(); const payload = { pet_id: pet.id, user_id: userId, kind: f.kind, name: f.name.trim(), date_given: f.date_given || null, expires_on: f.expires_on || null, clinic: f.clinic.trim() || null, notes: f.notes.trim() || null, show_to_finder: !!f.show_to_finder }; if (!payload.name) return; const { error } = await supabase.from("pet_health_records").insert(payload); if (!error) { setF({ kind: "vaccine", name: "", date_given: "", expires_on: "", clinic: "", notes: "", show_to_finder: false }); setShow(false); load(); } }
   async function remove(id) { if (window.confirm("Remove this health record?")) { await supabase.from("pet_health_records").delete().eq("id", id); load(); } }
   async function toggle(row) { await supabase.from("pet_health_records").update({ show_to_finder: !row.show_to_finder }).eq("id", row.id); load(); }
@@ -168,10 +170,12 @@ export function ShareCard({ pet, userId }) {
 }
 
 export default function PetIdV2({ pet, userId, onChanged }) {
+  const [refresh, setRefresh] = useState(0);
   return <div className="rounded-xl p-5 mt-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
     <div style={{ fontFamily: font.mono, fontSize: 11.5, letterSpacing: "0.12em", color: tokens.stamp, fontWeight: 700 }}>PET ID EXTRAS</div>
     <ChipVault pet={pet} userId={userId} onChanged={onChanged} />
-    <HealthPassport pet={pet} userId={userId} />
+    <HealthPassport pet={pet} userId={userId} refreshKey={refresh} />
+    <VetImport pet={pet} userId={userId} onSaved={() => { setRefresh((v) => v + 1); onChanged?.(); }} />
     <ShareCard pet={pet} userId={userId} />
     <WalletCard pet={pet} />
   </div>;
