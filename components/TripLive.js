@@ -204,9 +204,114 @@ export function DayOfMode({ trip, pet, actionItems = [], onShowFull }) {
           </div>
         )}
       </div>
+      <TripExtras trip={trip} pet={pet} />
       <PetReliefCard airportLabel={trip.origin} title="Pet relief areas" />
       <PetReliefCard airportLabel={trip.destination} title="When you land: pet relief" />
       <button onClick={onShowFull} className="w-full rounded-full py-3" style={{ background: "#fff", border: `2px solid ${tokens.navy}`, color: tokens.navy, fontFamily: font.body, fontWeight: 600 }}>Show my full checklist</button>
     </div>
+  );
+}
+
+const WX_ICON = { clearsky: "☀️", fair: "🌤️", partlycloudy: "⛅", cloudy: "☁️", fog: "🌫️" };
+function wxIcon(sym = "") {
+  if (WX_ICON[sym]) return WX_ICON[sym];
+  if (/thunder/.test(sym)) return "⛈️";
+  if (/snow|sleet/.test(sym)) return "🌨️";
+  if (/rain|showers/.test(sym)) return "🌧️";
+  return "🌡️";
+}
+const SPOT_LABEL = { emergency_vet: "🚑 Emergency vet", vet: "🩺 Vet", dog_park: "🌳 Dog park", pet_store: "🛍️ Pet store" };
+
+function WeatherTile({ label, end }) {
+  const w = end?.weather;
+  return (
+    <div className="rounded-xl p-4 flex-1 min-w-[140px]" style={{ background: tokens.sky }}>
+      <div style={{ fontFamily: font.mono, fontSize: 11.5, letterSpacing: "0.08em", color: tokens.muted }}>{label} · {end?.code}</div>
+      {w?.status === "ok" ? (
+        <div className="flex items-center gap-2 mt-1">
+          <span style={{ fontSize: 26 }}>{wxIcon(w.symbol)}</span>
+          <div style={{ fontFamily: font.display, fontSize: 21, fontWeight: 700, color: tokens.navy, whiteSpace: "nowrap" }}>{w.highF}°<span style={{ fontSize: 14, fontWeight: 500, color: tokens.muted }}> / {w.lowF}°F</span></div>
+        </div>
+      ) : (
+        <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mt-1">{w?.status === "later" ? "Forecast appears closer to your trip (about 9 days out)." : "Forecast unavailable right now."}</div>
+      )}
+      <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.ink }} className="mt-0.5">{end?.city}</div>
+    </div>
+  );
+}
+
+export function TripExtras({ trip, pet }) {
+  const [x, setX] = useState(null);
+  const [filter, setFilter] = useState("all");
+  const [spotsData, setSpotsData] = useState(null);
+  useEffect(() => {
+    (async () => {
+      const { data: s } = await supabase.auth.getSession();
+      const h = { headers: { "x-sb-token": s?.session?.access_token || "" } };
+      const r = await fetch(`/api/trip-extras?trip_id=${trip.id}`, h).catch(() => null);
+      setX(r && r.ok ? await r.json() : { failed: true });
+      const r2 = await fetch(`/api/trip-extras?trip_id=${trip.id}&part=spots`, h).catch(() => null);
+      const j2 = r2 && r2.ok ? await r2.json() : null;
+      setSpotsData(j2?.spots || []);
+    })();
+  }, [trip.id]);
+  if (!x) return <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body, color: tokens.muted }}>Checking the weather and nearby spots…</div>;
+  if (x.failed || (!x.origin && !x.destination)) return null;
+  const temps = [x.origin?.weather, x.destination?.weather].filter((w) => w?.status === "ok");
+  const hot = temps.some((w) => w.highF >= 85), cold = temps.some((w) => w.lowF <= 45);
+  const name = pet?.name || "your pet";
+  const spots = (spotsData || []).filter((s) => filter === "all" || s.type === filter || (filter === "vet" && s.type === "emergency_vet"));
+  return (
+    <>
+      <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+        <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }} className="mb-3">Weather on travel day</div>
+        <div className="flex gap-3 flex-wrap">
+          {x.origin && <WeatherTile label="DEPART" end={x.origin} />}
+          {x.destination && <WeatherTile label="ARRIVE" end={x.destination} />}
+        </div>
+        {(hot || cold) && (
+          <div className="mt-3 rounded-lg p-3" style={{ background: "#FFF9EC", fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>
+            {hot ? `☀️ It could be warm. Keep ${name} cool and hydrated, and never leave a pet in a parked car. ` : ""}
+            {cold ? `❄️ It could be chilly. A cozy blanket in the carrier can help ${name}. ` : ""}
+            Some airlines restrict pets in cargo in extreme temperatures, so check your airline's policy.
+          </div>
+        )}
+        <div style={{ fontFamily: font.body, fontSize: 12, color: tokens.muted }} className="mt-3">
+          Approximate day high/low. Weather data from <a href="https://www.met.no/en" target="_blank" rel="noopener noreferrer" style={{ color: tokens.primary }}>MET Norway</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" style={{ color: tokens.primary }}>CC BY 4.0</a>), summarized by PetPassGo.
+        </div>
+      </div>
+      {x.destination && spotsData === null && (
+        <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body, color: tokens.muted }}>🐾 Finding vets, dog parks and pet stores near {x.destination.code}…</div>
+      )}
+      {x.destination && spotsData !== null && (
+        <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+          <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }} className="mb-1">Pet-friendly spots near {x.destination.code}</div>
+          <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-3">For {name} when you land in {x.destination.city}.</div>
+          <div className="flex gap-2 flex-wrap mb-3">
+            {[["all", "All"], ["vet", "Vets"], ["dog_park", "Dog parks"], ["pet_store", "Pet stores"]].map(([k, l]) => (
+              <button key={k} onClick={() => setFilter(k)} className="rounded-full px-3.5 py-1.5" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, background: filter === k ? tokens.navy : tokens.sky, color: filter === k ? "#fff" : tokens.navy }}>{l}</button>
+            ))}
+          </div>
+          {spots.length === 0 ? (
+            <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>Nothing found nearby right now. Try again later.</div>
+          ) : (
+            <ul className="divide-y" style={{ borderColor: tokens.line }}>
+              {spots.map((s) => (
+                <li key={s.map} className="py-2.5 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div style={{ fontFamily: font.body, fontSize: 15.5, fontWeight: 600, color: tokens.navy }} className="truncate">{s.name}</div>
+                    <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>{SPOT_LABEL[s.type]}</div>
+                  </div>
+                  <a href={s.map} target="_blank" rel="noopener noreferrer" className="rounded-full px-3 py-1.5 flex-shrink-0" style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, background: tokens.sky, color: tokens.navy, textDecoration: "none" }}>Map</a>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div style={{ fontFamily: font.body, fontSize: 12, color: tokens.muted }} className="mt-3">
+            Listings from OpenStreetMap; call ahead to confirm hours. Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" style={{ color: tokens.primary }}>OpenStreetMap contributors</a>.
+          </div>
+        </div>
+      )}
+    </>
   );
 }

@@ -9,7 +9,7 @@ import { startStripe } from "../../lib/checkout";
 import { requirementAirline } from "../../lib/airlines";
 import { tripTypeForRoute, isMexicoAirport } from "../../lib/airports";
 import SiteHeader from "../../components/SiteHeader";
-import { useTripPet, isTravelDay, TripCountdown, DayOfMode, PetReliefCard, CommunityPulse } from "../../components/TripLive";
+import { useTripPet, isTravelDay, TripCountdown, DayOfMode, PetReliefCard, CommunityPulse, TripExtras } from "../../components/TripLive";
 import LostPanel from "../../components/LostPanel";
 import PetIdCard, { PetIllustration } from "../../components/PetIdCard";
 import TripTimeline from "../../components/TripTimeline";
@@ -1341,6 +1341,7 @@ function CurrentFlightTab({ userId }) {
       <VetGuidance trip={trip} requirements={results} paid={!!trip.paid} />
       {showTrack && <ServiceAnimalTrack trip={trip} />}
       {trip.paid && <DocCheck trip={trip} />}
+      {trip.paid && <TripExtras trip={trip} pet={tripPet} />}
       {trip.paid && <CommunityPulse trip={trip} isMember={isMember} />}
       {trip.paid && <PetReliefCard airportLabel={trip.origin} />}
       {trip.paid && <PetReliefCard airportLabel={trip.destination} title="When you land: pet relief" />}
