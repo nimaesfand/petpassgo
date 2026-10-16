@@ -10,6 +10,7 @@ import { requirementAirline } from "../../lib/airlines";
 import { tripTypeForRoute, isMexicoAirport } from "../../lib/airports";
 import SiteHeader from "../../components/SiteHeader";
 import { useTripPet, isTravelDay, TripCountdown, DayOfMode, PetReliefCard, CommunityPulse, TripExtras } from "../../components/TripLive";
+import PetIdV2, { maskChip } from "../../components/PetIdV2";
 import LostPanel from "../../components/LostPanel";
 import PetIdCard, { PetIllustration } from "../../components/PetIdCard";
 import TripTimeline from "../../components/TripTimeline";
@@ -134,7 +135,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
       pet.emergency_contact_name
         ? `Emergency Contact: ${pet.emergency_contact_name}${pet.emergency_contact_phone ? " - " + pet.emergency_contact_phone : ""}`
         : null,
-      pet.microchip_number ? `Microchip: ${pet.microchip_number}` : null,
+      pet.microchip_number ? `Microchip ending: ${maskChip(pet.microchip_number)}` : null,
     ].filter(Boolean);
     const text = lines.join("\n");
 
@@ -493,7 +494,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
           )}
           {pet.microchip_number && (
             <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.75 }}>
-              🔖 Microchip: {pet.microchip_number}
+              🔖 Microchip ending {maskChip(pet.microchip_number)}
             </div>
           )}
         </div>
@@ -529,6 +530,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         </label>
       </PetIdCard>
       <LostPanel pet={pet} userId={userId} />
+      <PetIdV2 pet={pet} userId={userId} onChanged={onPhotoUpdated} />
       </div>
 
       <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${tokens.line}` }}>

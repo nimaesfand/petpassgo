@@ -21,5 +21,5 @@ export function middleware(req) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/cron/|api/stripe/webhook).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/cron/|api/stripe/webhook|api/pet-share/).*)"],
 };
