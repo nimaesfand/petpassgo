@@ -8,6 +8,7 @@ import { findAirport } from "../lib/airports";
 import { PET_RELIEF } from "../lib/petRelief";
 import { AIRLINE_GUIDES } from "../lib/airlineGuides";
 import { getSignedUrl, SignedImg } from "../lib/storage";
+import { LiveFlightCard } from "./FlightLookup";
 import { PRICES as P } from "../lib/pricing";
 
 // The trip's pet (or the owner's first pet), for names and photos throughout.
@@ -206,6 +207,16 @@ export function DayOfMode({ trip, pet, actionItems = [], onShowFull }) {
           </div>
         )}
       </div>
+      <LiveFlightCard trip={trip} />
+      {pet?.id && (
+        <div className="rounded-xl p-5 mb-4 flex flex-wrap items-center justify-between gap-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+          <div>
+            <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }}>{name}’s Pet ID, one tap away</div>
+            <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>The page a finder (or gate agent) sees — QR, message button, shared details.</div>
+          </div>
+          <a href={`/id/${pet.id}`} target="_blank" rel="noopener noreferrer" className="rounded-full px-5 py-2.5" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600, fontSize: 14.5, textDecoration: "none" }}>Open Pet ID →</a>
+        </div>
+      )}
       <TripExtras trip={trip} pet={pet} />
       <PetReliefCard airportLabel={trip.origin} title="Pet relief areas" />
       <PetReliefCard airportLabel={trip.destination} title="When you land: pet relief" />

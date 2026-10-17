@@ -236,10 +236,10 @@ export function SampleTravelPass() {
           {row("30 days before — start documents", "EMAIL + IN-APP", false)}
           {row("7 days before — confirm reservations & carrier", "EMAIL + IN-APP", false)}
           {row("1 day before — pack & print copies", "EMAIL + IN-APP", false)}
-          {row("Travel day — one calm morning checklist", "DAY-OF MODE", false)}
+          {row("Travel day — one calm morning checklist", "TRAVEL DAY VIEW", false)}
         </ul>
       )}
-      <p style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }} className="mt-4">Plus: tips from other travelers on your airline’s community board, and a calm day-of-travel mode on flight day.</p>
+      <p style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }} className="mt-4">Plus: tips from other travelers on your airline’s community board, and a calm Travel Day view on flight day — live flight, documents and Pet ID up top.</p>
     </div>
   );
 }
