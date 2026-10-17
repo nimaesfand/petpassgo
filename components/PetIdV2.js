@@ -172,13 +172,13 @@ export function ShareCard({ pet, userId, onDone }) {
 function ActivationChecklist({ pet, userId, refreshKey }) {
   const [act, setAct] = useState(null); const [counts, setCounts] = useState({ health: 0, docs: 0, bonus: false });
   const load = async () => {
-    const [{ data: a }, { count: health }, { count: docs }, { count: trips }] = await Promise.all([
+    const [{ data: a }, { count: health }, { count: docs }, { data: bonus }] = await Promise.all([
       supabase.from("pet_activation").select("*").eq("pet_id", pet.id).maybeSingle(),
       supabase.from("pet_health_records").select("id", { count: "exact", head: true }).eq("pet_id", pet.id),
       supabase.from("documents").select("id", { count: "exact", head: true }).eq("pet_id", pet.id),
-      supabase.from("trips").select("id", { count: "exact", head: true }).eq("user_id", userId),
+      supabase.rpc("activation_bonus"),
     ]);
-    setAct(a || {}); setCounts({ health: health || 0, docs: docs || 0, bonus: (trips || 0) > 0 });
+    setAct(a || {}); setCounts({ health: health || 0, docs: docs || 0, bonus: !!bonus });
   };
   useEffect(() => { load(); }, [pet.id, refreshKey]);
   async function save(patch) { await supabase.from("pet_activation").upsert({ pet_id: pet.id, user_id: userId, ...patch, updated_at: new Date().toISOString() }); load(); }
