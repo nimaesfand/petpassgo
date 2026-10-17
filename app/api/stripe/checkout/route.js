@@ -21,6 +21,12 @@ async function handle(req) {
   try { body = await req.json(); } catch { return NextResponse.json({ error: "Bad request" }, { status: 400 }); }
   const plan = body?.plan;
   const tripId = body?.trip_id || null;
+  // First-touch attribution -> Stripe metadata (whitelisted, length-capped; optional).
+  const attribution = {};
+  for (const k of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "fbclid"]) {
+    const v = body?.attribution?.[k];
+    if (typeof v === "string" && v) attribution[k] = v.slice(0, 200);
+  }
   if (!["pass", "member_pass", "join", "membership"].includes(plan)) return NextResponse.json({ error: "Unknown plan" }, { status: 400 });
 
   const sb = serviceClient();
@@ -39,7 +45,7 @@ async function handle(req) {
 
   const customer = await customerFor(sb, user);
   const base = siteUrl(req);
-  const meta = { user_id: user.id, trip_id: effPlan === "membership" ? "" : tripId, plan: effPlan };
+  const meta = { user_id: user.id, trip_id: effPlan === "membership" ? "" : tripId, plan: effPlan, ...attribution };
   const params = {
     customer,
     client_reference_id: user.id,
@@ -57,7 +63,7 @@ async function handle(req) {
   } else {
     const items = [{ price: await priceId("membership"), quantity: 1 }];
     if (effPlan === "join") items.push({ price: await priceId("member_pass"), quantity: 1 });
-    Object.assign(params, { mode: "subscription", line_items: items, subscription_data: { metadata: { user_id: user.id } } });
+    Object.assign(params, { mode: "subscription", line_items: items, subscription_data: { metadata: { user_id: user.id, ...attribution } } });
   }
   const session = await stripe().checkout.sessions.create(params);
   return NextResponse.json({ url: session.url });

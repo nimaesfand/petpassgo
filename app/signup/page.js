@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { PRICES as P } from "../../lib/pricing";
 import { supabase } from "../../lib/supabaseClient";
 import SiteHeader from "../../components/SiteHeader";
+import { trackEvent, getAttribution } from "../../lib/analytics";
 import { tokens, font } from "../../lib/theme";
 
 
@@ -27,12 +28,14 @@ export default function SignupPage() {
 
     // Remember the chosen plan; checkout happens after the email is confirmed (Stripe phase).
     localStorage.setItem("petpassgo_plan", plan);
+    try { localStorage.setItem("ppg_signup_attribution", JSON.stringify(getAttribution())); } catch {}
     const { error } = await supabase.auth.signUp({ email, password });
 
     if (error) {
       setStatus("error");
       setErrorMsg(error.message);
     } else {
+      trackEvent("sign_up", { method: "email", plan, content_type: "signup" });
       setStatus("success");
     }
   }

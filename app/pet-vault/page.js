@@ -1,4 +1,6 @@
 import SiteHeader from "../../components/SiteHeader";
+import { TrackOnMount } from "../../components/Analytics";
+
 import Logo from "../../components/Logo";
 import { SamplePetIdCard, VaultInUseGallery } from "../../components/SalesSamples";
 import { PRICES as P } from "../../lib/pricing";
@@ -16,6 +18,7 @@ export default function PetVaultPage() {
   return (
     <div style={{ background: tokens.sky, minHeight: "100vh" }}>
       <SiteHeader />
+      <TrackOnMount contentType="pet_vault" contentName="Pet Vault" />
       <main className="max-w-[980px] mx-auto px-4 sm:px-6 py-10 lg:py-14">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4"><Logo size={44} /></div>

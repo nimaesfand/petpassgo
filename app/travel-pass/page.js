@@ -1,4 +1,6 @@
 import SiteHeader from "../../components/SiteHeader";
+import { TrackOnMount } from "../../components/Analytics";
+
 import { SampleTravelPass } from "../../components/SalesSamples";
 import { PRICES as P } from "../../lib/pricing";
 import { tokens, font } from "../../lib/theme";
@@ -10,6 +12,7 @@ export default function TravelPassPage() {
   return (
     <div style={{ background: tokens.sky, minHeight: "100vh" }}>
       <SiteHeader />
+      <TrackOnMount contentType="travel_pass" contentName="Travel Pass" />
       <main className="max-w-[860px] mx-auto px-4 sm:px-6 py-10 lg:py-14">
         <div className="text-center mb-8">
           <h1 style={{ fontFamily: font.display, fontWeight: 700, color: tokens.navy, lineHeight: 1.1 }} className="text-[32px] lg:text-[44px]">Here’s what a Travel Pass gives you</h1>
