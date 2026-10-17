@@ -6,6 +6,7 @@ import { supabase } from "../../lib/supabaseClient";
 import { AIRLINES, requirementAirline } from "../../lib/airlines";
 import { tripTypeForRoute, isMexicoAirport } from "../../lib/airports";
 import AirportField from "../../components/AirportField";
+import FlightLookup, { airportLabel, airlinePickerName } from "../../components/FlightLookup";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
 
@@ -256,6 +257,8 @@ export default function PetPassGoQuiz() {
     destination: "",
     date: "",
     airline: "",
+    flight_number: "",
+    flight_snapshot: null,
   });
   const [results, setResults] = useState([]);
   const [loadingResults, setLoadingResults] = useState(false);
@@ -301,6 +304,8 @@ export default function PetPassGoQuiz() {
       destination: answers.destination,
       airline: answers.airline,
       travel_date: answers.date || null,
+      flight_number: answers.flight_number || null,
+      flight_snapshot: answers.flight_snapshot || null,
       animal_type: answers.animal,
       role: answers.role,
       status: "ready",
@@ -446,9 +451,10 @@ export default function PetPassGoQuiz() {
               <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-5">
                 City or airport code is fine.
               </p>
+              <FlightLookup date={answers.date} onFill={(f) => setAnswers((a) => ({ ...a, flight_number: f.flight_iata || a.flight_number, flight_snapshot: f, origin: airportLabel(f.departure?.iata, f.departure?.airport) || a.origin, destination: airportLabel(f.arrival?.iata, f.arrival?.airport) || a.destination, airline: airlinePickerName(f.airline) || a.airline, date: a.date || f.flight_date || a.date }))} />
               <div className="flex flex-col gap-3" style={{ position: "relative", zIndex: 1 }}>
-                <AirportField label="Departing from (type a city)" value={answers.origin} onSelect={(v) => set("origin", v)} />
-                <AirportField label="Flying to (type a city)" value={answers.destination} onSelect={(v) => set("destination", v)} />
+                <AirportField key={`o-${answers.origin}`} label="Departing from (type a city)" value={answers.origin} onSelect={(v) => set("origin", v)} />
+                <AirportField key={`d-${answers.destination}`} label="Flying to (type a city)" value={answers.destination} onSelect={(v) => set("destination", v)} />
               </div>
               <NavRow onBack={back} onNext={next} nextDisabled={!answers.origin || !answers.destination} />
             </>
