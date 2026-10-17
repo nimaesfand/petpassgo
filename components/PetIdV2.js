@@ -63,7 +63,7 @@ export function ChipVault({ pet, userId, onChanged }) {
   }
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   return (
-    <section style={section} aria-label="Chip Vault">
+    <section id="chip-vault" style={section} aria-label="Chip Vault">
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div><div style={h3}>🔖 Chip Vault</div><div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>Private in PetPassGo. The chip registry keeps the official record.</div></div>
         {due && <DueBadge tone={due.tone}>{due.text}</DueBadge>}
@@ -114,7 +114,7 @@ export function HealthPassport({ pet, userId, refreshKey = 0 }) {
   async function remove(id) { if (window.confirm("Remove this health record?")) { await supabase.from("pet_health_records").delete().eq("id", id); load(); } }
   async function toggle(row) { await supabase.from("pet_health_records").update({ show_to_finder: !row.show_to_finder }).eq("id", row.id); load(); }
   return (
-    <section style={section} aria-label="Health passport">
+    <section id="health-passport" style={section} aria-label="Health passport">
       <div className="flex items-start justify-between gap-3 flex-wrap"><div><div style={h3}>🩺 Health passport</div><div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>Owner-entered, not verified by PetPassGo or a vet.</div></div><button onClick={() => setShow((v) => !v)} style={{ ...btn, background: tokens.navy, color: "#fff" }}>+ Add record</button></div>
       {show && <form onSubmit={add} className="grid sm:grid-cols-2 gap-2 mt-3 rounded-xl p-3" style={{ background: tokens.paper }}>
         <label style={label}>Type<select style={input} value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })}>{KIND.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
@@ -134,7 +134,7 @@ export function HealthPassport({ pet, userId, refreshKey = 0 }) {
   );
 }
 
-export function WalletCard({ pet }) {
+export function WalletCard({ pet, onDone }) {
   const [busy, setBusy] = useState(false);
   async function download() {
     setBusy(true);
@@ -148,20 +148,20 @@ export function WalletCard({ pet }) {
       c.font = "700 26px system-ui"; c.fillStyle = "#C2410C"; c.fillText("SCAN IF FOUND", 42, 350);
       c.font = "22px system-ui"; c.fillStyle = "#52606D"; c.fillText("Message the owner through PetPassGo.", 42, 390); c.fillText("No chip number or owner phone is shown.", 42, 425);
       const img = new Image(); await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = qr; }); c.drawImage(img, 590, 160, 260, 260);
-      const a = document.createElement("a"); a.download = `${(pet.name || "pet").replace(/[^a-z0-9]+/gi, "-")}-petpassgo-id.png`; a.href = canvas.toDataURL("image/png"); a.click();
+      const a = document.createElement("a"); a.download = `${(pet.name || "pet").replace(/[^a-z0-9]+/gi, "-")}-petpassgo-id.png`; a.href = canvas.toDataURL("image/png"); a.click(); onDone?.();
     } finally { setBusy(false); }
   }
-  return <section style={section}><div style={h3}>📱 Wallet QR card</div><p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">Save this card to your phone photos or Files for one-tap access to {pet.name}'s QR.</p><button disabled={busy} onClick={download} style={{ ...btn, background: tokens.navy, color: "#fff" }} className="mt-2">{busy ? "Making card…" : "Download QR card"}</button><p style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.muted }} className="mt-2">Apple Wallet needs a paid Apple Developer certificate we don't have yet, and Google Wallet needs issuer access, so there's no one-tap Wallet pass yet. This downloadable card works in any photos app.</p></section>;
+  return <section id="wallet-card" style={section}><div style={h3}>📱 Wallet QR card</div><p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">Save this card to your phone photos or Files for one-tap access to {pet.name}'s QR.</p><button disabled={busy} onClick={download} style={{ ...btn, background: tokens.navy, color: "#fff" }} className="mt-2">{busy ? "Making card…" : "Download QR card"}</button><p style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.muted }} className="mt-2">Apple Wallet needs a paid Apple Developer certificate we don't have yet, and Google Wallet needs issuer access, so there's no one-tap Wallet pass yet. This downloadable card works in any photos app.</p></section>;
 }
 
-export function ShareCard({ pet, userId }) {
+export function ShareCard({ pet, userId, onDone }) {
   const [days, setDays] = useState(7); const [url, setUrl] = useState(""); const [err, setErr] = useState(""); const [busy, setBusy] = useState(false); const [links, setLinks] = useState([]);
   async function load() { const { data } = await supabase.from("pet_share_cards").select("id,expires_at,revoked_at,created_at,view_count").eq("pet_id", pet.id).order("created_at", { ascending: false }).limit(5); setLinks(data || []); }
   useEffect(() => { load(); }, [pet.id]);
-  async function create() { setBusy(true); setErr(""); const { data: s } = await supabase.auth.getSession(); const r = await fetch("/api/pet-share", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id, days }) }); const j = await r.json().catch(() => ({})); if (r.ok && j.url) { setUrl(j.url); load(); } else setErr(j.error || "Couldn't create the link."); setBusy(false); }
+  async function create() { setBusy(true); setErr(""); const { data: s } = await supabase.auth.getSession(); const r = await fetch("/api/pet-share", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id, days }) }); const j = await r.json().catch(() => ({})); if (r.ok && j.url) { setUrl(j.url); load(); onDone?.(); } else setErr(j.error || "Couldn't create the link."); setBusy(false); }
   async function revoke(id) { await supabase.from("pet_share_cards").update({ revoked_at: new Date().toISOString() }).eq("id", id); load(); }
   const active = links.filter((l) => !l.revoked_at && new Date(l.expires_at) > new Date());
-  return <section style={section}><div style={h3}>🧑‍⚕️ Vet / sitter share card</div><p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">A private, expiring page with {pet.name}'s photo, chip last 4, vet, emergency contact and health records. It never shows the full chip number.</p>
+  return <section id="share-card" style={section}><div style={h3}>🧑‍⚕️ Vet / sitter share card</div><p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">A private, expiring page with {pet.name}'s photo, chip last 4, vet, emergency contact and health records. It never shows the full chip number.</p>
     <div className="flex gap-2 items-center flex-wrap mt-3"><label style={label}>Expires in <select value={days} onChange={(e) => setDays(Number(e.target.value))} style={{ ...input, width: "auto", display: "inline-block", marginLeft: 6 }}><option value={1}>1 day</option><option value={7}>7 days</option><option value={30}>30 days</option></select></label><button disabled={busy} onClick={create} style={{ ...btn, background: tokens.stamp, color: "#fff" }}>{busy ? "Creating…" : "Create share link"}</button></div>
     {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-2">{err}</div>}
     {url && <div className="rounded-xl p-3 mt-3 flex gap-2 flex-wrap items-center" style={{ background: tokens.paper }}><input readOnly value={url} style={{ ...input, flex: 1, minWidth: 220 }} onFocus={(e) => e.target.select()} /><button onClick={() => navigator.clipboard?.writeText(url)} style={{ ...btn, background: tokens.navy, color: "#fff" }}>Copy</button><a href={url} target="_blank" rel="noopener noreferrer" style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, textDecoration: "none" }}>Open / PDF</a></div>}
@@ -169,10 +169,48 @@ export function ShareCard({ pet, userId }) {
   </section>;
 }
 
+function ActivationChecklist({ pet, userId, refreshKey }) {
+  const [act, setAct] = useState(null); const [counts, setCounts] = useState({ health: 0, docs: 0, bonus: false });
+  const load = async () => {
+    const [{ data: a }, { count: health }, { count: docs }, { count: trips }] = await Promise.all([
+      supabase.from("pet_activation").select("*").eq("pet_id", pet.id).maybeSingle(),
+      supabase.from("pet_health_records").select("id", { count: "exact", head: true }).eq("pet_id", pet.id),
+      supabase.from("documents").select("id", { count: "exact", head: true }).eq("pet_id", pet.id),
+      supabase.from("trips").select("id", { count: "exact", head: true }).eq("user_id", userId),
+    ]);
+    setAct(a || {}); setCounts({ health: health || 0, docs: docs || 0, bonus: (trips || 0) > 0 });
+  };
+  useEffect(() => { load(); }, [pet.id, refreshKey]);
+  async function save(patch) { await supabase.from("pet_activation").upsert({ pet_id: pet.id, user_id: userId, ...patch, updated_at: new Date().toISOString() }); load(); }
+  useEffect(() => { const h = () => save({ qr_done_at: new Date().toISOString() }); window.addEventListener("ppg-qr-done", h); return () => window.removeEventListener("ppg-qr-done", h); }, [pet.id]);
+  if (!act) return null;
+  const steps = [
+    { done: !!pet.photo_url, icon: "📸", title: "Add a photo", text: "A clear headshot helps anyone who finds them.", href: `#pet-top-${pet.id}`, cta: "Add photo" },
+    { done: !!(pet.microchip_number && pet.chip_verified_at), icon: "🔖", title: "Save the chip & check it", text: "Two minutes now can bring them home later.", href: "#chip-vault", cta: "Open Chip Vault" },
+    { done: counts.health + counts.docs > 0, icon: "🩺", title: "Add one health record", text: "A vaccine, med or allergy — typed in or smart-imported.", href: "#health-passport", cta: "Add a record" },
+    { done: !!act.qr_done_at, icon: "📱", title: "Download or share the QR card", text: "Keep it on your phone, ready for a sitter or a just-in-case moment.", href: "#wallet-card", cta: "Get the card" },
+    { done: counts.bonus, icon: "✨", title: "Optional: plan a trip or say hello", text: "Start trip questions or browse your airline's board.", href: "/assessment", cta: "Explore", optional: true },
+  ];
+  const required = steps.slice(0, 4); const done = required.filter((x) => x.done).length; const pct = Math.round((done / 4) * 100);
+  if (act.dismissed_at && done < 4) return null;
+  const r = 24, c = 2 * Math.PI * r;
+  return <div className="rounded-2xl p-4 mt-3" style={{ background: "linear-gradient(135deg,#FFF9EC,#fff)", border: `1.5px solid ${tokens.gold}` }}>
+    <div className="flex items-center gap-3">
+      <svg width="58" height="58" viewBox="0 0 58 58" className="flex-shrink-0"><circle cx="29" cy="29" r={r} fill="none" stroke={tokens.line} strokeWidth="6"/><circle cx="29" cy="29" r={r} fill="none" stroke={pct === 100 ? tokens.green : tokens.stamp} strokeWidth="6" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c - c * pct / 100} transform="rotate(-90 29 29)"/><text x="29" y="34" textAnchor="middle" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 13, fill: tokens.navy }}>{pct}%</text></svg>
+      <div className="flex-1 min-w-0"><div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }}>{done === 4 ? `${pet.name}'s ID is all set 🎉` : `Finish ${pet.name}'s ID`}</div><div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>{done === 4 ? "Everything important is stored safely here, ready whenever you need it." : `${done} of 4 little steps done. No rush — each one makes the ID more useful.`}</div></div>
+      {done < 4 && <button onClick={() => save({ dismissed_at: new Date().toISOString() })} style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>Later</button>}
+    </div>
+    <div className="grid gap-2 mt-3">{steps.map((s) => <div key={s.title} className="flex items-center gap-3 rounded-xl px-3 py-2.5" style={{ background: "#fff", border: `1px solid ${tokens.line}`, opacity: s.done ? 0.72 : 1, flexWrap: "wrap" }}>
+      <span style={{ fontSize: 20 }}>{s.done ? "✅" : s.icon}</span><div className="min-w-0" style={{ flex: "1 1 180px" }}><div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 14.5, color: tokens.navy }}>{s.title}{s.optional ? " (optional)" : ""}</div><div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>{s.text}</div></div>
+      {!s.done && <a href={s.href} className="rounded-full px-3 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 13, fontWeight: 700, textDecoration: "none" }}>{s.cta}</a>}
+    </div>)}</div>
+  </div>;
+}
 export default function PetIdV2({ pet, userId, onChanged }) {
   const [refresh, setRefresh] = useState(0);
   return <div className="rounded-xl p-5 mt-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
     <div style={{ fontFamily: font.mono, fontSize: 11.5, letterSpacing: "0.12em", color: tokens.stamp, fontWeight: 700 }}>PET ID EXTRAS</div>
+    <ActivationChecklist pet={pet} userId={userId} refreshKey={refresh} />
     <div className="rounded-xl p-4 mt-3" style={{ background: tokens.sky }}>
       <div style={{ fontFamily: font.display, fontSize: 17, fontWeight: 700, color: tokens.navy }}>What this is</div>
       <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">{pet.name}'s everyday safety kit: chip details, health records and a card you can share with a vet or sitter.</p>
@@ -186,7 +224,7 @@ export default function PetIdV2({ pet, userId, onChanged }) {
     <ChipVault pet={pet} userId={userId} onChanged={onChanged} />
     <HealthPassport pet={pet} userId={userId} refreshKey={refresh} />
     <VetImport pet={pet} userId={userId} onSaved={() => { setRefresh((v) => v + 1); onChanged?.(); }} />
-    <ShareCard pet={pet} userId={userId} />
-    <WalletCard pet={pet} />
+    <ShareCard pet={pet} userId={userId} onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
+    <WalletCard pet={pet} onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
   </div>;
 }

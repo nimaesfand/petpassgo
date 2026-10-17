@@ -273,7 +273,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
   const delta = current && previous ? current.value - previous.value : null;
 
   return (
-    <div className="rounded-xl p-5 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+    <div id={`pet-top-${pet.id}`} className="rounded-xl p-5 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
       <div className="flex items-center gap-4">
         <div className="relative flex-shrink-0">
           {pet.photo_url ? (

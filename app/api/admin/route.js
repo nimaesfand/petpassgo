@@ -36,6 +36,15 @@ async function customer(admin, id) {
 export async function GET(req) {
   const ctx = await gate(req); if (!ctx) return NextResponse.json({ error: "Owner only." }, { status: 403 });
   const url = new URL(req.url); const email = url.searchParams.get("email"); const id = url.searchParams.get("id");
+  if (url.searchParams.get("activation")) {
+    const [{ data: mems }, { data: pets }, { data: health }, { data: acts }, { data: trips }, { data: posts }] = await Promise.all([
+      ctx.admin.from("memberships").select("user_id").eq("status", "active"), ctx.admin.from("pets").select("user_id,photo_url,microchip_number,chip_verified_at"),
+      ctx.admin.from("pet_health_records").select("user_id"), ctx.admin.from("pet_activation").select("user_id,qr_done_at"), ctx.admin.from("trips").select("user_id"), ctx.admin.from("community_posts").select("user_id"),
+    ]);
+    const members = new Set((mems || []).map((x) => x.user_id)); const only = (rows, pred = () => true) => new Set((rows || []).filter((x) => members.has(x.user_id) && pred(x)).map((x) => x.user_id)).size;
+    const bonus = new Set([...(trips || []), ...(posts || [])].filter((x) => members.has(x.user_id)).map((x) => x.user_id)).size;
+    return NextResponse.json({ members: members.size, steps: { pet_with_photo: only(pets, (x) => !!x.photo_url), chip_checked: only(pets, (x) => !!(x.microchip_number && x.chip_verified_at)), health_record: only(health), qr_downloaded_or_shared: only(acts, (x) => !!x.qr_done_at), trip_or_community: bonus } });
+  }
   if (id) { const c = await customer(ctx.admin, id); if (!c) return NextResponse.json({ error: "Customer not found" }, { status: 404 }); await audit(ctx, id, "view_customer", { email: c.email }); return NextResponse.json({ customer: c }); }
   return NextResponse.json({ results: await findUser(ctx.admin, email) });
 }

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { tokens, font } from "../../lib/theme";
 
@@ -7,6 +7,8 @@ async function call(path, opts = {}) { const { data: s } = await supabase.auth.g
 const btn = { fontFamily: font.body, fontWeight: 700, fontSize: 14, borderRadius: 999, padding: "8px 14px", background: tokens.navy, color: "#fff" };
 
 export default function AdminPage() {
+  const [activation, setActivation] = useState(null);
+  useEffect(() => { call("/api/admin?activation=1").then(({ r, j }) => { if (r.ok) setActivation(j); }); });
   const [email, setEmail] = useState(""); const [results, setResults] = useState([]); const [c, setC] = useState(null); const [msg, setMsg] = useState(""); const [days, setDays] = useState(30);
   async function search(e) { e.preventDefault(); setMsg(""); const { r, j } = await call(`/api/admin?email=${encodeURIComponent(email)}`); if (!r.ok) setMsg(j.error || "Owner only."); else setResults(j.results || []); }
   async function load(id) { const { r, j } = await call(`/api/admin?id=${id}`); if (r.ok) setC(j.customer); else setMsg(j.error); }
@@ -14,6 +16,7 @@ export default function AdminPage() {
   return <main style={{ background: tokens.sky, minHeight: "100vh", fontFamily: font.body }} className="px-4 py-8"><div className="max-w-[860px] mx-auto">
     <h1 style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700, color: tokens.navy }}>Owner support</h1>
     <p style={{ color: tokens.muted, fontSize: 14.5 }} className="mt-1">Private owner view. Passwords are never shown or handled here. Every change is logged.</p>
+    {activation && <div className="rounded-2xl p-5 mt-5" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}><div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }}>Activation (members, aggregate only)</div><div style={{ fontSize: 14.5, color: tokens.muted }} className="mt-1">{activation.members} active members · Photo {activation.steps.pet_with_photo} · Chip checked {activation.steps.chip_checked} · Health record {activation.steps.health_record} · QR card {activation.steps.qr_downloaded_or_shared} · Trip/community {activation.steps.trip_or_community}</div></div>}
     <form onSubmit={search} className="flex gap-2 mt-5"><input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Search customer by email" style={{ flex: 1, border: `2px solid ${tokens.line}`, borderRadius: 12, padding: "11px 14px", fontSize: 16 }} /><button style={btn}>Search</button></form>
     {msg && <div className="rounded-xl p-3 mt-3" style={{ background: "#FFF9EC", fontSize: 14.5 }}>{msg}</div>}
     <div className="space-y-2 mt-4">{results.map((x) => <button key={x.id} onClick={() => load(x.id)} className="w-full text-left rounded-xl p-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}><b style={{ color: tokens.navy }}>{x.email}</b><span style={{ color: tokens.muted, fontSize: 13 }}> · joined {new Date(x.created_at).toLocaleDateString()}</span></button>)}</div>
