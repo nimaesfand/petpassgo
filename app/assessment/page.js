@@ -629,7 +629,7 @@ export default function PetPassGoQuiz() {
                       style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}
                       className="w-full rounded-full py-3.5 text-[15px] hover:opacity-90 transition"
                     >
-                      Unlock this trip — {P.memberPass} member price
+                      Unlock your Travel Pass — {P.memberPass} member price
                     </button>
                     <ul
                       style={{ fontFamily: font.body, fontSize: 14, color: tokens.ink, opacity: 0.75 }}
@@ -666,7 +666,7 @@ export default function PetPassGoQuiz() {
                         <div style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700 }}>{P.memberPass} <span style={{ fontSize: 15, fontWeight: 500, opacity: 0.75 }}>+ {P.member}/mo</span></div>
                         <p style={{ fontFamily: font.body, fontSize: 14, opacity: 0.8 }} className="mb-4 flex-1">This trip, plus Pet ID, lost-pet alerts, community and every future pass at {P.memberPass}.</p>
                         <button onClick={() => { setAddMembership(true); handlePurchase("member"); }} className="w-full rounded-full py-3 hover:opacity-90 transition" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, fontSize: 15 }}>
-                          Join and unlock · {P.joinToday} today
+                          Join and unlock your Travel Pass · {P.joinToday} today
                         </button>
                       </div>
                       <div className="rounded-2xl p-5 flex flex-col" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
@@ -674,7 +674,7 @@ export default function PetPassGoQuiz() {
                         <div style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700, color: tokens.navy }}>{P.pass}</div>
                         <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-4 flex-1">Full checklist, deadlines, sources and reminders. Pet ID and vault until your trip ends.</p>
                         <button onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3 hover:opacity-90 transition" style={{ background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, fontFamily: font.body, fontWeight: 600, fontSize: 15 }}>
-                          Buy Travel Pass
+                          Unlock your Travel Pass — {P.pass}
                         </button>
                       </div>
                     </div>

@@ -1278,10 +1278,10 @@ export function DashboardTab({ userId, onOpenTrips }) {
   const startCard = (
     <div className="rounded-2xl p-5 sm:p-6 mb-4 sm:mb-6" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
       <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-1">Traveling? Start here.</div>
-      <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-4">{trip ? (trip.paid ? `Next trip: ${trip.origin} → ${trip.destination}${trip.travel_date ? ` · ${trip.travel_date}` : ""}.` : `You have a trip being planned: ${trip.origin} → ${trip.destination}.`) : "Plan a new trip and we’ll build the checklist for you."}</p>
+      <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-4">{trip ? (trip.paid ? `Next trip: ${trip.origin} → ${trip.destination}${trip.travel_date ? ` · ${trip.travel_date}` : ""}.` : `You have a trip being planned: ${trip.origin} → ${trip.destination}.`) : "See what’s included, then start a new trip plan."}</p>
       <div className="flex flex-wrap gap-3">
         {trip && <button onClick={onOpenTrips} className="rounded-full px-6 py-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, border: "none", cursor: "pointer" }}>Open my trip</button>}
-        <a href="/assessment" className="rounded-full px-6 py-3 inline-block" style={{ background: trip ? "#fff" : tokens.primary, color: trip ? tokens.navy : "#fff", border: trip ? `2px solid ${tokens.navy}` : "none", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Plan a new trip{trip ? "" : " — start free"}</a>
+        <a href="/travel-pass" className="rounded-full px-6 py-3 inline-block" style={{ background: trip ? "#fff" : tokens.primary, color: trip ? tokens.navy : "#fff", border: trip ? `2px solid ${tokens.navy}` : "none", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>{trip ? "Travel Pass — see what’s included" : "See the Travel Pass"}</a>
       </div>
     </div>
   );
