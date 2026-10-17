@@ -242,6 +242,70 @@ function WeatherTile({ label, end }) {
   );
 }
 
+function spotMapHref(s) {
+  const apple = typeof navigator !== "undefined" && /iphone|ipad|ipod/i.test(navigator.userAgent || "");
+  if (apple) return `https://maps.apple.com/?q=${encodeURIComponent(s.name)}${s.lat != null ? `&ll=${s.lat},${s.lon}` : ""}`;
+  return s.map; // Google Maps universal URL built server-side
+}
+
+// We check the airline's verified checked-pet/cargo temperature policy for the
+// user, instead of telling them to check it themselves. Policy data comes from
+// public.airline_cargo_temp_policies (official airline source per row).
+export function CargoTempCheck({ x, trip, name }) {
+  const airline = x.airline || trip.airline || "Your airline";
+  const policy = x.cargoPolicy;
+  const isService = /service/i.test(x.role || trip.role || "");
+  const box = { background: tokens.sky };
+  const head = { fontFamily: font.body, fontWeight: 700, fontSize: 15, color: tokens.navy };
+  const body = { fontFamily: font.body, fontSize: 14, color: tokens.ink, marginTop: 4, lineHeight: 1.5 };
+  const source = policy && (
+    <div style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.muted, marginTop: 6 }}>
+      Source: <a href={policy.source_url} target="_blank" rel="noopener noreferrer" style={{ color: tokens.primary }}>{airline} (official site)</a>, checked {policy.verified_at}. Forecast temperatures are approximate, and the airline makes the final call at check-in.
+    </div>
+  );
+  if (isService) return (
+    <div className="mt-3 rounded-lg p-3" style={box}>
+      <div style={head}>🌡️ Temperature check — done for you</div>
+      <div style={body}>Service animals travel in the cabin with you, so checked-pet and cargo temperature limits don’t apply to this trip. The hot/cold comfort tips above still help.</div>
+    </div>
+  );
+  if (!policy) return (
+    <div className="mt-3 rounded-lg p-3" style={box}>
+      <div style={head}>🌡️ Temperature check — done for you</div>
+      <div style={body}>{airline} hasn’t published a checked-pet or cargo temperature limit we could verify on its official site, so we won’t guess one. If {name} is flying checked or as cargo, confirm with {airline} before travel. If {name} is in the cabin with you, cargo temperature limits don’t apply anyway.</div>
+    </div>
+  );
+  if (policy.service_type === "cabin_only") return (
+    <div className="mt-3 rounded-lg p-3" style={box}>
+      <div style={head}>🌡️ Temperature check — done for you</div>
+      <div style={body}>{policy.summary} So there’s no cargo temperature risk to check for this trip — that only matters for pets traveling checked or as cargo.</div>
+      {source}
+    </div>
+  );
+  const ends = [[x.origin?.code, x.origin?.weather], [x.destination?.code, x.destination?.weather]].filter(([, w]) => w?.status === "ok");
+  const problems = [];
+  for (const [code, w] of ends) {
+    if (w.highF > policy.max_f) problems.push(`${code}’s forecast high of ${w.highF}°F is above the ${policy.max_f}°F maximum`);
+    if (w.lowF < policy.min_f) problems.push(`${code}’s forecast low of ${w.lowF}°F is below the ${policy.min_f}°F minimum`);
+  }
+  const range = ends.map(([code, w]) => `${code} ${w.lowF}–${w.highF}°F`).join(", ");
+  return (
+    <div className="mt-3 rounded-lg p-3" style={{ background: problems.length ? "#FFF1E8" : "#EAF6EE" }}>
+      <div style={head}>🌡️ Checked-pet temperature check — done for you</div>
+      <div style={body}>
+        {ends.length === 0
+          ? `The travel-day forecast isn’t available yet, so we can’t compare it today. ${airline}’s verified limit (below) is the one to watch as your trip gets closer.`
+          : problems.length
+            ? `Heads up: ${problems.join(" and ")}. That’s outside ${airline}’s verified ${policy.min_f}–${policy.max_f}°F limit for checked/cargo pets, so the airline could refuse a checked pet on this trip. Consider the cabin, a different flight time, or rebooking.`
+            : `Good news: the forecast for your travel day (${range}) sits inside ${airline}’s verified ${policy.min_f}–${policy.max_f}°F limit for checked/cargo pets at both ends of this trip.`}
+      </div>
+      <div style={{ ...body, fontSize: 13.5 }}>{policy.summary}</div>
+      <div style={body}>Flying in the cabin instead? These checked/cargo limits don’t apply to {name} — they only matter if {name} travels checked or as cargo.</div>
+      {source}
+    </div>
+  );
+}
+
 export function TripExtras({ trip, pet }) {
   const [x, setX] = useState(null);
   const [filter, setFilter] = useState("all");
@@ -275,9 +339,9 @@ export function TripExtras({ trip, pet }) {
           <div className="mt-3 rounded-lg p-3" style={{ background: "#FFF9EC", fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>
             {hot ? `☀️ It could be warm. Keep ${name} cool and hydrated, and never leave a pet in a parked car. ` : ""}
             {cold ? `❄️ It could be chilly. A cozy blanket in the carrier can help ${name}. ` : ""}
-            Some airlines restrict pets in cargo in extreme temperatures, so check your airline's policy.
           </div>
         )}
+        <CargoTempCheck x={x} trip={trip} name={name} />
         <div style={{ fontFamily: font.body, fontSize: 12, color: tokens.muted }} className="mt-3">
           Approximate day high/low. Weather data from <a href="https://www.met.no/en" target="_blank" rel="noopener noreferrer" style={{ color: tokens.primary }}>MET Norway</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" style={{ color: tokens.primary }}>CC BY 4.0</a>), summarized by PetPassGo.
         </div>
@@ -299,18 +363,18 @@ export function TripExtras({ trip, pet }) {
           ) : (
             <ul className="divide-y" style={{ borderColor: tokens.line }}>
               {spots.map((s) => (
-                <li key={s.map} className="py-2.5 flex items-center justify-between gap-3">
+                <li key={`${s.name}-${s.lat}-${s.lon}`} className="py-2.5 flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <div style={{ fontFamily: font.body, fontSize: 15.5, fontWeight: 600, color: tokens.navy }} className="truncate">{s.name}</div>
                     <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>{SPOT_LABEL[s.type]}</div>
                   </div>
-                  <a href={s.map} target="_blank" rel="noopener noreferrer" className="rounded-full px-3 py-1.5 flex-shrink-0" style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, background: tokens.sky, color: tokens.navy, textDecoration: "none" }}>Map</a>
+                  <a href={spotMapHref(s)} target="_blank" rel="noopener noreferrer" className="rounded-full px-3 py-1.5 flex-shrink-0" style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, background: tokens.sky, color: tokens.navy, textDecoration: "none" }}>Map</a>
                 </li>
               ))}
             </ul>
           )}
           <div style={{ fontFamily: font.body, fontSize: 12, color: tokens.muted }} className="mt-3">
-            Listings from OpenStreetMap; call ahead to confirm hours. Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" style={{ color: tokens.primary }}>OpenStreetMap contributors</a>.
+            Place listings from OpenStreetMap data; the Map button opens Google Maps (Apple Maps on iPhone/iPad). Call ahead to confirm hours. Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" style={{ color: tokens.primary }}>OpenStreetMap contributors</a>.
           </div>
         </div>
       )}
