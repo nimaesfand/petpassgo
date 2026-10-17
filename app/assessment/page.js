@@ -7,6 +7,7 @@ import { AIRLINES, requirementAirline } from "../../lib/airlines";
 import { tripTypeForRoute, isMexicoAirport } from "../../lib/airports";
 import AirportField from "../../components/AirportField";
 import FlightLookup, { airportLabel, airlinePickerName } from "../../components/FlightLookup";
+import { SampleTravelPass } from "../../components/SalesSamples";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
 
@@ -610,6 +611,13 @@ export default function PetPassGoQuiz() {
                       </button>
                     </div>
                   ))}
+                </div>
+              )}
+
+              {!unlocked && !noMatch && (
+                <div className="mt-6 mb-2">
+                  <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }} className="mb-3">Here’s what your Travel Pass gives you</div>
+                  <SampleTravelPass />
                 </div>
               )}
 

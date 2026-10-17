@@ -4,8 +4,8 @@ const D = "var(--font-display), system-ui, sans-serif", B = "var(--font-body), s
 
 export const PLANS = [
   { k: "free", name: "Free", price: "$0", unit: "no account needed", blurb: "See what your trip needs.", items: ["Trip questions", "Preview of the steps you'll need", "Lost-pet flyer + instant sharing"], cta: "Plan your trip", href: "/assessment" },
-  { k: "member", name: "Membership", price: P.member, unit: "per month", blurb: "Everything for your pet, all year.", items: ["Pet vault + Digital Pet ID with QR", "Lost-pet alerts + finder messages", "Community boards", "Expiry reminders · unlimited pets", `Travel Passes just ${P.memberPass}`], cta: `Join for ${P.member}/mo`, href: "/signup?plan=member", hi: true },
-  { k: "pass", name: "Travel Pass", price: P.pass, unit: "per trip, no membership", blurb: "One trip, fully covered.", items: ["Full checklist + deadlines", "Official sources", "Reminders for this trip", "Pet ID + vault until the trip ends"], cta: "Buy a Travel Pass", href: "/assessment" },
+  { k: "member", name: "Membership", price: P.member, unit: "per month", blurb: "Everything for your pet, all year.", items: ["Pet vault + Digital Pet ID with QR", "Lost-pet alerts + finder messages", "Community boards", "Expiry reminders · unlimited pets", `Travel Passes just ${P.memberPass}`], cta: "See the Pet Vault", href: "/pet-vault", hi: true },
+  { k: "pass", name: "Travel Pass", price: P.pass, unit: "per trip, no membership", blurb: "One trip, fully covered.", items: ["Full checklist + deadlines", "Official sources", "Reminders for this trip", "Pet ID + vault until the trip ends"], cta: "Plan your trip", href: "/assessment" },
 ];
 const ROWS = [
   ["Trip questions + step preview", 1, 1, 1], ["Lost-pet flyer + social sharing", 1, 1, 1],
