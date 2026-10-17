@@ -4,7 +4,7 @@ import { getAllPosts } from "../lib/blog";
 
 export default function sitemap() {
   const now = new Date();
-  const pages = ["", "/assessment", "/airlines", "/faq", "/blog"].map((p) => ({
+  const pages = ["", "/assessment", "/airlines", "/faq"].map((p) => ({
     url: `${SITE_URL}${p}`, lastModified: now, changeFrequency: "weekly", priority: p === "" ? 1 : 0.7,
   }));
   const extra = ["/lost-flyer"].map((p) => ({ url: `${SITE_URL}${p}`, lastModified: now, changeFrequency: "monthly", priority: 0.6 }));

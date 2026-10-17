@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { tokens, font } from "../lib/theme";
 import SiteHeader from "../components/SiteHeader";
-import { PlanCards, CompareTable } from "../components/PricingPlans";
+import Logo from "../components/Logo";
+import { PlanCards } from "../components/PricingPlans";
 import { PRICES } from "../lib/pricing";
 import { PetIllustration } from "../components/PetIdCard";
 import PetQr from "../lib/PetQr";
@@ -225,49 +226,7 @@ function Cta({ children = "Plan your trip", href = "/assessment" }) {
   );
 }
 
-function ChecklistPreview() {
-  const rows = [
-    ["Reserve your pet's spot", "Done", tokens.green],
-    ["Vet health document", "Due in 9 days", tokens.stamp],
-    ["Carrier check", "To do", tokens.muted],
-    ["Rabies certificate", "Uploaded", tokens.green],
-  ];
-  return (
-    <div className="rounded-2xl overflow-hidden w-full" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.10)" }}>
-      <div className="px-5 py-3.5 flex items-center justify-between" style={{ background: tokens.navy }}>
-        <span style={{ fontFamily: D, fontWeight: 700, color: "#fff", fontSize: 17 }}>Travel Pass</span>
-        <span style={{ fontFamily: B, fontWeight: 700, fontSize: 11.5, letterSpacing: "0.14em", color: tokens.gold }}>2 OF 4 DONE</span>
-      </div>
-      <div className="px-5 pt-4">
-        <div className="h-2 rounded-full" style={{ background: tokens.sky }}><div className="h-2 rounded-full" style={{ width: "50%", background: tokens.green }} /></div>
-      </div>
-      <ul className="p-5 space-y-3">
-        {rows.map(([t, s, c]) => (
-          <li key={t} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ border: `1px solid ${tokens.line}` }}>
-            <span className="flex items-center gap-3" style={{ fontFamily: B, fontWeight: 600, color: tokens.navy, fontSize: 15 }}>
-              <span className="inline-flex items-center justify-center rounded-full" style={{ width: 22, height: 22, border: `2px solid ${c}`, background: c === tokens.green ? c : "transparent", color: "#fff", fontSize: 12 }}>{c === tokens.green ? "✓" : ""}</span>
-              {t}
-            </span>
-            <span style={{ fontFamily: B, fontSize: 12.5, fontWeight: 700, color: c, whiteSpace: "nowrap" }}>{s}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
 
-function LostPreview() {
-  return (
-    <div className="rounded-2xl overflow-hidden w-full" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.10)" }}>
-      <div className="px-5 py-3 text-center" style={{ background: tokens.stamp, color: "#fff", fontFamily: D, fontWeight: 800, fontSize: 22, letterSpacing: "0.08em" }}>LOST PET</div>
-      <div className="p-5">
-        <div style={{ fontFamily: B, fontSize: 15, color: tokens.muted }} className="mb-4">Biscuit is missing. Seen him? Message his owner. Your details stay private until you share them.</div>
-        <div className="rounded-xl px-4 py-3 mb-3" style={{ background: tokens.sky, fontFamily: B, fontSize: 14, color: tokens.muted }}>I think I saw him near the park…</div>
-        <div className="rounded-full py-3 text-center" style={{ background: tokens.navy, color: "#fff", fontFamily: B, fontWeight: 600, fontSize: 15 }}>Message the owner</div>
-      </div>
-    </div>
-  );
-}
 
 function IdPreview() {
   return (
@@ -365,24 +324,20 @@ export default function PetPassGoLanding() {
         </div>
       </section>
 
-      {/* 3. WHAT YOU GET — visual previews */}
-      <section className="max-w-[1240px] mx-auto px-6 md:px-14 py-20">
-        <Eyebrow>WHAT YOU GET</Eyebrow>
-        <H2>See it before you pay.</H2>
-        <div className="grid lg:grid-cols-3 gap-8 mt-10 items-start">
-          {[
-            ["Your Travel Pass", "Every step, with its deadline. Tick it off as you go.", <ChecklistPreview key="c" />],
-            ["A Digital Pet ID", "A shareable profile with a QR code for the collar or carrier.", <IdPreview key="p" />],
-            ["Lost-pet mode", "One tap turns the ID into a lost poster. Finders message you; your contact stays hidden.", <LostPreview key="l" />],
-          ].map(([t, b, v]) => (
-            <div key={t}>
-              <div className="mb-5">{v}</div>
-              <h3 style={{ fontFamily: D, color: tokens.navy, fontSize: 22, fontWeight: 700 }} className="mb-1">{t}</h3>
-              <p style={{ fontFamily: B, color: tokens.muted, fontSize: 16, lineHeight: 1.55 }}>{b}</p>
-            </div>
-          ))}
+      {/* 3. PET VAULT — one calm banner, not a wall of previews */}
+      <section className="max-w-[1240px] mx-auto px-6 md:px-14 py-14">
+        <div className="rounded-3xl p-8 md:p-10 flex flex-col md:flex-row md:items-center gap-7" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+          <div className="flex-1">
+            <Eyebrow>THE PET VAULT</Eyebrow>
+            <h3 style={{ fontFamily: D, color: tokens.navy, fontSize: 26, fontWeight: 700 }} className="mb-2">One safe place for everything about your pet.</h3>
+            <p style={{ fontFamily: B, color: tokens.muted, fontSize: 16.5, lineHeight: 1.55 }}>Digital Pet ID with a QR code for the collar, chip details, vet records and health documents — ready at home, and vital if you’re ever separated.</p>
+          </div>
+          <div className="flex-shrink-0"><IdPreview /></div>
+          <div className="flex-shrink-0">
+            <a href="/signup?plan=member" className="btn-primary rounded-full px-7 py-3.5 inline-block" style={{ background: tokens.navy, color: "#fff", fontFamily: B, fontWeight: 700, textDecoration: "none" }}>Get your pet’s ID →</a>
+            <div style={{ fontFamily: B, fontSize: 13.5, color: tokens.muted }} className="mt-2">Membership · {PRICES.member}/mo</div>
+          </div>
         </div>
-        <p style={{ fontFamily: B, fontSize: 13, color: tokens.muted }} className="mt-8">Sample previews. Your pass is built for your trip.</p>
       </section>
 
       {/* 4. AIRLINES */}
@@ -402,11 +357,10 @@ export default function PetPassGoLanding() {
       </section>
 
       {/* 5. PRICING */}
-      <section id="pricing" className="max-w-[1240px] mx-auto px-6 md:px-14 py-20">
+      <section id="pricing" className="max-w-[1240px] mx-auto px-6 md:px-14 py-14">
         <Eyebrow>PRICING</Eyebrow>
         <H2>Start free. Pay when you fly.</H2>
         <div className="mt-10"><PlanCards /></div>
-        <CompareTable />
       </section>
 
       {/* 6. FAQ TEASER */}
@@ -433,6 +387,7 @@ export default function PetPassGoLanding() {
       </section>
 
       <footer className="px-6 md:px-14 py-8 text-center" style={{ borderTop: `1px solid ${tokens.line}`, fontFamily: B, fontSize: 13, color: tokens.muted }}>
+        <div className="flex justify-center mb-3"><Logo size={30} /></div>
         PetPassGo is a preparation tool, not a certifying authority. Requirements are set by airlines and government agencies.
         <div className="mt-2"><a href="/lost-flyer" style={{ color: tokens.navy, textDecoration: "underline" }}>Free lost pet flyer</a>{" · "}<a href="/terms" style={{ color: tokens.navy, textDecoration: "underline" }}>Terms of Service</a>{" · "}<a href="/privacy" style={{ color: tokens.navy, textDecoration: "underline" }}>Privacy Policy</a></div>
       </footer>
