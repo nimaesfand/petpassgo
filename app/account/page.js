@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { LiveFlightCard } from "../../components/FlightLookup";
 import { supabase } from "../../lib/supabaseClient";
 import { usePetAccess } from "../../lib/access";
 import WinBack from "../../components/WinBack";
@@ -1340,6 +1341,7 @@ function CurrentFlightTab({ userId }) {
         </div>
       </div>
 
+      {trip.paid && <LiveFlightCard trip={trip} />}
       {trip.paid && <TripTimeline trip={trip} requirements={results} statusMap={statusMap} />}
       <VetGuidance trip={trip} requirements={results} paid={!!trip.paid} />
       {showTrack && <ServiceAnimalTrack trip={trip} />}
