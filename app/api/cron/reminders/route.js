@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { reminderSchedule, fmt } from "../../../../lib/travelDates";
+import { reminderSchedule, fmt, flightPhrase, daysUntil } from "../../../../lib/travelDates";
 import { SITE_URL } from "../../../../lib/site";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +21,7 @@ export async function GET(req) {
 
   let sent = 0;
   for (const trip of trips || []) {
-    for (const it of reminderSchedule(trip).filter((x) => x.date === today)) {
+    for (const it of reminderSchedule(trip, today).filter((x) => x.date === today)) {
       const { error: insErr } = await sb.from("trip_reminders").insert({ trip_id: trip.id, user_id: trip.user_id, kind: it.kind, due_date: it.date });
       if (insErr) continue; // already sent (unique trip_id+kind)
       const { data: u } = await sb.auth.admin.getUserById(trip.user_id);
@@ -33,7 +33,7 @@ export async function GET(req) {
         body: JSON.stringify({
           from: process.env.REMINDER_FROM_EMAIL, to,
           subject: `PetPassGo: ${it.title}`,
-          text: `${it.title} (${fmt(it.date)})\n\n${it.body}\n\nYour flight: ${trip.origin} → ${trip.destination}, ${fmt(trip.travel_date)}.\nOpen your checklist: ${SITE_URL}/account`,
+          text: `${it.title} (${fmt(it.date)})\n\n${flightPhrase(daysUntil(trip.travel_date, today)) || "Your flight"} — ${it.body}\n\nYour flight: ${trip.origin} → ${trip.destination}, ${fmt(trip.travel_date)}.\nOpen your checklist: ${SITE_URL}/account`,
         }),
       });
       if (r.ok) { sent++; await sb.from("trip_reminders").update({ sent_at: new Date().toISOString() }).eq("trip_id", trip.id).eq("kind", it.kind); }

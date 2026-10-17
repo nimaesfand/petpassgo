@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
 import { todayPT, daysUntil } from "../lib/travelDates";
+import { useTodayPT } from "../lib/useTodayPT";
 import { findAirport } from "../lib/airports";
 import { PET_RELIEF } from "../lib/petRelief";
 import { AIRLINE_GUIDES } from "../lib/airlineGuides";
@@ -41,7 +42,8 @@ function PetAvatar({ pet, size = 56 }) {
 
 export function TripCountdown({ trip, pet, done, total }) {
   const name = pet?.name || "Your pet";
-  const days = trip.travel_date ? daysUntil(trip.travel_date, todayPT()) : null;
+  const today = useTodayPT();
+  const days = trip.travel_date ? daysUntil(trip.travel_date, today) : null;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
   const [shown, setShown] = useState(0);
   useEffect(() => { const t = setTimeout(() => setShown(pct), 150); return () => clearTimeout(t); }, [pct]);

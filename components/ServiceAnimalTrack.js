@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { tokens } from "../lib/theme";
 import { supabase } from "../lib/supabaseClient";
-import { serviceFormDeadline, daysUntil, fmt } from "../lib/travelDates";
+import { serviceFormDeadline, daysUntil, fmt, todayPT } from "../lib/travelDates";
 
 const AIR_PDF = "/forms/dot-service-animal-air-transportation-form.pdf";
 const RELIEF_PDF = "/forms/dot-service-animal-relief-attestation-form.pdf";
@@ -44,7 +44,7 @@ export default function ServiceAnimalTrack({ trip }) {
   }, [trip.pet_id]);
 
   const deadline = trip.travel_date ? serviceFormDeadline(trip.travel_date) : null;
-  const left = deadline ? daysUntil(deadline) : null;
+  const left = deadline ? daysUntil(deadline, todayPT()) : null;
   const longFlight = Number(extra.hours) >= 8;
   const set = (k) => (e) => setExtra((x) => ({ ...x, [k]: e.target.value }));
 
@@ -88,7 +88,7 @@ export default function ServiceAnimalTrack({ trip }) {
       <div style={{ fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 12, letterSpacing: "0.1em", color: tokens.green }} className="mb-1">SERVICE ANIMAL TRACK</div>
       {deadline && (
         <div style={{ fontSize: 15.5, fontWeight: 700 }} className="mb-1">
-          Submit your DOT form to {trip.airline || "your airline"} by {fmt(deadline)}{left >= 0 ? ` (${left} day${left === 1 ? "" : "s"} left)` : " (deadline passed — contact your airline)"}
+          Submit your DOT form to {trip.airline || "your airline"} by {fmt(deadline)}{left === 0 ? " (due today)" : left > 0 ? ` (${left} day${left === 1 ? "" : "s"} left)` : " (deadline passed — contact your airline)"}
         </div>
       )}
       <div style={{ fontSize: 14, opacity: 0.7 }} className="mb-3">

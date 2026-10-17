@@ -1,7 +1,8 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { tokens, font } from "../lib/theme";
-import { reminderSchedule, classifyReminder, daysUntil, fmt, todayPT } from "../lib/travelDates";
+import { reminderSchedule, classifyReminder, daysUntil, fmt, flightPhrase } from "../lib/travelDates";
+import { useTodayPT } from "../lib/useTodayPT";
 
 // A reminder counts as "done" when every HEALTH DOCUMENTATION / REQUIRED FORM /
 // VACCINATION / SUBMISSION requirement on the trip is checked off (or there are none
@@ -21,16 +22,17 @@ export default function TripTimeline({ trip, requirements = [], statusMap = {} }
   const [dismissed, setDismissed] = useState(() => {
     try { return new Set(JSON.parse(sessionStorage.getItem(`ppg_rem_done_${trip.id}`) || "[]")); } catch { return new Set(); }
   });
-  const today = todayPT();
+  // Live PT date (ticks every minute / on refocus) — every relative string
+  // below is derived from it and the flight date on THIS render, never from
+  // text formed when the trip or reminder was created.
+  const today = useTodayPT();
   const flightDays = trip.travel_date ? daysUntil(trip.travel_date, today) : null;
 
-  const rows = useMemo(() => {
-    return reminderSchedule(trip).map((it) => {
-      const done = dismissed.has(it.kind) || relatedDone(it, requirements, statusMap);
-      const { state, days } = classifyReminder(it, trip, { done, today });
-      return { ...it, state, days };
-    });
-  }, [trip, requirements, statusMap, dismissed, today]);
+  const rows = reminderSchedule(trip, today).map((it) => {
+    const done = dismissed.has(it.kind) || relatedDone(it, requirements, statusMap);
+    const { state, days } = classifyReminder(it, trip, { done, today });
+    return { ...it, state, days };
+  });
 
   if (!rows.length) return null;
 
@@ -50,6 +52,7 @@ export default function TripTimeline({ trip, requirements = [], statusMap = {} }
     if (r.state === "done") return "done";
     if (r.state === "passed") return "passed";
     if (r.state === "today") return "today";
+    if (r.days === 1) return "tomorrow";
     return `in ${r.days} day${r.days === 1 ? "" : "s"}`;
   };
 
@@ -71,7 +74,7 @@ export default function TripTimeline({ trip, requirements = [], statusMap = {} }
         <div style={{ fontWeight: 700, fontSize: 12.5, letterSpacing: "0.04em", textTransform: "uppercase", color: alert ? tokens.primary : tokens.muted, opacity: alert ? 1 : 0.75 }}>{label(r)}</div>
       </div>
       <div className="flex-1" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>
-        <b style={{ color: tokens.navy }}>{alert ? (flightDays != null && flightDays >= 0 ? `Your flight is in ${flightDays} day${flightDays === 1 ? "" : "s"}` : "Do this before you fly") : r.title}</b>
+        <b style={{ color: tokens.navy }}>{alert ? (flightPhrase(flightDays) || "Do this before you fly") : r.title}</b>
         <div style={{ opacity: 0.8, marginTop: 2, lineHeight: 1.45 }}>{alert ? r.body : r.body}</div>
         {alert && <div style={{ fontSize: 12.5, color: tokens.muted, marginTop: 2 }}>Was due {fmt(r.date)} ({r.title})</div>}
         {alert && (
