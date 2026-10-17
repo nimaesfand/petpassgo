@@ -42,11 +42,11 @@ export default function PetIdCard({ pet, photo, showQr = true, children }) {
           <svg width="18" height="18" viewBox="0 0 24 24" fill={tokens.gold} aria-hidden="true"><circle cx="6" cy="9" r="2.2"/><circle cx="10" cy="5.5" r="2.2"/><circle cx="14" cy="5.5" r="2.2"/><circle cx="18" cy="9" r="2.2"/><path d="M12 10c-3.3 0-6 3.6-6 6.2 0 2 1.6 2.8 3.3 2.8 1.2 0 1.8-.6 2.7-.6s1.5.6 2.7.6c1.7 0 3.3-.8 3.3-2.8 0-2.6-2.7-6.2-6-6.2z"/></svg>
           <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 17, color: "#fff" }}>PetPassGo</span>
         </div>
-        <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 11.5, letterSpacing: "0.14em", color: tokens.gold }}>DIGITAL PET ID</span>
+        <span style={{ textAlign: "right" }}><span style={{ display: "block", fontFamily: font.body, fontWeight: 700, fontSize: 11.5, letterSpacing: "0.14em", color: tokens.gold }}>DIGITAL PET ID</span><span style={{ display: "block", fontFamily: font.body, fontSize: 11, color: "#fff", opacity: 0.75 }}>Show this if found</span></span>
       </div>
       <div className="p-5 sm:p-6 flex flex-col sm:flex-row gap-6 items-center sm:items-stretch">
         <div className="flex gap-5 items-center flex-1 w-full">
-          <div className="rounded-2xl overflow-hidden flex-shrink-0" style={{ width: 104, height: 104, border: `3px solid ${tokens.sky}` }}>
+          <div className="rounded-2xl overflow-hidden flex-shrink-0" style={{ width: 104, height: 104, border: `4px solid ${tokens.gold}`, boxShadow: "0 4px 14px rgba(20,33,61,0.15)" }}>
             {photo || <PetIllustration type={pet.animal_type} size={104} />}
           </div>
           <div className="min-w-0">
@@ -76,8 +76,12 @@ export default function PetIdCard({ pet, photo, showQr = true, children }) {
           <div className="flex flex-col items-center justify-center rounded-xl p-3 flex-shrink-0" style={{ border: `2px dashed ${tokens.line}` }}>
             <PetQr petId={pet.id} size={128} color={tokens.navy} />
             <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 12, letterSpacing: "0.12em", color: tokens.navy }} className="mt-2">SCAN IF FOUND</div>
+            <div style={{ fontFamily: font.body, fontSize: 11.5, color: tokens.muted, textAlign: "center", maxWidth: 140 }}>Opens {pet.name || "this pet"}'s safe public page</div>
           </div>
         )}
+      </div>
+      <div className="px-5 py-3 flex flex-wrap gap-2" style={{ background: tokens.paper, borderTop: `1px solid ${tokens.line}`, fontFamily: font.body, fontSize: 12.5, color: tokens.muted }}>
+        <span>🐾 Name & photo only</span><span>·</span><span>🔖 No chip number shown</span><span>·</span><span>💬 Message the owner privately</span>
       </div>
       {children}
     </div>

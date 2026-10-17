@@ -173,6 +173,16 @@ export default function PetIdV2({ pet, userId, onChanged }) {
   const [refresh, setRefresh] = useState(0);
   return <div className="rounded-xl p-5 mt-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
     <div style={{ fontFamily: font.mono, fontSize: 11.5, letterSpacing: "0.12em", color: tokens.stamp, fontWeight: 700 }}>PET ID EXTRAS</div>
+    <div className="rounded-xl p-4 mt-3" style={{ background: tokens.sky }}>
+      <div style={{ fontFamily: font.display, fontSize: 17, fontWeight: 700, color: tokens.navy }}>What this is</div>
+      <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">{pet.name}'s everyday safety kit: chip details, health records and a card you can share with a vet or sitter.</p>
+      <div style={{ fontFamily: font.display, fontSize: 17, fontWeight: 700, color: tokens.navy }} className="mt-3">What to do next</div>
+      <ol style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink }} className="mt-1 space-y-1 list-none">
+        <li>1. 🔖 Save the chip and tap “I checked it today”.</li>
+        <li>2. 🩺 Add vaccines, meds and allergies — or smart-import them.</li>
+        <li>3. 📱 Download the QR card and share it when someone cares for {pet.name}.</li>
+      </ol>
+    </div>
     <ChipVault pet={pet} userId={userId} onChanged={onChanged} />
     <HealthPassport pet={pet} userId={userId} refreshKey={refresh} />
     <VetImport pet={pet} userId={userId} onSaved={() => { setRefresh((v) => v + 1); onChanged?.(); }} />

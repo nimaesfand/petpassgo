@@ -11,6 +11,7 @@ import { tripTypeForRoute, isMexicoAirport } from "../../lib/airports";
 import SiteHeader from "../../components/SiteHeader";
 import { useTripPet, isTravelDay, TripCountdown, DayOfMode, PetReliefCard, CommunityPulse, TripExtras } from "../../components/TripLive";
 import PetIdV2, { maskChip } from "../../components/PetIdV2";
+import FeedbackPrompt from "../../components/FeedbackPrompt";
 import LostPanel from "../../components/LostPanel";
 import PetIdCard, { PetIllustration } from "../../components/PetIdCard";
 import TripTimeline from "../../components/TripTimeline";
@@ -1379,51 +1380,67 @@ function CurrentFlightTab({ userId }) {
 }
 
 function BillingTab({ userId }) {
-  const [isMember, setIsMember] = useState(null);
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState("");
-  useEffect(() => { if (userId) supabase.rpc("my_membership").then(({ data }) => setIsMember(!!data)); }, [userId]);
-  async function go(path, body) {
-    setBusy(true); setErr("");
-    const { data: s } = await supabase.auth.getSession();
-    const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify(body || {}) });
-    const j = await r.json().catch(() => ({}));
-    if (r.ok && j.url) window.location.href = j.url; else { setErr(j.error || "Something went wrong. Please try again."); setBusy(false); }
-  }
+  const [memberRow, setMemberRow] = useState(null); const [isMember, setIsMember] = useState(null);
+  const [purchases, setPurchases] = useState([]); const [legacyTrips, setLegacyTrips] = useState([]);
+  const [busy, setBusy] = useState(false); const [err, setErr] = useState("");
+  useEffect(() => { if (!userId) return; (async () => {
+    const [{ data: m }, { data: buys }, { data: trips }] = await Promise.all([
+      supabase.from("memberships").select("status,current_period_end").eq("user_id", userId).maybeSingle(),
+      supabase.from("purchases").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(20),
+      supabase.from("trips").select("id,origin,destination,airline,travel_date,paid_at").eq("paid", true).order("paid_at", { ascending: false }).limit(20),
+    ]);
+    setMemberRow(m || null); setIsMember(!!m && m.status === "active" && (!m.current_period_end || new Date(m.current_period_end) > new Date()));
+    setPurchases(buys || []); if (!buys?.length) setLegacyTrips(trips || []);
+  })(); }, [userId]);
+  async function go(path, body) { setBusy(true); setErr(""); const { data: s } = await supabase.auth.getSession(); const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify(body || {}) }); const j = await r.json().catch(() => ({})); if (r.ok && j.url) window.location.href = j.url; else { setErr(j.error || "Something went wrong. Please try again."); setBusy(false); } }
   const btn = { background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600 };
+  const money = (c, cur) => c == null ? "" : `$${(c / 100).toFixed(2)}`;
+  const kindLabel = { pass: "Travel Pass", member_pass: "Travel Pass · member price", join: "Membership + Travel Pass", membership: "Membership", membership_renewal: "Membership renewal" };
   return (
-    <div className="rounded-xl p-8" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+    <div className="rounded-xl p-6 sm:p-8" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
       <div style={{ fontFamily: font.display, fontSize: 22, color: tokens.navy }} className="mb-2">Billing</div>
-      {isMember === null ? (
-        <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div>
-      ) : isMember ? (
-        <>
-          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-4">You're a PetPassGo member ({P.member}{P.memberUnit}). Update your card, see receipts or cancel anytime.</p>
-          <button disabled={busy} onClick={() => go("/api/stripe/portal")} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Manage or cancel membership</button>
-        </>
-      ) : (
-        <>
-          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-4">Membership is {P.member}{P.memberUnit}: Pet ID, vault, lost-pet alerts, community, unlimited pets and {P.memberPass} Travel Passes. Monthly, cancel anytime.</p>
-          <div className="flex flex-wrap gap-3">
-            <button disabled={busy} onClick={() => go("/api/stripe/checkout", { plan: "membership" })} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Become a member</button>
-            <button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts</button>
-          </div>
-        </>
-      )}
+      {isMember === null ? <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div> : isMember ? <>
+          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-1">You're a PetPassGo member ({P.member}{P.memberUnit}).</p>
+          {memberRow?.current_period_end && <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-4">Current period ends {new Date(memberRow.current_period_end).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.</p>}
+          <button disabled={busy} onClick={() => go("/api/stripe/portal")} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Manage, receipts or cancel</button>
+        </> : <>
+          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}Membership is {P.member}{P.memberUnit}: Pet ID, vault, lost-pet alerts, community, unlimited pets and {P.memberPass} Travel Passes. Monthly, cancel anytime.</p>
+          <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => go("/api/stripe/checkout", { plan: "membership" })} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Become a member</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts & cards</button></div>
+        </>}
       {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-3">{err}</div>}
+      <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${tokens.line}` }}>
+        <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-2">Purchase history</div>
+        {purchases.length === 0 && legacyTrips.length === 0 && <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>No purchases yet. Stripe also emails a receipt for every payment.</p>}
+        <div className="space-y-2">{purchases.map((x) => <div key={x.id} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
+          <div><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>{kindLabel[x.kind] || "Purchase"}</div><div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>{new Date(x.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}{x.amount_cents != null ? ` · ${money(x.amount_cents, x.currency)}` : ""}</div></div>
+          {x.receipt_url ? <a href={x.receipt_url} target="_blank" rel="noopener noreferrer" className="rounded-full px-3.5 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 13.5, fontWeight: 700, textDecoration: "none" }}>Receipt</a> : <button onClick={() => go("/api/stripe/portal")} className="rounded-full px-3.5 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 13.5, fontWeight: 700 }}>Receipts</button>}
+        </div>)}{legacyTrips.map((t) => <div key={t.id} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
+          <div><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>Travel Pass</div><div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>{t.origin} → {t.destination}{t.paid_at ? ` · ${new Date(t.paid_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` : ""}</div></div>
+          <button onClick={() => go("/api/stripe/portal")} className="rounded-full px-3.5 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 13.5, fontWeight: 700 }}>Receipts</button>
+        </div>)}</div>
+        <p style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.muted }} className="mt-3">Receipts open in Stripe. “Receipts & cards” manages payment methods and cancellations.</p>
+      </div>
     </div>
   );
 }
 
 function CheckoutBanner() {
-  const [msg, setMsg] = useState(null);
+  const [msg, setMsg] = useState(null); const [sessionId, setSessionId] = useState(null);
   useEffect(() => {
-    const q = new URLSearchParams(window.location.search).get("checkout");
-    if (q === "success") setMsg("Payment received. Thank you! Your trip unlocks in a few seconds. Refresh if it still looks locked.");
+    const u = new URLSearchParams(window.location.search); const q = u.get("checkout");
+    if (q === "success") { setMsg("Payment received. Thank you! Your trip unlocks in a few seconds. Refresh if it still looks locked."); setSessionId(u.get("session_id")); }
     else if (q === "canceled") setMsg("Checkout canceled. You haven't been charged.");
   }, []);
   if (!msg) return null;
-  return <div className="rounded-xl p-4 mb-6" style={{ background: "#fff", border: `1px solid ${tokens.green}`, fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{msg}</div>;
+  return <><div className="rounded-xl p-4 mb-6" style={{ background: "#fff", border: `1px solid ${tokens.green}`, fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{msg}</div>
+  {sessionId && <FeedbackPrompt kind="purchase" refKey={sessionId} title="How did that feel?" blurb="A quick rating helps us make PetPassGo better." />}</>;
+}
+
+function PostTripFeedback() {
+  const [trip, setTrip] = useState(null);
+  useEffect(() => { const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" }); supabase.from("trips").select("id,origin,destination,travel_date").eq("paid", true).lt("travel_date", today).order("travel_date", { ascending: false }).limit(1).then(({ data }) => setTrip(data?.[0] || null)); }, []);
+  if (!trip) return null;
+  return <FeedbackPrompt kind="post_trip" tripId={trip.id} refKey={trip.id} title="How was the trip?" blurb={`Tell us how ${trip.origin} → ${trip.destination} went. Private to PetPassGo.`} />;
 }
 
 export default function AccountPage() {
@@ -1467,6 +1484,7 @@ export default function AccountPage() {
         </div>
 
         <CheckoutBanner />
+        <PostTripFeedback />
         <div role="tablist" className="inline-flex flex-wrap gap-1 mb-8 p-1 rounded-full" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           {TABS.map((tab) => (
             <button
