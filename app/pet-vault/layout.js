@@ -1,0 +1,2 @@
+export const metadata = { title: "Pet Vault — Digital Pet ID, chip & vet records", description: "Your pet's Digital ID with QR, chip vault, vet records, health passport, lost-pet alerts and reminders. Membership $6.99/mo.", alternates: { canonical: "/pet-vault" }, openGraph: { title: "Pet Vault | PetPassGo", description: "Digital Pet ID with QR, chip vault, vet records and lost-pet alerts.", url: "/pet-vault" } };
+export default function L({ children }) { return children; }

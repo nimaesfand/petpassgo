@@ -206,7 +206,7 @@ const B = "var(--font-body), system-ui, sans-serif";
 
 const STEPS = [
   { n: "1", title: "Answer 6 questions", body: "Airline, route, animal. About 3 minutes.", icon: "M4 6h16M4 12h10M4 18h7" },
-  { n: "2", title: "Get your Travel Pass", body: "Every requirement for your exact trip, in order.", icon: "M5 4h14v16H5zM8 9h8M8 13h8M8 17h5" },
+  { n: "2", title: "Unlock your Travel Pass", body: "Every requirement for your exact trip, in order.", icon: "M5 4h14v16H5zM8 9h8M8 13h8M8 17h5" },
   { n: "3", title: "Check it off and fly", body: "Reminders before each deadline. Docs in one vault.", icon: "M5 13l4 4L19 7" },
 ];
 
@@ -257,7 +257,7 @@ export default function PetPassGoLanding() {
         <div className={`fade-up grid md:grid-cols-2 gap-3 lg:gap-5 max-w-[900px] mx-auto text-left ${loaded ? "in" : ""}`} style={{ transitionDelay: "120ms" }}>
           {[
             ["Traveling? Start here.", "Answer a few trip questions. We build your pet's travel plan.", "Plan your trip", "/assessment", "Start free · pay only to unlock your full pass", false],
-            ["Pet Vault? Start here.", "Your pet's ID, chip and vet records, all in one place.", "Get your pet's ID", "/signup?plan=member", `Membership · ${PRICES.member}/mo`, true],
+            ["Pet Vault? Start here.", "Your pet's ID, chip and vet records, all in one place.", "See the Pet Vault", "/pet-vault", `Membership · ${PRICES.member}/mo`, true],
           ].map(([t, b, c, href, sub, dark]) => (
             <div key={t} className="rounded-2xl p-4 sm:p-5 lg:p-7 flex flex-col" style={{ background: dark ? tokens.navy : "#fff", border: `1px solid ${dark ? tokens.navy : tokens.line}`, color: dark ? "#fff" : tokens.navy }}>
               <span aria-hidden="true" className="inline-flex items-center justify-center rounded-full mb-3 lg:mb-4" style={{ width: 40, height: 40, background: tokens.gold }}>
