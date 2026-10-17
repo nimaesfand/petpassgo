@@ -249,24 +249,24 @@ export default function PetPassGoLanding() {
       <SiteHeader />
 
       {/* 1. HERO — two paths */}
-      <section className="max-w-[1240px] mx-auto px-6 md:px-14 pt-14 md:pt-20 pb-20 text-center">
+      <section className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14 pt-7 sm:pt-10 lg:pt-20 pb-10 lg:pb-20 text-center">
         <div className={`fade-up ${loaded ? "in" : ""}`}>
-          <h1 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[40px] sm:text-[52px] lg:text-[64px] font-bold mb-5">Fly with your pet. Skip the guesswork.</h1>
-          <p style={{ fontFamily: B, fontSize: 19, color: tokens.muted }} className="mb-10">Two simple ways to start. Pick one.</p>
+          <h1 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[29px] sm:text-[31px] leading-[1.08] sm:text-[52px] lg:text-[64px] font-bold mb-3 lg:mb-5">Fly with your pet. Skip the guesswork.</h1>
+          <p style={{ fontFamily: B, color: tokens.muted }} className="text-[16px] lg:text-[19px] mb-5 lg:mb-10">Two simple ways to start. Pick one.</p>
         </div>
-        <div className={`fade-up grid md:grid-cols-2 gap-5 max-w-[900px] mx-auto text-left ${loaded ? "in" : ""}`} style={{ transitionDelay: "120ms" }}>
+        <div className={`fade-up grid md:grid-cols-2 gap-3 lg:gap-5 max-w-[900px] mx-auto text-left ${loaded ? "in" : ""}`} style={{ transitionDelay: "120ms" }}>
           {[
             ["Traveling? Start here.", "Answer a few trip questions. We build your pet's travel plan.", "Plan your trip", "/assessment", "Start free · pay only to unlock your full pass", false],
             ["Pet Vault? Start here.", "Your pet's ID, chip and vet records, all in one place.", "Get your pet's ID", "/signup?plan=member", `Membership · ${PRICES.member}/mo`, true],
           ].map(([t, b, c, href, sub, dark]) => (
-            <div key={t} className="rounded-2xl p-7 flex flex-col" style={{ background: dark ? tokens.navy : "#fff", border: `1px solid ${dark ? tokens.navy : tokens.line}`, color: dark ? "#fff" : tokens.navy }}>
-              <span aria-hidden="true" className="inline-flex items-center justify-center rounded-full mb-4" style={{ width: 48, height: 48, background: tokens.gold }}>
+            <div key={t} className="rounded-2xl p-4 sm:p-5 lg:p-7 flex flex-col" style={{ background: dark ? tokens.navy : "#fff", border: `1px solid ${dark ? tokens.navy : tokens.line}`, color: dark ? "#fff" : tokens.navy }}>
+              <span aria-hidden="true" className="inline-flex items-center justify-center rounded-full mb-3 lg:mb-4" style={{ width: 40, height: 40, background: tokens.gold }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={tokens.navy} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{dark ? <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M14 10h4M14 14h3" /><circle cx="8.5" cy="11" r="2" /><path d="M5.5 16c.6-1.6 1.7-2.4 3-2.4s2.4.8 3 2.4" /></> : <path d="M2 16l20-6-20-6 3 6-3 6zM5 10h7" />}</svg>
               </span>
-              <div style={{ fontFamily: D, fontSize: 25, fontWeight: 700 }} className="mb-2">{t}</div>
-              <p style={{ fontFamily: B, fontSize: 16.5, opacity: 0.8, lineHeight: 1.5 }} className="mb-6 flex-1">{b}</p>
+              <div style={{ fontFamily: D, fontWeight: 700 }} className="text-[22px] lg:text-[25px] mb-1.5 lg:mb-2">{t}</div>
+              <p style={{ fontFamily: B, opacity: 0.8, lineHeight: 1.45 }} className="text-[15px] lg:text-[16.5px] mb-4 lg:mb-6 flex-1">{b}</p>
               <div className="flex items-center gap-3 flex-wrap">
-                <a href={href} className="btn-primary rounded-full px-7 py-3.5" style={{ background: dark ? tokens.gold : tokens.primary, color: dark ? tokens.navy : "#fff", fontFamily: B, fontWeight: 700, textDecoration: "none" }}>{c} →</a>
+                <a href={href} className="btn-primary rounded-full px-6 lg:px-7 py-3 lg:py-3.5 min-h-[44px]" style={{ background: dark ? tokens.gold : tokens.primary, color: dark ? tokens.navy : "#fff", fontFamily: B, fontWeight: 700, textDecoration: "none" }}>{c} →</a>
                 <span style={{ fontFamily: B, fontSize: 13.5, opacity: 0.75 }}>{sub}</span>
               </div>
             </div>
@@ -275,7 +275,7 @@ export default function PetPassGoLanding() {
       </section>
 
       {/* 2. HOW IT WORKS */}
-      <section style={{ background: tokens.navy }} className="py-20">
+      <section style={{ background: tokens.navy }} className="py-12 lg:py-20">
         <div className="max-w-[1240px] mx-auto px-6 md:px-14">
           <Eyebrow color={tokens.gold}>HOW IT WORKS</Eyebrow>
           <H2 light>Three steps to the gate.</H2>
@@ -297,13 +297,13 @@ export default function PetPassGoLanding() {
       </section>
 
       {/* 4. AIRLINES */}
-      <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-20">
+      <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-12 lg:py-20">
         <div className="max-w-[1240px] mx-auto px-6 md:px-14">
           <Eyebrow>AIRLINES</Eyebrow>
           <H2>10 U.S. airlines. One place.</H2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mt-10">
             {AIRLINE_GUIDES.map((a) => (
-              <a key={a.slug} href={`/airlines/${a.slug}`} className="airline-tile rounded-xl px-5 py-4 flex items-center justify-between gap-2" style={{ background: tokens.sky, border: `1px solid ${tokens.line}`, textDecoration: "none" }}>
+              <a key={a.slug} href={`/airlines/${a.slug}`} className="airline-tile rounded-xl px-5 py-4 min-h-[48px] flex items-center justify-between gap-2" style={{ background: tokens.sky, border: `1px solid ${tokens.line}`, textDecoration: "none" }}>
                 <span style={{ fontFamily: B, fontWeight: 600, fontSize: 16, color: tokens.navy }}>{a.name}</span>
                 <span style={{ color: tokens.stamp, fontWeight: 700 }} aria-hidden="true">→</span>
               </a>
@@ -313,14 +313,14 @@ export default function PetPassGoLanding() {
       </section>
 
       {/* 5. PRICING */}
-      <section id="pricing" className="max-w-[1240px] mx-auto px-6 md:px-14 py-14">
+      <section id="pricing" className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14 py-10 lg:py-14">
         <Eyebrow>PRICING</Eyebrow>
         <H2>Start free. Pay when you fly.</H2>
         <div className="mt-10"><PlanCards /></div>
       </section>
 
       {/* 6. FAQ TEASER */}
-      <section className="max-w-3xl mx-auto px-6 md:px-14 pb-20">
+      <section className="max-w-3xl mx-auto px-4 sm:px-6 md:px-14 pb-12 lg:pb-20">
         <H2>Quick answers</H2>
         <div className="mt-6">
           {HOME_FAQ.map((f) => (
@@ -334,7 +334,7 @@ export default function PetPassGoLanding() {
       </section>
 
       {/* 7. FINAL CTA */}
-      <section className="px-6 md:px-14 pb-24">
+      <section className="px-4 sm:px-6 md:px-14 pb-14 lg:pb-24">
         <div className="max-w-[1240px] mx-auto rounded-3xl px-8 py-14 md:py-16 text-center" style={{ background: tokens.navy }}>
           <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.1 }} className="text-[32px] md:text-[44px] font-bold mb-3">Where are you two flying?</h2>
           <p style={{ fontFamily: B, color: "#C9D3E3", fontSize: 17 }} className="mb-8">A few trip questions. Three minutes. Your plan.</p>

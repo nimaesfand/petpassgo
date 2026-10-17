@@ -27,18 +27,18 @@ export default function SiteHeader({ onLogout }) {
   }
   return (
     <header style={{ background: "#fff", borderBottom: `1px solid ${tokens.line}` }}>
-      <nav className="max-w-[1280px] mx-auto flex items-center justify-between px-5 md:px-10 py-4 flex-wrap gap-3">
+      <nav className="max-w-[1280px] mx-auto flex items-center justify-between px-4 sm:px-5 md:px-10 py-3 md:py-4 gap-3">
         <a href="/" className="flex items-center gap-2" style={{ textDecoration: "none" }}>
           <Logo size={34} />
-          <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 24, color: tokens.navy, letterSpacing: "-0.02em" }}>PetPassGo</span>
+          <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 21, color: tokens.navy, letterSpacing: "-0.02em" }}>PetPassGo</span>
         </a>
         <div className="flex items-center gap-4 md:gap-6 flex-wrap">
-          {NAV_LINKS.map((l) => <a key={l.href} href={l.href} style={link}>{l.label}</a>)}
+          {NAV_LINKS.map((l) => <a key={l.href} href={l.href} style={link} className="hidden md:inline">{l.label}</a>)}
           {signedIn ? (
             <>
-              <a href="/account" style={link}>Dashboard</a>
-              <a href="/account?tab=vault" style={link}>Pet Vault</a>
-              <a href="/account?tab=trips" style={link}>My Trips</a>
+              <a href="/account" style={link} className="hidden md:inline">Dashboard</a>
+              <a href="/account?tab=vault" style={link} className="hidden md:inline">Pet Vault</a>
+              <a href="/account?tab=trips" style={link} className="hidden md:inline">My Trips</a>
               <button onClick={logout} style={{ ...link, background: "none", border: "none", cursor: "pointer", padding: 0 }}>Log out</button>
             </>
           ) : (

@@ -1223,8 +1223,8 @@ export function VaultCard({ userId, onOpenVault }) {
   })(); }, [userId]);
   const btn = { fontFamily: font.body, fontSize: 14, fontWeight: 600, textDecoration: "none", cursor: "pointer" };
   return (
-    <div className="rounded-2xl p-6 mb-6" style={{ background: tokens.navy }}>
-      <div className="flex flex-wrap items-center gap-5">
+    <div className="rounded-2xl p-5 sm:p-6 mb-4 sm:mb-6" style={{ background: tokens.navy }}>
+      <div className="flex flex-wrap items-center gap-4 sm:gap-5">
         <div className="rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" style={{ width: 72, height: 72, background: tokens.gold, border: "3px solid #fff" }}>
           {pet?.photo_url ? <SignedImg value={pet.photo_url} alt={pet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : <span style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: tokens.navy }}>{(pet?.name || "P").slice(0, 1)}</span>}
         </div>
@@ -1235,9 +1235,9 @@ export function VaultCard({ userId, onOpenVault }) {
           {pct != null && pet && <div className="w-full max-w-[260px] h-[6px] rounded-full mt-2" style={{ background: "rgba(255,255,255,0.18)" }}><div className="h-full rounded-full" style={{ width: `${pct}%`, background: tokens.gold }} /></div>}
         </div>
         <div className="flex flex-col gap-2">
-          <button onClick={() => onOpenVault && onOpenVault()} style={{ ...btn, background: tokens.gold, color: tokens.navy, border: "none" }} className="rounded-full px-5 py-2.5 text-left">View Pet ID / QR</button>
-          <button onClick={() => onOpenVault && onOpenVault("#chip-vault")} style={{ ...btn, background: "transparent", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)" }} className="rounded-full px-5 py-2.5 text-left">Chip check</button>
-          <button onClick={() => onOpenVault && onOpenVault()} style={{ ...btn, background: "transparent", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)" }} className="rounded-full px-5 py-2.5 text-left">Upload a vet record</button>
+          <button onClick={() => onOpenVault && onOpenVault()} style={{ ...btn, background: tokens.gold, color: tokens.navy, border: "none" }} className="rounded-full px-5 py-2.5 min-h-[44px] text-left">View Pet ID / QR</button>
+          <button onClick={() => onOpenVault && onOpenVault("#chip-vault")} style={{ ...btn, background: "transparent", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)" }} className="rounded-full px-5 py-2.5 min-h-[44px] text-left">Chip check</button>
+          <button onClick={() => onOpenVault && onOpenVault()} style={{ ...btn, background: "transparent", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)" }} className="rounded-full px-5 py-2.5 min-h-[44px] text-left">Upload a vet record</button>
         </div>
       </div>
     </div>
@@ -1276,7 +1276,7 @@ export function DashboardTab({ userId, onOpenTrips }) {
   })(); }, []);
   if (loading) return <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading your dashboard…</div>;
   const startCard = (
-    <div className="rounded-2xl p-6 mb-6" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
+    <div className="rounded-2xl p-5 sm:p-6 mb-4 sm:mb-6" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
       <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-1">Traveling? Start here.</div>
       <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-4">{trip ? (trip.paid ? `Next trip: ${trip.origin} → ${trip.destination}${trip.travel_date ? ` · ${trip.travel_date}` : ""}.` : `You have a trip being planned: ${trip.origin} → ${trip.destination}.`) : "Plan a new trip and we’ll build the checklist for you."}</p>
       <div className="flex flex-wrap gap-3">
@@ -1297,7 +1297,7 @@ export function DashboardTab({ userId, onOpenTrips }) {
         </div>
       )}
       {trip?.paid && (
-        <div className="rounded-2xl p-6 mb-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+        <div className="rounded-2xl p-5 sm:p-6 mb-4 sm:mb-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 700, color: tokens.navy }} className="mb-1">Needs action</div>
           <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-4">The few things that matter next — reminders and checklist combined, nothing duplicated.</p>
           {actions.length === 0 ? <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Nothing needs action right now. 🎉</p> : <>
