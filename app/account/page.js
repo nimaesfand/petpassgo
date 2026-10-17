@@ -743,7 +743,7 @@ function AccessGate() {
     <div className="rounded-2xl p-7 text-center" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
       <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-2">Your pet vault and Digital Pet ID are paused</div>
       <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted, lineHeight: 1.55 }} className="mb-5 max-w-lg mx-auto">
-        They're included with Membership, or with a Travel Pass until your trip ends. Your pets and documents are kept safe and come back as soon as you rejoin.
+        They're included with Membership, or with a Travel Pass until 7 days after your travel date. Your pets and documents are kept safe and come back as soon as you rejoin.
       </p>
       <div className="flex gap-3 justify-center flex-wrap">
         <a href="/signup?plan=member" className="btn-primary rounded-full px-6 py-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Join for {P.member}/mo</a>
@@ -1293,7 +1293,7 @@ export function DashboardTab({ userId, onOpenTrips }) {
         <div className="rounded-2xl p-7 mb-6 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }} className="mb-2">Where are you two flying?</div>
           <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-5">Answer a few trip questions and your plan, reminders and checklist land here.</p>
-          <a href="/assessment" className="rounded-full px-6 py-3 inline-block" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Plan your trip — start free</a>
+          <a href="/assessment" className="rounded-full px-6 py-3 inline-block" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Try the trip questions</a>
         </div>
       )}
       {trip?.paid && (

@@ -8,6 +8,7 @@ import { tripTypeForRoute, isMexicoAirport } from "../../lib/airports";
 import AirportField from "../../components/AirportField";
 import FlightLookup, { airportLabel, airlinePickerName } from "../../components/FlightLookup";
 import { SampleTravelPass } from "../../components/SalesSamples";
+import { tripAccessCopy } from "../../lib/tripAccess";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
 
@@ -243,9 +244,14 @@ export default function PetPassGoQuiz() {
   const [isMember, setIsMember] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const [addMembership, setAddMembership] = useState(false);
+  const [purchaseIntent, setPurchaseIntent] = useState(""); // "join" | "pass", from /travel-pass
   const [showDetails, setShowDetails] = useState(true);
   // Real membership status (read-only; only the server/Stripe can set it). The checkbox
   // further down is a pre-launch preview only and is hidden when NEXT_PUBLIC_SITE_LAUNCHED=true.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("plan");
+    if (q === "join" || q === "pass") setPurchaseIntent(q);
+  }, []);
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data?.session) supabase.rpc("my_membership").then(({ data: m }) => { if (m) setIsMember(true); });
@@ -276,6 +282,9 @@ export default function PetPassGoQuiz() {
         const savedAnswers = JSON.parse(pending);
         setAnswers(savedAnswers);
         setStep(5);
+        const intent = localStorage.getItem("petpassgo_purchase_intent");
+        if (intent === "join" || intent === "pass") setPurchaseIntent(intent);
+        localStorage.removeItem("petpassgo_purchase_intent");
       } catch (e) {
         // ignore corrupted storage
       }
@@ -295,6 +304,7 @@ export default function PetPassGoQuiz() {
     const { data } = await supabase.auth.getUser();
     if (!data.user) {
       localStorage.setItem("petpassgo_pending_trip", JSON.stringify(answers));
+      localStorage.setItem("petpassgo_purchase_intent", plan === "member" ? "join" : "pass");
       window.location.href = `/signup?plan=${plan === "member" ? "member" : "pass"}`;
       return;
     }
@@ -408,6 +418,9 @@ export default function PetPassGoQuiz() {
           )}
         </div>
 
+        {step < 5 && (
+          <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-4 text-center">See how it works — answer a few questions, preview your checklist, and only pay to unlock your real pass.{purchaseIntent === "join" ? ` Your pick: Join + Travel Pass (${P.joinToday} today, then ${P.member}/mo) — applied at checkout.` : purchaseIntent === "pass" ? ` Your pick: Travel Pass only (${P.pass}) — applied at checkout.` : ""}</p>
+        )}
         <div className="rounded-2xl p-6 md:p-9" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.06)" }}>
           {step < TOTAL_STEPS && <ProgressStub step={step} />}
 
@@ -661,7 +674,7 @@ export default function PetPassGoQuiz() {
 
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="rounded-2xl p-5 relative flex flex-col" style={{ background: tokens.navy, color: "#fff", border: `2px solid ${tokens.gold}` }}>
-                        <span className="absolute -top-3 left-5 rounded-full px-3 py-0.5" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 11 }}>SAVE {P.savings} ON THIS TRIP</span>
+                        <span className="absolute -top-3 left-5 rounded-full px-3 py-0.5" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 11 }}>{purchaseIntent === "join" ? "YOUR PICK · " : ""}SAVE {P.savings} ON THIS TRIP</span>
                         <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 12.5, letterSpacing: ".12em", color: tokens.gold }} className="mb-1 mt-1">JOIN + PASS</div>
                         <div style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700 }}>{P.memberPass} <span style={{ fontSize: 15, fontWeight: 500, opacity: 0.75 }}>+ {P.member}/mo</span></div>
                         <p style={{ fontFamily: font.body, fontSize: 14, opacity: 0.8 }} className="mb-4 flex-1">This trip, plus Pet ID, lost-pet alerts, community and every future pass at {P.memberPass}.</p>
@@ -672,7 +685,7 @@ export default function PetPassGoQuiz() {
                       <div className="rounded-2xl p-5 flex flex-col" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
                         <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 12.5, letterSpacing: ".12em", color: tokens.primary }} className="mb-1 mt-1">THIS TRIP ONLY</div>
                         <div style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700, color: tokens.navy }}>{P.pass}</div>
-                        <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-4 flex-1">Full checklist, deadlines, sources and reminders. Pet ID and vault until your trip ends.</p>
+                        <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-4 flex-1">Full checklist, deadlines, sources and reminders. {tripAccessCopy(answers.date)}.{purchaseIntent === "pass" ? " (Your pick.)" : ""}</p>
                         <button onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3 hover:opacity-90 transition" style={{ background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, fontFamily: font.body, fontWeight: 600, fontSize: 15 }}>
                           Unlock your Travel Pass — {P.pass}
                         </button>

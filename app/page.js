@@ -315,7 +315,7 @@ export default function PetPassGoLanding() {
       {/* 5. PRICING */}
       <section id="pricing" className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14 py-10 lg:py-14">
         <Eyebrow>PRICING</Eyebrow>
-        <H2>Start free. Pay when you fly.</H2>
+        <H2>See how it works. Pay when you fly.</H2>
         <div className="mt-10"><PlanCards /></div>
       </section>
 

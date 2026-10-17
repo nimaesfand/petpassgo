@@ -51,8 +51,9 @@ export default function PetVaultPage() {
           <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold, letterSpacing: "0.12em" }} className="mb-2">MEMBERSHIP</div>
           <div style={{ fontFamily: font.display, fontSize: 34, fontWeight: 700, color: "#fff" }}>{P.member}<span style={{ fontSize: 16, fontWeight: 500, opacity: 0.8 }}>/month</span></div>
           <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.sky }} className="mt-2 mb-7 max-w-[480px] mx-auto">Pet Vault, Digital Pet ID & QR, lost-pet alerts, community and reminders — plus every future Travel Pass at {P.memberPass} instead of {P.pass}. Monthly, cancel anytime.</p>
-          <a href="/signup?plan=member" className="btn-primary rounded-full px-8 py-4 inline-block min-h-[48px]" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Start with the Pet Vault — {P.member}/mo</a>
-          <div className="mt-4"><a href="/account?tab=vault" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, textDecoration: "underline" }}>Already a member? Open your vault →</a></div>
+          <a href="/signup?plan=member" className="btn-primary rounded-full px-8 py-4 inline-block min-h-[48px]" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Join Membership — {P.member}/mo</a>
+          <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.sky }} className="mt-4">Next: create your account, confirm your email, then secure checkout. No charge until then.</p>
+          <div className="mt-3"><a href="/account?tab=vault" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, textDecoration: "underline" }}>Already a member? Open your vault →</a></div>
         </div>
       </main>
     </div>
