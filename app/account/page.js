@@ -7,6 +7,7 @@ import { usePetAccess } from "../../lib/access";
 import WinBack from "../../components/WinBack";
 import { PRICES as P } from "../../lib/pricing";
 import { startStripe } from "../../lib/checkout";
+import { trackBeginCheckout, trackPurchaseOnce, getAttribution } from "../../lib/analytics";
 import { requirementAirline } from "../../lib/airlines";
 import { tripTypeForRoute, isMexicoAirport } from "../../lib/airports";
 import SiteHeader from "../../components/SiteHeader";
@@ -762,7 +763,7 @@ function MemberUpsell() {
       <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted, lineHeight: 1.55 }} className="mb-3">
         Your plan includes one pet. Membership ({P.member}/mo) adds unlimited pets, {P.memberPass} Travel Passes and reminders before your documents expire.
       </p>
-      <button disabled={busy} onClick={async () => { setBusy(true); const e = await startStripe("/api/stripe/checkout", { plan: "membership" }); if (e) { setErr(e); setBusy(false); } }} className="rounded-full px-5 py-2.5 hover:opacity-90" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontSize: 14.5, fontWeight: 600 }}>Become a member · {P.member}/mo</button>
+      <button disabled={busy} onClick={async () => { trackBeginCheckout("membership"); setBusy(true); const e = await startStripe("/api/stripe/checkout", { plan: "membership" }); if (e) { setErr(e); setBusy(false); } }} className="rounded-full px-5 py-2.5 hover:opacity-90" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontSize: 14.5, fontWeight: 600 }}>Become a member · {P.member}/mo</button>
       {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-2">{err}</div>}
     </div>
   );
@@ -1190,7 +1191,8 @@ function UnlockTripCard({ trip }) {
     setBusy(true); setErr("");
     const { data: m } = await supabase.rpc("my_membership");
     const { data: s } = await supabase.auth.getSession();
-    const r = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ plan: m ? "member_pass" : "pass", trip_id: trip.id }) });
+    trackBeginCheckout(m ? "member_pass" : "pass");
+    const r = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ plan: m ? "member_pass" : "pass", trip_id: trip.id, attribution: getAttribution() }) });
     const j = await r.json().catch(() => ({}));
     if (r.ok && j.url) window.location.href = j.url; else { setErr(j.error || "Checkout isn't available right now. Please try again."); setBusy(false); }
   }
@@ -1552,7 +1554,7 @@ function BillingTab({ userId }) {
           <button disabled={busy} onClick={() => go("/api/stripe/portal")} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Manage, receipts or cancel</button>
         </> : <>
           <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}Membership is {P.member}{P.memberUnit}: Pet ID, vault, lost-pet alerts, community, unlimited pets and {P.memberPass} Travel Passes. Monthly, cancel anytime.</p>
-          <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => go("/api/stripe/checkout", { plan: "membership" })} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Become a member</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts & cards</button></div>
+          <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => { trackBeginCheckout("membership"); go("/api/stripe/checkout", { plan: "membership" }); }} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Become a member</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts & cards</button></div>
         </>}
       {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-3">{err}</div>}
       <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${tokens.line}` }}>
@@ -1575,7 +1577,20 @@ function CheckoutBanner() {
   const [msg, setMsg] = useState(null); const [sessionId, setSessionId] = useState(null);
   useEffect(() => {
     const u = new URLSearchParams(window.location.search); const q = u.get("checkout");
-    if (q === "success") { setMsg("Payment received. Thank you! Your trip unlocks in a few seconds. Refresh if it still looks locked."); setSessionId(u.get("session_id")); }
+    if (q === "success") {
+      setMsg("Payment received. Thank you! Your trip unlocks in a few seconds. Refresh if it still looks locked.");
+      const sid = u.get("session_id"); setSessionId(sid);
+      // Fire Purchase (and MembershipStart for membership kinds) once, with the
+      // real amount/kind from the purchases row written by the Stripe webhook.
+      if (sid) (async () => {
+        for (let i = 0; i < 6; i++) {
+          const { data } = await supabase.from("purchases").select("kind,amount_cents,currency").eq("stripe_checkout_session_id", sid).maybeSingle();
+          if (data) { trackPurchaseOnce({ transactionId: sid, value: data.amount_cents != null ? data.amount_cents / 100 : undefined, currency: data.currency || "USD", kind: data.kind }); return; }
+          await new Promise((r) => setTimeout(r, 2000));
+        }
+        trackPurchaseOnce({ transactionId: sid, kind: "purchase" }); // amount unknown; still count the conversion once
+      })();
+    }
     else if (q === "canceled") setMsg("Checkout canceled. You haven't been charged.");
   }, []);
   if (!msg) return null;

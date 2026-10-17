@@ -9,6 +9,7 @@ import AirportField from "../../components/AirportField";
 import FlightLookup, { airportLabel, airlinePickerName } from "../../components/FlightLookup";
 import { SampleTravelPass } from "../../components/SalesSamples";
 import { tripAccessCopy } from "../../lib/tripAccess";
+import { trackEvent, trackBeginCheckout, getAttribution } from "../../lib/analytics";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
 
@@ -251,7 +252,12 @@ export default function PetPassGoQuiz() {
   useEffect(() => {
     const q = new URLSearchParams(window.location.search).get("plan");
     if (q === "join" || q === "pass") setPurchaseIntent(q);
+    trackEvent("start_assessment", { content_type: "assessment", plan_intent: q || undefined });
   }, []);
+  const previewTracked = React.useRef(false);
+  useEffect(() => {
+    if (step === 5 && !previewTracked.current) { previewTracked.current = true; trackEvent("preview_viewed", { content_type: "locked_preview" }); }
+  }, [step]);
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data?.session) supabase.rpc("my_membership").then(({ data: m }) => { if (m) setIsMember(true); });
@@ -325,11 +331,12 @@ export default function PetPassGoQuiz() {
 
     // Payment happens on Stripe; only the Stripe webhook can mark the trip paid.
     const stripePlan = plan === "member" ? "join" : isMember ? "member_pass" : "pass";
+    trackBeginCheckout(stripePlan);
     const { data: s } = await supabase.auth.getSession();
     const r = await fetch("/api/stripe/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" },
-      body: JSON.stringify({ plan: stripePlan, trip_id: trip.id }),
+      body: JSON.stringify({ plan: stripePlan, trip_id: trip.id, attribution: getAttribution() }),
     });
     const j = await r.json().catch(() => ({}));
     if (!r.ok || !j.url) { alert(j.error || "Checkout isn't available right now. Please try again."); return; }
