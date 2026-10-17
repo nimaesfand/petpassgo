@@ -1230,8 +1230,8 @@ export function VaultCard({ userId, onOpenVault }) {
         </div>
         <div className="flex-1 min-w-[200px]">
           <div style={{ fontFamily: font.mono, fontSize: 11.5, color: tokens.gold, letterSpacing: "0.12em" }}>PET VAULT</div>
-          <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: "#fff" }}>{pet ? `${pet.name}’s vault` : "Your pet vault"}</div>
-          <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, opacity: 0.85 }}>Pet ID & QR, chip details, vet records and health documents — all in one place.{pct != null && pet ? ` ${pct}% set up.` : ""}</div>
+          <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: "#fff" }}>Pet Vault? Start here.</div>
+          <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, opacity: 0.85 }}>{pet ? `${pet.name}’s ID, chip and vet records, all in one place.` : "Your pet’s ID, chip and vet records, all in one place."}{pct != null && pet ? ` ${pct}% set up.` : ""}</div>
           {pct != null && pet && <div className="w-full max-w-[260px] h-[6px] rounded-full mt-2" style={{ background: "rgba(255,255,255,0.18)" }}><div className="h-full rounded-full" style={{ width: `${pct}%`, background: tokens.gold }} /></div>}
         </div>
         <div className="flex flex-col gap-2">
@@ -1275,9 +1275,20 @@ export function DashboardTab({ userId, onOpenTrips }) {
     setActions(list); setLoading(false);
   })(); }, []);
   if (loading) return <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading your dashboard…</div>;
+  const startCard = (
+    <div className="rounded-2xl p-6 mb-6" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
+      <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-1">Traveling? Start here.</div>
+      <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-4">{trip ? (trip.paid ? `Next trip: ${trip.origin} → ${trip.destination}${trip.travel_date ? ` · ${trip.travel_date}` : ""}.` : `You have a trip being planned: ${trip.origin} → ${trip.destination}.`) : "Plan a new trip and we’ll build the checklist for you."}</p>
+      <div className="flex flex-wrap gap-3">
+        {trip && <button onClick={onOpenTrips} className="rounded-full px-6 py-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, border: "none", cursor: "pointer" }}>Open my trip</button>}
+        <a href="/assessment" className="rounded-full px-6 py-3 inline-block" style={{ background: trip ? "#fff" : tokens.primary, color: trip ? tokens.navy : "#fff", border: trip ? `2px solid ${tokens.navy}` : "none", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Plan a new trip{trip ? "" : " — start free"}</a>
+      </div>
+    </div>
+  );
   const visible = showAll ? actions : actions.slice(0, 4);
   return (
     <div>
+      {startCard}
       {trip?.paid ? <TripCountdown trip={trip} pet={pet} done={0} total={actions.length} /> : (
         <div className="rounded-2xl p-7 mb-6 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }} className="mb-2">Where are you two flying?</div>

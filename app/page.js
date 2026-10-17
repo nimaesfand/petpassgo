@@ -228,34 +228,6 @@ function Cta({ children = "Plan your trip", href = "/assessment" }) {
 
 
 
-function IdPreview() {
-  return (
-    <div className="rounded-2xl overflow-hidden w-full" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.10)" }}>
-      <div className="px-5 py-3.5 flex items-center justify-between" style={{ background: tokens.navy }}>
-        <span style={{ fontFamily: D, fontWeight: 700, color: "#fff", fontSize: 17 }}>PetPassGo</span>
-        <span style={{ fontFamily: B, fontWeight: 700, fontSize: 11.5, letterSpacing: "0.14em", color: tokens.gold }}>DIGITAL PET ID</span>
-      </div>
-      <div className="p-5 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4 min-w-0">
-          <PetIllustration type="Dog" size={72} />
-          <div className="min-w-0">
-            <div style={{ fontFamily: D, fontWeight: 700, fontSize: 26, color: tokens.navy, lineHeight: 1.1 }}>Biscuit</div>
-            <div style={{ fontFamily: B, fontWeight: 600, fontSize: 14.5, color: tokens.ink }}>Beagle · Dog</div>
-          </div>
-        </div>
-        <div className="flex flex-col items-center flex-shrink-0">
-          <PetQr petId="demo" size={84} color={tokens.navy} />
-          <div style={{ fontFamily: B, fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", color: tokens.navy }} className="mt-1">SCAN IF FOUND</div>
-        </div>
-      </div>
-      <div className="px-5 pb-5 grid grid-cols-3 gap-2" style={{ fontFamily: B, fontSize: 12.5 }}>
-        {["Vaccines", "Microchip", "Vet contact"].map((t) => (
-          <div key={t} className="rounded-lg py-2 text-center" style={{ background: tokens.sky, color: tokens.navy, fontWeight: 600 }}>{t}</div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default function PetPassGoLanding() {
   const [loaded, setLoaded] = useState(false);
@@ -280,12 +252,12 @@ export default function PetPassGoLanding() {
       <section className="max-w-[1240px] mx-auto px-6 md:px-14 pt-14 md:pt-20 pb-20 text-center">
         <div className={`fade-up ${loaded ? "in" : ""}`}>
           <h1 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[40px] sm:text-[52px] lg:text-[64px] font-bold mb-5">Fly with your pet. Skip the guesswork.</h1>
-          <p style={{ fontFamily: B, fontSize: 19, color: tokens.muted }} className="mb-10">Two ways to start.</p>
+          <p style={{ fontFamily: B, fontSize: 19, color: tokens.muted }} className="mb-10">Two simple ways to start. Pick one.</p>
         </div>
         <div className={`fade-up grid md:grid-cols-2 gap-5 max-w-[900px] mx-auto text-left ${loaded ? "in" : ""}`} style={{ transitionDelay: "120ms" }}>
           {[
-            ["Flying soon?", "Answer a few trip questions and see every step you'll need.", "Plan your trip", "/assessment", "Start free · pay only to unlock your full pass", false],
-            ["Want peace of mind?", "Pet vault, a Digital Pet ID with QR code, and lost-pet alerts.", "Get your pet's ID", "/signup?plan=member", `Membership · ${PRICES.member}/mo`, true],
+            ["Traveling? Start here.", "Answer a few trip questions. We build your pet's travel plan.", "Plan your trip", "/assessment", "Start free · pay only to unlock your full pass", false],
+            ["Pet Vault? Start here.", "Your pet's ID, chip and vet records, all in one place.", "Get your pet's ID", "/signup?plan=member", `Membership · ${PRICES.member}/mo`, true],
           ].map(([t, b, c, href, sub, dark]) => (
             <div key={t} className="rounded-2xl p-7 flex flex-col" style={{ background: dark ? tokens.navy : "#fff", border: `1px solid ${dark ? tokens.navy : tokens.line}`, color: dark ? "#fff" : tokens.navy }}>
               <span aria-hidden="true" className="inline-flex items-center justify-center rounded-full mb-4" style={{ width: 48, height: 48, background: tokens.gold }}>
@@ -320,22 +292,6 @@ export default function PetPassGoLanding() {
                 <p style={{ fontFamily: B, color: "#C9D3E3", fontSize: 16, lineHeight: 1.55 }}>{s.body}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 3. PET VAULT — one calm banner, not a wall of previews */}
-      <section className="max-w-[1240px] mx-auto px-6 md:px-14 py-14">
-        <div className="rounded-3xl p-8 md:p-10 flex flex-col md:flex-row md:items-center gap-7" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-          <div className="flex-1">
-            <Eyebrow>THE PET VAULT</Eyebrow>
-            <h3 style={{ fontFamily: D, color: tokens.navy, fontSize: 26, fontWeight: 700 }} className="mb-2">One safe place for everything about your pet.</h3>
-            <p style={{ fontFamily: B, color: tokens.muted, fontSize: 16.5, lineHeight: 1.55 }}>Digital Pet ID with a QR code for the collar, chip details, vet records and health documents — ready at home, and vital if you’re ever separated.</p>
-          </div>
-          <div className="flex-shrink-0"><IdPreview /></div>
-          <div className="flex-shrink-0">
-            <a href="/signup?plan=member" className="btn-primary rounded-full px-7 py-3.5 inline-block" style={{ background: tokens.navy, color: "#fff", fontFamily: B, fontWeight: 700, textDecoration: "none" }}>Get your pet’s ID →</a>
-            <div style={{ fontFamily: B, fontSize: 13.5, color: tokens.muted }} className="mt-2">Membership · {PRICES.member}/mo</div>
           </div>
         </div>
       </section>
