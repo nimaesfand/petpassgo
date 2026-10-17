@@ -54,7 +54,8 @@ async function spots(code) {
           const lat = e.lat ?? e.center?.lat, lon = e.lon ?? e.center?.lon;
           if (!t.name || lat == null) return null;
           const type = t.amenity === "veterinary" ? (t.emergency === "yes" ? "emergency_vet" : "vet") : t.leisure === "dog_park" ? "dog_park" : "pet_store";
-          return { name: t.name, type, map: `https://www.openstreetmap.org/${e.type}/${e.id}`, d: dist(lat, lon) };
+          const addr = [t["addr:housenumber"], t["addr:street"], t["addr:city"]].filter(Boolean).join(" ");
+          return { name: t.name, type, address: addr || null, lat, lon, map: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${t.name} ${addr || `${lat},${lon}`}`)}`, d: dist(lat, lon) };
         }).filter(Boolean).sort((a, b) => a.d - b.d);
         const pick = (ty, n) => items.filter((i) => i.type === ty).slice(0, n).map(({ d, ...rest }) => rest);
         return [...pick("emergency_vet", 3), ...pick("vet", 4), ...pick("dog_park", 4), ...pick("pet_store", 3)];
@@ -69,15 +70,17 @@ export async function GET(req) {
   const tripId = new URL(req.url).searchParams.get("trip_id");
   if (!token || !tripId) return NextResponse.json({ error: "Bad request" }, { status: 400 });
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, { auth: { persistSession: false }, global: { headers: { Authorization: `Bearer ${token}` } } });
-  const { data: trip } = await sb.from("trips").select("id,paid,origin,destination,travel_date").eq("id", tripId).maybeSingle();
+  const { data: trip } = await sb.from("trips").select("id,paid,origin,destination,travel_date,airline,role").eq("id", tripId).maybeSingle();
   if (!trip?.paid) return NextResponse.json({ error: "Paid trips only" }, { status: 403 });
   const o = findAirport(trip.origin), d = findAirport(trip.destination);
   if (new URL(req.url).searchParams.get("part") === "spots") {
     return NextResponse.json({ destination: d && { code: d.code, city: d.city }, spots: d ? await spots(d.code).catch(() => null) : null });
   }
+  const policyAirline = trip.airline === "Hawaiian Airlines" ? "Alaska Airlines" : trip.airline;
+  const { data: cargoPolicy } = await sb.from("airline_cargo_temp_policies").select("airline,service_type,min_f,max_f,summary,source_url,verified_at").eq("airline", policyAirline).maybeSingle();
   const [wo, wd] = await Promise.all([
     o ? weather(o.code, trip.travel_date).catch(() => ({ status: "unavailable" })) : null,
     d ? weather(d.code, trip.travel_date).catch(() => ({ status: "unavailable" })) : null,
   ]);
-  return NextResponse.json({ origin: o && { code: o.code, city: o.city, weather: wo }, destination: d && { code: d.code, city: d.city, weather: wd } });
+  return NextResponse.json({ origin: o && { code: o.code, city: o.city, weather: wo }, destination: d && { code: d.code, city: d.city, weather: wd }, airline: trip.airline || null, role: trip.role || null, cargoPolicy: cargoPolicy || null });
 }
