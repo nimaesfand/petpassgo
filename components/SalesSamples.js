@@ -46,7 +46,7 @@ export function SamplePetIdCard() {
             <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 700, color: "#fff" }} className="mt-3 mb-2">Found Buddy? You’re in the right place.</div>
             <ul style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, lineHeight: 1.7, paddingLeft: 18 }}>
               <li>Message Buddy’s owner right from this page — no phone number shown</li>
-              <li>Chip number on file (••••0000) and vet clinic listed</li>
+              <li>Buddy’s vet clinic is listed — chip details stay private</li>
               <li>Allergies &amp; meds shown only if the owner chose to share them</li>
             </ul>
             <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.gold }} className="mt-2">Tap to flip back →</div>
@@ -97,7 +97,7 @@ const Avatar = ({ size = 52 }) => (
 export function VaultInUseGallery() {
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <GalleryItem title="A finder scans the QR" caption="They land here and message you — your number never shows.">
+      <GalleryItem title="A finder scans the QR" caption="They land here and message you through PetPassGo.">
         <Phone title="petpassgo.com/id/…">
           <div className="flex items-center gap-3 mb-3"><Avatar /><div><div style={h3}>Found Buddy?</div><div style={txt}>You’re in the right place.</div></div></div>
           <div className="rounded-xl px-3 py-2.5 mb-2" style={{ background: tokens.paper, ...txt, color: tokens.ink }}>Friendly, loves people. Please keep him safe — his owner is one tap away.</div>
@@ -118,7 +118,7 @@ export function VaultInUseGallery() {
         </div>
       </GalleryItem>
 
-      <GalleryItem title="Chip Vault" caption="Chip, brand and registry — plus a yearly “still pointing to you?” check.">
+      <GalleryItem title="Chip Vault" caption="Chip, brand and registry — plus a yearly check that it still points to you.">
         <Phone title="Buddy · Chip Vault">
           <div style={txt}>Microchip</div>
           <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy, letterSpacing: "0.03em" }}>•••• •••• 0000</div>

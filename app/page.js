@@ -256,7 +256,7 @@ export default function PetPassGoLanding() {
         </div>
         <div className={`fade-up grid md:grid-cols-2 gap-3 lg:gap-5 max-w-[900px] mx-auto text-left ${loaded ? "in" : ""}`} style={{ transitionDelay: "120ms" }}>
           {[
-            ["Traveling? Start here.", "Answer a few trip questions. We build your pet's travel plan.", "Plan your trip", "/assessment", "Start free · pay only to unlock your full pass", false],
+            ["Traveling? Start here.", "See what's inside the Travel Pass, then plan your trip in about three minutes.", "See the Travel Pass", "/travel-pass", `${PRICES.pass} per trip · ${PRICES.memberPass} for members`, false],
             ["Pet Vault? Start here.", "Your pet's ID, chip and vet records, all in one place.", "See the Pet Vault", "/pet-vault", `Membership · ${PRICES.member}/mo`, true],
           ].map(([t, b, c, href, sub, dark]) => (
             <div key={t} className="rounded-2xl p-4 sm:p-5 lg:p-7 flex flex-col" style={{ background: dark ? tokens.navy : "#fff", border: `1px solid ${dark ? tokens.navy : tokens.line}`, color: dark ? "#fff" : tokens.navy }}>
@@ -338,7 +338,7 @@ export default function PetPassGoLanding() {
         <div className="max-w-[1240px] mx-auto rounded-3xl px-8 py-14 md:py-16 text-center" style={{ background: tokens.navy }}>
           <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.1 }} className="text-[32px] md:text-[44px] font-bold mb-3">Where are you two flying?</h2>
           <p style={{ fontFamily: B, color: "#C9D3E3", fontSize: 17 }} className="mb-8">A few trip questions. Three minutes. Your plan.</p>
-          <Cta>Start planning</Cta>
+          <Cta>Plan your trip</Cta>
         </div>
       </section>
 

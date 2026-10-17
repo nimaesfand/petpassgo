@@ -8,7 +8,8 @@ import { tokens, font } from "../../lib/theme";
 const FEATURES = [
   ["Smart vet import", "Snap a photo of vet paperwork and we read it into the record for you to review — nothing saved without your OK."],
   ["Unlimited pets", "One membership covers every pet in the house, each with their own ID, chip vault and documents."],
-  ["Private by design", "Your contact details are never printed on the ID. You choose exactly what a finder or share link can see."],
+  ["Private by default", "Your pet’s info is private — only people you share with can see it. Finders message you through PetPassGo; your email and phone stay hidden unless you choose to show an emergency contact."],
+  ["Digital, ready instantly", "Your pet’s ID lives on your phone — no waiting for a printed card in the mail."],
 ];
 
 export default function PetVaultPage() {
@@ -37,7 +38,7 @@ export default function PetVaultPage() {
         </div>
         <div className="mb-10"><VaultInUseGallery /></div>
 
-        <div className="grid sm:grid-cols-3 gap-4 mb-12">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           {FEATURES.map(([t, b]) => (
             <div key={t} className="rounded-2xl p-5" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
               <div style={{ fontFamily: font.display, fontSize: 17.5, fontWeight: 700, color: tokens.navy }} className="mb-1.5">{t}</div>

@@ -47,7 +47,7 @@ export default function SiteHeader({ onLogout }) {
               <a href="/signup" style={link}>Sign up</a>
             </>
           )}
-          <a href="/assessment" className="btn-primary rounded-full px-5 py-2.5 hidden sm:inline-block" style={{ ...link, background: tokens.primary, color: "#fff", fontWeight: 600 }}>Plan your trip</a>
+          <a href="/assessment" className="btn-primary rounded-full px-5 py-2.5 hidden md:inline-block" style={{ ...link, background: tokens.primary, color: "#fff", fontWeight: 600 }}>Plan your trip</a>
         </div>
       </nav>
     </header>
