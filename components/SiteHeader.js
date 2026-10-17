@@ -2,12 +2,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
+import Logo from "./Logo";
 
+// Public nav stays to three calm items. Blog is hidden until the owner
+// approves launch posts (drafts live outside the repo, unpublished).
 export const NAV_LINKS = [
   { href: "/airlines", label: "Airlines" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/blog", label: "Blog" },
   ...(process.env.NEXT_PUBLIC_COMMUNITY_ENABLED === "true" ? [{ href: "/community", label: "Community" }] : []),
+  { href: "/faq", label: "FAQ" },
 ];
 
 const link = { fontFamily: font.body, fontSize: 15, fontWeight: 500, color: tokens.navy, textDecoration: "none", whiteSpace: "nowrap" };
@@ -27,16 +29,16 @@ export default function SiteHeader({ onLogout }) {
     <header style={{ background: "#fff", borderBottom: `1px solid ${tokens.line}` }}>
       <nav className="max-w-[1280px] mx-auto flex items-center justify-between px-5 md:px-10 py-4 flex-wrap gap-3">
         <a href="/" className="flex items-center gap-2" style={{ textDecoration: "none" }}>
-          <span aria-hidden="true" className="rounded-lg flex items-center justify-center" style={{ width: 32, height: 32, background: tokens.navy }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill={tokens.gold}><circle cx="6" cy="9" r="2.2"/><circle cx="10" cy="5.5" r="2.2"/><circle cx="14" cy="5.5" r="2.2"/><circle cx="18" cy="9" r="2.2"/><path d="M12 10c-3.3 0-6 3.6-6 6.2 0 2 1.6 2.8 3.3 2.8 1.2 0 1.8-.6 2.7-.6s1.5.6 2.7.6c1.7 0 3.3-.8 3.3-2.8 0-2.6-2.7-6.2-6-6.2z"/></svg>
-          </span>
+          <Logo size={34} />
           <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 24, color: tokens.navy, letterSpacing: "-0.02em" }}>PetPassGo</span>
         </a>
-        <div className="flex items-center gap-5 md:gap-7 flex-wrap">
+        <div className="flex items-center gap-4 md:gap-6 flex-wrap">
           {NAV_LINKS.map((l) => <a key={l.href} href={l.href} style={link}>{l.label}</a>)}
           {signedIn ? (
             <>
-              <a href="/account" style={link}>My dashboard</a>
+              <a href="/account" style={link}>Dashboard</a>
+              <a href="/account?tab=vault" style={link}>Pet Vault</a>
+              <a href="/account?tab=trips" style={link}>My Trips</a>
               <button onClick={logout} style={{ ...link, background: "none", border: "none", cursor: "pointer", padding: 0 }}>Log out</button>
             </>
           ) : (

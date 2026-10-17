@@ -18,6 +18,7 @@ import PetIdCard, { PetIllustration } from "../../components/PetIdCard";
 import TripTimeline from "../../components/TripTimeline";
 import ServiceAnimalTrack from "../../components/ServiceAnimalTrack";
 import DocCheck from "../../components/DocCheck";
+import { reminderSchedule, classifyReminder, todayPT } from "../../lib/travelDates";
 import VetGuidance from "../../components/VetGuidance";
 import { BUCKET, SignedImg, getSignedUrl, toStoragePath } from "../../lib/storage";
 import { tokens, font } from "../../lib/theme";
@@ -25,10 +26,10 @@ import { tokens, font } from "../../lib/theme";
 
 
 const TABS = [
-  { key: "flight", label: "Current Flight" },
-  { key: "profile", label: "Pet Profile" },
-  { key: "history", label: "Flight History" },
-  { key: "billing", label: "Billing" },
+  { key: "dashboard", label: "Dashboard" },
+  { key: "vault", label: "Pet Vault" },
+  { key: "trips", label: "My Trips" },
+  { key: "billing", label: "Account & Billing" },
 ];
 
 function ComingSoon({ title, blurb }) {
@@ -1151,9 +1152,11 @@ function RequirementItem({ req, checked, onToggle }) {
 
 function RequirementGroup({ title, items, statusMap, onToggle, defaultOpen }) {
   const [open, setOpen] = useState(defaultOpen);
+  const [expanded, setExpanded] = useState(false);
   const doneCount = items.filter((r) => statusMap[r.id]).length;
 
   if (items.length === 0) return null;
+  const visible = expanded ? items : items.slice(0, 3);
 
   return (
     <div className="mb-4">
@@ -1168,10 +1171,14 @@ function RequirementGroup({ title, items, statusMap, onToggle, defaultOpen }) {
           {open ? "Hide" : "Show"}
         </span>
       </button>
-      {open &&
-        items.map((r) => (
-          <RequirementItem key={r.id} req={r} checked={!!statusMap[r.id]} onToggle={() => onToggle(r.id)} />
-        ))}
+      {open && visible.map((r) => (
+        <RequirementItem key={r.id} req={r} checked={!!statusMap[r.id]} onToggle={() => onToggle(r.id)} />
+      ))}
+      {open && items.length > 3 && (
+        <button onClick={() => setExpanded((e) => !e)} style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy, background: "none", border: "none", padding: "4px 0", cursor: "pointer", textDecoration: "underline" }}>
+          {expanded ? "Show less" : `Show ${items.length - 3} more`}
+        </button>
+      )}
     </div>
   );
 }
@@ -1197,6 +1204,107 @@ function UnlockTripCard({ trip }) {
   );
 }
 
+
+// Prominent Pet Vault card: pet, completion, three quick actions. Shown at the
+// top of the Dashboard so the vault is never buried under trip details.
+export function VaultCard({ userId, onOpenVault }) {
+  const [pet, setPet] = useState(null);
+  const [pct, setPct] = useState(null);
+  useEffect(() => { if (!userId) return; (async () => {
+    const { data: pets } = await supabase.from("pets").select("*").order("created_at", { ascending: false }).limit(1);
+    const first = pets?.[0] || null; setPet(first);
+    if (!first) { setPct(0); return; }
+    const [{ count: docs }, { count: health }] = await Promise.all([
+      supabase.from("documents").select("id", { count: "exact", head: true }).eq("pet_id", first.id),
+      supabase.from("pet_health_records").select("id", { count: "exact", head: true }).eq("pet_id", first.id),
+    ]);
+    const checks = [!!first.name, !!first.photo_url, !!first.microchip_number, !!first.chip_verified_at, !!first.vet_name, !!first.emergency_contact_name, (docs || 0) > 0, (health || 0) > 0];
+    setPct(Math.round((checks.filter(Boolean).length / checks.length) * 100));
+  })(); }, [userId]);
+  const btn = { fontFamily: font.body, fontSize: 14, fontWeight: 600, textDecoration: "none", cursor: "pointer" };
+  return (
+    <div className="rounded-2xl p-6 mb-6" style={{ background: tokens.navy }}>
+      <div className="flex flex-wrap items-center gap-5">
+        <div className="rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" style={{ width: 72, height: 72, background: tokens.gold, border: "3px solid #fff" }}>
+          {pet?.photo_url ? <SignedImg value={pet.photo_url} alt={pet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : <span style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: tokens.navy }}>{(pet?.name || "P").slice(0, 1)}</span>}
+        </div>
+        <div className="flex-1 min-w-[200px]">
+          <div style={{ fontFamily: font.mono, fontSize: 11.5, color: tokens.gold, letterSpacing: "0.12em" }}>PET VAULT</div>
+          <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: "#fff" }}>{pet ? `${pet.name}’s vault` : "Your pet vault"}</div>
+          <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, opacity: 0.85 }}>Pet ID & QR, chip details, vet records and health documents — all in one place.{pct != null && pet ? ` ${pct}% set up.` : ""}</div>
+          {pct != null && pet && <div className="w-full max-w-[260px] h-[6px] rounded-full mt-2" style={{ background: "rgba(255,255,255,0.18)" }}><div className="h-full rounded-full" style={{ width: `${pct}%`, background: tokens.gold }} /></div>}
+        </div>
+        <div className="flex flex-col gap-2">
+          <button onClick={() => onOpenVault && onOpenVault()} style={{ ...btn, background: tokens.gold, color: tokens.navy, border: "none" }} className="rounded-full px-5 py-2.5 text-left">View Pet ID / QR</button>
+          <button onClick={() => onOpenVault && onOpenVault("#chip-vault")} style={{ ...btn, background: "transparent", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)" }} className="rounded-full px-5 py-2.5 text-left">Chip check</button>
+          <button onClick={() => onOpenVault && onOpenVault()} style={{ ...btn, background: "transparent", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)" }} className="rounded-full px-5 py-2.5 text-left">Upload a vet record</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Calm overview: next-trip countdown, ONE consolidated Needs Action list
+// (time-sensitive reminders first, then open checklist steps, de-duplicated),
+// then the vault. Everything detailed lives under My Trips.
+export function DashboardTab({ userId, onOpenTrips }) {
+  const [trip, setTrip] = useState(null);
+  const [actions, setActions] = useState([]);
+  const [showAll, setShowAll] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const pet = useTripPet(trip);
+  useEffect(() => { (async () => {
+    const { data: trips } = await supabase.from("trips").select("*").order("created_at", { ascending: false }).limit(1);
+    const current = trips?.[0] || null; setTrip(current);
+    const list = [];
+    if (current?.paid) {
+      const today = todayPT();
+      for (const it of reminderSchedule(current, today)) {
+        const { state } = classifyReminder(it, current, { today });
+        if (state === "do_now" || state === "today") list.push({ key: `rem-${it.kind}`, label: it.title, hint: state === "today" ? "Due today" : "Catch up" });
+      }
+      const { data: reqs } = await supabase.rpc("get_trip_requirements", { p_trip_id: current.id, p_trip_types: tripTypeForRoute(current.origin, current.destination) === "international" ? ["international", "domestic"] : ["domestic"] });
+      const { data: statusRows } = await supabase.from("trip_requirement_status").select("*").eq("trip_id", current.id);
+      const doneIds = new Set((statusRows || []).filter((s) => s.completed).map((s) => s.requirement_id));
+      const seen = new Set(list.map((a) => a.label.toLowerCase()));
+      for (const r of (reqs || []).filter((x) => x.status === "attention" && !doneIds.has(x.id))) {
+        if (seen.has((r.title || "").toLowerCase())) continue;
+        list.push({ key: `req-${r.id}`, label: r.title, hint: "Checklist" });
+      }
+    }
+    setActions(list); setLoading(false);
+  })(); }, []);
+  if (loading) return <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading your dashboard…</div>;
+  const visible = showAll ? actions : actions.slice(0, 4);
+  return (
+    <div>
+      {trip?.paid ? <TripCountdown trip={trip} pet={pet} done={0} total={actions.length} /> : (
+        <div className="rounded-2xl p-7 mb-6 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+          <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }} className="mb-2">Where are you two flying?</div>
+          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-5">Answer a few trip questions and your plan, reminders and checklist land here.</p>
+          <a href="/assessment" className="rounded-full px-6 py-3 inline-block" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Plan your trip — start free</a>
+        </div>
+      )}
+      {trip?.paid && (
+        <div className="rounded-2xl p-6 mb-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+          <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 700, color: tokens.navy }} className="mb-1">Needs action</div>
+          <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-4">The few things that matter next — reminders and checklist combined, nothing duplicated.</p>
+          {actions.length === 0 ? <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Nothing needs action right now. 🎉</p> : <>
+            <ul className="space-y-2">{visible.map((a) => (
+              <li key={a.key} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
+                <span style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{a.label}</span>
+                <span style={{ fontFamily: font.mono, fontSize: 11, color: tokens.stamp, whiteSpace: "nowrap" }}>{a.hint.toUpperCase()}</span>
+              </li>))}
+            </ul>
+            {actions.length > 4 && <button onClick={() => setShowAll((s) => !s)} style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy, background: "none", border: "none", padding: "8px 0 0", cursor: "pointer", textDecoration: "underline" }}>{showAll ? "Show less" : `Show ${actions.length - 4} more`}</button>}
+            <div className="mt-4"><button onClick={onOpenTrips} className="rounded-full px-5 py-2.5" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600, border: "none", cursor: "pointer" }}>Open in My Trips →</button></div>
+          </>}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function CurrentFlightTab({ userId }) {
   const [trip, setTrip] = useState(null);
   const [results, setResults] = useState([]);
@@ -1204,6 +1312,8 @@ function CurrentFlightTab({ userId }) {
   const [loading, setLoading] = useState(true);
   const [isMember, setIsMember] = useState(false);
   const [showFull, setShowFull] = useState(false);
+  const [section, setSection] = useState("overview");
+  const [showAllActions, setShowAllActions] = useState(false);
   const petForTrip = useTripPet(trip);
   useEffect(() => { supabase.rpc("my_membership").then(({ data }) => setIsMember(!!data)); }, []);
 
@@ -1341,19 +1451,43 @@ function CurrentFlightTab({ userId }) {
         </div>
       </div>
 
-      {trip.paid && <LiveFlightCard trip={trip} />}
-      {trip.paid && <TripTimeline trip={trip} requirements={results} statusMap={statusMap} />}
-      <VetGuidance trip={trip} requirements={results} paid={!!trip.paid} />
-      {showTrack && <ServiceAnimalTrack trip={trip} />}
-      {trip.paid && <DocCheck trip={trip} />}
-      {trip.paid && <TripExtras trip={trip} pet={tripPet} />}
-      {trip.paid && <CommunityPulse trip={trip} isMember={isMember} />}
-      {trip.paid && <PetReliefCard airportLabel={trip.origin} />}
-      {trip.paid && <PetReliefCard airportLabel={trip.destination} title="When you land: pet relief" />}
+      {trip.paid && (
+        <div role="tablist" aria-label="Trip sections" className="inline-flex flex-wrap gap-1 mb-5 p-1 rounded-full" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+          {[["overview", "Overview"], ["flight", "Flight & weather"], ["checklist", "Checklist"], ["reminders", "Reminders"]].map(([k, l]) => (
+            <button key={k} role="tab" aria-selected={section === k} onClick={() => setSection(k)} className="rounded-full px-4 py-2" style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 600, background: section === k ? tokens.navy : "transparent", color: section === k ? "#fff" : tokens.ink, border: "none", cursor: "pointer" }}>{l}</button>
+          ))}
+        </div>
+      )}
+
+      {trip.paid && section === "overview" && (<>
+        <LiveFlightCard trip={trip} />
+        {(actionItems.length + verifyItems.length) > 0 && (
+          <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+            <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-1">Needs action</div>
+            <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mb-3">Start here — the full list is under Checklist.</p>
+            <ul className="space-y-2">{[...actionItems, ...verifyItems].filter((r) => !statusMap[r.id]).slice(0, showAllActions ? undefined : 3).map((r) => (
+              <li key={r.id} className="rounded-xl px-4 py-3" style={{ background: tokens.paper, fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{r.title}</li>
+            ))}</ul>
+            {[...actionItems, ...verifyItems].filter((r) => !statusMap[r.id]).length > 3 && <button onClick={() => setShowAllActions((s) => !s)} style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy, background: "none", border: "none", padding: "8px 0 0", cursor: "pointer", textDecoration: "underline" }}>{showAllActions ? "Show less" : "Show more"}</button>}
+            <div className="mt-3"><button onClick={() => setSection("checklist")} className="rounded-full px-5 py-2.5" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600, border: "none", cursor: "pointer" }}>Open the checklist →</button></div>
+          </div>
+        )}
+        <CommunityPulse trip={trip} isMember={isMember} />
+      </>)}
+      {trip.paid && section === "flight" && (<>
+        <LiveFlightCard trip={trip} />
+        <TripExtras trip={trip} pet={tripPet} />
+        <PetReliefCard airportLabel={trip.origin} />
+        <PetReliefCard airportLabel={trip.destination} title="When you land: pet relief" />
+        {showTrack && <ServiceAnimalTrack trip={trip} />}
+        <DocCheck trip={trip} />
+      </>)}
+      {trip.paid && section === "reminders" && <TripTimeline trip={trip} requirements={results} statusMap={statusMap} />}
+      {trip.paid && section === "checklist" && <VetGuidance trip={trip} requirements={results} paid={!!trip.paid} />}
 
       {!trip.paid ? (
         <UnlockTripCard trip={trip} />
-      ) : results.length === 0 ? (
+      ) : section !== "checklist" ? null : results.length === 0 ? (
         <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 15, opacity: 0.7 }}>
           No requirements found for this exact combination yet.
         </div>
@@ -1448,7 +1582,7 @@ function PostTripFeedback() {
 export default function AccountPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("flight");
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   useEffect(() => {
     supabase.auth
@@ -1460,8 +1594,10 @@ export default function AccountPage() {
       .catch(() => (window.location.href = "/login"))
       .finally(() => setLoading(false));
 
-    if (localStorage.getItem("petpassgo_open_flight_tab")) {
-      setActiveTab("flight");
+    const want = new URLSearchParams(window.location.search).get("tab");
+    if (want) setActiveTab({ vault: "vault", profile: "vault", trips: "trips", flight: "trips", history: "trips", billing: "billing", dashboard: "dashboard" }[want] || "dashboard");
+    else if (localStorage.getItem("petpassgo_open_flight_tab")) {
+      setActiveTab("trips");
       localStorage.removeItem("petpassgo_open_flight_tab");
     }
   }, []);
@@ -1509,16 +1645,18 @@ export default function AccountPage() {
           ))}
         </div>
 
-        {activeTab === "profile" && <PetProfileTab userId={user?.id} />}
+        {activeTab === "dashboard" && (<>
+          <DashboardTab userId={user?.id} onOpenTrips={() => setActiveTab("trips")} />
+          <VaultCard userId={user?.id} onOpenVault={(anchor) => { setActiveTab("vault"); if (anchor) setTimeout(() => document.querySelector(anchor)?.scrollIntoView({ behavior: "smooth" }), 350); }} />
+        </>)}
 
-        {activeTab === "flight" && <CurrentFlightTab userId={user?.id} />}
+        {activeTab === "vault" && (<>
+          <div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: tokens.navy }} className="mb-1">Pet Vault</div>
+          <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-6">Pet ID & QR, chip vault, vet records, health passport and documents.</p>
+          <PetProfileTab userId={user?.id} />
+        </>)}
 
-        {activeTab === "history" && (
-          <ComingSoon
-            title="Flight History"
-            blurb="Every trip you complete will show up here, so your next one starts faster."
-          />
-        )}
+        {activeTab === "trips" && <CurrentFlightTab userId={user?.id} />}
 
         {activeTab === "billing" && <BillingTab userId={user?.id} />}
       </div>
