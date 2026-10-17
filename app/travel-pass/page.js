@@ -10,7 +10,7 @@ export default function TravelPassPage() {
       <main className="max-w-[860px] mx-auto px-4 sm:px-6 py-10 lg:py-14">
         <div className="text-center mb-8">
           <h1 style={{ fontFamily: font.display, fontWeight: 700, color: tokens.navy, lineHeight: 1.1 }} className="text-[32px] lg:text-[44px]">Here’s what a Travel Pass gives you</h1>
-          <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.muted }} className="mt-3 max-w-[540px] mx-auto">Take a look inside before you plan. Everything below is a labelled example — your real pass is built from your trip answers.</p>
+          <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.muted }} className="mt-3 max-w-[540px] mx-auto">Take a look inside before you plan. Your real pass is built from your trip answers.</p>
         </div>
         <SampleTravelPass />
         <div className="grid sm:grid-cols-2 gap-4 mt-8">

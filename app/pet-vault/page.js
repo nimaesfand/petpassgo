@@ -1,19 +1,14 @@
 import SiteHeader from "../../components/SiteHeader";
 import Logo from "../../components/Logo";
-import { SamplePetIdCard } from "../../components/SalesSamples";
+import { SamplePetIdCard, VaultInUseGallery } from "../../components/SalesSamples";
 import { PRICES as P } from "../../lib/pricing";
 import { tokens, font } from "../../lib/theme";
 
+// The gallery above shows most features in use; these three don't photograph well.
 const FEATURES = [
-  ["Digital Pet ID & QR", "A page for your pet with a QR code for the collar or carrier. Finders scan it and message you — your phone number stays private."],
-  ["Chip Vault + registration check", "Chip number, brand and registry kept safe, with a yearly 'check it still scans and points to you' reminder."],
-  ["Vet records & health passport", "Vaccines, medications and documents in one vault, with expiry dates tracked for you."],
   ["Smart vet import", "Snap a photo of vet paperwork and we read it into the record for you to review — nothing saved without your OK."],
-  ["Lost-pet mode", "One tap turns the Pet ID into a lost-pet page and printable flyer. Finders message you instantly."],
-  ["Share card for vet or sitter", "A time-limited link with just what a vet, sitter or groomer needs. You control what it shows."],
-  ["Reminders that matter", "Document expiries, chip checks and trip deadlines — before they become emergencies."],
-  ["Unlimited pets", "One membership covers every pet in the house, each with their own ID and vault."],
-  ["Private by design", "Your contact details are never printed on the ID. You choose what a finder or share link can see."],
+  ["Unlimited pets", "One membership covers every pet in the house, each with their own ID, chip vault and documents."],
+  ["Private by design", "Your contact details are never printed on the ID. You choose exactly what a finder or share link can see."],
 ];
 
 export default function PetVaultPage() {
@@ -24,19 +19,25 @@ export default function PetVaultPage() {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4"><Logo size={44} /></div>
           <h1 style={{ fontFamily: font.display, fontWeight: 700, color: tokens.navy, lineHeight: 1.1 }} className="text-[32px] lg:text-[44px]">The Pet Vault</h1>
-          <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.muted }} className="mt-3 max-w-[560px] mx-auto">Your pet’s ID, chip and vet records — safe in one place, and working for you if you’re ever separated. Tap the example ID to see how it works.</p>
+          <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.muted }} className="mt-3 max-w-[560px] mx-auto">Your pet’s ID, chip and vet records — safe in one place, and working for you if you’re ever separated. Tap the ID to see how it works.</p>
         </div>
 
         <div className="max-w-[640px] mx-auto mb-4"><SamplePetIdCard /></div>
         <div className="max-w-[640px] mx-auto mb-10 rounded-2xl p-4 flex items-center gap-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           <div className="flex-1">
-            <div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy, fontSize: 15 }}>Setting up Buddy’s vault — example</div>
+            <div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy, fontSize: 15 }}>Setting up Buddy’s vault <span style={{ fontFamily: font.mono, fontSize: 10, letterSpacing: "0.1em", background: tokens.gold, borderRadius: 999, padding: "2px 8px", marginLeft: 6 }}>EXAMPLE</span></div>
             <div className="w-full h-[8px] rounded-full mt-2" style={{ background: tokens.line }}><div className="h-full rounded-full" style={{ width: "80%", background: tokens.green }} /></div>
           </div>
           <div style={{ fontFamily: font.display, fontWeight: 700, color: tokens.navy }}>80%</div>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+        <div className="text-center mb-6">
+          <h2 style={{ fontFamily: font.display, fontWeight: 700, color: tokens.navy, lineHeight: 1.15 }} className="text-[26px] lg:text-[32px]">See it in use</h2>
+          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mt-2">This is Buddy’s vault, doing its jobs. Yours looks like this — with your pet in it.</p>
+        </div>
+        <div className="mb-10"><VaultInUseGallery /></div>
+
+        <div className="grid sm:grid-cols-3 gap-4 mb-12">
           {FEATURES.map(([t, b]) => (
             <div key={t} className="rounded-2xl p-5" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
               <div style={{ fontFamily: font.display, fontSize: 17.5, fontWeight: 700, color: tokens.navy }} className="mb-1.5">{t}</div>
