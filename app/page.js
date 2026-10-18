@@ -205,9 +205,9 @@ const D = "var(--font-display), system-ui, sans-serif";
 const B = "var(--font-body), system-ui, sans-serif";
 
 const STEPS = [
-  { n: "1", title: "Answer 6 questions", body: "Airline, route, animal. About 3 minutes.", icon: "M4 6h16M4 12h10M4 18h7" },
-  { n: "2", title: "Unlock your Travel Pass", body: "Every requirement for your exact trip, in order.", icon: "M5 4h14v16H5zM8 9h8M8 13h8M8 17h5" },
-  { n: "3", title: "Check it off and fly", body: "Reminders before each deadline. Docs in one vault.", icon: "M5 13l4 4L19 7" },
+  { n: "1", title: "Answer 6 questions", body: "Tell us about your flight and your pets.", icon: "M4 6h16M4 12h10M4 18h7" },
+  { n: "2", title: "Unlock your Travel Pass", body: "Every requirement for your trip, in the order you'll need them.", icon: "M5 4h14v16H5zM8 9h8M8 13h8M8 17h5" },
+  { n: "3", title: "Check it off and fly", body: "Reminders before each deadline. Documents, forms, and everything you need in one vault.", icon: "M5 13l4 4L19 7" },
 ];
 
 const HOME_FAQ = [FAQ[2], FAQ[6], FAQ[7]];
@@ -251,24 +251,41 @@ export default function PetPassGoLanding() {
       {/* 1. HERO — two paths */}
       <section className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14 pt-7 sm:pt-10 lg:pt-20 pb-10 lg:pb-20 text-center">
         <div className={`fade-up ${loaded ? "in" : ""}`}>
-          <h1 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[29px] sm:text-[31px] leading-[1.08] sm:text-[52px] lg:text-[64px] font-bold mb-3 lg:mb-5">Fly with your pet. Skip the guesswork.</h1>
+          <h1 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[29px] sm:text-[31px] leading-[1.08] sm:text-[52px] lg:text-[64px] font-bold mb-3 lg:mb-5">Fly with your pets, skip the guesswork.</h1>
           <p style={{ fontFamily: B, color: tokens.muted }} className="text-[16px] lg:text-[19px] mb-5 lg:mb-10">Two simple ways to start. Pick one.</p>
         </div>
         <div className={`fade-up grid md:grid-cols-2 gap-3 lg:gap-5 max-w-[900px] mx-auto text-left ${loaded ? "in" : ""}`} style={{ transitionDelay: "120ms" }}>
           {[
-            ["Traveling? Start here.", "See what's inside the Travel Pass, then plan your trip in about three minutes.", "See the Travel Pass", "/travel-pass", `${PRICES.pass} per trip · ${PRICES.memberPass} for members`, false],
-            ["Pet Vault? Start here.", "Your pet's ID, chip and vet records, all in one place.", "See the Pet Vault", "/pet-vault", `Membership · ${PRICES.member}/mo`, true],
-          ].map(([t, b, c, href, sub, dark]) => (
-            <div key={t} className="rounded-2xl p-4 sm:p-5 lg:p-7 flex flex-col" style={{ background: dark ? tokens.navy : "#fff", border: `1px solid ${dark ? tokens.navy : tokens.line}`, color: dark ? "#fff" : tokens.navy }}>
+            {
+              title: "Traveling? Start here.",
+              body: "See what's inside the Travel Pass, then plan your trip.",
+              cta: "See the Travel Pass",
+              href: "/travel-pass",
+              lead: "Free to check your trip",
+              price: `Travel Pass ${PRICES.pass} when you're ready (members ${PRICES.memberPass})`,
+              dark: false,
+            },
+            {
+              title: "Pet Vault? Start here.",
+              body: "Your pet's ID, chip and vet records, all in one place.",
+              cta: "See the Pet Vault",
+              href: "/pet-vault",
+              lead: "",
+              price: `Membership ${PRICES.member}/mo · cancel anytime`,
+              dark: true,
+            },
+          ].map((door) => (
+            <div key={door.title} className="rounded-2xl p-4 sm:p-5 lg:p-7 flex flex-col h-full" style={{ background: door.dark ? tokens.navy : "#fff", border: `1px solid ${door.dark ? tokens.navy : tokens.line}`, color: door.dark ? "#fff" : tokens.navy }}>
               <span aria-hidden="true" className="inline-flex items-center justify-center rounded-full mb-3 lg:mb-4" style={{ width: 40, height: 40, background: tokens.gold }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={tokens.navy} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{dark ? <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M14 10h4M14 14h3" /><circle cx="8.5" cy="11" r="2" /><path d="M5.5 16c.6-1.6 1.7-2.4 3-2.4s2.4.8 3 2.4" /></> : <path d="M2 16l20-6-20-6 3 6-3 6zM5 10h7" />}</svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={tokens.navy} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{door.dark ? <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M14 10h4M14 14h3" /><circle cx="8.5" cy="11" r="2" /><path d="M5.5 16c.6-1.6 1.7-2.4 3-2.4s2.4.8 3 2.4" /></> : <path d="M2 16l20-6-20-6 3 6-3 6zM5 10h7" />}</svg>
               </span>
-              <div style={{ fontFamily: D, fontWeight: 700 }} className="text-[22px] lg:text-[25px] mb-1.5 lg:mb-2">{t}</div>
-              <p style={{ fontFamily: B, opacity: 0.8, lineHeight: 1.45 }} className="text-[15px] lg:text-[16.5px] mb-4 lg:mb-6 flex-1">{b}</p>
-              <div className="flex items-center gap-3 flex-wrap">
-                <a href={href} className="btn-primary rounded-full px-6 lg:px-7 py-3 lg:py-3.5 min-h-[44px]" style={{ background: dark ? tokens.gold : tokens.primary, color: dark ? tokens.navy : "#fff", fontFamily: B, fontWeight: 700, textDecoration: "none" }}>{c} →</a>
-                <span style={{ fontFamily: B, fontSize: 13.5, opacity: 0.75 }}>{sub}</span>
-              </div>
+              <div style={{ fontFamily: D, fontWeight: 700 }} className="text-[22px] lg:text-[25px] mb-1.5 lg:mb-2">{door.title}</div>
+              <p style={{ fontFamily: B, opacity: 0.8, lineHeight: 1.45 }} className="text-[15px] lg:text-[16.5px] mb-4 lg:mb-6 flex-1">{door.body}</p>
+              <a href={door.href} className="btn-primary self-start rounded-full px-6 lg:px-7 py-3 lg:py-3.5 min-h-[44px]" style={{ background: door.dark ? tokens.gold : tokens.primary, color: door.dark ? tokens.navy : "#fff", fontFamily: B, fontWeight: 700, textDecoration: "none" }}>{door.cta} →</a>
+              <p style={{ fontFamily: B, lineHeight: 1.4 }} className="mt-3">
+                {door.lead ? <span style={{ display: "block", fontSize: 14, fontWeight: 600, color: door.dark ? "#fff" : tokens.navy }}>{door.lead}</span> : null}
+                <span style={{ display: "block", fontSize: 12.5, fontWeight: 500, color: door.dark ? "#C9D3E3" : tokens.muted, marginTop: door.lead ? 2 : 0 }}>{door.price}</span>
+              </p>
             </div>
           ))}
         </div>
@@ -336,8 +353,8 @@ export default function PetPassGoLanding() {
       {/* 7. FINAL CTA */}
       <section className="px-4 sm:px-6 md:px-14 pb-14 lg:pb-24">
         <div className="max-w-[1240px] mx-auto rounded-3xl px-8 py-14 md:py-16 text-center" style={{ background: tokens.navy }}>
-          <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.1 }} className="text-[32px] md:text-[44px] font-bold mb-3">Where are you two flying?</h2>
-          <p style={{ fontFamily: B, color: "#C9D3E3", fontSize: 17 }} className="mb-8">A few trip questions. Three minutes. Your plan.</p>
+          <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.1 }} className="text-[32px] md:text-[44px] font-bold mb-3">Where are you and your pets flying to?</h2>
+          <p style={{ fontFamily: B, color: "#C9D3E3", fontSize: 17 }} className="mb-8">A few trip questions. Then your plan.</p>
           <Cta>Plan your trip</Cta>
         </div>
       </section>
