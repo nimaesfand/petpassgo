@@ -1293,7 +1293,7 @@ export function DashboardTab({ userId, onOpenTrips }) {
       {startCard}
       {trip?.paid ? <TripCountdown trip={trip} pet={pet} done={0} total={actions.length} /> : (
         <div className="rounded-2xl p-7 mb-6 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-          <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }} className="mb-2">Where are you two flying?</div>
+          <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }} className="mb-2">Where are you and your pets flying to?</div>
           <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-5">Answer a few trip questions and your plan, reminders and checklist land here.</p>
           <a href="/assessment" className="rounded-full px-6 py-3 inline-block" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Try the trip questions</a>
         </div>
