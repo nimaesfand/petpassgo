@@ -22,15 +22,6 @@ function encouragedHealth(requirements) {
   return (requirements || []).find((r) => /health/i.test(`${r.category} ${r.title}`) && /encourag/i.test(`${r.title} ${r.description}`) && /not required/i.test(`${r.title} ${r.description}`));
 }
 
-function SourceLink({ req, paid }) {
-  if (!paid || !req.source_url) return null;
-  return (
-    <a href={req.source_url} target="_blank" rel="noopener noreferrer" style={{ fontFamily: font.body, fontSize: 13, fontWeight: 600, color: tokens.primary, textDecoration: "underline" }}>
-      Official source →
-    </a>
-  );
-}
-
 function LockedTeaser() {
   return (
     <div className="rounded-xl p-4 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
@@ -97,27 +88,7 @@ export default function VetGuidance({ trip, requirements = [], paid }) {
             ? (service ? "Vaccination / health items are on your checklist" : "A vet visit is on your checklist for this trip")
             : "No veterinary health certificate is on your checklist for this trip"}
         </div>
-        <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, lineHeight: 1.5, opacity: 0.85 }}>
-          {noCert
-            ? noCert.description
-            : encouraged && !needsVet
-            ? encouraged.description
-            : service && !needsVet
-            ? "U.S. airlines use the DOT Service Animal Air Transportation Form (and the Relief Attestation on flights of 8+ hours). A psychiatric service dog (PSD) is a service dog and uses that same form. Your airline may also ask that vaccinations be current. The DOT form is one card on your pass — we will not attest for you, and you do not need a separate letter or certificate."
-            : needsVet
-            ? "Based on the verified requirements for your airline, route and animal. The matching steps are cards on your pass, so they are not repeated here."
-            : `Your ${trip.airline || "airline"} Travel Pass for ${trip.origin || "?"} → ${trip.destination || "?"} doesn't list a veterinary health certificate. Always reconfirm with ${trip.airline || "your airline"} before you fly — rules can change.`}
-        </p>
-        {noCert?.source_url && (
-          <div className="mt-2"><SourceLink req={noCert} paid /></div>
-        )}
       </div>
-
-      {service && rows.length === 0 && !encouraged && (
-        <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-3">
-          The DOT form is a single card on your pass, including how to send it to {trip.airline || "your airline"}.
-        </p>
-      )}
 
       {(uniq(bring).length > 0 || uniq(ask).length > 0) && (
         <div className="grid sm:grid-cols-2 gap-3">
@@ -136,9 +107,7 @@ export default function VetGuidance({ trip, requirements = [], paid }) {
         </div>
       )}
 
-      <p style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.muted }} className="mt-3">
-        Guidance only — not veterinary advice. Your airline and a licensed veterinarian have the final say.
-      </p>
+      <p style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }} className="mt-3">Not veterinary advice.</p>
     </div>
   );
 }

@@ -1310,8 +1310,10 @@ function CurrentFlightTab({ userId }) {
       {trip.paid && section === "flight" && (<>
         <LiveFlightCard trip={trip} />
         <TripExtras trip={trip} pet={tripPet} />
-        <PetReliefCard airportLabel={trip.origin} />
-        <PetReliefCard airportLabel={trip.destination} title="When you land: pet relief" />
+        <div id="pet-relief">
+          <PetReliefCard airportLabel={trip.origin} />
+          <PetReliefCard airportLabel={trip.destination} title="When you land: pet relief" />
+        </div>
         <DocCheck trip={trip} />
       </>)}
       {trip.paid && section === "reminders" && <TripTimeline trip={trip} requirements={results} statusMap={statusMap} />}
@@ -1334,7 +1336,7 @@ function CurrentFlightTab({ userId }) {
               No requirements found for this exact combination yet.
             </div>
           ) : (
-            <PassChecklist trip={trip} requirements={results} statusMap={statusMap} onSetDone={handleSetDone} />
+            <PassChecklist trip={trip} requirements={results} statusMap={statusMap} onSetDone={handleSetDone} onOpenRelief={() => { setSection("flight"); setTimeout(() => document.getElementById("pet-relief")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }} />
           )}
         </>
       )}

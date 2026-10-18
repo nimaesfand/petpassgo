@@ -21,11 +21,12 @@ function SectionLabel({ children, hint }) {
   );
 }
 
-function PassCard({ card, open, done, today, onOpen, onMark, showTrack }) {
+function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRelief }) {
   const chip = dueChip(card.dueDate, today);
   const tone = CHIP[chip.tone] || CHIP.later;
+  const showChip = !card.fact || !!card.dueDate;
   return (
-    <article className="rounded-2xl mb-2 overflow-hidden" style={{ background: "#fff", border: `1px solid ${done ? tokens.line : tokens.line}`, boxShadow: open ? "0 8px 24px rgba(20,33,61,0.08)" : "none" }}>
+    <article className="rounded-2xl mb-2 overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: open ? "0 8px 24px rgba(20,33,61,0.08)" : "none" }}>
       <button
         type="button"
         aria-expanded={open}
@@ -34,8 +35,8 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack }) {
         style={{ minHeight: 56, background: "transparent", border: "none", cursor: "pointer" }}
       >
         <span aria-hidden className="flex items-center justify-center flex-shrink-0 rounded-xl" style={{ width: 36, height: 36, background: tokens.sky, fontSize: 18 }}>{card.icon}</span>
-        <span className="flex-1 min-w-0" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{card.shortTitle}</span>
-        <span className="flex-shrink-0 rounded-full px-2 py-1" style={{ fontFamily: font.body, fontSize: 11.5, fontWeight: 700, background: tone.background, color: tone.color, maxWidth: 108, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{chip.label}</span>
+        <span className="flex-1 min-w-0" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, lineHeight: 1.25, color: tokens.navy }}>{card.shortTitle}</span>
+        {showChip && <span className="flex-shrink-0 rounded-full px-2 py-1" style={{ fontFamily: font.body, fontSize: 11.5, fontWeight: 700, background: tone.background, color: tone.color }}>{chip.label}</span>}
         <span className="flex-shrink-0 rounded-full px-2.5 py-1" style={{ fontFamily: font.body, fontSize: 12, fontWeight: 700, background: done ? "#EAF6EE" : tokens.sky, color: done ? tokens.green : tokens.navy }}>{done ? "Done" : card.fact ? "Fact" : "To do"}</span>
       </button>
       {open && (
@@ -44,23 +45,37 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack }) {
             <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", color: tokens.muted }}>WHAT TO DO</div>
             <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }} className="mt-1">{card.what}</p>
           </div>
-          <div className="rounded-xl p-3 mb-2" style={{ background: tokens.paper }}>
-            <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", color: tokens.muted }}>WHY · DEADLINE</div>
-            <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }} className="mt-1">{card.why}</p>
-            <p style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 700, color: tokens.navy }} className="mt-2">{card.dueDate ? (chip.tone === "today" ? chip.label : `Due ${chip.label}`) : "Timing: before you fly"}</p>
-          </div>
-          {(card.submission_link || card.source_url) && (
+          {card.why && (
             <div className="rounded-xl p-3 mb-2" style={{ background: tokens.paper }}>
-              <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", color: tokens.muted }}>GO HERE</div>
-              <div className="flex flex-col gap-2 mt-2">
-                {card.submission_link && (
-                  <a href={card.submission_link} target="_blank" rel="noopener noreferrer" className="rounded-full px-4 py-3 text-center" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>{card.goLabel || "Go here"}</a>
-                )}
-                {card.source_url && (
-                  <a href={card.source_url} target="_blank" rel="noopener noreferrer" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.primary }}>Source: {card.sourceHost || "official page"}</a>
-                )}
-              </div>
+              <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", color: tokens.muted }}>WHY</div>
+              <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }} className="mt-1">{card.why}</p>
             </div>
+          )}
+          {card.relief && card.relief.covered.length > 0 && (
+            <div className="rounded-xl p-3 mb-2" style={{ background: tokens.paper }}>
+              {card.relief.covered.map((a) => (
+                <div key={a.code} className="mb-3 last:mb-0">
+                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, color: tokens.navy }}>{a.code} · {a.city}</div>
+                  <ul className="mt-1 space-y-1">
+                    {a.areas.map((x, i) => (
+                      <li key={`${a.code}-${i}`} style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, lineHeight: 1.4 }}>
+                        <b>{x.terminal}.</b> {x.spot} ({x.where === "before" ? "before security" : "after security"})
+                      </li>
+                    ))}
+                  </ul>
+                  <a href={a.source} target="_blank" rel="noopener noreferrer" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.primary }}>Official {a.code} page</a>
+                </div>
+              ))}
+              {onOpenRelief && (
+                <button type="button" onClick={onOpenRelief} className="mt-1" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 14.5, color: tokens.navy, background: "none", border: "none", padding: 0, cursor: "pointer", textDecoration: "underline" }}>Show in Flight & weather</button>
+              )}
+            </div>
+          )}
+          {card.submission_link && (
+            <a href={card.submission_link} target="_blank" rel="noopener noreferrer" className="rounded-full px-4 py-3 text-center block mb-2" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>{card.goLabel || "Go here"}</a>
+          )}
+          {card.source_url && (
+            <a href={card.source_url} target="_blank" rel="noopener noreferrer" className="block mb-2" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.primary }}>Source: {card.sourceHost || "official page"}</a>
           )}
           {showTrack && card.dot && <div className="mb-2"><ServiceAnimalTrack trip={showTrack} embedded /></div>}
           {!card.fact && (
@@ -74,7 +89,7 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack }) {
   );
 }
 
-export default function PassChecklist({ trip, requirements = [], statusMap = {}, onSetDone }) {
+export default function PassChecklist({ trip, requirements = [], statusMap = {}, onSetDone, onOpenRelief }) {
   const today = useTodayPT();
   const cards = useMemo(() => buildPassCards(requirements, trip), [requirements, trip]);
   const groups = useMemo(() => groupCards(cards, statusMap), [cards, statusMap]);
@@ -113,6 +128,7 @@ export default function PassChecklist({ trip, requirements = [], statusMap = {},
       done={cardDone(card, statusMap)}
       today={today}
       showTrack={card.dot ? trip : null}
+      onOpenRelief={onOpenRelief}
       onOpen={() => toggleOpen(card.id)}
       onMark={() => mark(card)}
     />
