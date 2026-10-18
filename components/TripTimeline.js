@@ -9,7 +9,7 @@ import { useTodayPT } from "../lib/useTodayPT";
 // of those and the user marks it done). Day-of packing (d1) is manual.
 function relatedDone(item, requirements, statusMap) {
   if (item.kind === "d1") return false;
-  if (item.kind === "dot48") {
+  if (item.kind === "dot48" || item.kind === "rdot48") {
     const forms = (requirements || []).filter((r) => /REQUIRED FORM|SUBMISSION/i.test(r.category || ""));
     return forms.length > 0 && forms.every((r) => statusMap[r.id]);
   }

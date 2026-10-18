@@ -74,7 +74,7 @@ export default function SignupPage() {
               <div role="radiogroup" aria-label="Plan" className="mb-6">
                 {[
                   ["member", "Membership", `${P.member}/mo`, `Pet vault, Digital Pet ID, lost-pet alerts, community. Travel Passes ${P.memberPass}.`],
-                  ["pass", "Travel Pass only", `${P.pass} per trip`, "One trip's checklist, deadlines and reminders. Pet ID & vault stay open until 7 days after your travel date."],
+                  ["pass", "Travel Pass only", `${P.pass} per trip`, "One trip's checklist, deadlines and reminders. Pet ID & vault stay open until 7 days after your travel date, or 7 days after your return if you add one."],
                 ].map(([k, n, price, d]) => {
                   const sel = plan === k;
                   return (
