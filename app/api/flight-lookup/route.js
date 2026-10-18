@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { explicitFlightDate } from "../../../lib/flightDate";
 
 export const dynamic = "force-dynamic";
 
@@ -47,7 +48,12 @@ function shape(d, requested) {
     airline_iata: d.airline?.iata || null,
     departure: side(d.departure),
     arrival: side(d.arrival),
-    codeshare: d.flight?.codeshared?.airline_iata ? { airline_iata: d.flight.codeshared.airline_iata, flight_iata: d.flight.codeshared.flight_iata || null } : null,
+    codeshare: d.flight?.codeshared ? {
+      airline_name: d.flight.codeshared.airline_name || null,
+      airline_iata: d.flight.codeshared.airline_iata || null,
+      flight_iata: d.flight.codeshared.flight_iata || null,
+      flight_number: d.flight.codeshared.flight_number || null,
+    } : null,
   };
 }
 
@@ -55,8 +61,9 @@ export async function POST(req) {
   try {
     const body = await req.json().catch(() => ({}));
     const flight = normalizeFlight(body.flight);
-    const date = /^\d{4}-\d{2}-\d{2}$/.test(body.date || "") ? body.date : new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+    const date = explicitFlightDate(body.date);
     if (!flight) return NextResponse.json({ configured: true, found: false, error: "Enter a flight number like UA1234." }, { status: 400 });
+    if (!date) return NextResponse.json({ configured: true, found: false, error: "Pick the flight date first. We won't assume today or set your travel date for you." }, { status: 400 });
 
     const sb = serviceClient();
     // 1) Cache first — a fresh hit never spends API quota.

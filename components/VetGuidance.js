@@ -13,9 +13,13 @@ function explicitNoHealthCert(requirements) {
 function healthRows(requirements) {
   return (requirements || []).filter((r) => {
     const text = `${r.title} ${r.description}`;
-    if (/does not require a health certificate/i.test(text)) return false;
+    if (/does not require a health certificate|not required|encouraged/i.test(text)) return false;
     return HEALTH_CATS.test(r.category || "") || /health certificate|APHIS|FAVN|screwworm|rabies|microchip|CDC Dog Import/i.test(text);
   });
+}
+
+function encouragedHealth(requirements) {
+  return (requirements || []).find((r) => /health/i.test(`${r.category} ${r.title}`) && /encourag/i.test(`${r.title} ${r.description}`) && /not required/i.test(`${r.title} ${r.description}`));
 }
 
 function SourceLink({ req, paid }) {
@@ -45,6 +49,7 @@ export default function VetGuidance({ trip, requirements = [], paid }) {
 
   const rows = healthRows(requirements);
   const noCert = explicitNoHealthCert(requirements);
+  const encouraged = encouragedHealth(requirements);
   const service = isService(trip.role);
   const needsVet = rows.length > 0;
 
@@ -84,6 +89,8 @@ export default function VetGuidance({ trip, requirements = [], paid }) {
         <div style={{ fontFamily: font.display, fontSize: 17, fontWeight: 700, color: tokens.navy }} className="mb-1">
           {noCert
             ? `${trip.airline} does not require a health certificate for cabin pets`
+            : encouraged && !needsVet
+            ? `${trip.airline || "Your airline"} encourages health papers. They are not required for this domestic trip`
             : service && !needsVet
             ? "Service animals: DOT forms, not a pet health certificate"
             : needsVet
@@ -93,10 +100,12 @@ export default function VetGuidance({ trip, requirements = [], paid }) {
         <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, lineHeight: 1.5, opacity: 0.85 }}>
           {noCert
             ? noCert.description
+            : encouraged && !needsVet
+            ? encouraged.description
             : service && !needsVet
-            ? "U.S. airlines use the DOT Service Animal Air Transportation Form (and the Relief Attestation on flights of 8+ hours). Your airline may also ask that vaccinations be current — check the vaccination and submission steps in your checklist."
+            ? "U.S. airlines use the DOT Service Animal Air Transportation Form (and the Relief Attestation on flights of 8+ hours). A psychiatric service dog (PSD) is a service dog and uses that same form. Your airline may also ask that vaccinations be current. The DOT form is one card on your pass — we will not attest for you, and you do not need a separate letter or certificate."
             : needsVet
-            ? "Based on the verified requirements for your airline, route and animal. Details and official sources are below."
+            ? "Based on the verified requirements for your airline, route and animal. The matching steps are cards on your pass, so they are not repeated here."
             : `Your ${trip.airline || "airline"} Travel Pass for ${trip.origin || "?"} → ${trip.destination || "?"} doesn't list a veterinary health certificate. Always reconfirm with ${trip.airline || "your airline"} before you fly — rules can change.`}
         </p>
         {noCert?.source_url && (
@@ -104,27 +113,9 @@ export default function VetGuidance({ trip, requirements = [], paid }) {
         )}
       </div>
 
-      {/* Matched health requirements */}
-      {rows.length > 0 && (
-        <div className="mb-4">
-          <div style={{ fontFamily: font.body, fontSize: 13, fontWeight: 700, color: tokens.navy, letterSpacing: "0.06em" }} className="mb-2">ON YOUR CHECKLIST</div>
-          <ul className="space-y-3">
-            {rows.map((r) => (
-              <li key={r.id} className="rounded-lg px-3 py-2.5" style={{ background: tokens.sky }}>
-                <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 14.5, color: tokens.navy }}>{r.title}</div>
-                <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.ink, lineHeight: 1.45, opacity: 0.85 }} className="mt-0.5">{r.description}</div>
-                {r.deadline_description && <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.primary, fontWeight: 600 }} className="mt-1">Timing: {r.deadline_description}</div>}
-                <div className="mt-1"><SourceLink req={r} paid /></div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Service-animal form note when no health rows but service */}
-      {service && rows.length === 0 && (
+      {service && rows.length === 0 && !encouraged && (
         <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-3">
-          See the REQUIRED FORM and SUBMISSION steps in your checklist for how to send the DOT form to {trip.airline || "your airline"}.
+          The DOT form is a single card on your pass, including how to send it to {trip.airline || "your airline"}.
         </p>
       )}
 

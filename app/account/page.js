@@ -17,9 +17,12 @@ import FeedbackPrompt from "../../components/FeedbackPrompt";
 import LostPanel from "../../components/LostPanel";
 import PetIdCard, { PetIllustration } from "../../components/PetIdCard";
 import TripTimeline from "../../components/TripTimeline";
-import ServiceAnimalTrack from "../../components/ServiceAnimalTrack";
 import DocCheck from "../../components/DocCheck";
+import PassChecklist from "../../components/PassChecklist";
+import RoundTripAddon from "../../components/RoundTripAddon";
+import { buildPassCards, groupCards, isServiceRole } from "../../lib/passCards";
 import { reminderSchedule, classifyReminder, todayPT } from "../../lib/travelDates";
+import { fmtTripDate } from "../../lib/tripAccess";
 import VetGuidance from "../../components/VetGuidance";
 import { BUCKET, SignedImg, getSignedUrl, toStoragePath } from "../../lib/storage";
 import { tokens, font } from "../../lib/theme";
@@ -744,7 +747,7 @@ function AccessGate() {
     <div className="rounded-2xl p-7 text-center" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
       <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-2">Your pet vault and Digital Pet ID are paused</div>
       <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted, lineHeight: 1.55 }} className="mb-5 max-w-lg mx-auto">
-        They're included with Membership, or with a Travel Pass until 7 days after your travel date. Your pets and documents are kept safe and come back as soon as you rejoin.
+        They're included with Membership, or with a Travel Pass until 7 days after you fly (7 days after your return, if you added one). Your pets and documents are kept safe and come back as soon as you rejoin.
       </p>
       <div className="flex gap-3 justify-center flex-wrap">
         <a href="/signup?plan=member" className="btn-primary rounded-full px-6 py-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Join for {P.member}/mo</a>
@@ -989,200 +992,6 @@ function PetProfileTab({ userId }) {
   );
 }
 
-const CATEGORY_ICONS = {
-  "BOOKING REQUIREMENT": "📞",
-  "KENNEL REQUIREMENT": "🧳",
-  "PET FEE": "💵",
-  "AGE REQUIREMENT": "🗓️",
-  "WEIGHT LIMIT": "⚖️",
-  "BREED RESTRICTION": "🐾",
-  "REQUIRED FORM": "📄",
-  SUBMISSION: "📤",
-  "HEALTH DOCUMENTATION": "🩺",
-  VACCINATION: "💉",
-  "ROUTE RESTRICTION": "🚫",
-  "PHONE SUPPORT": "☎️",
-};
-
-function categoryIcon(category) {
-  if (CATEGORY_ICONS[category]) return CATEGORY_ICONS[category];
-  if (category.includes("CARGO") || category.includes("FIT IN THE CABIN")) return "📦";
-  if (category.includes("MISS A STEP")) return "⚠️";
-  return "📌";
-}
-
-const STATUS_ACCENT = {
-  attention: tokens.stamp,
-  verify: tokens.gold,
-  complete: tokens.green,
-};
-
-// Pure facts (kennel size, age, fee, breed rule, vaccination timing) never get a "Go here"
-// button — there's no real destination for a fact, only for an actual form or booking action.
-const NO_LINK_CATEGORIES = new Set(["KENNEL REQUIREMENT", "AGE REQUIREMENT", "PET FEE", "BREED RESTRICTION", "VACCINATION"]);
-
-function RequirementItem({ req, checked, onToggle }) {
-  const accent = STATUS_ACCENT[req.status] || tokens.line;
-  return (
-    <div
-      className="rounded-xl p-4 mb-2.5 flex items-start gap-3"
-      style={{
-        background: checked ? tokens.paper : "#fff",
-        borderLeft: `4px solid ${checked ? tokens.line : accent}`,
-        borderTop: `1px solid ${tokens.line}`,
-        borderRight: `1px solid ${tokens.line}`,
-        borderBottom: `1px solid ${tokens.line}`,
-        opacity: checked ? 0.6 : 1,
-      }}
-    >
-      <div
-        className="rounded-lg flex items-center justify-center flex-shrink-0"
-        style={{ width: 34, height: 34, background: tokens.sky, fontSize: 16 }}
-      >
-        {categoryIcon(req.category)}
-      </div>
-      <div className="flex-1">
-        <div style={{ fontFamily: font.mono, fontSize: 11.5, color: tokens.ink, opacity: 0.4, letterSpacing: "0.08em" }} className="mb-0.5">
-          {req.category}
-        </div>
-        <div
-          style={{
-            fontFamily: font.body,
-            fontWeight: 700,
-            fontSize: 16.5,
-            color: tokens.navy,
-            textDecoration: checked ? "line-through" : "none",
-            lineHeight: 1.25,
-          }}
-          className="mb-1"
-        >
-          {req.title}
-        </div>
-        <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.ink, opacity: 0.7 }} className="mb-2">
-          {req.description}
-          {req.source_url && req.verified_at && (
-            <div style={{ fontFamily: font.mono, fontSize: 12, opacity: 0.55, marginTop: 4 }}>
-              Source:{" "}
-              <a href={req.source_url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "underline" }}>
-                {(() => { try { return new URL(req.source_url).hostname.replace(/^www\./, ""); } catch { return "official page"; } })()}
-              </a>
-              {" · last verified "}
-              {new Date(req.verified_at + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-            </div>
-          )}
-        </div>
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span
-              style={{
-                fontFamily: font.mono,
-                fontSize: 12,
-                color: tokens.navy,
-                background: tokens.sky,
-                padding: "3px 8px",
-                borderRadius: 6,
-              }}
-            >
-              DUE {req.deadline_description}
-            </span>
-            {req.category === "REQUIRED FORM" && (
-              <span style={{ fontFamily: font.body, fontSize: 12, color: tokens.stamp, fontWeight: 600 }}>
-                Submit it as shown in the "Submission" step
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            {req.submission_link && !NO_LINK_CATEGORIES.has(req.category) && (
-              <a
-                href={req.submission_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  fontFamily: font.body,
-                  fontSize: 13.5,
-                  fontWeight: 600,
-                  color: "#fff",
-                  background: tokens.primary,
-                  textDecoration: "none",
-                  flexShrink: 0,
-                  whiteSpace: "nowrap",
-                }}
-                className="rounded-full px-3.5 py-1.5 hover:opacity-90 transition"
-              >
-                Go here →
-              </a>
-            )}
-            <button
-              onClick={onToggle}
-              className="rounded-full flex items-center gap-1.5 flex-shrink-0 transition-all duration-200"
-              style={{
-                padding: "5px 12px 5px 6px",
-                border: `2px solid ${checked ? tokens.green : tokens.line}`,
-                background: checked ? tokens.green : "#fff",
-                boxShadow: checked ? `0 0 0 4px rgba(47,111,237,0.18)` : "none",
-              }}
-            >
-              <span
-                className="rounded-full flex items-center justify-center flex-shrink-0"
-                style={{
-                  width: 18,
-                  height: 18,
-                  background: checked ? "#fff" : tokens.paper,
-                  border: checked ? "none" : `1.5px solid ${tokens.line}`,
-                }}
-              >
-                {checked && <span style={{ color: tokens.green, fontSize: 12.5, fontWeight: 900 }}>✓</span>}
-              </span>
-              <span
-                style={{
-                  fontFamily: font.body,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: checked ? "#fff" : tokens.ink,
-                }}
-              >
-                {checked ? "Done" : "Mark as done"}
-              </span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RequirementGroup({ title, items, statusMap, onToggle, defaultOpen }) {
-  const [open, setOpen] = useState(defaultOpen);
-  const [expanded, setExpanded] = useState(false);
-  const doneCount = items.filter((r) => statusMap[r.id]).length;
-
-  if (items.length === 0) return null;
-  const visible = expanded ? items : items.slice(0, 3);
-
-  return (
-    <div className="mb-4">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="flex items-center justify-between w-full py-2"
-      >
-        <span style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, color: tokens.navy }}>
-          {title} ({doneCount}/{items.length})
-        </span>
-        <span style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink, color: tokens.muted }}>
-          {open ? "Hide" : "Show"}
-        </span>
-      </button>
-      {open && visible.map((r) => (
-        <RequirementItem key={r.id} req={r} checked={!!statusMap[r.id]} onToggle={() => onToggle(r.id)} />
-      ))}
-      {open && items.length > 3 && (
-        <button onClick={() => setExpanded((e) => !e)} style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy, background: "none", border: "none", padding: "4px 0", cursor: "pointer", textDecoration: "underline" }}>
-          {expanded ? "Show less" : `Show ${items.length - 3} more`}
-        </button>
-      )}
-    </div>
-  );
-}
 
 function UnlockTripCard({ trip }) {
   const [busy, setBusy] = useState(false);
@@ -1267,11 +1076,14 @@ export function DashboardTab({ userId, onOpenTrips }) {
       }
       const { data: reqs } = await supabase.rpc("get_trip_requirements", { p_trip_id: current.id, p_trip_types: tripTypeForRoute(current.origin, current.destination) === "international" ? ["international", "domestic"] : ["domestic"] });
       const { data: statusRows } = await supabase.from("trip_requirement_status").select("*").eq("trip_id", current.id);
-      const doneIds = new Set((statusRows || []).filter((s) => s.completed).map((s) => s.requirement_id));
+      const doneMap = {};
+      (statusRows || []).forEach((s) => { if (s.completed) doneMap[s.requirement_id] = true; });
       const seen = new Set(list.map((a) => a.label.toLowerCase()));
-      for (const r of (reqs || []).filter((x) => x.status === "attention" && !doneIds.has(x.id))) {
-        if (seen.has((r.title || "").toLowerCase())) continue;
-        list.push({ key: `req-${r.id}`, label: r.title, hint: "Checklist" });
+      const grouped = groupCards(buildPassCards(reqs || [], current), doneMap);
+      for (const card of [...grouped.first, ...grouped.confirm]) {
+        if (seen.has(card.shortTitle.toLowerCase())) continue;
+        seen.add(card.shortTitle.toLowerCase());
+        list.push({ key: `card-${card.id}`, label: card.shortTitle, hint: "Checklist" });
       }
     }
     setActions(list); setLoading(false);
@@ -1382,19 +1194,25 @@ function CurrentFlightTab({ userId }) {
     setLoading(false);
   }
 
-  async function handleToggle(requirementId) {
-    const newValue = !statusMap[requirementId];
-    setStatusMap((m) => ({ ...m, [requirementId]: newValue }));
-
-    await supabase.from("trip_requirement_status").upsert(
-      {
-        user_id: userId,
-        trip_id: trip.id,
-        requirement_id: requirementId,
-        completed: newValue,
-      },
+  async function handleSetDone(requirementIds, completed) {
+    const ids = (requirementIds || []).filter((id) => /^[0-9a-f-]{36}$/i.test(String(id || "")));
+    setStatusMap((m) => {
+      const next = { ...m };
+      (requirementIds || []).forEach((id) => { next[id] = completed; });
+      return next;
+    });
+    if (!ids.length || !trip?.id) return;
+    await Promise.all(ids.map((requirementId) => supabase.from("trip_requirement_status").upsert(
+      { user_id: userId, trip_id: trip.id, requirement_id: requirementId, completed },
       { onConflict: "trip_id,requirement_id" }
-    );
+    )));
+  }
+
+  async function saveReturn(patch) {
+    const { error } = await supabase.from("trips").update(patch).eq("id", trip.id);
+    if (error) return error.message || "Couldn't save the return. Try again.";
+    setTrip((t) => ({ ...t, ...patch }));
+    return "";
   }
 
   if (loading) {
@@ -1421,47 +1239,49 @@ function CurrentFlightTab({ userId }) {
     );
   }
 
-  const actionItems = results.filter((r) => r.status === "attention");
-  const showTrack = trip.paid && /service|psychiatric/i.test(trip.role || "");
-  const verifyItems = results.filter((r) => r.status === "verify");
-  const goodToKnow = results.filter((r) => r.status === "complete");
-
+  const passCards = buildPassCards(results, trip);
+  const passGroups = groupCards(passCards, statusMap);
+  const actionItems = [...passGroups.first, ...passGroups.confirm];
   const tripPet = petForTrip;
-  const trackedTotal = actionItems.length + verifyItems.length;
-  const trackedDone = [...actionItems, ...verifyItems].filter((r) => statusMap[r.id]).length;
-  const progressPct = trackedTotal > 0 ? Math.round((trackedDone / trackedTotal) * 100) : 100;
+  const trackedTotal = actionItems.length + passGroups.done.length;
+  const trackedDone = passGroups.done.length;
+  const progressPct = trackedTotal > 0 ? Math.round((trackedDone / trackedTotal) * 100) : 0;
+  const serviceDogMismatch = trip.paid && isServiceRole(trip.role) && trip.animal_type && !/dog/i.test(trip.animal_type);
 
   if (trip.paid && isTravelDay(trip) && !showFull) {
-    return <DayOfMode trip={trip} pet={tripPet} actionItems={actionItems.filter((r) => !statusMap[r.id])} onShowFull={() => setShowFull(true)} />;
+    return <DayOfMode trip={trip} pet={tripPet} actionItems={passGroups.first.map((c) => ({ title: c.shortTitle }))} onShowFull={() => setShowFull(true)} />;
   }
 
   return (
     <div>
       {trip.paid && <TripCountdown trip={trip} pet={tripPet} done={trackedDone} total={trackedTotal} />}
       <div className="rounded-xl p-5 mb-4" style={{ background: tokens.navy }}>
-        <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold, letterSpacing: "0.1em" }} className="mb-1">
-          YOUR TRAVEL PASS
+        <div className="flex items-center gap-3 mb-3">
+          <div className="rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" style={{ width: 52, height: 52, background: tokens.gold, border: "2px solid #fff" }}>
+            {tripPet?.photo_url ? <SignedImg value={tripPet.photo_url} alt={tripPet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : <span style={{ fontSize: 26 }}>{/cat/i.test(trip.animal_type || tripPet?.animal_type || "") ? "🐈" : "🐕"}</span>}
+          </div>
+          <div className="min-w-0">
+            <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold, letterSpacing: "0.1em" }}>YOUR TRAVEL PASS</div>
+            <div style={{ fontFamily: font.display, fontSize: 20, color: "#fff", lineHeight: 1.2 }}>{tripPet?.name ? `${tripPet.name}’s trip` : "Your trip"}</div>
+          </div>
         </div>
-        <div style={{ fontFamily: font.display, fontSize: 20, color: "#fff" }} className="mb-1">
-          {trip.animal_type} · {trip.origin} → {trip.destination}
+        <div style={{ fontFamily: font.display, fontSize: 18, color: "#fff" }} className="mb-1">
+          {trip.origin} → {trip.destination}
         </div>
-        <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, opacity: 0.8 }} className="mb-3">
-          {trip.airline} · {trip.travel_date || "date pending"} · {trip.role}{isMexicoAirport(trip.destination) || isMexicoAirport(trip.origin) ? " · International (Mexico)" : ""}
+        <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, opacity: 0.9 }} className="mb-3">
+          {trip.airline} · {trip.travel_date || "date pending"}{trip.return_date ? ` · back ${fmtTripDate(trip.return_date)}` : ""} · {isServiceRole(trip.role) ? (serviceDogMismatch ? trip.role : trip.service_kind === "psd" ? "PSD (service dog)" : "Service dog") : trip.role}{isMexicoAirport(trip.destination) || isMexicoAirport(trip.origin) ? " · International (Mexico)" : ""}
         </div>
-        <div className="flex items-center justify-between mb-1.5">
-          <span style={{ fontFamily: font.mono, fontSize: 12, color: tokens.sky, opacity: 0.7, letterSpacing: "0.08em" }}>
-            TRIP READINESS
-          </span>
-          <span style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold }}>
-            {trackedDone}/{trackedTotal} DONE
-          </span>
-        </div>
-        <div className="w-full h-[6px] rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.15)" }}>
-          <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{ width: `${progressPct}%`, background: tokens.stamp }}
-          />
-        </div>
+        {trackedTotal > 0 && <>
+          <div className="flex items-center justify-between mb-1.5">
+            <span style={{ fontFamily: font.mono, fontSize: 12, color: tokens.sky, opacity: 0.7, letterSpacing: "0.08em" }}>TRIP READINESS</span>
+            <span style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold }}>{trackedDone}/{trackedTotal} DONE</span>
+          </div>
+          <div className="w-full h-[6px] rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.15)" }}>
+            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${progressPct}%`, background: progressPct >= 100 ? "#7DCEA0" : tokens.stamp }} />
+          </div>
+          {progressPct >= 100 && <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.gold }} className="mt-2">100% — you’re ready to fly.</div>}
+          {progressPct >= 50 && progressPct < 100 && <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.gold }} className="mt-2">50% milestone — halfway there.</div>}
+        </>}
       </div>
 
       {trip.paid && (
@@ -1474,14 +1294,14 @@ function CurrentFlightTab({ userId }) {
 
       {trip.paid && section === "overview" && (<>
         <LiveFlightCard trip={trip} />
-        {(actionItems.length + verifyItems.length) > 0 && (
+        {actionItems.length > 0 && (
           <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
             <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-1">Needs action</div>
             <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mb-3">Start here — the full list is under Checklist.</p>
-            <ul className="space-y-2">{[...actionItems, ...verifyItems].filter((r) => !statusMap[r.id]).slice(0, showAllActions ? undefined : 3).map((r) => (
-              <li key={r.id} className="rounded-xl px-4 py-3" style={{ background: tokens.paper, fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{r.title}</li>
+            <ul className="space-y-2">{actionItems.slice(0, showAllActions ? undefined : 3).map((r) => (
+              <li key={r.id} className="rounded-xl px-4 py-3" style={{ background: tokens.paper, fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{r.shortTitle}</li>
             ))}</ul>
-            {[...actionItems, ...verifyItems].filter((r) => !statusMap[r.id]).length > 3 && <button onClick={() => setShowAllActions((s) => !s)} style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy, background: "none", border: "none", padding: "8px 0 0", cursor: "pointer", textDecoration: "underline" }}>{showAllActions ? "Show less" : "Show more"}</button>}
+            {actionItems.length > 3 && <button onClick={() => setShowAllActions((s) => !s)} style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy, background: "none", border: "none", padding: "8px 0 0", cursor: "pointer", textDecoration: "underline" }}>{showAllActions ? "Show less" : "Show more"}</button>}
             <div className="mt-3"><button onClick={() => setSection("checklist")} className="rounded-full px-5 py-2.5" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600, border: "none", cursor: "pointer" }}>Open the checklist →</button></div>
           </div>
         )}
@@ -1492,36 +1312,30 @@ function CurrentFlightTab({ userId }) {
         <TripExtras trip={trip} pet={tripPet} />
         <PetReliefCard airportLabel={trip.origin} />
         <PetReliefCard airportLabel={trip.destination} title="When you land: pet relief" />
-        {showTrack && <ServiceAnimalTrack trip={trip} />}
         <DocCheck trip={trip} />
       </>)}
       {trip.paid && section === "reminders" && <TripTimeline trip={trip} requirements={results} statusMap={statusMap} />}
-      {trip.paid && section === "checklist" && <VetGuidance trip={trip} requirements={results} paid={!!trip.paid} />}
+      {trip.paid && section === "checklist" && <VetGuidance trip={trip} requirements={[...results, ...passCards.filter((c) => String(c.id).startsWith("syn:"))]} paid={!!trip.paid} />}
 
       {!trip.paid ? (
         <UnlockTripCard trip={trip} />
-      ) : section !== "checklist" ? null : results.length === 0 ? (
-        <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 15, opacity: 0.7 }}>
-          No requirements found for this exact combination yet.
-        </div>
-      ) : (
+      ) : section !== "checklist" ? null : (
         <>
-          {trackedTotal > 0 && trackedDone === trackedTotal && (
-            <div
-              className="rounded-xl p-5 mb-4 text-center"
-              style={{ background: "#EAF6EE", border: `1.5px solid ${tokens.green}` }}
-            >
-              <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.green }} className="mb-1">
-                🎉 You're all set for this trip
-              </div>
-              <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, opacity: 0.75 }}>
-                Everything that needed action or verification is checked off. Review "Good to know" below before you fly.
-              </div>
+          {serviceDogMismatch && (
+            <div className="rounded-2xl p-4 mb-4" style={{ background: "#FFF7F2", border: `1px solid ${tokens.primary}` }}>
+              <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-1">U.S. service animals are dogs</div>
+              <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }} className="mb-3">A psychiatric service dog (PSD) is a service dog. Cats and other animals, and emotional support animals, fly as pets: carrier plus the airline’s pet fee. Since 2021, airlines don’t treat an ESA as a service animal.</p>
+              <button type="button" onClick={async () => { await supabase.from("trips").update({ role: "Pet", service_kind: null }).eq("id", trip.id); setTrip((t) => ({ ...t, role: "Pet", service_kind: null })); }} className="rounded-full px-5 py-3" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, border: "none", cursor: "pointer" }}>Switch this trip to the pet path</button>
             </div>
           )}
-          <RequirementGroup title="Needs action" items={actionItems} statusMap={statusMap} onToggle={handleToggle} defaultOpen={true} />
-          <RequirementGroup title="Needs verification" items={verifyItems} statusMap={statusMap} onToggle={handleToggle} defaultOpen={false} />
-          <RequirementGroup title="Good to know" items={goodToKnow} statusMap={statusMap} onToggle={handleToggle} defaultOpen={false} />
+          <RoundTripAddon trip={trip} onSave={saveReturn} />
+          {passCards.length === 0 ? (
+            <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 15, opacity: 0.7 }}>
+              No requirements found for this exact combination yet.
+            </div>
+          ) : (
+            <PassChecklist trip={trip} requirements={results} statusMap={statusMap} onSetDone={handleSetDone} />
+          )}
         </>
       )}
     </div>
@@ -1600,7 +1414,7 @@ function CheckoutBanner() {
 
 function PostTripFeedback() {
   const [trip, setTrip] = useState(null);
-  useEffect(() => { const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" }); supabase.from("trips").select("id,origin,destination,travel_date").eq("paid", true).lt("travel_date", today).order("travel_date", { ascending: false }).limit(1).then(({ data }) => setTrip(data?.[0] || null)); }, []);
+  useEffect(() => { const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" }); supabase.from("trips").select("id,origin,destination,travel_date,return_date").eq("paid", true).lt("travel_date", today).order("travel_date", { ascending: false }).limit(1).then(async ({ data, error }) => { let row = data?.[0]; if (error) { const again = await supabase.from("trips").select("id,origin,destination,travel_date").eq("paid", true).lt("travel_date", today).order("travel_date", { ascending: false }).limit(1); row = again.data?.[0]; } if (row && (!row.return_date || row.return_date < today)) setTrip(row); }); }, []);
   if (!trip) return null;
   return <FeedbackPrompt kind="post_trip" tripId={trip.id} refKey={trip.id} title="How was the trip?" blurb={`Tell us how ${trip.origin} → ${trip.destination} went. Private to PetPassGo.`} />;
 }

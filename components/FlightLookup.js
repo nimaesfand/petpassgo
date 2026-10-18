@@ -42,6 +42,9 @@ export function FlightSummary({ f }) {
   return (
     <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>
       <div style={{ fontWeight: 700, color: tokens.navy }}>{f.airline || ""} {f.flight_iata} · {f.flight_status || "scheduled"}{delay ? ` · delayed ${delay} min` : ""}</div>
+      {(f.codeshare?.airline_name || f.codeshare?.airline_iata) && (
+        <div style={{ fontWeight: 700, color: tokens.primary }}>Operated by {f.codeshare.airline_name || f.codeshare.airline_iata}{f.codeshare.flight_iata ? ` · ${f.codeshare.flight_iata}` : ""}</div>
+      )}
       <div>{f.departure?.iata} {f.departure?.airport || ""} → {f.arrival?.iata} {f.arrival?.airport || ""}</div>
       <div style={{ color: tokens.muted }}>Departs {fmtTime(f.departure?.estimated || f.departure?.scheduled, f.departure?.timezone)}{f.departure?.terminal ? ` · Terminal ${f.departure.terminal}` : ""}{f.departure?.gate ? ` · Gate ${f.departure.gate}` : ""}</div>
       <div style={{ color: tokens.muted }}>Arrives {fmtTime(f.arrival?.estimated || f.arrival?.scheduled, f.arrival?.timezone)}{f.arrival?.terminal ? ` · Terminal ${f.arrival.terminal}` : ""}{f.arrival?.gate ? ` · Gate ${f.arrival.gate}` : ""}</div>
@@ -49,7 +52,7 @@ export function FlightSummary({ f }) {
   );
 }
 
-export default function FlightLookup({ date, onFill }) {
+export default function FlightLookup({ date, onFill, mode = "outbound" }) {
   const [flight, setFlight] = useState("");
   const [day, setDay] = useState(date || "");
   const [busy, setBusy] = useState(false);
@@ -58,21 +61,27 @@ export default function FlightLookup({ date, onFill }) {
   const [hidden, setHidden] = useState(false);
   async function go() {
     if (!flight.trim()) return;
+    const lookupDate = day || date || "";
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(lookupDate)) {
+      setMsg("Pick the flight date first. We won't assume today or fill in your travel date.");
+      return;
+    }
     setBusy(true); setMsg(""); setResult(null);
     try {
-      const j = await lookupFlight(flight, day || date);
+      const j = await lookupFlight(flight, lookupDate);
       if (j.configured === false) { setHidden(true); return; }
-      if (!j.found || !j.flight) { setMsg("We couldn't find that flight — double-check the number and date, or just enter your route manually below. Nothing is lost."); return; }
-      setResult(j.flight);
-      onFill && onFill(j.flight);
+      if (!j.found || !j.flight) { setMsg(j.error || "We couldn't find that flight — double-check the number and date, or just enter your route manually below. Nothing is lost."); return; }
+      const filled = { ...j.flight, date_was_requested: true };
+      setResult(filled);
+      onFill && onFill(filled);
     } catch { setMsg("Flight lookup isn't responding — enter your route manually below."); }
     finally { setBusy(false); }
   }
   if (hidden) return null;
   return (
     <div className="rounded-xl p-4 mb-4" style={{ background: tokens.sky, border: `1px solid ${tokens.line}` }}>
-      <div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy, fontSize: 15 }}>✈️ Have a flight number? Skip the typing</div>
-      <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mb-3">We’ll fill in your airports, airline and times. Manual entry always works too.</p>
+      <div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy, fontSize: 15 }}>{mode === "return" ? "Optional return flight" : "Have a flight number? Skip the typing"}</div>
+      <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mb-3">{mode === "return" ? "Add a return flight number only if you want. Pick the return date first — we never assume today." : "Pick the date, then we’ll fill in your airports and airline. If you skip the date, nothing is set to today."}</p>
       <div className="flex flex-wrap gap-2">
         <input value={flight} onChange={(e) => setFlight(e.target.value)} placeholder="Flight # e.g. UA1234" aria-label="Flight number" style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }} className="rounded-xl px-3 py-2.5 outline-none flex-1 min-w-[150px]" />
         <input type="date" value={day} onChange={(e) => setDay(e.target.value)} aria-label="Flight date" style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }} className="rounded-xl px-3 py-2.5 outline-none" />
@@ -92,9 +101,13 @@ export function LiveFlightCard({ trip }) {
   const [hidden, setHidden] = useState(false);
   async function load(no) {
     const f = (no || flightNo || "").trim(); if (!f) return;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(trip?.travel_date || "")) {
+      setNote("Add your travel date before looking up this flight. We won’t use today.");
+      return;
+    }
     setBusy(true); setNote("");
     try {
-      const j = await lookupFlight(f, trip?.travel_date, trip?.id);
+      const j = await lookupFlight(f, trip.travel_date, trip?.id);
       if (j.configured === false) { setHidden(true); return; }
       if (j.found && j.flight) { setData(j.flight); setNote(j.cached ? `Last checked ${fmtTime(j.fetched_at)} — updates at most every 15 minutes on travel day.` : "Flight details updated just now."); }
       else setNote("We couldn't find live details for that flight yet — your saved trip is unchanged. Try again closer to departure.");

@@ -16,7 +16,13 @@ export async function GET(req) {
 
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
   const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
-  const { data: trips, error } = await sb.from("trips").select("id,user_id,airline,role,origin,destination,travel_date,paid").eq("paid", true).gte("travel_date", today);
+  let { data: trips, error } = await sb.from("trips").select("id,user_id,airline,role,origin,destination,travel_date,return_date,paid").eq("paid", true).or(`travel_date.gte.${today},return_date.gte.${today}`);
+  if (error) {
+    // Before the return_date column exists, keep sending outbound reminders.
+    const fallback = await sb.from("trips").select("id,user_id,airline,role,origin,destination,travel_date,paid").eq("paid", true).gte("travel_date", today);
+    trips = fallback.data;
+    error = fallback.error;
+  }
   if (error) return NextResponse.json({ error: "Query failed" }, { status: 500 });
 
   let sent = 0;
@@ -33,7 +39,7 @@ export async function GET(req) {
         body: JSON.stringify({
           from: process.env.REMINDER_FROM_EMAIL, to,
           subject: `PetPassGo: ${it.title}`,
-          text: `${it.title} (${fmt(it.date)})\n\n${flightPhrase(daysUntil(trip.travel_date, today)) || "Your flight"} — ${it.body}\n\nYour flight: ${trip.origin} → ${trip.destination}, ${fmt(trip.travel_date)}.\nOpen your checklist: ${SITE_URL}/account`,
+          text: `${it.title} (${fmt(it.date)})\n\n${flightPhrase(daysUntil(it.leg === "return" ? trip.return_date : trip.travel_date, today)) || "Your flight"} — ${it.body}\n\nYour flight: ${trip.origin} → ${trip.destination}, ${fmt(trip.travel_date)}.${trip.return_date ? `\nReturn: ${fmt(trip.return_date)}.` : ""}\nOpen your checklist: ${SITE_URL}/account`,
         }),
       });
       if (r.ok) { sent++; await sb.from("trip_reminders").update({ sent_at: new Date().toISOString() }).eq("trip_id", trip.id).eq("kind", it.kind); }

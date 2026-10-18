@@ -280,6 +280,15 @@ export function CargoTempCheck({ x, trip, name }) {
       <div style={body}>Service animals travel in the cabin with you, so checked-pet and cargo temperature limits don’t apply to this trip. The hot/cold comfort tips above still help.</div>
     </div>
   );
+  if (!policy && /united/i.test(airline)) return (
+    <div className="mt-3 rounded-lg p-3" style={box}>
+      <div style={head}>🌡️ Temperature check — done for you</div>
+      <div style={body}>United no longer lets general travelers check pets through PetSafe. Cats and dogs fly in the cabin, so checked-pet temperature limits don’t apply. Cargo is only for certain active-duty military and State Department travelers.</div>
+      <div style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.muted, marginTop: 6 }}>
+        Source: <a href="https://www.united.com/en/us/fly/travel/traveling-with-pets.html" target="_blank" rel="noopener noreferrer" style={{ color: tokens.primary }}>United (official site)</a>. This note is United-only.
+      </div>
+    </div>
+  );
   if (!policy) return (
     <div className="mt-3 rounded-lg p-3" style={box}>
       <div style={head}>🌡️ Temperature check — done for you</div>

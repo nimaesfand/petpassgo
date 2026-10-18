@@ -31,7 +31,7 @@ async function fill(url, values, filename) {
   setTimeout(() => URL.revokeObjectURL(a.href), 5000);
 }
 
-export default function ServiceAnimalTrack({ trip }) {
+export default function ServiceAnimalTrack({ trip, embedded = false }) {
   const [pet, setPet] = useState(null);
   const [email, setEmail] = useState("");
   const [extra, setExtra] = useState({ handler: "", phone: "", rabiesExp: "", hours: "" });
@@ -84,15 +84,15 @@ export default function ServiceAnimalTrack({ trip }) {
 
   const input = { border: "1px solid #E5E0D5", borderRadius: 8, padding: "6px 10px", fontSize: 14.5, width: "100%" };
   return (
-    <div className="rounded-xl p-4 mb-4" style={{ background: "#fff", border: `1.5px solid ${tokens.navy}` }}>
-      <div style={{ fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 12, letterSpacing: "0.1em", color: tokens.green }} className="mb-1">SERVICE ANIMAL TRACK</div>
-      {deadline && (
+    <div className={embedded ? "" : "rounded-xl p-4 mb-4"} style={embedded ? undefined : { background: "#fff", border: `1.5px solid ${tokens.navy}` }}>
+      {!embedded && <div style={{ fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 12, letterSpacing: "0.1em", color: tokens.green }} className="mb-1">SERVICE ANIMAL TRACK</div>}
+      {!embedded && deadline && (
         <div style={{ fontSize: 15.5, fontWeight: 700 }} className="mb-1">
           Submit your DOT form to {trip.airline || "your airline"} by {fmt(deadline)}{left === 0 ? " (due today)" : left > 0 ? ` (${left} day${left === 1 ? "" : "s"} left)` : " (deadline passed — contact your airline)"}
         </div>
       )}
       <div style={{ fontSize: 14, opacity: 0.7 }} className="mb-3">
-        US airlines may require the official DOT forms up to 48 hours before departure (if you booked more than 48 hours ahead). We pre-fill what we know. Review every field, check each attestation box yourself, then sign and date. Only you can make these attestations.
+        {embedded ? "We pre-fill the official DOT PDF with what we know. Review every field, check each attestation box yourself, then sign and date. PetPassGo will not attest for you." : "US airlines may require the official DOT forms up to 48 hours before departure if you booked more than 48 hours ahead. We pre-fill what we know. Review every field, check each attestation box yourself, then sign and date. Only you can make these attestations. You do not need a separate letter or certificate."}
       </div>
       <div className="grid gap-2 mb-3" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))" }}>
         <label style={{ fontSize: 13.5 }}>Handler full name<input style={input} value={extra.handler} onChange={set("handler")} /></label>

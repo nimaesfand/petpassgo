@@ -29,7 +29,7 @@ export default function TravelPassPage() {
           <div className="rounded-3xl p-7 flex flex-col" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
             <div style={{ fontFamily: font.mono, fontSize: 11.5, color: tokens.primary, letterSpacing: "0.1em" }}>TRAVEL PASS ONLY</div>
             <div style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700, color: tokens.navy }} className="mt-1">{P.pass} <span style={{ fontSize: 15, fontWeight: 500, color: tokens.muted }}>per trip</span></div>
-            <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="flex-1 mt-1">Full checklist, deadlines, official sources and reminders for one trip. Pet ID &amp; vault stay open until 7 days after your travel date.</p>
+            <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="flex-1 mt-1">Full checklist, deadlines, official sources and reminders for one trip. Pet ID &amp; vault stay open until 7 days after your travel date, or 7 days after your return if you add one.</p>
             <a href="/assessment?plan=pass" className="btn-primary rounded-full px-6 py-3.5 text-center min-h-[48px] mt-5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Choose Travel Pass only — {P.pass}</a>
           </div>
         </div>

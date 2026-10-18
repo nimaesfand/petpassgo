@@ -8,7 +8,7 @@ import { tripTypeForRoute, isMexicoAirport } from "../../lib/airports";
 import AirportField from "../../components/AirportField";
 import FlightLookup, { airportLabel, airlinePickerName } from "../../components/FlightLookup";
 import { SampleTravelPass } from "../../components/SalesSamples";
-import { tripAccessCopy } from "../../lib/tripAccess";
+import { tripAccessCopy, fmtTripDate } from "../../lib/tripAccess";
 import { trackEvent, trackBeginCheckout, getAttribution } from "../../lib/analytics";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
@@ -272,6 +272,12 @@ export default function PetPassGoQuiz() {
     airline: "",
     flight_number: "",
     flight_snapshot: null,
+    round_trip: false,
+    return_date: "",
+    return_flight_number: "",
+    return_flight_snapshot: null,
+    psd: false,
+    esa: false,
   });
   const [results, setResults] = useState([]);
   const [loadingResults, setLoadingResults] = useState(false);
@@ -315,7 +321,7 @@ export default function PetPassGoQuiz() {
       return;
     }
 
-    const { data: trip, error } = await supabase.from("trips").insert({
+    const baseTrip = {
       user_id: data.user.id,
       origin: answers.origin,
       destination: answers.destination,
@@ -326,7 +332,21 @@ export default function PetPassGoQuiz() {
       animal_type: answers.animal,
       role: answers.role,
       status: "ready",
-    }).select("id").single();
+    };
+    // New columns are optional. One-way trips omit them so a trip still saves
+    // if the return-date migration has not been applied yet.
+    const extras = {};
+    if (answers.round_trip && answers.return_date) {
+      extras.return_date = answers.return_date;
+      extras.return_flight_number = answers.return_flight_number || null;
+      extras.return_flight_snapshot = answers.return_flight_snapshot || null;
+    }
+    if (answers.role === "Service animal" && answers.psd) extras.service_kind = "psd";
+    let { data: trip, error } = await supabase.from("trips").insert({ ...baseTrip, ...extras }).select("id").single();
+    if (error && Object.keys(extras).length) {
+      ({ data: trip, error } = await supabase.from("trips").insert(baseTrip).select("id").single());
+      if (!error) alert("Your trip was saved as a one-way trip. The return date can be added from your pass once the account update is in place.");
+    }
     if (error || !trip) { alert("Sorry, something went wrong saving your trip. Please try again."); return; }
 
     // Payment happens on Stripe; only the Stripe webhook can mark the trip paid.
@@ -451,16 +471,36 @@ export default function PetPassGoQuiz() {
           {step === 1 && (
             <>
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
-                Pet, or service animal?
+                Pet, service dog, or ESA?
               </h2>
               <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-5">
-                Service animals follow a different set of requirements than pets flying for companionship.
+                A psychiatric service dog (PSD) is a service dog. An emotional support animal is not.
               </p>
               <div className="flex flex-col gap-3">
-                <OptionCard label="Pet" sub="Traveling for companionship, not task-trained" selected={answers.role === "Pet"} onClick={() => set("role", "Pet")} />
-                <OptionCard label="Service animal" sub="Trained to perform tasks for a disability" selected={answers.role === "Service animal"} onClick={() => set("role", "Service animal")} />
+                <OptionCard label="Pet" sub="Traveling for companionship, not task-trained" selected={answers.role === "Pet" && !answers.esa} onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: false, psd: false }))} />
+                <OptionCard label="Service dog" sub="Task-trained dog, including a psychiatric service dog (PSD)" selected={answers.role === "Service animal"} onClick={() => setAnswers((a) => ({ ...a, role: "Service animal", esa: false }))} />
+                <OptionCard label="Emotional support animal" sub="Flies as a pet since 2021 — carrier and the airline pet fee" selected={answers.role === "Pet" && answers.esa} onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: true, psd: false }))} />
               </div>
-              <NavRow onBack={back} onNext={next} nextDisabled={!answers.role} />
+              {answers.esa && (
+                <div className="rounded-xl p-4 mt-4" style={{ background: tokens.sky }}>
+                  <div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>Your ESA flies as a pet</div>
+                  <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, lineHeight: 1.45 }} className="mt-1">Since 2021, U.S. airlines don’t treat emotional support animals as service animals. You’ll follow the pet path: a carrier under the seat and the airline’s pet fee. No DOT service-animal form.</p>
+                </div>
+              )}
+              {answers.role === "Service animal" && answers.animal === "Dog" && (
+                <label className="flex items-start gap-3 mt-4 rounded-xl p-4" style={{ background: tokens.sky, cursor: "pointer" }}>
+                  <input type="checkbox" checked={!!answers.psd} onChange={(e) => set("psd", e.target.checked)} className="mt-1" />
+                  <span style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}><b>This is a PSD.</b> A psychiatric service dog is a service dog trained to do work for a psychiatric disability. Same DOT form as any service dog. Not an ESA, and not a letter you buy.</span>
+                </label>
+              )}
+              {answers.role === "Service animal" && answers.animal && answers.animal !== "Dog" && (
+                <div className="rounded-xl p-4 mt-4" style={{ background: "#FFF7F2", border: `1px solid ${tokens.primary}` }}>
+                  <div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>U.S. airlines only recognize dogs as service animals</div>
+                  <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, lineHeight: 1.45 }} className="mt-1 mb-3">A cat or other animal can’t fly as a service animal. They fly as pets (carrier and pet fee). You can switch to the pet path and keep going, or go back and choose Dog.</p>
+                  <button type="button" onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: false, psd: false }))} className="rounded-full px-5 py-3" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, border: "none", cursor: "pointer" }}>Switch to the pet path</button>
+                </div>
+              )}
+              <NavRow onBack={back} onNext={next} nextDisabled={!answers.role || (answers.role === "Service animal" && answers.animal !== "Dog")} />
             </>
           )}
 
@@ -472,7 +512,7 @@ export default function PetPassGoQuiz() {
               <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-5">
                 City or airport code is fine.
               </p>
-              <FlightLookup date={answers.date} onFill={(f) => setAnswers((a) => ({ ...a, flight_number: f.flight_iata || a.flight_number, flight_snapshot: f, origin: airportLabel(f.departure?.iata, f.departure?.airport) || a.origin, destination: airportLabel(f.arrival?.iata, f.arrival?.airport) || a.destination, airline: airlinePickerName(f.airline) || a.airline, date: a.date || f.flight_date || a.date }))} />
+              <FlightLookup date={answers.date} onFill={(f) => setAnswers((a) => ({ ...a, flight_number: f.flight_iata || a.flight_number, flight_snapshot: f, origin: airportLabel(f.departure?.iata, f.departure?.airport) || a.origin, destination: airportLabel(f.arrival?.iata, f.arrival?.airport) || a.destination, airline: airlinePickerName(f.airline) || a.airline, date: f.date_was_requested ? (f.flight_date || a.date) : a.date }))} />
               <div className="flex flex-col gap-3" style={{ position: "relative", zIndex: 1 }}>
                 <AirportField key={`o-${answers.origin}`} label="Departing from (type a city)" value={answers.origin} onSelect={(v) => set("origin", v)} />
                 <AirportField key={`d-${answers.destination}`} label="Flying to (type a city)" value={answers.destination} onSelect={(v) => set("destination", v)} />
@@ -486,13 +526,19 @@ export default function PetPassGoQuiz() {
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
                 When are you traveling?
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-5">
-                Deadlines for forms and health certificates are counted back from this date.
+              <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-4">
+                One way is the normal trip: from, to, and one date. Round trip is optional — tap it only if you’re flying back.
               </p>
+              <div className="flex gap-2 mb-4">
+                <button type="button" onClick={() => setAnswers((a) => ({ ...a, round_trip: false, return_date: "", return_flight_number: "", return_flight_snapshot: null }))} className="rounded-full px-4 py-2.5" style={{ fontFamily: font.body, fontWeight: 700, background: !answers.round_trip ? tokens.navy : "#fff", color: !answers.round_trip ? "#fff" : tokens.navy, border: `2px solid ${tokens.navy}`, cursor: "pointer" }}>One way</button>
+                <button type="button" onClick={() => set("round_trip", true)} className="rounded-full px-4 py-2.5" style={{ fontFamily: font.body, fontWeight: 700, background: answers.round_trip ? tokens.navy : "#fff", color: answers.round_trip ? "#fff" : tokens.navy, border: `2px solid ${tokens.navy}`, cursor: "pointer" }}>Round trip</button>
+              </div>
+              <label style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.navy }}>Depart</label>
               <input
                 type="date"
                 value={answers.date}
                 onChange={(e) => set("date", e.target.value)}
+                aria-label="Departure date"
                 style={{
                   fontFamily: font.body,
                   border: `2px solid ${tokens.line}`,
@@ -503,9 +549,19 @@ export default function PetPassGoQuiz() {
                   WebkitAppearance: "none",
                   appearance: "none",
                 }}
-                className="rounded-xl px-4 outline-none w-full"
+                className="rounded-xl px-4 outline-none w-full mt-1"
               />
-              <NavRow onBack={back} onNext={next} nextDisabled={!answers.date} />
+              {answers.round_trip && (
+                <div className="mt-4">
+                  <label style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.navy }}>Return date</label>
+                  <input type="date" value={answers.return_date} min={answers.date || undefined} onChange={(e) => set("return_date", e.target.value)} aria-label="Return date" className="rounded-xl px-4 outline-none w-full mt-1" style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, height: 52 }} />
+                  <div className="mt-3">
+                    <FlightLookup mode="return" date={answers.return_date} onFill={(f) => setAnswers((a) => ({ ...a, return_flight_number: f.flight_iata || a.return_flight_number, return_flight_snapshot: f, return_date: f.date_was_requested ? (f.flight_date || a.return_date) : a.return_date }))} />
+                  </div>
+                  {answers.return_date && <p style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>Back {fmtTripDate(answers.return_date)}</p>}
+                </div>
+              )}
+              <NavRow onBack={back} onNext={next} nextDisabled={!answers.date || (answers.round_trip && !answers.return_date)} />
             </>
           )}
 
@@ -536,7 +592,7 @@ export default function PetPassGoQuiz() {
                   {answers.animal} · {answers.origin || "—"} → {answers.destination || "—"}
                 </h2>
                 <div style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mt-1">
-                  {answers.airline} · {answers.date || "date pending"} · {answers.role}{isMexicoAirport(answers.destination) || isMexicoAirport(answers.origin) ? " · International (Mexico)" : ""}
+                  {answers.airline} · {answers.date || "date pending"}{answers.round_trip && answers.return_date ? ` · back ${fmtTripDate(answers.return_date)}` : ""} · {answers.role === "Service animal" ? (answers.psd ? "PSD (service dog)" : "Service dog") : answers.esa ? "ESA, flying as a pet" : answers.role}{isMexicoAirport(answers.destination) || isMexicoAirport(answers.origin) ? " · International (Mexico)" : ""}
                 </div>
               </div>
 
@@ -692,7 +748,7 @@ export default function PetPassGoQuiz() {
                       <div className="rounded-2xl p-5 flex flex-col" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
                         <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 12.5, letterSpacing: ".12em", color: tokens.primary }} className="mb-1 mt-1">THIS TRIP ONLY</div>
                         <div style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700, color: tokens.navy }}>{P.pass}</div>
-                        <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-4 flex-1">Full checklist, deadlines, sources and reminders. {tripAccessCopy(answers.date)}.{purchaseIntent === "pass" ? " (Your pick.)" : ""}</p>
+                        <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-4 flex-1">Full checklist, deadlines, sources and reminders. {tripAccessCopy(answers.date, answers.round_trip ? answers.return_date : null)}.{purchaseIntent === "pass" ? " (Your pick.)" : ""}</p>
                         <button onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3 hover:opacity-90 transition" style={{ background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, fontFamily: font.body, fontWeight: 600, fontSize: 15 }}>
                           Unlock your Travel Pass — {P.pass}
                         </button>
