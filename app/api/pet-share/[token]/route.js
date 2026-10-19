@@ -25,22 +25,27 @@ export async function GET(req, { params }) {
     if (!pet) return unavailable("This pet profile could not be found.");
     await admin.from("pet_share_cards").update({ last_viewed_at: new Date().toISOString(), view_count: (card.view_count || 0) + 1 }).eq("id", card.id);
 
-    const groups = [
+    const emergency = card.preset === "emergency";
+    const allGroups = [
       ["Medications", (records || []).filter((r) => r.kind === "medication")],
       ["Allergies", (records || []).filter((r) => r.kind === "allergy")],
       ["Vaccines", (records || []).filter((r) => r.kind === "vaccine")],
       ["Care notes", (records || []).filter((r) => r.kind === "note")],
     ];
+    // Emergency: meds/allergies first. Sitter: care notes (feeding, walks, quirks) first.
+    const groups = emergency ? allGroups : [allGroups[3], allGroups[0], allGroups[1], allGroups[2]];
     const groupHtml = groups.filter(([, rows]) => rows.length).map(([title, rows]) => `<section><h2>${title}</h2>${rows.map((r) => `<div class="row"><b>${esc(r.name)}</b><span>${esc([date(r.date_given), r.expires_on ? `expires ${date(r.expires_on)}` : "", r.clinic || ""].filter(Boolean).join(" · "))}</span>${r.notes ? `<small>${esc(r.notes)}</small>` : ""}</div>`).join("")}</section>`).join("");
-    const html = `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(pet.name)}'s PetPassGo share card</title><style>
+    const html = `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(pet.name)}'s Care Card</title><style>
       body{font-family:system-ui,-apple-system,sans-serif;background:#E8EEF7;color:#1F2A37;margin:0;padding:18px}main{max-width:640px;margin:0 auto;background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 10px 30px rgba(20,33,61,.12)}
       header{background:#14213D;color:#fff;padding:22px}h1{font-size:30px;margin:4px 0}h2{font-size:18px;color:#14213D;margin:20px 0 6px}.body{padding:6px 22px 24px}.muted{color:#718096;font-size:14px}.row{padding:9px 0;border-top:1px solid #E5EAF1;display:grid;gap:2px}.row span,.row small{color:#52606D;font-size:14px}.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:15px}.facts dt{color:#718096}.facts dd{margin:0;font-weight:600}img.pet{width:100%;max-height:320px;object-fit:cover}button{background:#C2410C;color:white;border:0;border-radius:999px;padding:12px 20px;font-weight:700;width:100%;margin-top:20px}@media print{button{display:none}body{background:#fff;padding:0}main{box-shadow:none}}
     </style></head><body><main>
-      <header><div style="letter-spacing:.14em;font-size:12px;color:#F2B84B;font-weight:700">PETPASSGO SHARE CARD</div><h1>${esc(pet.name)}</h1><div>${esc([pet.breed, pet.animal_type, pet.sex].filter(Boolean).join(" · "))}</div></header>
+      <header><div style="letter-spacing:.14em;font-size:12px;color:#F2B84B;font-weight:700">PETPASSGO CARE CARD · ${emergency ? "EMERGENCY" : "SITTER"}</div><h1>${esc(pet.name)}</h1><div>${esc([pet.breed, pet.animal_type, pet.sex].filter(Boolean).join(" · "))}</div></header>
       <img class="pet" src="/api/pet-photo/${esc(pet.id)}" alt="" onerror="this.remove()">
       <div class="body">
-        <p class="muted">Shared by the owner for a vet, sitter or groomer. This link expires ${esc(new Date(card.expires_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }))}. Health details are owner-entered and not verified by PetPassGo.</p>
+        <p class="muted">Shared by the owner as this pet's Care Card. This link expires ${esc(new Date(card.expires_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }))}. Health details are owner-entered and not verified by PetPassGo.</p>
+        ${emergency && (pet.emergency_contact_name || pet.emergency_contact_phone) ? `<p style="background:#FDE8E2;border-radius:12px;padding:12px"><b>Who to call:</b> ${esc([pet.emergency_contact_name, pet.emergency_contact_phone].filter(Boolean).join(" · "))}</p>` : ""}
         <dl class="facts">
+          ${pet.passport_no ? `<dt>Passport No.</dt><dd>${esc(pet.passport_no)}</dd>` : ""}
           <dt>Microchip</dt><dd>${last4(pet.microchip_number)}</dd>
           ${pet.vet_name || pet.vet_phone ? `<dt>Vet</dt><dd>${esc([pet.vet_name, pet.vet_phone].filter(Boolean).join(" · "))}</dd>` : ""}
           ${pet.emergency_contact_name || pet.emergency_contact_phone ? `<dt>Emergency</dt><dd>${esc([pet.emergency_contact_name, pet.emergency_contact_phone].filter(Boolean).join(" · "))}</dd>` : ""}

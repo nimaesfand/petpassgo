@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
 import { PUBLIC_ID_BASE } from "../lib/PetQr";
 import VetImport from "./VetImport";
+import { WhatsNeededNext, TravelStamps, FindAVet } from "./PetExtras";
 
 const AAHA = "https://www.aahanet.org/searching-for-the-microchip/";
 const input = { fontFamily: font.body, fontSize: 15.5, border: `2px solid ${tokens.line}`, borderRadius: 10, padding: "9px 12px", width: "100%", background: "#fff" };
@@ -145,6 +146,7 @@ export function WalletCard({ pet, onDone }) {
       c.fillStyle = "#F2B84B"; c.font = "700 25px system-ui"; c.fillText("PETPASSGO · DIGITAL PET ID", 42, 72);
       c.fillStyle = "#14213D"; c.font = "700 58px system-ui"; c.fillText(pet.name || "My pet", 42, 220);
       c.font = "30px system-ui"; c.fillStyle = "#52606D"; c.fillText([pet.breed, pet.animal_type].filter(Boolean).join(" · "), 42, 270);
+      if (pet.passport_no) { c.font = "700 24px system-ui"; c.fillStyle = "#14213D"; c.fillText(`Passport No. ${pet.passport_no}`, 42, 315); }
       c.font = "700 26px system-ui"; c.fillStyle = "#C2410C"; c.fillText("SCAN IF FOUND", 42, 350);
       c.font = "22px system-ui"; c.fillStyle = "#52606D"; c.fillText("Message the owner through PetPassGo.", 42, 390); c.fillText("No chip number or owner phone is shown.", 42, 425);
       const img = new Image(); await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = qr; }); c.drawImage(img, 590, 160, 260, 260);
@@ -155,17 +157,18 @@ export function WalletCard({ pet, onDone }) {
 }
 
 export function ShareCard({ pet, userId, onDone }) {
-  const [days, setDays] = useState(7); const [url, setUrl] = useState(""); const [err, setErr] = useState(""); const [busy, setBusy] = useState(false); const [links, setLinks] = useState([]);
-  async function load() { const { data } = await supabase.from("pet_share_cards").select("id,expires_at,revoked_at,created_at,view_count").eq("pet_id", pet.id).order("created_at", { ascending: false }).limit(5); setLinks(data || []); }
+  const [days, setDays] = useState(7); const [preset, setPreset] = useState("sitter"); const [url, setUrl] = useState(""); const [err, setErr] = useState(""); const [busy, setBusy] = useState(false); const [links, setLinks] = useState([]);
+  async function load() { const { data } = await supabase.from("pet_share_cards").select("id,expires_at,revoked_at,created_at,view_count,preset").eq("pet_id", pet.id).order("created_at", { ascending: false }).limit(5); setLinks(data || []); }
   useEffect(() => { load(); }, [pet.id]);
-  async function create() { setBusy(true); setErr(""); const { data: s } = await supabase.auth.getSession(); const r = await fetch("/api/pet-share", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id, days }) }); const j = await r.json().catch(() => ({})); if (r.ok && j.url) { setUrl(j.url); load(); onDone?.(); } else setErr(j.error || "Couldn't create the link."); setBusy(false); }
+  async function create() { setBusy(true); setErr(""); const { data: s } = await supabase.auth.getSession(); const r = await fetch("/api/pet-share", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id, days, preset }) }); const j = await r.json().catch(() => ({})); if (r.ok && j.url) { setUrl(j.url); load(); onDone?.(); } else setErr(j.error || "Couldn't create the link."); setBusy(false); }
   async function revoke(id) { await supabase.from("pet_share_cards").update({ revoked_at: new Date().toISOString() }).eq("id", id); load(); }
   const active = links.filter((l) => !l.revoked_at && new Date(l.expires_at) > new Date());
-  return <section id="share-card" style={section}><div style={h3}>🧑‍⚕️ Vet / sitter share card</div><p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">A private, expiring page with {pet.name}'s photo, chip last 4, vet, emergency contact and health records. It never shows the full chip number.</p>
+  return <section id="share-card" style={section}><div style={h3}>🧑‍⚕️ {pet.name}'s Care Card</div><p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">{preset === "emergency" ? "Meds, allergies, vet and who to call — first. For an emergency vet." : "Feeding, walks, meds, quirks, and who to call. Made for sitters and vets."} A private, expiring link; it never shows the full chip number.</p>
+    <div className="flex gap-2 mt-3" role="tablist" aria-label="Care Card type">{[["sitter", "🧑 Sitter"], ["emergency", "🚑 Emergency"]].map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={preset === k} onClick={() => setPreset(k)} className="rounded-full px-4 py-2" style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 700, background: preset === k ? tokens.navy : tokens.sky, color: preset === k ? "#fff" : tokens.navy, border: "none", cursor: "pointer" }}>{l}</button>)}</div>
     <div className="flex gap-2 items-center flex-wrap mt-3"><label style={label}>Expires in <select value={days} onChange={(e) => setDays(Number(e.target.value))} style={{ ...input, width: "auto", display: "inline-block", marginLeft: 6 }}><option value={1}>1 day</option><option value={7}>7 days</option><option value={30}>30 days</option></select></label><button disabled={busy} onClick={create} style={{ ...btn, background: tokens.stamp, color: "#fff" }}>{busy ? "Creating…" : "Create share link"}</button></div>
     {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-2">{err}</div>}
     {url && <div className="rounded-xl p-3 mt-3 flex gap-2 flex-wrap items-center" style={{ background: tokens.paper }}><input readOnly value={url} style={{ ...input, flex: 1, minWidth: 220 }} onFocus={(e) => e.target.select()} /><button onClick={() => navigator.clipboard?.writeText(url)} style={{ ...btn, background: tokens.navy, color: "#fff" }}>Copy</button><a href={url} target="_blank" rel="noopener noreferrer" style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, textDecoration: "none" }}>Open / PDF</a></div>}
-    {active.length > 0 && <div className="mt-3 space-y-1">{active.map((l) => <div key={l.id} className="flex justify-between gap-2" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}><span>Active until {fmtDate(String(l.expires_at).slice(0, 10))} · viewed {l.view_count || 0}×</span><button onClick={() => revoke(l.id)} style={{ color: tokens.stamp, fontWeight: 700 }}>Turn off</button></div>)}</div>}
+    {active.length > 0 && <div className="mt-3 space-y-1">{active.map((l) => <div key={l.id} className="flex justify-between gap-2" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}><span>{l.preset === "emergency" ? "Emergency" : "Sitter"} · active until {fmtDate(String(l.expires_at).slice(0, 10))} · viewed {l.view_count || 0}×</span><button onClick={() => revoke(l.id)} style={{ color: tokens.stamp, fontWeight: 700 }}>Turn off</button></div>)}</div>}
   </section>;
 }
 
@@ -222,9 +225,12 @@ export default function PetIdV2({ pet, userId, onChanged }) {
       </ol>
     </div>
     <ChipVault pet={pet} userId={userId} onChanged={onChanged} />
+    <WhatsNeededNext pet={pet} />
     <HealthPassport pet={pet} userId={userId} refreshKey={refresh} />
     <VetImport pet={pet} userId={userId} onSaved={() => { setRefresh((v) => v + 1); onChanged?.(); }} />
     <ShareCard pet={pet} userId={userId} onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
     <WalletCard pet={pet} onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
+    <TravelStamps pet={pet} />
+    <FindAVet pet={pet} />
   </div>;
 }
