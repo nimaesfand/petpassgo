@@ -14,6 +14,7 @@ export async function POST(req) {
     const body = await req.json().catch(() => ({}));
     const petId = String(body?.pet_id || "");
     const days = Math.min(30, Math.max(1, Number(body?.days) || 7));
+    const preset = body?.preset === "emergency" ? "emergency" : "sitter";
     if (!UUID.test(petId)) return NextResponse.json({ error: "Bad request" }, { status: 400 });
 
     const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, { auth: { persistSession: false } });
@@ -27,11 +28,11 @@ export async function POST(req) {
     const clear = `${randomBytes(24).toString("base64url")}${randomBytes(8).toString("hex")}`;
     const tokenHash = createHash("sha256").update(clear).digest("hex");
     const expiresAt = new Date(Date.now() + days * 86400_000).toISOString();
-    const { error } = await admin.from("pet_share_cards").insert({ pet_id: petId, user_id: u.user.id, token_hash: tokenHash, expires_at: expiresAt });
+    const { error } = await admin.from("pet_share_cards").insert({ pet_id: petId, user_id: u.user.id, token_hash: tokenHash, expires_at: expiresAt, preset });
     if (error) throw error;
     const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
     const proto = req.headers.get("x-forwarded-proto") || "https";
-    return NextResponse.json({ url: `${proto}://${host}/api/pet-share/${clear}`, expires_at: expiresAt });
+    return NextResponse.json({ url: `${proto}://${host}/api/pet-share/${clear}`, expires_at: expiresAt, preset });
   } catch (e) {
     console.error("pet-share create", e?.message);
     return NextResponse.json({ error: "Share links aren't available right now. You can still use the QR card below." }, { status: 503 });

@@ -14,6 +14,7 @@ import SiteHeader from "../../components/SiteHeader";
 import { useTripPet, isTravelDay, TripCountdown, DayOfMode, PetReliefCard, CommunityPulse, TripExtras } from "../../components/TripLive";
 import PetIdV2, { maskChip } from "../../components/PetIdV2";
 import FeedbackPrompt from "../../components/FeedbackPrompt";
+import MobileBottomNav from "../../components/MobileBottomNav";
 import LostPanel from "../../components/LostPanel";
 import PetIdCard, { PetIllustration } from "../../components/PetIdCard";
 import TripTimeline from "../../components/TripTimeline";
@@ -332,6 +333,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
             {calculateAge(pet.date_of_birth) ? `${calculateAge(pet.date_of_birth)} · ` : ""}
             {pet.role}
           </div>
+          {pet.passport_no && <div style={{ fontFamily: font.body, fontSize: 13, fontWeight: 700, color: tokens.navy }}>Passport No. {pet.passport_no}</div>}
         </div>
         <div className="flex flex-col items-end gap-1">
           <button
@@ -633,7 +635,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         )}
       </div>
 
-      <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${tokens.line}` }}>
+      <div id={`documents-${pet.id}`} className="mt-4 pt-4" style={{ borderTop: `1px solid ${tokens.line}` }}>
         <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, color: tokens.navy }} className="mb-2">
           {pet.name ? `${pet.name}'s documents` : "Documents"}
         </div>
@@ -1425,6 +1427,7 @@ export default function AccountPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [bottomKey, setBottomKey] = useState(null);
 
   useEffect(() => {
     supabase.auth
@@ -1449,13 +1452,30 @@ export default function AccountPage() {
     window.location.href = "/";
   }
 
+  // Mobile bottom tabs -> real surfaces only: Home=Dashboard, Travel=My Trips,
+  // Passport=Pet Vault Pet ID card, Health=Pet Vault health passport, More=Billing.
+  const bottomActive = (bottomKey === "passport" || bottomKey === "health") && activeTab === "vault" ? bottomKey : activeTab === "dashboard" ? "home" : activeTab === "trips" ? "travel" : activeTab === "billing" ? "more" : "passport";
+  function openVaultAnchor(anchor) {
+    setActiveTab("vault");
+    if (anchor) setTimeout(() => document.querySelector(anchor)?.scrollIntoView({ behavior: "smooth", block: "start" }), 350);
+  }
+  function handleBottomNav(key) {
+    setBottomKey(key);
+    if (key === "home") setActiveTab("dashboard");
+    else if (key === "travel") setActiveTab("trips");
+    else if (key === "passport") openVaultAnchor("[data-pet-passport]");
+    else if (key === "health") openVaultAnchor("#health-passport");
+    else setActiveTab("billing");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   return (
     <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full">
       <SiteHeader onLogout={handleLogout} />
       {loading ? (
         <div className="flex items-center justify-center py-24" style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div>
       ) : (
-      <div className="w-full max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-12">
+      <div className="w-full max-w-[1100px] mx-auto px-4 md:px-8 pt-8 md:pt-12 pb-28 md:pb-12">
         <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
           <div>
             <h1 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 34, color: tokens.navy, lineHeight: 1.1 }}>Your dashboard</h1>
@@ -1471,7 +1491,7 @@ export default function AccountPage() {
               key={tab.key}
               role="tab"
               aria-selected={activeTab === tab.key}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => { setBottomKey(null); setActiveTab(tab.key); }}
               style={{
                 fontFamily: font.body,
                 fontSize: 16,
@@ -1503,6 +1523,7 @@ export default function AccountPage() {
         {activeTab === "billing" && <BillingTab userId={user?.id} />}
       </div>
       )}
+      {!loading && user && <MobileBottomNav active={bottomActive} onNavigate={handleBottomNav} />}
     </div>
   );
 }

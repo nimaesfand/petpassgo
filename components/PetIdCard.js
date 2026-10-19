@@ -34,9 +34,10 @@ export function PetIllustration({ type, size = 96 }) {
 export default function PetIdCard({ pet, photo, showQr = true, children }) {
   const details = [
     ["Sex", pet.sex],
+    ["Passport No.", pet.passport_no],
   ].filter(([, v]) => v);
   return (
-    <div className="rounded-2xl overflow-hidden w-full" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.10)" }}>
+    <div data-pet-passport className="rounded-2xl overflow-hidden w-full" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.10)" }}>
       <div style={{ background: tokens.navy }} className="px-5 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <svg width="18" height="18" viewBox="0 0 24 24" fill={tokens.gold} aria-hidden="true"><circle cx="6" cy="9" r="2.2"/><circle cx="10" cy="5.5" r="2.2"/><circle cx="14" cy="5.5" r="2.2"/><circle cx="18" cy="9" r="2.2"/><path d="M12 10c-3.3 0-6 3.6-6 6.2 0 2 1.6 2.8 3.3 2.8 1.2 0 1.8-.6 2.7-.6s1.5.6 2.7.6c1.7 0 3.3-.8 3.3-2.8 0-2.6-2.7-6.2-6-6.2z"/></svg>
