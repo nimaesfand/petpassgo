@@ -7,7 +7,7 @@ status: draft
 robots: noindex
 ---
 
-DRAFT — do not publish, do not link, noindex.
+DRAFT — do not publish, do not link, noindex. The approved post is live at content/blog/do-you-need-a-psd-letter.md.
 
 Outline only. Not a live blog post.
 

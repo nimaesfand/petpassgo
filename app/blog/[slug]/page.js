@@ -29,7 +29,8 @@ export default function BlogPost({ params }) {
       <Prose>
         <JsonLd data={{ "@context": "https://schema.org", "@type": "Article", headline: post.title, description: post.description, datePublished: post.date,
           author: { "@type": "Organization", name: post.author }, publisher: { "@type": "Organization", name: "PetPassGo" }, mainEntityOfPage: `${SITE_URL}/blog/${post.slug}` }} />
-        <h1 style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: 38, color: "#14213D" }}>{post.title}</h1>
+        <a href="/blog" style={{ fontSize: 14, fontWeight: 600, color: "#14213D" }}>Blog</a>
+        <h1 style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: 38, color: "#14213D" }} className="mt-2">{post.title}</h1>
         <div style={{ fontSize: 13, opacity: 0.6 }} className="mb-8">{post.date}</div>
         <div className="blog-body" style={{ lineHeight: 1.7 }} dangerouslySetInnerHTML={{ __html: post.html }} />
       </Prose>

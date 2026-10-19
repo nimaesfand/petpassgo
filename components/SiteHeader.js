@@ -4,10 +4,11 @@ import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
 import Logo from "./Logo";
 
-// Public nav stays to three calm items. Blog is hidden until the owner
-// approves launch posts (drafts live outside the repo, unpublished).
+// Airlines, Blog, and FAQ. Blog is listed because the owner approved the
+// service-dog posts on 2026-10-19. Outlines in content/drafts stay unpublished.
 export const NAV_LINKS = [
   { href: "/airlines", label: "Airlines" },
+  { href: "/blog", label: "Blog" },
   ...(process.env.NEXT_PUBLIC_COMMUNITY_ENABLED === "true" ? [{ href: "/community", label: "Community" }] : []),
   { href: "/faq", label: "FAQ" },
 ];
