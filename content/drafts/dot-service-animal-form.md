@@ -7,7 +7,7 @@ status: draft
 robots: noindex
 ---
 
-DRAFT — do not publish, do not link, noindex.
+DRAFT — do not publish, do not link, noindex. The approved post is live at content/blog/dot-service-animal-form.md.
 
 Outline only. Not routed. The blog loader skips `status: draft`.
 

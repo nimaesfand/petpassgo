@@ -1326,7 +1326,7 @@ function CurrentFlightTab({ userId }) {
           {serviceDogMismatch && (
             <div className="rounded-2xl p-4 mb-4" style={{ background: "#FFF7F2", border: `1px solid ${tokens.primary}` }}>
               <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-1">U.S. service animals are dogs</div>
-              <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }} className="mb-3">A psychiatric service dog (PSD) is a service dog. Cats and other animals, and emotional support animals, fly as pets: carrier plus the airline’s pet fee. Since 2021, airlines don’t treat an ESA as a service animal.</p>
+              <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }} className="mb-3">A psychiatric service dog (PSD) is a service dog. Cats and other animals, and emotional support animals, fly as pets: carrier plus the airline’s pet fee. Since 2021, airlines don’t treat an ESA as a service animal. <a href="/blog/service-dog-vs-esa-vs-psd-flying" style={{ color: tokens.navy, fontWeight: 600 }}>How this works.</a></p>
               <button type="button" onClick={async () => { await supabase.from("trips").update({ role: "Pet", service_kind: null }).eq("id", trip.id); setTrip((t) => ({ ...t, role: "Pet", service_kind: null })); }} className="rounded-full px-5 py-3" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, border: "none", cursor: "pointer" }}>Switch this trip to the pet path</button>
             </div>
           )}

@@ -7,7 +7,7 @@ status: draft
 robots: noindex
 ---
 
-DRAFT — do not publish, do not link, noindex.
+DRAFT — do not publish, do not link, noindex. The approved post is live at content/blog/service-dog-vs-esa-vs-psd-flying.md.
 
 This file is an outline only. It is not a live route. Move it out of `content/drafts/` and drop `status: draft` only after a human edits and approves it.
 

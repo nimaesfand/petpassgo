@@ -21,6 +21,7 @@ export default function FaqPage() {
           <details key={f.q} className="mb-3 rounded-xl p-4" style={{ border: "1px solid #DCE3EC", background: "#fff" }}>
             <summary className="cursor-pointer" style={{ fontWeight: 600, color: "#14213D" }}>{f.q}</summary>
             <p className="mt-3" style={{ lineHeight: 1.6, opacity: 0.85 }}>{f.a}</p>
+            {f.guide && <p className="mt-2"><a href={f.guide.href} style={{ color: "#14213D", fontWeight: 600 }}>{f.guide.label} →</a></p>}
           </details>
         ))}
         <p className="mt-10"><a href="/assessment" style={{ color: "#14213D", fontWeight: 600 }}>Start planning your trip →</a></p>

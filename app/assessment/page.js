@@ -474,7 +474,8 @@ export default function PetPassGoQuiz() {
                 Pet, service dog, or ESA?
               </h2>
               <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-5">
-                A psychiatric service dog (PSD) is a service dog. An emotional support animal is not.
+                A psychiatric service dog (PSD) is a service dog. An emotional support animal is not.{" "}
+                <a href="/blog/service-dog-vs-esa-vs-psd-flying" style={{ color: tokens.navy, fontWeight: 600 }}>How they differ when you fly.</a>
               </p>
               <div className="flex flex-col gap-3">
                 <OptionCard label="Pet" sub="Traveling for companionship, not task-trained" selected={answers.role === "Pet" && !answers.esa} onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: false, psd: false }))} />
@@ -492,6 +493,12 @@ export default function PetPassGoQuiz() {
                   <input type="checkbox" checked={!!answers.psd} onChange={(e) => set("psd", e.target.checked)} className="mt-1" />
                   <span style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}><b>This is a PSD.</b> A psychiatric service dog is a service dog trained to do work for a psychiatric disability. Same DOT form as any service dog. Not an ESA, and not a letter you buy.</span>
                 </label>
+              )}
+              {answers.role === "Service animal" && answers.animal === "Dog" && (
+                <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-3">
+                  The airline can ask for the <a href="/blog/dot-service-animal-form" style={{ color: tokens.navy, fontWeight: 600 }}>DOT service animal form</a>.
+                  {answers.psd ? <> A PSD does not need a <a href="/blog/do-you-need-a-psd-letter" style={{ color: tokens.navy, fontWeight: 600 }}>letter or certificate</a>.</> : null}
+                </p>
               )}
               {answers.role === "Service animal" && answers.animal && answers.animal !== "Dog" && (
                 <div className="rounded-xl p-4 mt-4" style={{ background: "#FFF7F2", border: `1px solid ${tokens.primary}` }}>

@@ -19,3 +19,8 @@ h1, h2, h3, h4 { font-family: var(--font-display), system-ui, sans-serif; letter
 a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid #C2410C55; outline-offset: 2px; }
 .btn-secondary { transition: background .15s ease; }
 .btn-secondary:hover { background: #EEF2F7 !important; }
+.blog-body p { margin: 0 0 1em; }
+.blog-body h2 { font-size: 26px; color: #14213D; margin: 1.5em 0 0.45em; }
+.blog-body ul { margin: 0 0 1em; padding-left: 1.25em; }
+.blog-body li + li { margin-top: 0.35em; }
+.blog-body a { color: #14213D; text-decoration: underline; text-underline-offset: 3px; }
