@@ -3,6 +3,7 @@ import { Bricolage_Grotesque, Inter } from "next/font/google";
 import { SITE_URL, SITE_NAME } from "../lib/site";
 import ChatWidget from "../components/ChatWidget";
 import Analytics from "../components/Analytics";
+import AuthResume from "../components/AuthResume";
 
 const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["500", "600", "700", "800"], variable: "--font-display", display: "swap" });
 const body = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-body", display: "swap" });
@@ -25,6 +26,7 @@ export default function RootLayout({ children }) {
       <body>
         {children}
         <Analytics />
+        <AuthResume />
         <ChatWidget />
       </body>
     </html>

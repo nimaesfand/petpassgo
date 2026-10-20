@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
+import { resumeAfterAuth } from "../../lib/resumeIntent";
 
 
 
@@ -21,11 +22,17 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
+      if (/not confirmed/i.test(error.message || "")) {
+        // Older accounts made before instant signup: resend the link, which brings them back to checkout.
+        await supabase.auth.resend({ type: "signup", email, options: { emailRedirectTo: `${window.location.origin}/login` } }).catch(() => {});
+        setStatus("error");
+        setErrorMsg("Please confirm your email first. We just sent you a new link; it brings you right back here.");
+        return;
+      }
       setStatus("error");
       setErrorMsg(error.message);
     } else {
-      const hasPendingTrip = localStorage.getItem("petpassgo_pending_trip");
-      window.location.href = hasPendingTrip ? "/assessment" : "/account";
+      await resumeAfterAuth();
     }
   }
 
