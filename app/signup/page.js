@@ -6,6 +6,7 @@ import { supabase } from "../../lib/supabaseClient";
 import SiteHeader from "../../components/SiteHeader";
 import { trackEvent, getAttribution } from "../../lib/analytics";
 import { tokens, font } from "../../lib/theme";
+import { saveCheckoutIntent, resumeAfterAuth } from "../../lib/resumeIntent";
 
 
 
@@ -26,18 +27,22 @@ export default function SignupPage() {
     setStatus("loading");
     setErrorMsg("");
 
-    // Remember the chosen plan; checkout happens after the email is confirmed (Stripe phase).
+    // Remember the chosen plan so signup (or a later login) continues straight to checkout.
     localStorage.setItem("petpassgo_plan", plan);
+    const hasTrip = !!localStorage.getItem("petpassgo_pending_trip");
+    saveCheckoutIntent(hasTrip ? null : plan === "member" ? "membership" : "pass");
     try { localStorage.setItem("ppg_signup_attribution", JSON.stringify(getAttribution())); } catch {}
-    const { error } = await supabase.auth.signUp({ email, password });
 
-    if (error) {
-      setStatus("error");
-      setErrorMsg(error.message);
-    } else {
-      trackEvent("sign_up", { method: "email", plan, content_type: "signup" });
-      setStatus("success");
-    }
+    const r = await fetch("/api/auth/signup", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 409) { setStatus("exists"); return; }
+    if (!r.ok) { setStatus("error"); setErrorMsg(j.error || "We couldn't create your account. Please try again."); return; }
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) { setStatus("error"); setErrorMsg(error.message); return; }
+    trackEvent("sign_up", { method: "email", plan, content_type: "signup" });
+    setStatus("redirecting");
+    await resumeAfterAuth();
   }
 
   return (
@@ -47,20 +52,17 @@ export default function SignupPage() {
       <div className="w-full max-w-[520px]">
 
         <div className="rounded-2xl p-8" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.06)" }}>
-          {status === "success" ? (
+          {status === "redirecting" ? (
             <div className="text-center">
-              <div style={{ fontFamily: font.display, fontSize: 22, color: tokens.navy }} className="mb-2">
-                Check your email
-              </div>
+              <div style={{ fontFamily: font.display, fontSize: 22, color: tokens.navy }} className="mb-2">Account created</div>
+              <p style={{ fontFamily: font.body, fontSize: 15.5, opacity: 0.7 }}>Taking you to secure checkout…</p>
+            </div>
+          ) : status === "exists" ? (
+            <div className="text-center">
+              <div style={{ fontFamily: font.display, fontSize: 22, color: tokens.navy }} className="mb-2">You already have an account</div>
               <p style={{ fontFamily: font.body, fontSize: 15.5, opacity: 0.7 }}>
-                We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account.
-              </p>
-              <p style={{ fontFamily: font.body, fontSize: 15.5, opacity: 0.7 }} className="mt-3">
-                Then come back and{" "}
-                <a href="/login" style={{ color: tokens.navy, fontWeight: 600, textDecoration: "underline" }}>
-                  log in
-                </a>{" "}
-                — we'll take you straight to your trip results.
+                <strong>{email}</strong> is already signed up.{" "}
+                <a href="/login" style={{ color: tokens.navy, fontWeight: 600, textDecoration: "underline" }}>Log in</a> and we'll take you straight to checkout.
               </p>
             </div>
           ) : (
@@ -128,7 +130,7 @@ export default function SignupPage() {
                   {status === "loading" ? "Creating account…" : plan === "member" ? `Create account · Membership ${P.member}/mo` : "Create account · Travel Pass"}
                 </button>
                 <p style={{ fontFamily: font.body, fontSize: 13, opacity: 0.7 }} className="text-center">
-                  {plan === "member" ? "Monthly, cancel anytime. " : ""}You'll confirm your email, then pay. By creating an account you agree to our{" "}
+                  {plan === "member" ? "Monthly, cancel anytime. " : ""}Next: secure checkout with Stripe. By creating an account you agree to our{" "}
                   <a href="/terms" style={{ color: tokens.navy, textDecoration: "underline" }}>Terms of Service</a> and{" "}
                   <a href="/privacy" style={{ color: tokens.navy, textDecoration: "underline" }}>Privacy Policy</a>.
                 </p>

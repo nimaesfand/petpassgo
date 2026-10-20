@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { PRICES as P } from "../../lib/pricing";
 import { supabase } from "../../lib/supabaseClient";
 import { AIRLINES, requirementAirline } from "../../lib/airlines";
@@ -246,6 +246,7 @@ export default function PetPassGoQuiz() {
   const [unlocked, setUnlocked] = useState(false);
   const [addMembership, setAddMembership] = useState(false);
   const [purchaseIntent, setPurchaseIntent] = useState(""); // "join" | "pass", from /travel-pass
+  const [autoBuy, setAutoBuy] = useState(""); // set when returning signed in from signup/login with a saved purchase
   const [showDetails, setShowDetails] = useState(true);
   // Real membership status (read-only; only the server/Stripe can set it). The checkbox
   // further down is a pre-launch preview only and is hidden when NEXT_PUBLIC_SITE_LAUNCHED=true.
@@ -295,7 +296,7 @@ export default function PetPassGoQuiz() {
         setAnswers(savedAnswers);
         setStep(5);
         const intent = localStorage.getItem("petpassgo_purchase_intent");
-        if (intent === "join" || intent === "pass") setPurchaseIntent(intent);
+        if (intent === "join" || intent === "pass") { setPurchaseIntent(intent); setAutoBuy(intent); }
         localStorage.removeItem("petpassgo_purchase_intent");
       } catch (e) {
         // ignore corrupted storage
@@ -363,6 +364,16 @@ export default function PetPassGoQuiz() {
     localStorage.setItem("petpassgo_open_flight_tab", "1");
     window.location.href = j.url;
   }
+
+  // Coming back signed in with a saved purchase: go straight to Stripe Checkout (no second click).
+  const autoBuyRan = useRef(false);
+  useEffect(() => {
+    if (!autoBuy || autoBuyRan.current || !answers.origin) return;
+    autoBuyRan.current = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (data?.session) handlePurchase(autoBuy === "join" ? "member" : "pass");
+    });
+  }, [autoBuy, answers]);
 
   function guessStatus(category) {
     category = String(category || "");
