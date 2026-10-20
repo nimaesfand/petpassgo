@@ -100,7 +100,7 @@ export function PetReliefCard({ airportLabel, title }) {
         );
       })}
       <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }} className="mt-3">
-        <a href={data.source} target="_blank" rel="noopener noreferrer" style={{ color: tokens.primary }}>Official airport page</a>
+        <a href={data.source} target="_blank" rel="noopener noreferrer" className="inline-block py-2" style={{ color: tokens.primary, fontWeight: 700, fontSize: 15, textDecoration: "underline" }}>Official airport page ↗</a>
         {data.checked ? ` · checked ${data.checked}` : ""}
       </div>
     </details>
@@ -275,7 +275,7 @@ export function CargoTempCheck({ x, trip, name }) {
         <summary style={{ fontFamily: font.body, fontWeight: 700, fontSize: 14, color: tokens.navy, cursor: "pointer" }}>Cargo limits</summary>
         <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, marginTop: 6, lineHeight: 1.45 }}>{copy.detail}</p>
         {copy.sourceUrl && (
-          <a href={copy.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.primary }}>
+          <a href={copy.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-block py-2" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.primary, textDecoration: "underline" }}>
             Source: {airline}{copy.verifiedAt ? ` · checked ${copy.verifiedAt}` : ""}
           </a>
         )}

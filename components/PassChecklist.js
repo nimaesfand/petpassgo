@@ -4,6 +4,8 @@ import { tokens, font } from "../lib/theme";
 import { useTodayPT } from "../lib/useTodayPT";
 import { buildPassCards, groupCards, cardDone, dueChip } from "../lib/passCards";
 import ServiceAnimalTrack from "./ServiceAnimalTrack";
+import LinkText from "./LinkText";
+import { isTel, prettyPhone } from "../lib/linkify";
 
 const CHIP = {
   overdue: { background: "#C2410C", color: "#fff" },
@@ -43,12 +45,12 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRe
         <div className="px-3 pb-3">
           <div className="rounded-xl p-3 mb-2" style={{ background: tokens.paper }}>
             <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", color: tokens.muted }}>WHAT TO DO</div>
-            <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }} className="mt-1">{card.what}</p>
+            <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }} className="mt-1"><LinkText text={card.what} /></p>
           </div>
           {card.why && (
             <div className="rounded-xl p-3 mb-2" style={{ background: tokens.paper }}>
               <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", color: tokens.muted }}>WHY</div>
-              <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }} className="mt-1">{card.why}</p>
+              <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }} className="mt-1"><LinkText text={card.why} /></p>
             </div>
           )}
           {card.relief && card.relief.covered.length > 0 && (
@@ -63,7 +65,7 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRe
                       </li>
                     ))}
                   </ul>
-                  <a href={a.source} target="_blank" rel="noopener noreferrer" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.primary }}>Official {a.code} page</a>
+                  <a href={a.source} target="_blank" rel="noopener noreferrer" className="inline-block py-2" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.primary, textDecoration: "underline" }}>Official {a.code} page ↗</a>
                 </div>
               ))}
               {onOpenRelief && (
@@ -72,10 +74,17 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRe
             </div>
           )}
           {card.submission_link && (
-            <a href={card.submission_link} target="_blank" rel="noopener noreferrer" className="rounded-full px-4 py-3 text-center block mb-2" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>{card.goLabel || "Go here"}</a>
+            isTel(card.submission_link) ? (
+              <a href={card.submission_link} className="rounded-full px-4 py-3 text-center block mb-2" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none", minHeight: 48 }}>📞 Call {prettyPhone(card.submission_link)}</a>
+            ) : (
+              <a href={card.submission_link} target="_blank" rel="noopener noreferrer" className="rounded-full px-4 py-3 text-center block mb-2" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none", minHeight: 48 }}>{card.goLabel || "Open the official page"} ↗</a>
+            )
           )}
           {card.source_url && (
-            <a href={card.source_url} target="_blank" rel="noopener noreferrer" className="block mb-2" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.primary }}>Source: {card.sourceHost || "official page"}</a>
+            <a href={card.source_url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between gap-2 rounded-xl px-3 py-2.5 mb-2" style={{ minHeight: 48, background: tokens.sky, fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy, textDecoration: "none" }}>
+              <span className="min-w-0" style={{ wordBreak: "break-word" }}>🔗 Official source: <span style={{ color: tokens.primary, textDecoration: "underline" }}>{card.sourceHost || "official page"}</span></span>
+              <span aria-hidden>↗</span>
+            </a>
           )}
           {showTrack && card.dot && <div className="mb-2"><ServiceAnimalTrack trip={showTrack} embedded /></div>}
           {!card.fact && (

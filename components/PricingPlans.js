@@ -1,11 +1,12 @@
 import { tokens } from "../lib/theme";
 import { PRICES as P } from "../lib/pricing";
+import { VAULT_NAME, VAULT_SUB } from "../lib/travelPassOffer";
 const D = "var(--font-display), system-ui, sans-serif", B = "var(--font-body), system-ui, sans-serif";
 
 export const PLANS = [
   { k: "free", name: "Free", price: "$0", unit: "no account needed", blurb: "See what your trip needs.", items: ["Trip questions", "Preview of the steps you'll need", "Lost-pet flyer + instant sharing"], cta: "Plan your trip", href: "/assessment" },
-  { k: "member", name: "Membership", price: P.member, unit: "per month", blurb: "Everything for your pet, all year.", items: ["Pet vault + Digital Pet ID with QR", "Lost-pet alerts + finder messages", "Community boards", "Expiry reminders · unlimited pets", `Travel Passes just ${P.memberPass}`], cta: "See the Pet Vault", href: "/pet-vault", hi: true },
-  { k: "pass", name: "Travel Pass", price: P.pass, unit: "per trip, no membership", blurb: "One trip, fully covered.", items: ["Full checklist + deadlines", "Official sources", "Reminders for this trip", "Pet ID & vault until 7 days after you fly (after your return, if you add one)"], cta: "Plan your trip", href: "/assessment" },
+  { k: "member", name: "Membership", price: P.member, unit: "per month", product: VAULT_NAME, blurb: VAULT_SUB, items: ["Digital Pet ID with QR", "Lost-pet alerts + finder messages", "Community boards", "Expiry reminders · unlimited pets", `Travel Passes just ${P.memberPass}`], cta: "See the Pet Vault", href: "/pet-vault", hi: true },
+  { k: "pass", name: "Travel Pass", price: P.pass, unit: "per trip, no membership", blurb: "One trip, fully covered.", items: ["Rules for your exact flight and pet", "Every step sourced, with a due date", "Flight day: live status, documents, Pet ID", "Pet ID & vault until 7 days after your trip"], cta: "Plan your trip", href: "/assessment" },
 ];
 const ROWS = [
   ["Trip questions + step preview", 1, 1, 1], ["Lost-pet flyer + social sharing", 1, 1, 1],
@@ -25,6 +26,7 @@ export function PlanCards() {
           {p.hi && <span className="absolute -top-3.5 left-7 rounded-full px-3 py-1" style={{ background: tokens.gold, color: tokens.navy, fontFamily: B, fontWeight: 800, fontSize: 12, letterSpacing: ".08em" }}>BEST VALUE · SAVE {P.savings} ON EVERY TRIP</span>}
           <div style={{ fontFamily: B, fontWeight: 700, fontSize: 13, letterSpacing: ".12em", color: p.hi ? tokens.gold : tokens.primary }} className="mb-3">{p.name.toUpperCase()}</div>
           <div className="flex items-baseline gap-2 flex-wrap"><span style={{ fontFamily: D, fontSize: 44, fontWeight: 700 }}>{p.price}</span><span style={{ fontFamily: B, fontSize: 14.5, opacity: 0.7 }}>{p.unit}</span></div>
+          {p.product && <div style={{ fontFamily: D, fontSize: 22, fontWeight: 700, color: p.hi ? "#fff" : tokens.navy }} className="mt-1">{p.product}</div>}
           <p style={{ fontFamily: B, fontSize: 15.5, opacity: 0.8 }} className="mb-5">{p.blurb}</p>
           <ul className="space-y-2 mb-7 flex-1">{p.items.map((i) => <li key={i} className="flex gap-2" style={{ fontFamily: B, fontSize: 15 }}><span style={{ color: p.hi ? tokens.gold : tokens.green, fontWeight: 700 }}>✓</span>{i}</li>)}</ul>
           <a href={p.href} className="btn-primary block rounded-full px-7 py-3.5 text-center" style={{ background: p.hi ? tokens.primary : "#fff", color: p.hi ? "#fff" : tokens.navy, border: p.hi ? "none" : `2px solid ${tokens.navy}`, fontFamily: B, fontWeight: 600, fontSize: 16, textDecoration: "none" }}>{p.cta}</a>

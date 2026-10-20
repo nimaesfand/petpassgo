@@ -31,4 +31,4 @@ No internet letter, registry, or certificate stands in for the DOT form. Use the
 
 Also read: [Service dog vs ESA vs PSD](/blog/service-dog-vs-esa-vs-psd-flying) and [Do you need a PSD letter to fly?](/blog/do-you-need-a-psd-letter).
 
-Source: [14 CFR § 382.75](https://www.ecfr.gov/current/title-14/section-382.75). Checked October 18, 2026.
+Source: [14 CFR § 382.75](https://www.ecfr.gov/current/title-14/chapter-II/subchapter-D/part-382/subpart-E/section-382.75). Checked October 18, 2026.

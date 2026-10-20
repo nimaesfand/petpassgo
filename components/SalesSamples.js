@@ -174,7 +174,7 @@ export function VaultInUseGallery() {
 
 /* ---------- Travel Pass example (unchanged structure, tightened copy) ---------- */
 
-const SAMPLE_TABS = [["checklist", "Checklist"], ["flight", "Flight"], ["weather", "Weather & spots"], ["reminders", "Reminders"]];
+const SAMPLE_TABS = [["checklist", "Checklist"], ["flight", "Flight"], ["weather", "Weather & spots"], ["reminders", "Timeline"]];
 
 export function SampleTravelPass() {
   const [tab, setTab] = useState("checklist");
@@ -224,7 +224,7 @@ export function SampleTravelPass() {
             ))}
           </div>
           <ul className="space-y-2">
-            {row("Pet relief areas at both airports, mapped", "MAPPED", false)}
+            {row("Pet relief areas, before and after security", "MAPPED", false)}
             {row("Veterinary clinic — near your arrival airport", "NEARBY", false)}
             {row("Dog park & pet store nearby", "NEARBY", false)}
           </ul>
@@ -233,13 +233,12 @@ export function SampleTravelPass() {
       )}
       {tab === "reminders" && (
         <ul className="space-y-2">
-          {row("30 days before — start documents", "EMAIL + IN-APP", false)}
-          {row("7 days before — confirm reservations & carrier", "EMAIL + IN-APP", false)}
-          {row("1 day before — pack & print copies", "EMAIL + IN-APP", false)}
-          {row("Travel day — one calm morning checklist", "TRAVEL DAY VIEW", false)}
+          {row("30 days before — start documents", "ON YOUR TIMELINE", false)}
+          {row("7 days before — confirm reservations & carrier", "ON YOUR TIMELINE", false)}
+          {row("1 day before — pack & print copies", "ON YOUR TIMELINE", false)}
+          {row("Flight day — live flight, documents and Pet ID on one screen", "FLIGHT DAY", false)}
         </ul>
       )}
-      <p style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }} className="mt-4">Plus: tips from other travelers on your airline’s community board, and a calm Travel Day view on flight day — live flight, documents and Pet ID up top.</p>
     </div>
   );
 }
