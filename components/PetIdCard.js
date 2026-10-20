@@ -82,7 +82,7 @@ export default function PetIdCard({ pet, photo, showQr = true, children }) {
         )}
       </div>
       <div className="px-5 py-3 flex flex-wrap gap-2" style={{ background: tokens.paper, borderTop: `1px solid ${tokens.line}`, fontFamily: font.body, fontSize: 12.5, color: tokens.muted }}>
-        <span>🐾 Name & photo only</span><span>·</span><span>🔖 No chip number shown</span><span>·</span><span>💬 Message the owner privately</span>
+        <span>Name & photo only</span><span>·</span><span>No chip number shown</span><span>·</span><span>Message the owner privately</span>
       </div>
       {children}
     </div>

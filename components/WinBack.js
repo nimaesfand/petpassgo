@@ -21,7 +21,7 @@ export function SadDog({ size = 112 }) {
 }
 
 const COPY = {
-  petid: (n) => [`${n || "Your pet"} misses you already 🐾`, "The full Digital Pet ID is resting. If someone scans the QR code, they can still message you."],
+  petid: (n) => [`${n || "Your pet"} misses you already`, "The full Digital Pet ID is resting. If someone scans the QR code, they can still message you."],
   vault: (n) => [`${n ? n + "'s" : "Your pet's"} papers are napping until you're back`, "Documents, vet details and expiry reminders are paused."],
   community: () => ["The boards feel quieter without you", "Fellow travelers are still swapping tips. Come say hi again."],
   pets: () => ["Room for one more?", "Extra pets come back with membership. Everyone you added is still here."],

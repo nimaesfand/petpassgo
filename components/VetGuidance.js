@@ -1,5 +1,6 @@
 "use client";
 import { tokens, font } from "../lib/theme";
+import Icon from "./Icon";
 
 // Builds trip-specific vet guidance ONLY from the filtered airline_requirements rows
 // already loaded for this trip. No invented airline facts.
@@ -29,7 +30,7 @@ function LockedTeaser() {
       <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted, lineHeight: 1.5 }}>
         Whether you need a vet visit, and exactly what to ask for, is in your Travel Pass — matched to your airline and route.
       </p>
-      <div className="mt-2 rounded-lg px-3 py-2" style={{ background: tokens.sky, fontFamily: font.body, fontSize: 13.5, color: tokens.navy }}>🔒 Unlock your Travel Pass to see the full guidance and official sources.</div>
+      <div className="mt-2 rounded-lg px-3 py-2" style={{ background: tokens.sky, fontFamily: font.body, fontSize: 13.5, color: tokens.navy }}><Icon name="lock" size={15} /> Unlock your Travel Pass to see the full guidance and official sources.</div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
+import Icon from "./Icon";
 import { tokens, font } from "../lib/theme";
 import { useTodayPT } from "../lib/useTodayPT";
 import { buildPassCards, groupCards, cardDone, dueChip } from "../lib/passCards";
@@ -36,7 +37,7 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRe
         className="w-full flex items-center gap-2.5 px-3 py-3 text-left"
         style={{ minHeight: 56, background: "transparent", border: "none", cursor: "pointer" }}
       >
-        <span aria-hidden className="flex items-center justify-center flex-shrink-0 rounded-xl" style={{ width: 36, height: 36, background: tokens.sky, fontSize: 18 }}>{card.icon}</span>
+        <span aria-hidden className="flex items-center justify-center flex-shrink-0 rounded-xl" style={{ width: 36, height: 36, background: tokens.sky, color: tokens.navy }}><Icon name={card.icon} size={20} /></span>
         <span className="flex-1 min-w-0" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, lineHeight: 1.25, color: tokens.navy }}>{card.shortTitle}</span>
         {showChip && <span className="flex-shrink-0 rounded-full px-2 py-1" style={{ fontFamily: font.body, fontSize: 11.5, fontWeight: 700, background: tone.background, color: tone.color }}>{chip.label}</span>}
         <span className="flex-shrink-0 rounded-full px-2.5 py-1" style={{ fontFamily: font.body, fontSize: 12, fontWeight: 700, background: done ? "#EAF6EE" : tokens.sky, color: done ? tokens.green : tokens.navy }}>{done ? "Done" : card.fact ? "Fact" : "To do"}</span>
@@ -75,15 +76,15 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRe
           )}
           {card.submission_link && (
             isTel(card.submission_link) ? (
-              <a href={card.submission_link} className="rounded-full px-4 py-3 text-center block mb-2" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none", minHeight: 48 }}>📞 Call {prettyPhone(card.submission_link)}</a>
+              <a href={card.submission_link} className="rounded-full px-4 py-3 text-center block mb-2" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none", minHeight: 48 }}><Icon name="phone" size={18} /> Call {prettyPhone(card.submission_link)}</a>
             ) : (
-              <a href={card.submission_link} target="_blank" rel="noopener noreferrer" className="rounded-full px-4 py-3 text-center block mb-2" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none", minHeight: 48 }}>{card.goLabel || "Open the official page"} ↗</a>
+              <a href={card.submission_link} target="_blank" rel="noopener noreferrer" className="rounded-full px-4 py-3 text-center block mb-2" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none", minHeight: 48 }}>{card.goLabel || "Open the official page"} <Icon name="external" size={16} /></a>
             )
           )}
           {card.source_url && (
             <a href={card.source_url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between gap-2 rounded-xl px-3 py-2.5 mb-2" style={{ minHeight: 48, background: tokens.sky, fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy, textDecoration: "none" }}>
-              <span className="min-w-0" style={{ wordBreak: "break-word" }}>🔗 Official source: <span style={{ color: tokens.primary, textDecoration: "underline" }}>{card.sourceHost || "official page"}</span></span>
-              <span aria-hidden>↗</span>
+              <span className="min-w-0" style={{ wordBreak: "break-word" }}><Icon name="link" size={17} /> Official source: <span style={{ color: tokens.primary, textDecoration: "underline" }}>{card.sourceHost || "official page"}</span></span>
+              <Icon name="external" size={18} />
             </a>
           )}
           {showTrack && card.dot && <div className="mb-2"><ServiceAnimalTrack trip={showTrack} embedded /></div>}

@@ -1,4 +1,5 @@
 import { linkParts, hostOf } from "../lib/linkify";
+import Icon from "./Icon";
 import { tokens } from "../lib/theme";
 
 const linkStyle = { color: tokens.primary, fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 2, wordBreak: "break-word" };
@@ -11,9 +12,9 @@ export default function LinkText({ text }) {
         p.type === "text" ? (
           <span key={i}>{p.value}</span>
         ) : p.type === "tel" ? (
-          <a key={i} href={p.href} style={{ ...linkStyle, whiteSpace: "nowrap" }}>📞 {p.value}</a>
+          <a key={i} href={p.href} style={{ ...linkStyle, whiteSpace: "nowrap" }}><Icon name="phone" size={15} /> {p.value}</a>
         ) : (
-          <a key={i} href={p.href} target="_blank" rel="noopener noreferrer" style={linkStyle}>{hostOf(p.value)} ↗</a>
+          <a key={i} href={p.href} target="_blank" rel="noopener noreferrer" style={linkStyle}>{hostOf(p.value)} <Icon name="external" size={14} /></a>
         )
       )}
     </>

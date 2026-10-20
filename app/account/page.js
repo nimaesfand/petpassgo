@@ -1,5 +1,7 @@
 "use client";
 
+import Icon from "../../components/Icon";
+import { telHref } from "../../lib/linkify";
 import React, { useEffect, useState } from "react";
 import { LiveFlightCard } from "../../components/FlightLookup";
 import { supabase } from "../../lib/supabaseClient";
@@ -135,7 +137,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
   async function handleShare() {
     const age = calculateAge(pet.date_of_birth);
     const lines = [
-      `🐾 ${pet.name}'s Info (via PetPassGo)`,
+      `${pet.name}'s Info (via PetPassGo)`,
       pet.breed ? `Breed: ${pet.breed}` : null,
       pet.sex ? `Sex: ${pet.sex}` : null,
       age ? `Age: ${age}` : null,
@@ -295,7 +297,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
               className="rounded-full flex items-center justify-center"
               style={{ width: 48, height: 48, background: tokens.sky, fontSize: 22 }}
             >
-              {pet.animal_type === "Dog" ? "🐕" : pet.animal_type === "Cat" ? "🐈" : "🐾"}
+              <Icon name="paw" size={28} stroke={1.5} />
             </div>
           )}
           <label
@@ -315,7 +317,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
               border: "2px solid #fff",
             }}
           >
-            📷
+            <Icon name="camera" size={18} />
             <input
               type="file"
               accept="image/*"
@@ -340,7 +342,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
             onClick={handleShare}
             style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.green, fontWeight: 600 }}
           >
-            {justCopied ? "Copied!" : "📤 Share"}
+            {justCopied ? "Copied!" : <><Icon name="share" size={16} /> Share</>}
           </button>
           <button
             onClick={() => setShowEditForm((v) => !v)}
@@ -493,17 +495,17 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         <div className="rounded-xl p-3 mt-3" style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}>
           {pet.vet_name && (
             <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.75 }}>
-              🩺 Vet: {pet.vet_name}{pet.vet_phone ? ` · ${pet.vet_phone}` : ""}
+              <Icon name="stethoscope" size={16} /> Vet: {pet.vet_name}{pet.vet_phone ? <> · <a href={telHref(pet.vet_phone)} style={{ color: tokens.primary, fontWeight: 700, textDecoration: "underline" }}>{pet.vet_phone}</a></> : ""}
             </div>
           )}
           {pet.emergency_contact_name && (
             <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.75 }}>
-              📞 Emergency: {pet.emergency_contact_name}{pet.emergency_contact_phone ? ` · ${pet.emergency_contact_phone}` : ""}
+              <Icon name="phone" size={16} /> Emergency: {pet.emergency_contact_name}{pet.emergency_contact_phone ? <> · <a href={telHref(pet.emergency_contact_phone)} style={{ color: tokens.primary, fontWeight: 700, textDecoration: "underline" }}>{pet.emergency_contact_phone}</a></> : ""}
             </div>
           )}
           {pet.microchip_number && (
             <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.75 }}>
-              🔖 Microchip ending {maskChip(pet.microchip_number)}
+              <Icon name="tag" size={16} /> Microchip ending {maskChip(pet.microchip_number)}
             </div>
           )}
         </div>
@@ -586,7 +588,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
                     }}
                     style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.stamp, color: tokens.muted }}
                   >
-                    ✕
+                    <Icon name="x" size={16} />
                   </button>
                 </div>
               </div>
@@ -1009,7 +1011,7 @@ function UnlockTripCard({ trip }) {
   }
   return (
     <div className="rounded-xl p-6 text-center" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
-      <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-1">🔒 This trip isn't unlocked yet</div>
+      <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-1"><Icon name="lock" size={18} /> This trip isn't unlocked yet</div>
       <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, opacity: 0.8 }} className="mb-4">Your full checklist, deadlines and reminders are ready the moment you finish checkout.</p>
       <button disabled={busy} onClick={unlock} className="rounded-full px-6 py-3" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}>Unlock this trip</button>
       {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-3">{err}</div>}
@@ -1116,7 +1118,7 @@ export function DashboardTab({ userId, onOpenTrips }) {
         <div className="rounded-2xl p-5 sm:p-6 mb-4 sm:mb-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 700, color: tokens.navy }} className="mb-1">Needs action</div>
           <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-4">The few things that matter next — reminders and checklist combined, nothing duplicated.</p>
-          {actions.length === 0 ? <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Nothing needs action right now. 🎉</p> : <>
+          {actions.length === 0 ? <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Nothing needs action right now.</p> : <>
             <ul className="space-y-2">{visible.map((a) => (
               <li key={a.key} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
                 <span style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{a.label}</span>
@@ -1260,7 +1262,7 @@ function CurrentFlightTab({ userId }) {
       <div className="rounded-xl p-5 mb-4" style={{ background: tokens.navy }}>
         <div className="flex items-center gap-3 mb-3">
           <div className="rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" style={{ width: 52, height: 52, background: tokens.gold, border: "2px solid #fff" }}>
-            {tripPet?.photo_url ? <SignedImg value={tripPet.photo_url} alt={tripPet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : <span style={{ fontSize: 26 }}>{/cat/i.test(trip.animal_type || tripPet?.animal_type || "") ? "🐈" : "🐕"}</span>}
+            {tripPet?.photo_url ? <SignedImg value={tripPet.photo_url} alt={tripPet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : <span style={{ color: tokens.navy }}><Icon name="paw" size={26} stroke={1.5} /></span>}
           </div>
           <div className="min-w-0">
             <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold, letterSpacing: "0.1em" }}>YOUR TRAVEL PASS</div>
@@ -1485,7 +1487,7 @@ export default function AccountPage() {
 
         <CheckoutBanner />
         <PostTripFeedback />
-        <div role="tablist" className="inline-flex flex-wrap gap-1 mb-8 p-1 rounded-full" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+        <div role="tablist" className="hidden md:inline-flex flex-wrap gap-1 mb-8 p-1 rounded-full" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           {TABS.map((tab) => (
             <button
               key={tab.key}

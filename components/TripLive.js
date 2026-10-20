@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Icon from "./Icon";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
 import { todayPT, daysUntil } from "../lib/travelDates";
@@ -36,7 +37,7 @@ function PetAvatar({ pet, size = 56 }) {
       {pet?.photo_url ? (
         <SignedImg value={pet.photo_url} alt={pet.name} className="object-cover" style={{ width: "100%", height: "100%" }} />
       ) : (
-        <span style={{ fontSize: size * 0.5 }}>{/cat/i.test(pet?.animal_type || "") ? "🐈" : "🐕"}</span>
+        <span style={{ color: tokens.navy }}><Icon name="paw" size={Math.round(size * 0.5)} stroke={1.5} /></span>
       )}
     </div>
   );
@@ -62,7 +63,7 @@ export function TripCountdown({ trip, pet, done, total }) {
       <div className="flex-1 min-w-0">
         <div style={{ fontFamily: font.display, fontSize: 21, fontWeight: 700, color: tokens.navy, lineHeight: 1.2 }}>{headline}</div>
         <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">
-          {total > 0 ? (done === total ? "Every step is checked off. Great job! 🎉" : `${done} of ${total} steps done. Check them off below as you go.`) : "Your checklist is below."}
+          {total > 0 ? (done === total ? "Every step is checked off. Great job!" : `${done} of ${total} steps done. Check them off below as you go.`) : "Your checklist is below."}
         </div>
       </div>
       {total > 0 && (
@@ -84,7 +85,7 @@ export function PetReliefCard({ airportLabel, title }) {
   const groups = [["before", "Before security"], ["after", "After security"]];
   return (
     <details className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-      <summary style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy, cursor: "pointer" }}>🌿 {title || "Pet relief areas"} at {a.code}</summary>
+      <summary style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy, cursor: "pointer" }}>{title || "Pet relief areas"} at {a.code}</summary>
       {groups.map(([k, label]) => {
         const rows = data.areas.filter((x) => x.where === k);
         if (!rows.length) return null;
@@ -129,7 +130,7 @@ export function CommunityPulse({ trip, isMember }) {
   return (
     <div className="rounded-xl p-5 mb-4" style={{ background: tokens.sky, border: `1px solid ${tokens.line}` }}>
       <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>
-        💬 {n === 0 ? `Be the first to share a tip about ${guide.name} this week` : `${n} traveler${n === 1 ? "" : "s"} posted about ${guide.name} this week`}
+        {n === 0 ? `Be the first to share a tip about ${guide.name} this week` : `${n} traveler${n === 1 ? "" : "s"} posted about ${guide.name} this week`}
       </div>
       {isMember ? (
         <>
@@ -176,7 +177,7 @@ export function DayOfMode({ trip, pet, actionItems = [], onShowFull }) {
       <div className="rounded-2xl p-6 mb-4 text-center" style={{ background: tokens.navy, color: "#fff" }}>
         <div className="flex justify-center mb-3"><PetAvatar pet={pet} size={72} /></div>
         <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold, letterSpacing: "0.12em" }}>TRAVEL DAY</div>
-        <div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700 }} className="mt-1">Today's the day, {name}! ✈️</div>
+        <div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700 }} className="mt-1">Today's the day, {name}!</div>
         <div style={{ fontFamily: font.body, fontSize: 15, opacity: 0.8 }} className="mt-1">{trip.airline} · {trip.origin} → {trip.destination}</div>
       </div>
       <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
@@ -203,7 +204,7 @@ export function DayOfMode({ trip, pet, actionItems = [], onShowFull }) {
           <div className="grid gap-2">
             {docs.map((d) => (
               <button key={d.id} onClick={() => openDoc(d)} className="w-full text-left rounded-xl px-4 py-3.5 flex items-center justify-between" style={{ background: tokens.sky, fontFamily: font.body, fontSize: 16, fontWeight: 600, color: tokens.navy }}>
-                <span>📄 {d.document_type || "Document"}</span><span>Open →</span>
+                <span><Icon name="file" size={16} /> {d.document_type || "Document"}</span><span>Open →</span>
               </button>
             ))}
           </div>
@@ -229,15 +230,15 @@ export function DayOfMode({ trip, pet, actionItems = [], onShowFull }) {
   );
 }
 
-const WX_ICON = { clearsky: "☀️", fair: "🌤️", partlycloudy: "⛅", cloudy: "☁️", fog: "🌫️" };
+const WX_ICON = { clearsky: "sun", fair: "cloudSun", partlycloudy: "cloudSun", cloudy: "cloud", fog: "fog" };
 function wxIcon(sym = "") {
   if (WX_ICON[sym]) return WX_ICON[sym];
-  if (/thunder/.test(sym)) return "⛈️";
-  if (/snow|sleet/.test(sym)) return "🌨️";
-  if (/rain|showers/.test(sym)) return "🌧️";
-  return "🌡️";
+  if (/thunder/.test(sym)) return "storm";
+  if (/snow|sleet/.test(sym)) return "snow";
+  if (/rain|showers/.test(sym)) return "rain";
+  return "thermometer";
 }
-const SPOT_LABEL = { emergency_vet: "🚑 Emergency vet", vet: "🩺 Vet", dog_park: "🌳 Dog park", pet_store: "🛍️ Pet store" };
+const SPOT_LABEL = { emergency_vet: "Emergency vet", vet: "Vet", dog_park: "Dog park", pet_store: "Pet store" };
 
 function WeatherTile({ label, end }) {
   const w = end?.weather;
@@ -246,7 +247,7 @@ function WeatherTile({ label, end }) {
       <div style={{ fontFamily: font.mono, fontSize: 11.5, letterSpacing: "0.08em", color: tokens.muted }}>{label} · {end?.code}</div>
       {w?.status === "ok" ? (
         <div className="flex items-center gap-2 mt-1">
-          <span style={{ fontSize: 26 }}>{wxIcon(w.symbol)}</span>
+          <span style={{ color: tokens.navy }}><Icon name={wxIcon(w.symbol)} size={28} stroke={1.5} /></span>
           <div style={{ fontFamily: font.display, fontSize: 21, fontWeight: 700, color: tokens.navy, whiteSpace: "nowrap" }}>{w.highF}°<span style={{ fontSize: 14, fontWeight: 500, color: tokens.muted }}> / {w.lowF}°F</span></div>
         </div>
       ) : (
@@ -315,8 +316,8 @@ export function TripExtras({ trip, pet }) {
         </div>
         {(hot || cold) && (
           <div className="mt-3 rounded-lg p-3" style={{ background: "#FFF9EC", fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>
-            {hot ? `☀️ It could be warm. Keep ${name} cool and hydrated, and never leave a pet in a parked car. ` : ""}
-            {cold ? `❄️ It could be chilly. A cozy blanket in the carrier can help ${name}. ` : ""}
+            {hot ? `It could be warm. Keep ${name} cool and hydrated, and never leave a pet in a parked car. ` : ""}
+            {cold ? `It could be chilly. A cozy blanket in the carrier can help ${name}. ` : ""}
           </div>
         )}
         <CargoTempCheck x={x} trip={trip} name={name} />
@@ -325,7 +326,7 @@ export function TripExtras({ trip, pet }) {
         </div>
       </div>
       {x.destination && spotsData === null && (
-        <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body, color: tokens.muted }}>🐾 Finding vets, dog parks and pet stores near {x.destination.code}…</div>
+        <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body, color: tokens.muted }}>Finding vets, dog parks and pet stores near {x.destination.code}…</div>
       )}
       {x.destination && spotsData !== null && (
         <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
