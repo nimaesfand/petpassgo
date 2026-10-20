@@ -118,8 +118,8 @@ export function VaultInUseGallery() {
         </div>
       </GalleryItem>
 
-      <GalleryItem title="Chip Vault" caption="Chip, brand and registry — plus a yearly check that it still points to you.">
-        <Phone title="Buddy · Chip Vault">
+      <GalleryItem title="Microchip" caption="Chip, brand and registry — plus a yearly check that it still points to you.">
+        <Phone title="Buddy · Microchip">
           <div style={txt}>Microchip</div>
           <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy, letterSpacing: "0.03em" }}>•••• •••• 0000</div>
           <div className="space-y-2 mt-3">
@@ -131,7 +131,7 @@ export function VaultInUseGallery() {
         </Phone>
       </GalleryItem>
 
-      <GalleryItem title="Health passport" caption="Every document in one place, expiry dates watched for you.">
+      <GalleryItem title="Health records" caption="Every document in one place, expiry dates watched for you.">
         <Phone title="Buddy · Documents">
           <div className="space-y-2">
             {[["Rabies certificate", "Expires in 8 mo", "#E7F4EC", tokens.green], ["Vaccination record", "Up to date", "#E7F4EC", tokens.green], ["Health certificate", "Add before a trip", "#FFF1F2", tokens.primary], ["Vet visit summary", "Imported ✓", tokens.sky, tokens.navy]].map(([a, b, bg, c]) => (

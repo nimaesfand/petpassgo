@@ -10,7 +10,7 @@ import { tokens, font } from "../../lib/theme";
 // The gallery above shows most features in use; these three don't photograph well.
 const FEATURES = [
   ["Smart vet import", "Snap a photo of vet paperwork and we read it into the record for you to review — nothing saved without your OK."],
-  ["Unlimited pets", "One membership covers every pet in the house, each with their own ID, chip vault and documents."],
+  ["Unlimited pets", "One membership covers every pet in the house, each with their own ID, microchip and health records."],
   ["Private by default", "Your pet’s info is private — only people you share with can see it. Finders message you through PetPassGo; your email and phone stay hidden unless you choose to show an emergency contact."],
   ["Digital, ready instantly", "Your pet’s ID lives on your phone — no waiting for a printed card in the mail."],
 ];
