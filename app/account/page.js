@@ -752,7 +752,7 @@ function AccessGate() {
         They're included with Membership, or with a Travel Pass until 7 days after you fly (7 days after your return, if you added one). Your pets and documents are kept safe and come back as soon as you rejoin.
       </p>
       <div className="flex gap-3 justify-center flex-wrap">
-        <a href="/signup?plan=member" className="btn-primary rounded-full px-6 py-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Join for {P.member}/mo</a>
+        <a href="/join" className="btn-primary rounded-full px-6 py-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Join for {P.member}/mo</a>
         <a href="/assessment" className="rounded-full px-6 py-3" style={{ border: `2px solid ${tokens.navy}`, color: tokens.navy, fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Plan your trip</a>
       </div>
     </div>

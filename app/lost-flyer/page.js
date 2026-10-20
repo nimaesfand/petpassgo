@@ -79,7 +79,7 @@ export default function LostFlyer() {
           <div className="rounded-2xl p-5 mt-8" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
             <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-1">Want finders to reach you without sharing your number?</div>
             <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mb-3">Members get a QR Pet ID, private finder messages and alerts when the poster is viewed.</p>
-            <a href="/signup?plan=member" style={{ fontFamily: font.body, fontWeight: 700, color: tokens.primary }}>Membership {P.member}/mo →</a>
+            <a href="/join" style={{ fontFamily: font.body, fontWeight: 700, color: tokens.primary }}>Membership {P.member}/mo →</a>
           </div>
         </div>
         <canvas ref={canvas} width={W} height={H} className="w-full rounded-xl" style={{ boxShadow: "0 10px 30px rgba(20,33,61,.15)", background: "#fff" }} aria-label="Flyer preview" role="img" />

@@ -18,6 +18,9 @@ export default function SignupPage() {
   const [plan, setPlan] = useState("member");
   useEffect(() => {
     const q = new URLSearchParams(window.location.search).get("plan");
+    // Pay first: plan links skip account creation and go straight to checkout.
+    if (q === "member" && !localStorage.getItem("petpassgo_pending_trip")) { window.location.replace("/join"); return; }
+    if (q === "pass" && !localStorage.getItem("petpassgo_pending_trip")) { window.location.replace("/assessment?plan=pass"); return; }
     if (q === "pass" || q === "member") setPlan(q);
     else if (localStorage.getItem("petpassgo_pending_trip")) setPlan("pass");
   }, []);

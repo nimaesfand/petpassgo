@@ -25,7 +25,7 @@ export default function CommunityPaywall({ boardName, signedIn }) {
               : `Sign in with a free account to read tips from people who flew ${boardName || "your airline"} with their pet. Members can post and reply.`}
           </p>
           {signedIn ? (
-            <a href="/signup?plan=member" className="btn-primary block rounded-full py-3.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Join for {P.member}/mo</a>
+            <a href="/join" className="btn-primary block rounded-full py-3.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Join for {P.member}/mo</a>
           ) : (
             <>
               <a href="/login" className="btn-primary block rounded-full py-3.5 mb-2" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Log in</a>
