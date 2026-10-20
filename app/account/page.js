@@ -2,6 +2,7 @@
 
 import Icon from "../../components/Icon";
 import { telHref } from "../../lib/linkify";
+import { VAULT_NAME, VAULT_SUB } from "../../lib/travelPassOffer";
 import React, { useEffect, useState } from "react";
 import { LiveFlightCard } from "../../components/FlightLookup";
 import { supabase } from "../../lib/supabaseClient";
@@ -1373,7 +1374,7 @@ function BillingTab({ userId }) {
           {memberRow?.current_period_end && <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-4">Current period ends {new Date(memberRow.current_period_end).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.</p>}
           <button disabled={busy} onClick={() => go("/api/stripe/portal")} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Manage, receipts or cancel</button>
         </> : <>
-          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}Membership is {P.member}{P.memberUnit}: Pet ID, vault, lost-pet alerts, community, unlimited pets and {P.memberPass} Travel Passes. Monthly, cancel anytime.</p>
+          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}<b>{VAULT_NAME}</b> · {P.member}{P.memberUnit}. {VAULT_SUB} Plus {P.memberPass} Travel Passes. Cancel anytime.</p>
           <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => { trackBeginCheckout("membership"); go("/api/stripe/checkout", { plan: "membership" }); }} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Become a member</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts & cards</button></div>
         </>}
       {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-3">{err}</div>}
