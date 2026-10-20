@@ -59,11 +59,17 @@ async function handle(req) {
       mode: "payment",
       line_items: [{ price: await priceId(effPlan), quantity: 1 }],
       payment_intent_data: { metadata: meta },
+      // Show the card already on file (e.g. the membership card) so returning customers just tap Pay.
+      saved_payment_method_options: { payment_method_save: "enabled", allow_redisplay_filters: ["always", "limited", "unspecified"] },
     });
   } else {
     const items = [{ price: await priceId("membership"), quantity: 1 }];
     if (effPlan === "join") items.push({ price: await priceId("member_pass"), quantity: 1 });
-    Object.assign(params, { mode: "subscription", line_items: items, subscription_data: { metadata: { user_id: user.id, ...attribution } } });
+    Object.assign(params, {
+      mode: "subscription", line_items: items, subscription_data: { metadata: { user_id: user.id, ...attribution } },
+      payment_method_data: { allow_redisplay: "always" }, // card can be offered again on later Travel Pass checkouts
+      saved_payment_method_options: { allow_redisplay_filters: ["always", "limited", "unspecified"] },
+    });
   }
   const session = await stripe().checkout.sessions.create(params);
   return NextResponse.json({ url: session.url });

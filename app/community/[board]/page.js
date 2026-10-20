@@ -40,7 +40,7 @@ function JoinToPost() {
         <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700 }}>Join to post</div>
         <div style={{ fontFamily: font.body, fontSize: 14.5, color: "#C9D3E3" }}>You can read every board with your account. Membership {P.member}/mo unlocks posting and replies.</div>
       </div>
-      <a href="/signup?plan=member" className="rounded-full px-5 py-2.5" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Join for {P.member}/mo</a>
+      <a href="/join" className="rounded-full px-5 py-2.5" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Join for {P.member}/mo</a>
     </div>
   );
 }
@@ -306,7 +306,7 @@ export default function BoardPage() {
                   : <button onClick={() => setOpenReply(t.id)} className="mt-3" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy, background: "none", border: "none", cursor: "pointer", padding: 0 }}>Reply</button>)}
                 {canRead && !canPost && (
                   <div className="mt-3" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>
-                    <a href="/signup?plan=member" style={{ color: tokens.navy, fontWeight: 600 }}>Join to post</a> a reply
+                    <a href="/join" style={{ color: tokens.navy, fontWeight: 600 }}>Join to post</a> a reply
                   </div>
                 )}
               </article>

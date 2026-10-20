@@ -10,6 +10,7 @@ import FlightLookup, { airportLabel, airlinePickerName } from "../../components/
 import { SampleTravelPass } from "../../components/SalesSamples";
 import { tripAccessCopy, fmtTripDate } from "../../lib/tripAccess";
 import { trackEvent, trackBeginCheckout, getAttribution } from "../../lib/analytics";
+import { startGuestCheckout } from "../../lib/checkout";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
 
@@ -316,9 +317,13 @@ export default function PetPassGoQuiz() {
   async function handlePurchase(plan = "pass") {
     const { data } = await supabase.auth.getUser();
     if (!data.user) {
+      // Pay first: Stripe collects email + name; the password is set on /welcome after payment.
+      // Answers stay in this browser so "Back" from Stripe returns to these results.
+      const guestPlan = plan === "member" ? "join" : "pass";
+      trackBeginCheckout(guestPlan);
       localStorage.setItem("petpassgo_pending_trip", JSON.stringify(answers));
-      localStorage.setItem("petpassgo_purchase_intent", plan === "member" ? "join" : "pass");
-      window.location.href = `/signup?plan=${plan === "member" ? "member" : "pass"}`;
+      const err = await startGuestCheckout(guestPlan, answers, "/assessment?checkout=canceled");
+      if (err) alert(err);
       return;
     }
 

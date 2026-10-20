@@ -57,7 +57,7 @@ export default function CommunityHome() {
             </div>
             <div className="flex gap-2 flex-wrap">
               <a href="/login" className="rounded-full px-5 py-3" style={{ background: "#fff", color: tokens.navy, fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Log in</a>
-              <a href="/signup?plan=member" className="btn-primary rounded-full px-6 py-3" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Join for {P.member}/mo</a>
+              <a href="/join" className="btn-primary rounded-full px-6 py-3" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Join for {P.member}/mo</a>
             </div>
           </div>
         )}
@@ -66,7 +66,7 @@ export default function CommunityHome() {
             <div style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }}>
               You're signed in — browse any board. <strong style={{ color: tokens.navy }}>Join to post</strong> for {P.member}/mo.
             </div>
-            <a href="/signup?plan=member" className="rounded-full px-5 py-2.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none", fontSize: 14.5 }}>Join to post</a>
+            <a href="/join" className="rounded-full px-5 py-2.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none", fontSize: 14.5 }}>Join to post</a>
           </div>
         )}
 
