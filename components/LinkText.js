@@ -12,7 +12,7 @@ export default function LinkText({ text }) {
         p.type === "text" ? (
           <span key={i}>{p.value}</span>
         ) : p.type === "tel" ? (
-          <a key={i} href={p.href} style={{ ...linkStyle, whiteSpace: "nowrap" }}><Icon name="phone" size={15} /> {p.value}</a>
+          <a key={i} href={p.href} style={{ ...linkStyle, whiteSpace: "nowrap", display: "inline-block", padding: "8px 2px", margin: "-8px 0" }}><Icon name="phone" size={15} /> {p.value}</a>
         ) : (
           <a key={i} href={p.href} target="_blank" rel="noopener noreferrer" style={linkStyle}>{hostOf(p.value)} <Icon name="external" size={14} /></a>
         )
