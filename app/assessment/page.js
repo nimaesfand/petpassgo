@@ -10,7 +10,7 @@ import FlightLookup, { airportLabel, airlinePickerName } from "../../components/
 import { SampleTravelPass } from "../../components/SalesSamples";
 import { tripAccessCopy, fmtTripDate } from "../../lib/tripAccess";
 import { trackEvent, trackBeginCheckout, getAttribution } from "../../lib/analytics";
-import { startGuestCheckout } from "../../lib/checkout";
+import { GuestEmailSheet } from "../../components/GuestEmailStep";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
 
@@ -247,6 +247,7 @@ export default function PetPassGoQuiz() {
   const [unlocked, setUnlocked] = useState(false);
   const [addMembership, setAddMembership] = useState(false);
   const [purchaseIntent, setPurchaseIntent] = useState(""); // "join" | "pass", from /travel-pass
+  const [guestPlan, setGuestPlan] = useState(""); // signed-out buyer: email sheet open for "pass" | "join"
   const [autoBuy, setAutoBuy] = useState(""); // set when returning signed in from signup/login with a saved purchase
   const [showDetails, setShowDetails] = useState(true);
   // Real membership status (read-only; only the server/Stripe can set it). The checkbox
@@ -317,13 +318,12 @@ export default function PetPassGoQuiz() {
   async function handlePurchase(plan = "pass") {
     const { data } = await supabase.auth.getUser();
     if (!data.user) {
-      // Pay first: Stripe collects email + name; the password is set on /welcome after payment.
+      // Pay first: ask for the email (existing accounts log in instead), then Stripe.
       // Answers stay in this browser so "Back" from Stripe returns to these results.
       const guestPlan = plan === "member" ? "join" : "pass";
       trackBeginCheckout(guestPlan);
       localStorage.setItem("petpassgo_pending_trip", JSON.stringify(answers));
-      const err = await startGuestCheckout(guestPlan, answers, "/assessment?checkout=canceled");
-      if (err) alert(err);
+      setGuestPlan(guestPlan);
       return;
     }
 
@@ -805,6 +805,7 @@ export default function PetPassGoQuiz() {
         </div>
       </div>
       </div>
+      <GuestEmailSheet open={!!guestPlan} title={guestPlan === "join" ? `Join + Travel Pass · ${P.joinToday}` : `Travel Pass · ${P.pass}`} plan={guestPlan} trip={answers} cancelPath="/assessment?checkout=canceled" onClose={() => setGuestPlan("")} />
     </div>
   );
 }
