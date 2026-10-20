@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import Icon from "./Icon";
 import QRCode from "qrcode";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
@@ -66,7 +67,7 @@ export function ChipVault({ pet, userId, onChanged }) {
   return (
     <section id="chip-vault" style={section} aria-label="Chip Vault">
       <div className="flex items-start justify-between gap-3 flex-wrap">
-        <div><div style={h3}>🔖 Chip Vault</div><div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>Private in PetPassGo. The chip registry keeps the official record.</div></div>
+        <div><div style={h3}>Chip Vault</div><div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>Private in PetPassGo. The chip registry keeps the official record.</div></div>
         {due && <DueBadge tone={due.tone}>{due.text}</DueBadge>}
       </div>
       {pet.microchip_number ? (
@@ -75,7 +76,7 @@ export function ChipVault({ pet, userId, onChanged }) {
           <span style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.muted }}>Full number stays private</span>
         </div>
       ) : <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-2">No chip number saved yet. Your vet can read it with a quick, free scan.</p>}
-      {trip && form.microchip_number && due?.tone !== "good" && <div className="rounded-xl p-3 mt-3" style={{ background: "#FFF9EC", fontFamily: font.body, fontSize: 14.5 }}>✈️ Before your {fmtDate(trip.travel_date)} trip{ trip.airline ? ` with ${trip.airline}` : ""}: take two minutes to confirm the registry has your current phone and email.</div>}
+      {trip && form.microchip_number && due?.tone !== "good" && <div className="rounded-xl p-3 mt-3" style={{ background: "#FFF9EC", fontFamily: font.body, fontSize: 14.5 }}><Icon name="plane" size={15} /> Before your {fmtDate(trip.travel_date)} trip{ trip.airline ? ` with ${trip.airline}` : ""}: take two minutes to confirm the registry has your current phone and email.</div>}
       <div className="grid sm:grid-cols-2 gap-2 mt-3">
         <label style={label}>Chip number<input style={input} value={form.microchip_number} onChange={(e) => set("microchip_number", e.target.value)} placeholder="9, 10 or 15 digits" inputMode="numeric" /></label>
         <label style={label}>Chip brand / maker<input style={input} value={form.chip_brand} onChange={(e) => set("chip_brand", e.target.value)} placeholder="e.g. HomeAgain, AVID" /></label>
@@ -104,7 +105,7 @@ export function ChipVault({ pet, userId, onChanged }) {
   );
 }
 
-const KIND = [["vaccine", "💉 Vaccine"], ["medication", "💊 Medication"], ["allergy", "⚠️ Allergy"], ["note", "📝 Care note"]];
+const KIND = [["vaccine", "Vaccine"], ["medication", "Medication"], ["allergy", "Allergy"], ["note", "Care note"]];
 
 export function HealthPassport({ pet, userId, refreshKey = 0 }) {
   const [rows, setRows] = useState([]); const [loading, setLoading] = useState(true); const [show, setShow] = useState(false);
@@ -116,7 +117,7 @@ export function HealthPassport({ pet, userId, refreshKey = 0 }) {
   async function toggle(row) { await supabase.from("pet_health_records").update({ show_to_finder: !row.show_to_finder }).eq("id", row.id); load(); }
   return (
     <section id="health-passport" style={section} aria-label="Health passport">
-      <div className="flex items-start justify-between gap-3 flex-wrap"><div><div style={h3}>🩺 Health passport</div><div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>Owner-entered, not verified by PetPassGo or a vet.</div></div><button onClick={() => setShow((v) => !v)} style={{ ...btn, background: tokens.navy, color: "#fff" }}>+ Add record</button></div>
+      <div className="flex items-start justify-between gap-3 flex-wrap"><div><div style={h3}>Health passport</div><div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>Owner-entered, not verified by PetPassGo or a vet.</div></div><button onClick={() => setShow((v) => !v)} style={{ ...btn, background: tokens.navy, color: "#fff" }}>+ Add record</button></div>
       {show && <form onSubmit={add} className="grid sm:grid-cols-2 gap-2 mt-3 rounded-xl p-3" style={{ background: tokens.paper }}>
         <label style={label}>Type<select style={input} value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })}>{KIND.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
         <label style={label}>Name<input required style={input} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Rabies, medication, allergy…" /></label>
@@ -153,7 +154,7 @@ export function WalletCard({ pet, onDone }) {
       const a = document.createElement("a"); a.download = `${(pet.name || "pet").replace(/[^a-z0-9]+/gi, "-")}-petpassgo-id.png`; a.href = canvas.toDataURL("image/png"); a.click(); onDone?.();
     } finally { setBusy(false); }
   }
-  return <section id="wallet-card" style={section}><div style={h3}>📱 Wallet QR card</div><p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">Save this card to your phone photos or Files for one-tap access to {pet.name}'s QR.</p><button disabled={busy} onClick={download} style={{ ...btn, background: tokens.navy, color: "#fff" }} className="mt-2">{busy ? "Making card…" : "Download QR card"}</button><p style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.muted }} className="mt-2">Apple Wallet needs a paid Apple Developer certificate we don't have yet, and Google Wallet needs issuer access, so there's no one-tap Wallet pass yet. This downloadable card works in any photos app.</p></section>;
+  return <section id="wallet-card" style={section}><div style={h3}>Wallet QR card</div><p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">Save this card to your phone photos or Files for one-tap access to {pet.name}'s QR.</p><button disabled={busy} onClick={download} style={{ ...btn, background: tokens.navy, color: "#fff" }} className="mt-2">{busy ? "Making card…" : "Download QR card"}</button><p style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.muted }} className="mt-2">Apple Wallet needs a paid Apple Developer certificate we don't have yet, and Google Wallet needs issuer access, so there's no one-tap Wallet pass yet. This downloadable card works in any photos app.</p></section>;
 }
 
 export function ShareCard({ pet, userId, onDone }) {
@@ -163,8 +164,8 @@ export function ShareCard({ pet, userId, onDone }) {
   async function create() { setBusy(true); setErr(""); const { data: s } = await supabase.auth.getSession(); const r = await fetch("/api/pet-share", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id, days, preset }) }); const j = await r.json().catch(() => ({})); if (r.ok && j.url) { setUrl(j.url); load(); onDone?.(); } else setErr(j.error || "Couldn't create the link."); setBusy(false); }
   async function revoke(id) { await supabase.from("pet_share_cards").update({ revoked_at: new Date().toISOString() }).eq("id", id); load(); }
   const active = links.filter((l) => !l.revoked_at && new Date(l.expires_at) > new Date());
-  return <section id="share-card" style={section}><div style={h3}>🧑‍⚕️ {pet.name}'s Care Card</div><p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">{preset === "emergency" ? "Meds, allergies, vet and who to call — first. For an emergency vet." : "Feeding, walks, meds, quirks, and who to call. Made for sitters and vets."} A private, expiring link; it never shows the full chip number.</p>
-    <div className="flex gap-2 mt-3" role="tablist" aria-label="Care Card type">{[["sitter", "🧑 Sitter"], ["emergency", "🚑 Emergency"]].map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={preset === k} onClick={() => setPreset(k)} className="rounded-full px-4 py-2" style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 700, background: preset === k ? tokens.navy : tokens.sky, color: preset === k ? "#fff" : tokens.navy, border: "none", cursor: "pointer" }}>{l}</button>)}</div>
+  return <section id="share-card" style={section}><div style={h3}>{pet.name}'s Care Card</div><p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">{preset === "emergency" ? "Meds, allergies, vet and who to call — first. For an emergency vet." : "Feeding, walks, meds, quirks, and who to call. Made for sitters and vets."} A private, expiring link; it never shows the full chip number.</p>
+    <div className="flex gap-2 mt-3" role="tablist" aria-label="Care Card type">{[["sitter", "Sitter"], ["emergency", "Emergency"]].map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={preset === k} onClick={() => setPreset(k)} className="rounded-full px-4 py-2" style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 700, background: preset === k ? tokens.navy : tokens.sky, color: preset === k ? "#fff" : tokens.navy, border: "none", cursor: "pointer" }}>{l}</button>)}</div>
     <div className="flex gap-2 items-center flex-wrap mt-3"><label style={label}>Expires in <select value={days} onChange={(e) => setDays(Number(e.target.value))} style={{ ...input, width: "auto", display: "inline-block", marginLeft: 6 }}><option value={1}>1 day</option><option value={7}>7 days</option><option value={30}>30 days</option></select></label><button disabled={busy} onClick={create} style={{ ...btn, background: tokens.stamp, color: "#fff" }}>{busy ? "Creating…" : "Create share link"}</button></div>
     {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-2">{err}</div>}
     {url && <div className="rounded-xl p-3 mt-3 flex gap-2 flex-wrap items-center" style={{ background: tokens.paper }}><input readOnly value={url} style={{ ...input, flex: 1, minWidth: 220 }} onFocus={(e) => e.target.select()} /><button onClick={() => navigator.clipboard?.writeText(url)} style={{ ...btn, background: tokens.navy, color: "#fff" }}>Copy</button><a href={url} target="_blank" rel="noopener noreferrer" style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, textDecoration: "none" }}>Open / PDF</a></div>}
@@ -188,11 +189,11 @@ function ActivationChecklist({ pet, userId, refreshKey }) {
   useEffect(() => { const h = () => save({ qr_done_at: new Date().toISOString() }); window.addEventListener("ppg-qr-done", h); return () => window.removeEventListener("ppg-qr-done", h); }, [pet.id]);
   if (!act) return null;
   const steps = [
-    { done: !!pet.photo_url, icon: "📸", title: "Add a photo", text: "A clear headshot helps anyone who finds them.", href: `#pet-top-${pet.id}`, cta: "Add photo" },
-    { done: !!(pet.microchip_number && pet.chip_verified_at), icon: "🔖", title: "Save the chip & check it", text: "Two minutes now can bring them home later.", href: "#chip-vault", cta: "Open Chip Vault" },
-    { done: counts.health + counts.docs > 0, icon: "🩺", title: "Add one health record", text: "A vaccine, med or allergy — typed in or smart-imported.", href: "#health-passport", cta: "Add a record" },
-    { done: !!act.qr_done_at, icon: "📱", title: "Download or share the QR card", text: "Keep it on your phone, ready for a sitter or a just-in-case moment.", href: "#wallet-card", cta: "Get the card" },
-    { done: counts.bonus, icon: "✨", title: "Optional: plan a trip or say hello", text: "Start trip questions or browse your airline's board.", href: "/assessment", cta: "Explore", optional: true },
+    { done: !!pet.photo_url, icon: "camera", title: "Add a photo", text: "A clear headshot helps anyone who finds them.", href: `#pet-top-${pet.id}`, cta: "Add photo" },
+    { done: !!(pet.microchip_number && pet.chip_verified_at), icon: "tag", title: "Save the chip & check it", text: "Two minutes now can bring them home later.", href: "#chip-vault", cta: "Open Chip Vault" },
+    { done: counts.health + counts.docs > 0, icon: "stethoscope", title: "Add one health record", text: "A vaccine, med or allergy — typed in or smart-imported.", href: "#health-passport", cta: "Add a record" },
+    { done: !!act.qr_done_at, icon: "smartphone", title: "Download or share the QR card", text: "Keep it on your phone, ready for a sitter or a just-in-case moment.", href: "#wallet-card", cta: "Get the card" },
+    { done: counts.bonus, icon: "sparkle", title: "Optional: plan a trip or say hello", text: "Start trip questions or browse your airline's board.", href: "/assessment", cta: "Explore", optional: true },
   ];
   const required = steps.slice(0, 4); const done = required.filter((x) => x.done).length; const pct = Math.round((done / 4) * 100);
   if (act.dismissed_at && done < 4) return null;
@@ -200,11 +201,11 @@ function ActivationChecklist({ pet, userId, refreshKey }) {
   return <div className="rounded-2xl p-4 mt-3" style={{ background: "linear-gradient(135deg,#FFF9EC,#fff)", border: `1.5px solid ${tokens.gold}` }}>
     <div className="flex items-center gap-3">
       <svg width="58" height="58" viewBox="0 0 58 58" className="flex-shrink-0"><circle cx="29" cy="29" r={r} fill="none" stroke={tokens.line} strokeWidth="6"/><circle cx="29" cy="29" r={r} fill="none" stroke={pct === 100 ? tokens.green : tokens.stamp} strokeWidth="6" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c - c * pct / 100} transform="rotate(-90 29 29)"/><text x="29" y="34" textAnchor="middle" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 13, fill: tokens.navy }}>{pct}%</text></svg>
-      <div className="flex-1 min-w-0"><div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }}>{done === 4 ? `${pet.name}'s ID is all set 🎉` : `Finish ${pet.name}'s ID`}</div><div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>{done === 4 ? "Everything important is stored safely here, ready whenever you need it." : `${done} of 4 little steps done. No rush — each one makes the ID more useful.`}</div></div>
+      <div className="flex-1 min-w-0"><div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }}>{done === 4 ? `${pet.name}'s ID is all set` : `Finish ${pet.name}'s ID`}</div><div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>{done === 4 ? "Everything important is stored safely here, ready whenever you need it." : `${done} of 4 little steps done. No rush — each one makes the ID more useful.`}</div></div>
       {done < 4 && <button onClick={() => save({ dismissed_at: new Date().toISOString() })} style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>Later</button>}
     </div>
     <div className="grid gap-2 mt-3">{steps.map((s) => <div key={s.title} className="flex items-center gap-3 rounded-xl px-3 py-2.5" style={{ background: "#fff", border: `1px solid ${tokens.line}`, opacity: s.done ? 0.72 : 1, flexWrap: "wrap" }}>
-      <span style={{ fontSize: 20 }}>{s.done ? "✅" : s.icon}</span><div className="min-w-0" style={{ flex: "1 1 180px" }}><div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 14.5, color: tokens.navy }}>{s.title}{s.optional ? " (optional)" : ""}</div><div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>{s.text}</div></div>
+      <span style={{ color: s.done ? tokens.green : tokens.navy }}><Icon name={s.done ? "checkCircle" : s.icon} size={22} /></span><div className="min-w-0" style={{ flex: "1 1 180px" }}><div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 14.5, color: tokens.navy }}>{s.title}{s.optional ? " (optional)" : ""}</div><div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>{s.text}</div></div>
       {!s.done && <a href={s.href} className="rounded-full px-3 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 13, fontWeight: 700, textDecoration: "none" }}>{s.cta}</a>}
     </div>)}</div>
   </div>;
@@ -219,9 +220,9 @@ export default function PetIdV2({ pet, userId, onChanged }) {
       <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">{pet.name}'s everyday safety kit: chip details, health records and a card you can share with a vet or sitter.</p>
       <div style={{ fontFamily: font.display, fontSize: 17, fontWeight: 700, color: tokens.navy }} className="mt-3">What to do next</div>
       <ol style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink }} className="mt-1 space-y-1 list-none">
-        <li>1. 🔖 Save the chip and tap “I checked it today”.</li>
-        <li>2. 🩺 Add vaccines, meds and allergies — or smart-import them.</li>
-        <li>3. 📱 Download the QR card and share it when someone cares for {pet.name}.</li>
+        <li>1. Save the chip and tap “I checked it today”.</li>
+        <li>2. Add vaccines, meds and allergies — or smart-import them.</li>
+        <li>3. Download the QR card and share it when someone cares for {pet.name}.</li>
       </ol>
     </div>
     <ChipVault pet={pet} userId={userId} onChanged={onChanged} />

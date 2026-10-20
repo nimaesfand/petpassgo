@@ -7,10 +7,13 @@ import { AIRLINES, requirementAirline } from "../../lib/airlines";
 import { tripTypeForRoute, isMexicoAirport } from "../../lib/airports";
 import AirportField from "../../components/AirportField";
 import FlightLookup, { airportLabel, airlinePickerName } from "../../components/FlightLookup";
-import { SampleTravelPass } from "../../components/SalesSamples";
+import { PassEdge, PassIncluded, PlanPoints } from "../../components/TravelPassOffer";
+import { JOIN_PASS_POINTS, JOIN_PASS_NOTE, passOnlyPoints } from "../../lib/travelPassOffer";
 import { tripAccessCopy, fmtTripDate } from "../../lib/tripAccess";
 import { trackEvent, trackBeginCheckout, getAttribution } from "../../lib/analytics";
 import { GuestEmailSheet } from "../../components/GuestEmailStep";
+import LinkText from "../../components/LinkText";
+import { isTel, prettyPhone } from "../../lib/linkify";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
 
@@ -121,7 +124,7 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
             <div style={{ fontFamily: font.display, fontSize: 17, color: tokens.navy }} className="mb-1">
               {what}
             </div>
-            <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, opacity: 0.75 }}>{why}</div>
+            <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, opacity: 0.85 }}><LinkText text={why} /></div>
           </>
         ) : (
           <div
@@ -154,7 +157,7 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
               <div style={{ fontFamily: font.display, fontSize: 17, color: tokens.navy }} className="mb-1">
                 {what}
               </div>
-              <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, opacity: 0.75 }}>{why}</div>
+              <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, opacity: 0.85 }}><LinkText text={why} /></div>
             </>
           ) : (
             <div
@@ -213,8 +216,7 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
           {link && (
             <a
               href={link}
-              target="_blank"
-              rel="noopener noreferrer"
+              {...(isTel(link) ? {} : { target: "_blank", rel: "noopener noreferrer" })}
               style={{
                 fontFamily: font.body,
                 fontSize: 14,
@@ -227,7 +229,7 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
               }}
               className="rounded-full px-4 py-1.5 hover:opacity-90 transition"
             >
-              Go here →
+              {isTel(link) ? `📞 Call ${prettyPhone(link)}` : "Go here →"}
             </a>
           )}
           </div>
@@ -715,8 +717,9 @@ export default function PetPassGoQuiz() {
 
               {!unlocked && !noMatch && (
                 <div className="mt-6 mb-2">
-                  <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }} className="mb-3">Here’s what your Travel Pass gives you</div>
-                  <SampleTravelPass />
+                  <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }} className="mb-3">What your Travel Pass gives you</div>
+                  <PassEdge />
+                  <div className="mt-3"><PassIncluded /></div>
                 </div>
               )}
 
@@ -730,14 +733,9 @@ export default function PetPassGoQuiz() {
                     >
                       Unlock your Travel Pass — {P.memberPass} member price
                     </button>
-                    <ul
-                      style={{ fontFamily: font.body, fontSize: 14, color: tokens.ink, opacity: 0.75 }}
-                      className="mt-3 rounded-lg p-3 list-disc pl-5 space-y-1"
-                    >
-                      <li>This trip's full requirement list, deadlines, and submission steps</li>
-                      <li>Your existing pet profile and documents carried over automatically</li>
-                      <li>Reminders before each deadline</li>
-                    </ul>
+                    <div className="mt-3 rounded-xl p-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+                      <PlanPoints points={["This trip’s full Travel Pass", "Your pet’s records and Pet ID carried over"]} />
+                    </div>
                   </div>
                 ) : (
                   <div className="mt-5">
@@ -745,16 +743,11 @@ export default function PetPassGoQuiz() {
                       className="rounded-xl p-5 mb-4"
                       style={{ background: tokens.navy }}
                     >
-                      <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold, letterSpacing: "0.1em" }} className="mb-2">
+                      <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold, letterSpacing: "0.1em" }} className="mb-1">
                         READY TO FLY WITH {(answers.airline || "YOUR AIRLINE").toUpperCase()}
                       </div>
-                      <div style={{ fontFamily: font.display, fontSize: 18, color: "#fff" }} className="mb-2">
-                        Everything you need for your trip is ready and waiting.
-                      </div>
-                      <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.sky, opacity: 0.85 }}>
-                        Every document, every form, the exact cost, and precisely where to send it — verified and
-                        ready the moment you unlock it below. No guessing, no outdated blog posts, no calling the
-                        airline and getting a different answer every time.
+                      <div style={{ fontFamily: font.display, fontSize: 18, color: "#fff" }}>
+                        Your pass for this trip is ready to unlock.
                       </div>
                     </div>
 
@@ -763,7 +756,7 @@ export default function PetPassGoQuiz() {
                         <span className="absolute -top-3 left-5 rounded-full px-3 py-0.5" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 11 }}>{purchaseIntent === "join" ? "YOUR PICK · " : ""}SAVE {P.savings} ON THIS TRIP</span>
                         <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 12.5, letterSpacing: ".12em", color: tokens.gold }} className="mb-1 mt-1">JOIN + PASS</div>
                         <div style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700 }}>{P.memberPass} <span style={{ fontSize: 15, fontWeight: 500, opacity: 0.75 }}>+ {P.member}/mo</span></div>
-                        <p style={{ fontFamily: font.body, fontSize: 14, opacity: 0.8 }} className="mb-4 flex-1">This trip, plus Pet ID, lost-pet alerts, community and every future pass at {P.memberPass}.</p>
+                        <div className="mb-4 flex-1 flex flex-col"><PlanPoints dark points={JOIN_PASS_POINTS} note={JOIN_PASS_NOTE} /></div>
                         <button onClick={() => { setAddMembership(true); handlePurchase("member"); }} className="w-full rounded-full py-3 hover:opacity-90 transition" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, fontSize: 15 }}>
                           Join and unlock your Travel Pass · {P.joinToday} today
                         </button>
@@ -771,13 +764,13 @@ export default function PetPassGoQuiz() {
                       <div className="rounded-2xl p-5 flex flex-col" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
                         <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 12.5, letterSpacing: ".12em", color: tokens.primary }} className="mb-1 mt-1">THIS TRIP ONLY</div>
                         <div style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700, color: tokens.navy }}>{P.pass}</div>
-                        <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-4 flex-1">Full checklist, deadlines, sources and reminders. {tripAccessCopy(answers.date, answers.round_trip ? answers.return_date : null)}.{purchaseIntent === "pass" ? " (Your pick.)" : ""}</p>
+                        <div className="mb-4 flex-1 flex flex-col"><PlanPoints points={passOnlyPoints(tripAccessCopy(answers.date, answers.round_trip ? answers.return_date : null))} note={purchaseIntent === "pass" ? "Your pick." : null} /></div>
                         <button onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3 hover:opacity-90 transition" style={{ background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, fontFamily: font.body, fontWeight: 600, fontSize: 15 }}>
                           Unlock your Travel Pass — {P.pass}
                         </button>
                       </div>
                     </div>
-                    <p style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }} className="mt-3 text-center">Membership is monthly. Cancel anytime.</p>
+                    <p style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }} className="mt-3 text-center">Nothing is charged until checkout.</p>
 
                   </div>
                 )

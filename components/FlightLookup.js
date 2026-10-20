@@ -118,7 +118,7 @@ export function LiveFlightCard({ trip }) {
   return (
     <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
       <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-        <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.navy }}>✈️ Live flight</div>
+        <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.navy }}>Live flight</div>
         {data && <button type="button" disabled={busy} onClick={() => load()} className="rounded-full px-4 py-1.5 disabled:opacity-50" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 13.5, fontWeight: 700 }}>{busy ? "Checking…" : "Refresh"}</button>}
       </div>
       {data ? <FlightSummary f={data} /> : (

@@ -7,6 +7,7 @@ import GuestEmailStep from "../../components/GuestEmailStep";
 import { startStripe } from "../../lib/checkout";
 import { trackBeginCheckout } from "../../lib/analytics";
 import { PRICES as P } from "../../lib/pricing";
+import { VAULT_NAME, VAULT_SUB } from "../../lib/travelPassOffer";
 import { tokens, font } from "../../lib/theme";
 
 // Membership. Signed in → straight to Stripe. Signed out → email first (existing accounts log in), then Stripe.
@@ -30,7 +31,8 @@ export default function JoinPage() {
           {mode === "guest" ? (
             <>
               <h1 style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-1">Join PetPassGo</h1>
-              <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-4">{P.member}/mo · cancel anytime</p>
+              <p style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{VAULT_NAME} · {P.member}/mo</p>
+              <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-4">{VAULT_SUB} Cancel anytime.</p>
               <GuestEmailStep plan="membership" cancelPath="/" />
             </>
           ) : mode === "error" ? (

@@ -79,7 +79,7 @@ export default function VetImport({ pet, userId, onSaved }) {
 
   return (
     <section id="vet-import" style={{ borderTop: `1px solid ${tokens.line}`, paddingTop: 16, marginTop: 16 }} aria-label="Smart vet paperwork import">
-      <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }}>📄 Smart import from vet paperwork</div>
+      <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }}>Smart import from vet paperwork</div>
       <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mt-1">Upload a photo or PDF. We read it, you check every detail, and nothing is saved until you confirm. The file goes into {pet.name}'s private vault and is sent only to read it — never used to train anything. Everything saved is marked owner-confirmed, not verified by a vet.</p>
       {phase !== "review" && phase !== "done" && (
         <label className="inline-block mt-3 rounded-full px-5 py-2.5 cursor-pointer" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 14.5, opacity: phase === "reading" ? 0.6 : 1 }}>

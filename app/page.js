@@ -6,6 +6,7 @@ import SiteHeader from "../components/SiteHeader";
 import Logo from "../components/Logo";
 import { PlanCards } from "../components/PricingPlans";
 import { PRICES } from "../lib/pricing";
+import { VAULT_SUB } from "../lib/travelPassOffer";
 import { PetIllustration } from "../components/PetIdCard";
 import PetQr from "../lib/PetQr";
 import { AIRLINE_GUIDES } from "../lib/airlineGuides";
@@ -267,7 +268,7 @@ export default function PetPassGoLanding() {
             },
             {
               title: "Pet Vault? Start here.",
-              body: "Your pet's ID, chip and vet records, all in one place.",
+              body: VAULT_SUB,
               cta: "See the Pet Vault",
               href: "/pet-vault",
               lead: "",

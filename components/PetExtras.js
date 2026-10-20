@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import Icon from "./Icon";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
 import { todayPT } from "../lib/travelDates";
@@ -27,7 +28,7 @@ export function SampleDogPreview({ petId, compact = false }) {
     <div className="rounded-xl p-3 mt-3" style={{ background: "#FFF9EC", border: `1.5px dashed ${tokens.gold}`, fontFamily: font.body }} aria-label="Sample preview">
       <div className="flex items-start justify-between gap-2">
         <div style={{ fontWeight: 800, fontSize: 13, letterSpacing: "0.08em", color: tokens.primary }}>SAMPLE · {SAMPLE_DOG.name} · Sample dog</div>
-        <button type="button" aria-label="Dismiss sample" onClick={() => { setGone(true); try { localStorage.setItem(key, "1"); } catch {} }} style={{ background: "none", border: "none", color: tokens.muted, fontSize: 16, cursor: "pointer", lineHeight: 1 }}>✕</button>
+        <button type="button" aria-label="Dismiss sample" onClick={() => { setGone(true); try { localStorage.setItem(key, "1"); } catch {} }} style={{ background: "none", border: "none", color: tokens.muted, fontSize: 16, cursor: "pointer", lineHeight: 1 }}><Icon name="x" size={16} /></button>
       </div>
       <div style={{ fontSize: 14.5, color: tokens.ink }} className="mt-1">This is what it looks like once your records are in — {SAMPLE_DOG.breed}:</div>
       {!compact && <div className="mt-2 space-y-1">{SAMPLE_DOG.rows.map((r) => (
@@ -60,9 +61,9 @@ export function WhatsNeededNext({ pet }) {
   if (!state) return null;
   return (
     <section style={section} aria-label="What's needed next">
-      <div style={h3}>⏰ What's needed next</div>
+      <div style={h3}>What's needed next</div>
       {state.items.length === 0 ? (
-        <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">Nothing is due for {pet.name} right now. 🎉</p>
+        <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">Nothing is due for {pet.name} right now.</p>
       ) : (
         <div className="mt-2 space-y-1.5">{state.items.slice(0, 5).map((it) => (
           <a key={it.key} href={it.href || "#health-passport"} className="flex items-center justify-between gap-3 rounded-xl px-3 py-2.5" style={{ background: it.tone === "bad" ? "#FDE8E2" : it.tone === "warn" ? "#FFF3D6" : tokens.paper, textDecoration: "none" }}>
@@ -102,12 +103,12 @@ export function TravelStamps({ pet }) {
   return (
     <section style={section} aria-label="Travel stamps">
       <details>
-        <summary style={{ ...h3, cursor: "pointer" }}>✈️ {pet.name}'s travel stamps{stamps.length ? ` (${stamps.length})` : ""}</summary>
+        <summary style={{ ...h3, cursor: "pointer" }}>{pet.name}'s travel stamps{stamps.length ? ` (${stamps.length})` : ""}</summary>
         {stamps.length === 0 ? (
           <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-2">No travel stamps yet — they appear here after a Travel Pass trip.</p>
         ) : <>
           <div className="flex flex-wrap gap-2 mt-3">{stamps.map((s) => (
-            <span key={s.id} className="rounded-full px-3.5 py-2" style={{ background: tokens.sky, border: `1.5px dashed ${tokens.navy}`, fontFamily: font.body, fontSize: 13.5, fontWeight: 700, color: tokens.navy }}>✈ {s.origin} → {s.destination} · {fmtDate(s.travelDate)}</span>
+            <span key={s.id} className="rounded-full px-3.5 py-2" style={{ background: tokens.sky, border: `1.5px dashed ${tokens.navy}`, fontFamily: font.body, fontSize: 13.5, fontWeight: 700, color: tokens.navy }}><Icon name="plane" size={14} /> {s.origin} → {s.destination} · {fmtDate(s.travelDate)}</span>
           ))}</div>
           <button type="button" disabled={busy} onClick={shareImage} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="mt-3">{busy ? "Making image…" : "Download stamps image"}</button>
         </>}
@@ -116,7 +117,7 @@ export function TravelStamps({ pet }) {
   );
 }
 
-const VET_MODES = [["nearby", "📍 Nearby"], ["emergency", "🚑 Emergency"], ["destination", "✈️ At a destination"]];
+const VET_MODES = [["nearby", "Nearby"], ["emergency", "Emergency"], ["destination", "At a destination"]];
 
 export function FindAVet({ pet }) {
   const [mode, setMode] = useState("nearby");
@@ -146,7 +147,7 @@ export function FindAVet({ pet }) {
   return (
     <section id="find-a-vet" style={section} aria-label="Find a vet">
       <details>
-        <summary style={{ ...h3, cursor: "pointer" }}>🩺 Find a vet for {pet.name}</summary>
+        <summary style={{ ...h3, cursor: "pointer" }}>Find a vet for {pet.name}</summary>
         <div className="flex gap-2 flex-wrap mt-3" role="tablist" aria-label="Vet search mode">
           {VET_MODES.map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={mode === k} onClick={() => { setMode(k); setSpots(null); setMsg(""); }} className="rounded-full px-4 py-2" style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 700, background: mode === k ? tokens.navy : tokens.sky, color: mode === k ? "#fff" : tokens.navy, border: "none", cursor: "pointer" }}>{l}</button>)}
         </div>
