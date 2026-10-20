@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { stripe, priceId, siteUrl, serviceClient } from "@/lib/stripeServer";
-import { cleanTrip } from "@/lib/guestCheckout";
+import { stripe, priceId, siteUrl, serviceClient, isMember } from "@/lib/stripeServer";
+import { cleanTrip, userIdByEmail } from "@/lib/guestCheckout";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +34,20 @@ async function handle(req) {
   }
   const cancelPath = typeof body?.cancel_path === "string" && /^\/(?!\/)[\w\-\/?=&.%]*$/.test(body.cancel_path) ? body.cancel_path.slice(0, 200) : "/";
 
+  const email = String(body?.email || "").trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return NextResponse.json({ error: "Please enter a valid email." }, { status: 400 });
+
   const sb = serviceClient();
+  // Per-IP limit on the email check (it reveals whether an account exists).
+  const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
+  const { data: allowed, error: rlErr } = await sb.rpc("rate_limit_hit", { p_key: `guest_checkout:${ip}`, p_limit: 15, p_window_seconds: 600 });
+  if (rlErr) throw rlErr;
+  if (!allowed) return NextResponse.json({ error: "Too many tries. Please wait a few minutes and try again." }, { status: 429 });
+
+  // Already has an account? Log in instead (members get the member price; no second membership).
+  const uid = await userIdByEmail(sb, email);
+  if (uid) return NextResponse.json({ action: "login", member: await isMember(sb, uid) });
+
   const { data: row, error } = await sb.from("guest_checkouts").insert({ plan, trip, attribution }).select("id").single();
   if (error) throw error;
 
@@ -43,6 +56,7 @@ async function handle(req) {
   const params = {
     metadata: meta,
     client_reference_id: row.id,
+    customer_email: email,
     custom_fields: NAME_FIELDS,
     success_url: `${base}/welcome?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${base}${cancelPath}`,
@@ -68,5 +82,5 @@ async function handle(req) {
   }
   const session = await stripe().checkout.sessions.create(params);
   await sb.from("guest_checkouts").update({ stripe_checkout_session_id: session.id }).eq("id", row.id);
-  return NextResponse.json({ url: session.url });
+  return NextResponse.json({ action: "checkout", url: session.url });
 }

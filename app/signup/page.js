@@ -7,6 +7,7 @@ import SiteHeader from "../../components/SiteHeader";
 import { trackEvent, getAttribution } from "../../lib/analytics";
 import { tokens, font } from "../../lib/theme";
 import { saveCheckoutIntent, resumeAfterAuth } from "../../lib/resumeIntent";
+import GuestEmailStep from "../../components/GuestEmailStep";
 
 
 
@@ -16,12 +17,14 @@ export default function SignupPage() {
   const [status, setStatus] = useState("idle"); // idle, loading, success, error
   const [errorMsg, setErrorMsg] = useState("");
   const [plan, setPlan] = useState("member");
+  const [free, setFree] = useState(false); // free account only (no plan, nothing to pay)
   useEffect(() => {
     const q = new URLSearchParams(window.location.search).get("plan");
     // Pay first: plan links skip account creation and go straight to checkout.
     if (q === "member" && !localStorage.getItem("petpassgo_pending_trip")) { window.location.replace("/join"); return; }
     if (q === "pass" && !localStorage.getItem("petpassgo_pending_trip")) { window.location.replace("/assessment?plan=pass"); return; }
     if (q === "pass" || q === "member") setPlan(q);
+    if (new URLSearchParams(window.location.search).get("free") === "1") setFree(true);
     else if (localStorage.getItem("petpassgo_pending_trip")) setPlan("pass");
   }, []);
 
@@ -33,7 +36,7 @@ export default function SignupPage() {
     // Remember the chosen plan so signup (or a later login) continues straight to checkout.
     localStorage.setItem("petpassgo_plan", plan);
     const hasTrip = !!localStorage.getItem("petpassgo_pending_trip");
-    saveCheckoutIntent(hasTrip ? null : plan === "member" ? "membership" : "pass");
+    saveCheckoutIntent(hasTrip || free ? null : plan === "member" ? "membership" : "pass");
     try { localStorage.setItem("ppg_signup_attribution", JSON.stringify(getAttribution())); } catch {}
 
     const r = await fetch("/api/auth/signup", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
@@ -70,35 +73,9 @@ export default function SignupPage() {
             </div>
           ) : (
             <>
-              <h1 style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700, color: tokens.navy }} className="mb-1 text-center">
-                Choose your plan
-              </h1>
-              <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-6 text-center">
-                You can switch later.
-              </p>
-              <div role="radiogroup" aria-label="Plan" className="mb-6">
-                {[
-                  ["member", "Membership", `${P.member}/mo`, `Pet vault, Digital Pet ID, lost-pet alerts, community. Travel Passes ${P.memberPass}.`],
-                  ["pass", "Travel Pass only", `${P.pass} per trip`, "One trip's checklist, deadlines and reminders. Pet ID & vault stay open until 7 days after your travel date, or 7 days after your return if you add one."],
-                ].map(([k, n, price, d]) => {
-                  const sel = plan === k;
-                  return (
-                    <label key={k} className="flex gap-3 items-start rounded-2xl p-4 mb-3 cursor-pointer" style={{ border: `2px solid ${sel ? tokens.primary : tokens.line}`, background: sel ? "#FFF7F2" : "#fff" }}>
-                      <input type="radio" name="plan" value={k} checked={sel} onChange={() => setPlan(k)} className="mt-1.5" style={{ accentColor: tokens.primary }} />
-                      <span className="flex-1">
-                        <span className="flex justify-between gap-2 flex-wrap">
-                          <span style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }}>
-                            {n}{k === "member" && <span className="ml-2 rounded-full px-2 py-0.5 align-middle" style={{ background: tokens.gold, fontFamily: font.body, fontSize: 10.5, fontWeight: 800 }}>BEST VALUE</span>}
-                          </span>
-                          <span style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy, fontSize: 15 }}>{price}</span>
-                        </span>
-                        <span style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>{d}</span>
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-
+              {free ? (
+                <>
+                  <h1 style={{ fontFamily: font.display, fontSize: 28, fontWeight: 700, color: tokens.navy }} className="mb-5 text-center">Create a free account</h1>
               <form onSubmit={handleSignup} className="flex flex-col gap-3">
                 <input
                   type="email"
@@ -130,14 +107,61 @@ export default function SignupPage() {
                   style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}
                   className="btn-primary rounded-full py-3.5 text-[16px] mt-2"
                 >
-                  {status === "loading" ? "Creating account…" : plan === "member" ? `Create account · Membership ${P.member}/mo` : "Create account · Travel Pass"}
+                  {status === "loading" ? "Creating account…" : "Create free account"}
                 </button>
                 <p style={{ fontFamily: font.body, fontSize: 13, opacity: 0.7 }} className="text-center">
-                  {plan === "member" ? "Monthly, cancel anytime. " : ""}Next: secure checkout with Stripe. By creating an account you agree to our{" "}
+                  No plan, nothing to pay. By creating an account you agree to our{" "}
                   <a href="/terms" style={{ color: tokens.navy, textDecoration: "underline" }}>Terms of Service</a> and{" "}
                   <a href="/privacy" style={{ color: tokens.navy, textDecoration: "underline" }}>Privacy Policy</a>.
                 </p>
               </form>
+
+                  <button type="button" onClick={() => setFree(false)} className="w-full mt-3 py-1" style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted, background: "none", border: "none" }}>See plans instead</button>
+                </>
+              ) : (
+                <>
+              <h1 style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700, color: tokens.navy }} className="mb-1 text-center">
+                Choose your plan
+              </h1>
+              <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-6 text-center">
+                You can switch later.
+              </p>
+              <div role="radiogroup" aria-label="Plan" className="mb-6">
+                {[
+                  ["member", "Membership", `${P.member}/mo`, `Pet vault, Digital Pet ID, lost-pet alerts, community. Travel Passes ${P.memberPass}.`],
+                  ["pass", "Travel Pass only", `${P.pass} per trip`, "One trip's checklist, deadlines and reminders. Pet ID & vault stay open until 7 days after your travel date, or 7 days after your return if you add one."],
+                ].map(([k, n, price, d]) => {
+                  const sel = plan === k;
+                  return (
+                    <label key={k} className="flex gap-3 items-start rounded-2xl p-4 mb-3 cursor-pointer" style={{ border: `2px solid ${sel ? tokens.primary : tokens.line}`, background: sel ? "#FFF7F2" : "#fff" }}>
+                      <input type="radio" name="plan" value={k} checked={sel} onChange={() => setPlan(k)} className="mt-1.5" style={{ accentColor: tokens.primary }} />
+                      <span className="flex-1">
+                        <span className="flex justify-between gap-2 flex-wrap">
+                          <span style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }}>
+                            {n}{k === "member" && <span className="ml-2 rounded-full px-2 py-0.5 align-middle" style={{ background: tokens.gold, fontFamily: font.body, fontSize: 10.5, fontWeight: 800 }}>BEST VALUE</span>}
+                          </span>
+                          <span style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy, fontSize: 15 }}>{price}</span>
+                        </span>
+                        <span style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>{d}</span>
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+
+              {plan === "member" ? (
+                <GuestEmailStep plan="membership" cancelPath="/signup" />
+              ) : (
+                <a href="/assessment?plan=pass" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }} className="btn-primary block text-center rounded-full py-3.5 text-[16px]">Start your trip · {P.pass}</a>
+              )}
+              <p style={{ fontFamily: font.body, fontSize: 13, opacity: 0.7 }} className="text-center mt-3">
+                {plan === "member" ? "Monthly, cancel anytime. Pay first, then set your password. " : ""}By continuing you agree to our{" "}
+                <a href="/terms" style={{ color: tokens.navy, textDecoration: "underline" }}>Terms of Service</a> and{" "}
+                <a href="/privacy" style={{ color: tokens.navy, textDecoration: "underline" }}>Privacy Policy</a>.
+              </p>
+              <button type="button" onClick={() => setFree(true)} className="w-full mt-2 py-1" style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted, background: "none", border: "none" }}>Just want a free account?</button>
+                </>
+              )}
 
               <div style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="text-center mt-5">
                 Already have an account?{" "}

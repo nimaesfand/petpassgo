@@ -29,7 +29,7 @@ export default function CommunityPaywall({ boardName, signedIn }) {
           ) : (
             <>
               <a href="/login" className="btn-primary block rounded-full py-3.5 mb-2" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Log in</a>
-              <a href="/signup" className="block rounded-full py-3" style={{ fontFamily: font.body, fontWeight: 600, color: tokens.navy, textDecoration: "none" }}>Create a free account</a>
+              <a href="/signup?free=1" className="block rounded-full py-3" style={{ fontFamily: font.body, fontWeight: 600, color: tokens.navy, textDecoration: "none" }}>Create a free account</a>
             </>
           )}
           <p style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }} className="mt-3">
