@@ -58,9 +58,10 @@ export function WhatsNeededNext({ pet }) {
       .map((it) => it.source === "document" ? { ...it, href: `#documents-${pet.id}` } : it);
     setState({ items, hasData: (health || []).length + (docs || []).length > 0, nextTrip });
   })(); }, [pet.id, firstId]);
-  if (!state) return null;
+  // Only shown when something is actually due; no empty card, no sample in the vault.
+  if (!state || state.items.length === 0) return null;
   return (
-    <section style={section} aria-label="What's needed next">
+    <section style={{ ...section, borderTop: "none", paddingTop: 0 }} aria-label="What's needed next">
       <div style={h3}>What's needed next</div>
       {state.items.length === 0 ? (
         <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">Nothing is due for {pet.name} right now.</p>
@@ -73,7 +74,6 @@ export function WhatsNeededNext({ pet }) {
           {state.items.length > 5 && <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>+ {state.items.length - 5} more below</div>}
         </div>
       )}
-      {!state.hasData && <SampleDogPreview petId={pet.id} />}
     </section>
   );
 }

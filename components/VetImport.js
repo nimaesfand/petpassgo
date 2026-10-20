@@ -89,7 +89,7 @@ export default function VetImport({ pet, userId, onSaved }) {
       )}
       {phase === "reading" && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mt-2">This can take a few seconds…</div>}
       {err && <div className="rounded-xl p-3 mt-3" style={{ background: "#FFF9EC", fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>{err}{path && phase === "idle" && <div className="mt-2 flex gap-2"><button onClick={discard} style={{ ...btn, background: "#fff", color: tokens.stamp, border: `2px solid ${tokens.stamp}`, padding: "6px 12px", fontSize: 13 }}>Remove uploaded file</button></div>}</div>}
-      {phase === "done" && <div className="rounded-xl p-3 mt-3" style={{ background: "#EAF6EE", fontFamily: font.body, fontSize: 14.5 }}>✓ Saved as owner-confirmed details. You'll see them in the Chip Vault, Health passport and vet info above.</div>}
+      {phase === "done" && <div className="rounded-xl p-3 mt-3" style={{ background: "#EAF6EE", fontFamily: font.body, fontSize: 14.5 }}>Saved. You'll see them under Microchip, Health records and Vet &amp; emergency contact.</div>}
       {phase === "review" && f && (
         <div className="rounded-xl p-4 mt-3" style={{ background: tokens.paper, border: `1.5px solid ${tokens.gold}` }}>
           <div style={{ fontFamily: font.display, fontSize: 17, fontWeight: 700, color: tokens.navy }}>Check what we read — edit anything</div>

@@ -55,7 +55,8 @@ export function TripCountdown({ trip, pet, done, total }) {
   else if (days > 1) headline = `${name} flies in ${days} days`;
   else if (days === 1) headline = `${name} flies tomorrow!`;
   else if (days === 0) headline = `${name} flies today!`;
-  else headline = `${name}'s trip is done. Welcome home!`;
+  else if (trip.return_date && trip.return_date >= today) headline = `${name} is away · back ${new Date(`${trip.return_date}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+  else headline = total > 0 && done < total ? `${name}'s trip date has passed` : `${name}'s trip is done. Welcome home!`;
   const r = 26, c = 2 * Math.PI * r;
   return (
     <div className="rounded-2xl p-5 mb-4 flex items-center gap-4" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>

@@ -15,7 +15,11 @@ import { requirementAirline } from "../../lib/airlines";
 import { tripTypeForRoute, isMexicoAirport } from "../../lib/airports";
 import SiteHeader from "../../components/SiteHeader";
 import { useTripPet, isTravelDay, TripCountdown, DayOfMode, PetReliefCard, CommunityPulse, TripExtras } from "../../components/TripLive";
-import PetIdV2, { maskChip } from "../../components/PetIdV2";
+import { maskChip, ChipVault, HealthPassport, ShareCard, WalletCard, ActivationChecklist } from "../../components/PetIdV2";
+import { WhatsNeededNext, TravelStamps, FindAVet } from "../../components/PetExtras";
+import VetImport from "../../components/VetImport";
+import PetQr from "../../lib/PetQr";
+import { PetIdSheet, cardFromPet, rabiesLine, isService } from "../../components/PetIdPreview";
 import FeedbackPrompt from "../../components/FeedbackPrompt";
 import MobileBottomNav from "../../components/MobileBottomNav";
 import LostPanel from "../../components/LostPanel";
@@ -98,6 +102,8 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
     emergency_contact_name: pet.emergency_contact_name || "",
     emergency_contact_phone: pet.emergency_contact_phone || "",
     microchip_number: pet.microchip_number || "",
+    handler_name: pet.handler_name || "",
+    trained: pet.trained == null ? "" : pet.trained ? "yes" : "no",
   });
   const [savingEdit, setSavingEdit] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -118,7 +124,8 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         vet_phone: editForm.vet_phone || null,
         emergency_contact_name: editForm.emergency_contact_name || null,
         emergency_contact_phone: editForm.emergency_contact_phone || null,
-        microchip_number: editForm.microchip_number || null,
+        handler_name: editForm.handler_name.trim() || null,
+        trained: editForm.trained === "" ? null : editForm.trained === "yes",
       })
       .eq("id", pet.id);
     setSavingEdit(false);
@@ -281,469 +288,188 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
   const current = measurements[0];
   const previous = measurements[1];
   const delta = current && previous ? current.value - previous.value : null;
+  const [showId, setShowId] = useState(false);
+  const [healthRows, setHealthRows] = useState([]);
+  const [healthKey, setHealthKey] = useState(0);
+  useEffect(() => { supabase.from("pet_health_records").select("kind,name,expires_on").eq("pet_id", pet.id).then(({ data }) => setHealthRows(data || [])); }, [pet.id, healthKey]);
+  const card = cardFromPet(pet, healthRows);
+  const rab = rabiesLine(card.rabiesExpires);
+  const field = { fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 };
+  const fieldCls = "rounded-lg px-3 py-2 outline-none w-full";
+  const sub = (t) => <div style={{ fontFamily: font.body, fontSize: 13, fontWeight: 700, color: tokens.navy }} className="mt-2">{t}</div>;
+  const photoEl = pet.photo_url ? <SignedImg value={pet.photo_url} alt={pet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : null;
 
   return (
-    <div id={`pet-top-${pet.id}`} className="rounded-xl p-5 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-      <div className="flex items-center gap-4">
+    <div id={`pet-top-${pet.id}`} data-pet-passport className="rounded-2xl p-4 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+      <div className="flex items-center gap-3">
         <div className="relative flex-shrink-0">
-          {pet.photo_url ? (
-            <SignedImg
-              value={pet.photo_url}
-              alt={pet.name}
-              className="rounded-full object-cover"
-              style={{ width: 48, height: 48 }}
-            />
-          ) : (
-            <div
-              className="rounded-full flex items-center justify-center"
-              style={{ width: 48, height: 48, background: tokens.sky, fontSize: 22 }}
-            >
-              <Icon name="paw" size={28} stroke={1.5} />
-            </div>
-          )}
-          <label
-            style={{
-              position: "absolute",
-              bottom: -2,
-              right: -2,
-              width: 18,
-              height: 18,
-              background: tokens.navy,
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 12,
-              cursor: "pointer",
-              border: "2px solid #fff",
-            }}
-          >
-            <Icon name="camera" size={18} />
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handlePhotoUpload}
-              style={{ display: "none" }}
-            />
+          <div className="rounded-2xl overflow-hidden flex items-center justify-center" style={{ width: 60, height: 60, background: tokens.sky, border: `2px solid ${isService(pet.role) ? tokens.primary : tokens.gold}` }}>
+            {photoEl || <PetIllustration type={pet.animal_type} size={56} />}
+          </div>
+          <label aria-label="Change photo" className="absolute flex items-center justify-center" style={{ bottom: -4, right: -4, width: 24, height: 24, background: tokens.navy, borderRadius: "50%", cursor: "pointer", border: "2px solid #fff" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: "none" }} />
           </label>
         </div>
-        <div className="flex-1">
-          <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.navy }}>{pet.name}</div>
-          <div style={{ fontFamily: font.body, fontSize: 14.5, opacity: 0.65 }}>
-            {pet.breed ? `${pet.breed} · ` : ""}
-            {pet.sex ? `${pet.sex} · ` : ""}
-            {calculateAge(pet.date_of_birth) ? `${calculateAge(pet.date_of_birth)} · ` : ""}
-            {pet.role}
+        <div className="flex-1 min-w-0">
+          <div style={{ fontFamily: font.display, fontSize: 21, fontWeight: 700, color: tokens.navy, lineHeight: 1.15 }}>{pet.name}</div>
+          <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>
+            {[pet.breed || pet.animal_type, pet.sex, calculateAge(pet.date_of_birth), isService(pet.role) ? "Service dog" : null].filter(Boolean).join(" · ")}
           </div>
-          {pet.passport_no && <div style={{ fontFamily: font.body, fontSize: 13, fontWeight: 700, color: tokens.navy }}>Passport No. {pet.passport_no}</div>}
+          {pet.passport_no && <div style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 700, color: tokens.navy, letterSpacing: "0.04em" }}>No. {pet.passport_no}</div>}
         </div>
-        <div className="flex flex-col items-end gap-1">
-          <button
-            onClick={handleShare}
-            style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.green, fontWeight: 600 }}
-          >
-            {justCopied ? "Copied!" : <><Icon name="share" size={16} /> Share</>}
-          </button>
-          <button
-            onClick={() => setShowEditForm((v) => !v)}
-            style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.navy, fontWeight: 600 }}
-          >
-            Edit
-          </button>
-          <button
-            onClick={handleDeletePet}
-            disabled={deleting}
-            style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.stamp, opacity: 0.7 }}
-          >
-            {deleting ? "Removing…" : "Remove"}
-          </button>
-        </div>
+        <button onClick={() => setShowEditForm((v) => !v)} className="rounded-full px-3.5 py-1.5" style={{ fontFamily: font.body, fontSize: 14, color: tokens.navy, fontWeight: 700, background: tokens.sky, border: "none", cursor: "pointer" }}>
+          {showEditForm ? "Close" : "Edit"}
+        </button>
       </div>
+      {uploadingPhoto && <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mt-2">Uploading photo…</div>}
 
       {showEditForm && (
-        <form
-          onSubmit={handleSaveEdit}
-          className="rounded-xl p-4 mt-3"
-          style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}
-        >
-          <div className="flex flex-col gap-2">
-            <input
-              required
-              placeholder="Name"
-              value={editForm.name}
-              onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
-              className="rounded-lg px-3 py-2 outline-none"
-            />
-            <div className="flex gap-2">
-              <select
-                value={editForm.animal_type}
-                onChange={(e) => setEditForm((f) => ({ ...f, animal_type: e.target.value }))}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
-                className="rounded-lg px-3 py-2 outline-none flex-1"
-              >
-                <option>Dog</option>
-                <option>Cat</option>
-                <option>Other</option>
-              </select>
-              <select
-                value={editForm.role}
-                onChange={(e) => setEditForm((f) => ({ ...f, role: e.target.value }))}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
-                className="rounded-lg px-3 py-2 outline-none flex-1"
-              >
-                <option>Pet</option>
-                <option>Service animal</option>
-              </select>
-            </div>
-            <input
-              placeholder="Breed (optional)"
-              value={editForm.breed}
-              onChange={(e) => setEditForm((f) => ({ ...f, breed: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
-              className="rounded-lg px-3 py-2 outline-none"
-            />
-            <div className="flex gap-2">
-              <select
-                value={editForm.sex}
-                onChange={(e) => setEditForm((f) => ({ ...f, sex: e.target.value }))}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
-                className="rounded-lg px-3 py-2 outline-none flex-1"
-              >
-                <option value="">Sex (optional)</option>
-                <option>Male</option>
-                <option>Female</option>
-              </select>
-              <input
-                type="date"
-                value={editForm.date_of_birth}
-                onChange={(e) => setEditForm((f) => ({ ...f, date_of_birth: e.target.value }))}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
-                className="rounded-lg px-3 py-2 outline-none flex-1"
-              />
-            </div>
-
-            <div style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 600, color: tokens.navy }} className="mt-2">
-              Vet & Emergency Info (optional)
-            </div>
-            <input
-              placeholder="Vet's name"
-              value={editForm.vet_name}
-              onChange={(e) => setEditForm((f) => ({ ...f, vet_name: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
-              className="rounded-lg px-3 py-2 outline-none"
-            />
-            <input
-              placeholder="Vet's phone"
-              value={editForm.vet_phone}
-              onChange={(e) => setEditForm((f) => ({ ...f, vet_phone: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
-              className="rounded-lg px-3 py-2 outline-none"
-            />
-            <input
-              placeholder="Emergency contact name"
-              value={editForm.emergency_contact_name}
-              onChange={(e) => setEditForm((f) => ({ ...f, emergency_contact_name: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
-              className="rounded-lg px-3 py-2 outline-none"
-            />
-            <input
-              placeholder="Emergency contact phone"
-              value={editForm.emergency_contact_phone}
-              onChange={(e) => setEditForm((f) => ({ ...f, emergency_contact_phone: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
-              className="rounded-lg px-3 py-2 outline-none"
-            />
-            <input
-              placeholder="Microchip number"
-              value={editForm.microchip_number}
-              onChange={(e) => setEditForm((f) => ({ ...f, microchip_number: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
-              className="rounded-lg px-3 py-2 outline-none"
-            />
+        <form data-pet-edit onSubmit={handleSaveEdit} className="rounded-xl p-3 mt-3 grid gap-2" style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}>
+          <input required placeholder="Name" value={editForm.name} onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))} style={field} className={fieldCls} />
+          <div className="grid grid-cols-2 gap-2">
+            <select value={editForm.animal_type} onChange={(e) => setEditForm((f) => ({ ...f, animal_type: e.target.value }))} style={field} className={fieldCls}><option>Dog</option><option>Cat</option><option>Other</option></select>
+            <select value={editForm.role} onChange={(e) => setEditForm((f) => ({ ...f, role: e.target.value }))} style={field} className={fieldCls}><option>Pet</option><option>Service animal</option></select>
           </div>
-          <div className="flex gap-2 mt-3">
-            <button
-              type="submit"
-              disabled={savingEdit}
-              style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, fontSize: 14.5 }}
-              className="rounded-lg px-4 py-2 hover:opacity-90 transition"
-            >
-              {savingEdit ? "Saving…" : "Save changes"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowEditForm(false)}
-              style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}
-            >
-              Cancel
-            </button>
+          <input placeholder="Breed" value={editForm.breed} onChange={(e) => setEditForm((f) => ({ ...f, breed: e.target.value }))} style={field} className={fieldCls} />
+          <div className="grid grid-cols-2 gap-2">
+            <select value={editForm.sex} onChange={(e) => setEditForm((f) => ({ ...f, sex: e.target.value }))} style={field} className={fieldCls}><option value="">Sex</option><option>Male</option><option>Female</option></select>
+            <input type="date" aria-label="Date of birth" value={editForm.date_of_birth} onChange={(e) => setEditForm((f) => ({ ...f, date_of_birth: e.target.value }))} style={field} className={fieldCls} />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <input placeholder={editForm.role === "Service animal" ? "Handler name" : "Owner name"} value={editForm.handler_name} onChange={(e) => setEditForm((f) => ({ ...f, handler_name: e.target.value }))} style={field} className={fieldCls} maxLength={80} />
+            <select aria-label="Trained" value={editForm.trained} onChange={(e) => setEditForm((f) => ({ ...f, trained: e.target.value }))} style={field} className={fieldCls}><option value="">Trained?</option><option value="yes">Trained: yes</option><option value="no">Trained: no</option></select>
+          </div>
+          {sub("Vet & emergency contact")}
+          <div className="grid grid-cols-2 gap-2">
+            <input placeholder="Vet name" value={editForm.vet_name} onChange={(e) => setEditForm((f) => ({ ...f, vet_name: e.target.value }))} style={field} className={fieldCls} />
+            <input placeholder="Vet phone" type="tel" value={editForm.vet_phone} onChange={(e) => setEditForm((f) => ({ ...f, vet_phone: e.target.value }))} style={field} className={fieldCls} />
+            <input placeholder="Emergency contact" value={editForm.emergency_contact_name} onChange={(e) => setEditForm((f) => ({ ...f, emergency_contact_name: e.target.value }))} style={field} className={fieldCls} />
+            <input placeholder="Their phone" type="tel" value={editForm.emergency_contact_phone} onChange={(e) => setEditForm((f) => ({ ...f, emergency_contact_phone: e.target.value }))} style={field} className={fieldCls} />
+          </div>
+          <div className="flex items-center gap-3 mt-1">
+            <button type="submit" disabled={savingEdit} className="rounded-full px-5 py-2.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 15, border: "none" }}>{savingEdit ? "Saving…" : "Save"}</button>
+            <button type="button" onClick={handleShare} style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 600, color: tokens.navy }}>{justCopied ? "Copied" : "Share info"}</button>
+            <button type="button" onClick={handleDeletePet} disabled={deleting} className="ml-auto" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.primary }}>{deleting ? "Removing…" : "Remove pet"}</button>
           </div>
         </form>
       )}
 
-      {!pet.photo_url && (
-        <div
-          style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink, color: tokens.muted }}
-          className="mt-2"
-        >
-          {uploadingPhoto ? "Uploading photo…" : "No photo yet — tap the camera icon above. For best results: a bright, clear headshot works better than a full-body or action shot."}
-        </div>
-      )}
-
-      {(pet.vet_name || pet.emergency_contact_name || pet.microchip_number) && (
-        <div className="rounded-xl p-3 mt-3" style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}>
-          {pet.vet_name && (
-            <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.75 }}>
-              <Icon name="stethoscope" size={16} /> Vet: {pet.vet_name}{pet.vet_phone ? <> · <a href={telHref(pet.vet_phone)} style={{ color: tokens.primary, fontWeight: 700, textDecoration: "underline" }}>{pet.vet_phone}</a></> : ""}
-            </div>
-          )}
-          {pet.emergency_contact_name && (
-            <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.75 }}>
-              <Icon name="phone" size={16} /> Emergency: {pet.emergency_contact_name}{pet.emergency_contact_phone ? <> · <a href={telHref(pet.emergency_contact_phone)} style={{ color: tokens.primary, fontWeight: 700, textDecoration: "underline" }}>{pet.emergency_contact_phone}</a></> : ""}
-            </div>
-          )}
-          {pet.microchip_number && (
-            <div style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.75 }}>
-              <Icon name="tag" size={16} /> Microchip ending {maskChip(pet.microchip_number)}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Digital Pet ID */}
-      <div className="mt-4">
-      <PetIdCard
-        pet={pet}
-        photo={pet.photo_url ? <SignedImg value={pet.photo_url} alt={pet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : null}
-      >
-        <label
-          className="px-5 py-4 flex items-start gap-3 cursor-pointer"
-          style={{ background: tokens.paper, borderTop: `1px solid ${tokens.line}` }}
-        >
-          <input
-            type="checkbox"
-            className="mt-1 w-5 h-5 flex-shrink-0"
-            style={{ accentColor: tokens.primary }}
-            checked={!!pet.show_contact_on_public_id}
-            disabled={savingContactToggle}
-            onChange={(e) => togglePublicContact(e.target.checked)}
-          />
-          <span style={{ fontFamily: font.body, fontSize: 16, fontWeight: 600, color: tokens.ink }}>
-            Show my emergency contact on the public Pet ID
-            <span style={{ display: "block", color: tokens.muted, fontWeight: 400, fontSize: 15, lineHeight: 1.5 }}>
-              {pet.show_contact_on_public_id
-                ? "On: anyone who scans this QR code sees your emergency contact's name and phone."
-                : "Off: your emergency contact stays private. Turn on so whoever finds your pet can reach you."}{" "}
-              Name, species, breed and photo are always shown.
-            </span>
+      {/* Pet ID: one tap to the polished card; lost report is a single button until used */}
+      <button data-preview-pet-id onClick={() => setShowId(true)} className="w-full mt-3 rounded-2xl px-4 py-3 flex items-center gap-3 text-left" style={{ background: `linear-gradient(135deg, ${tokens.navyDeep}, ${tokens.navy})`, border: "none", cursor: "pointer" }}>
+        <span className="rounded-lg p-1 flex-shrink-0" style={{ background: "#fff" }}><PetQr petId={pet.id} size={40} color={tokens.navy} /></span>
+        <span className="flex-1 min-w-0">
+          <span style={{ display: "block", fontFamily: font.body, fontWeight: 800, fontSize: 16, color: "#fff" }}>Preview Pet ID</span>
+          <span style={{ display: "block", fontFamily: font.body, fontSize: 13.5, color: tokens.sky, opacity: 0.85 }}>What a finder sees when they scan</span>
+        </span>
+        <span style={{ color: tokens.gold, fontSize: 22, fontWeight: 700 }} aria-hidden="true">›</span>
+      </button>
+      <PetIdSheet open={showId} onClose={() => setShowId(false)} card={card} photo={photoEl}>
+        <label className="flex items-start gap-3 rounded-2xl p-4" style={{ background: "#fff", cursor: "pointer" }}>
+          <input type="checkbox" className="mt-0.5 w-5 h-5 flex-shrink-0" style={{ accentColor: tokens.primary }} checked={!!pet.show_contact_on_public_id} disabled={savingContactToggle} onChange={(e) => togglePublicContact(e.target.checked)} />
+          <span style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, color: tokens.ink }}>Show {isService(pet.role) ? "handler" : "owner"} name and emergency contact to finders
+            <span style={{ display: "block", fontWeight: 400, fontSize: 14, color: tokens.muted }}>{pet.show_contact_on_public_id ? "On. Shown on the public page." : "Off. Finders message you privately."}</span>
           </span>
         </label>
-      </PetIdCard>
-      <LostPanel pet={pet} userId={userId} />
-      <PetIdV2 pet={pet} userId={userId} onChanged={onPhotoUpdated} />
-      </div>
-
-      <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${tokens.line}` }}>
-        {loadingLog ? (
-          <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>Loading weight…</div>
-        ) : current ? (
-          <button onClick={() => setShowLog((v) => !v)} className="flex items-center justify-between w-full text-left">
-            <div>
-              <span style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Weight: </span>
-              <span style={{ fontFamily: font.body, fontSize: 16, fontWeight: 600, color: tokens.navy }}>
-                {current.value} {current.unit || "lbs"}
-              </span>
-              {delta !== null && delta !== 0 && (
-                <span
-                  style={{ fontFamily: font.body, fontSize: 14, color: delta > 0 ? tokens.stamp : "#3E7A4B" }}
-                  className="ml-2"
-                >
-                  {delta > 0 ? "↗" : "↘"} {delta > 0 ? "+" : ""}
-                  {delta} since {previous.recorded_date}
-                </span>
-              )}
-            </div>
-            <span style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.navy, color: tokens.muted }}>
-              {showLog ? "Hide log" : "View log"}
-            </span>
-          </button>
-        ) : (
-          <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>No weight logged yet</div>
-        )}
-
-        {showLog && measurements.length > 0 && (
-          <div className="mt-3 flex flex-col gap-1.5">
-            {measurements.map((m) => (
-              <div key={m.id} className="flex justify-between items-center" style={{ fontFamily: font.body, fontSize: 14.5 }}>
-                <span style={{ color: tokens.muted }}>{m.recorded_date}</span>
-                <div className="flex items-center gap-2">
-                  <span style={{ color: tokens.navy, fontWeight: 600 }}>
-                    {m.value} {m.unit || "lbs"}
-                  </span>
-                  <button
-                    onClick={async () => {
-                      await supabase.from("pet_measurements").delete().eq("id", m.id);
-                      loadMeasurements();
-                    }}
-                    style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.stamp, color: tokens.muted }}
-                  >
-                    <Icon name="x" size={16} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {!showAddForm ? (
-          <button
-            onClick={() => setShowAddForm(true)}
-            style={{ fontFamily: font.body, fontSize: 14, color: tokens.navy, fontWeight: 600 }}
-            className="mt-3 underline"
-          >
-            + Log weight
-          </button>
-        ) : (
-          <form onSubmit={handleAddWeight} className="mt-3 flex gap-2 items-end">
-            <div className="flex-1">
-              <input
-                required
-                type="number"
-                step="0.1"
-                placeholder="Weight (lbs)"
-                value={newValue}
-                onChange={(e) => setNewValue(e.target.value)}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
-                className="rounded-lg px-3 py-2 outline-none w-full"
-              />
-            </div>
-            <input
-              type="date"
-              value={newDate}
-              onChange={(e) => setNewDate(e.target.value)}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
-              className="rounded-lg px-3 py-2 outline-none"
-            />
-            <button
-              type="submit"
-              disabled={saving}
-              style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, fontSize: 14.5 }}
-              className="rounded-lg px-4 py-2 hover:opacity-90 transition"
-            >
-              {saving ? "…" : "Save"}
-            </button>
-          </form>
-        )}
-      </div>
-
-      <div id={`documents-${pet.id}`} className="mt-4 pt-4" style={{ borderTop: `1px solid ${tokens.line}` }}>
-        <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, color: tokens.navy }} className="mb-2">
-          {pet.name ? `${pet.name}'s documents` : "Documents"}
+        <div className="flex gap-2 mt-3">
+          <a href={`/id/${pet.id}`} target="_blank" rel="noopener noreferrer" className="flex-1 text-center rounded-full px-4 py-3" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Open public page</a>
+          <button onClick={() => { setShowId(false); setShowEditForm(true); setTimeout(() => document.getElementById(`pet-top-${pet.id}`)?.scrollIntoView({ behavior: "smooth" }), 50); }} className="flex-1 rounded-full px-4 py-3" style={{ background: "rgba(255,255,255,0.14)", color: "#fff", fontFamily: font.body, fontWeight: 700, border: "none", cursor: "pointer" }}>Edit details</button>
         </div>
+      </PetIdSheet>
+      <LostPanel pet={pet} userId={userId} onChanged={onPhotoUpdated} />
 
-        {loadingDocs ? (
-          <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>Loading documents…</div>
-        ) : documents.length === 0 ? (
-          <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-2">
-            No documents uploaded yet
+      <ActivationChecklist pet={pet} userId={userId} refreshKey={healthKey} />
+      <WhatsNeededNext pet={pet} />
+
+      <div className="mt-3 rounded-2xl overflow-hidden" style={{ border: `1px solid ${tokens.line}` }}>
+        <VaultSection id={`chip-${pet.id}`} title="Microchip" hint={pet.microchip_number ? `•••• ${String(pet.microchip_number).replace(/[^0-9A-Za-z]/g, "").slice(-4)}` : "Not added"}>
+          <ChipVault pet={pet} userId={userId} onChanged={onPhotoUpdated} bare />
+        </VaultSection>
+        <VaultSection id={`health-${pet.id}`} anchor="health-passport" title="Health records" hint={rab.tone === "good" ? "Rabies current" : healthRows.length ? `${healthRows.length} record${healthRows.length === 1 ? "" : "s"}` : "None yet"} hintTone={rab.tone === "bad" ? "bad" : null}>
+          <HealthPassport pet={pet} userId={userId} refreshKey={healthKey} bare onRows={(rows) => setHealthRows(rows)} />
+          <VetImport pet={pet} userId={userId} onSaved={() => { setHealthKey((v) => v + 1); onPhotoUpdated(); }} />
+        </VaultSection>
+        <VaultSection id={`docs-${pet.id}`} title="Documents" hint={loadingDocs ? "" : documents.length ? `${documents.length} file${documents.length === 1 ? "" : "s"}` : "None yet"}>
+          <div id={`documents-${pet.id}`}>
+          {!loadingDocs && documents.map((doc) => (
+            <div key={doc.id} className="flex items-center justify-between gap-2 py-2" style={{ borderTop: `1px solid ${tokens.line}` }}>
+              <a href="#" onClick={async (e) => { e.preventDefault(); const win = window.open("", "_blank"); const url = await getSignedUrl(doc.file_url); if (url && win) win.location.href = url; else if (win) win.close(); }} style={{ fontFamily: font.body, fontSize: 15, color: tokens.navy, textDecoration: "underline" }}>{doc.document_type}</a>
+              {doc.expires_on && <span style={{ fontFamily: font.body, fontSize: 13, color: doc.expires_on < new Date().toISOString().slice(0, 10) ? tokens.stamp : tokens.muted }} className="ml-auto">{doc.expires_on < new Date().toISOString().slice(0, 10) ? "Expired" : "Expires"} {new Date(doc.expires_on + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>}
+              <button onClick={() => handleDeleteDocument(doc)} style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.stamp }}>Remove</button>
+            </div>
+          ))}
+          {!showUploadForm ? (
+            <button onClick={() => setShowUploadForm(true)} className="mt-2 rounded-full px-4 py-2" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.navy, fontWeight: 700, background: tokens.sky, border: "none" }}>Upload a document</button>
+          ) : (
+            <form onSubmit={handleUpload} className="mt-3 grid gap-2">
+              <select value={docType} onChange={(e) => setDocType(e.target.value)} style={field} className={fieldCls}>
+                <option>Vaccination record</option><option>Health certificate</option><option>Training documentation</option><option>Microchip registration</option><option>Insurance policy</option><option>Other</option>
+              </select>
+              <input type="file" accept="image/*,application/pdf" onChange={(e) => setSelectedFile(e.target.files[0])} style={{ fontFamily: font.body, fontSize: 14.5 }} />
+              <label style={{ fontFamily: font.body, fontSize: 14, color: tokens.navy }} className="flex items-center gap-2">Expires (optional)
+                <input type="date" value={expiresOn} onChange={(e) => setExpiresOn(e.target.value)} style={field} className="rounded-lg px-3 py-1.5 outline-none" />
+              </label>
+              <div className="flex gap-3">
+                <button type="submit" disabled={uploading || !selectedFile} className="rounded-full px-5 py-2" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 14.5, border: "none" }}>{uploading ? "Uploading…" : "Upload"}</button>
+                <button type="button" onClick={() => setShowUploadForm(false)} style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>Cancel</button>
+              </div>
+            </form>
+          )}
           </div>
-        ) : (
-          documents.map((doc) => (
-            <div
-              key={doc.id}
-              className="flex items-center justify-between py-2"
-              style={{ borderTop: `1px solid ${tokens.line}` }}
-            >
-              <a
-                href="#"
-                onClick={async (e) => {
-                  e.preventDefault();
-                  const win = window.open("", "_blank");
-                  const url = await getSignedUrl(doc.file_url);
-                  if (url && win) win.location.href = url;
-                  else if (win) win.close();
-                }}
-                style={{ fontFamily: font.body, fontSize: 15, color: tokens.navy, textDecoration: "underline" }}
-              >
-                {doc.document_type}
-              </a>
-              {doc.expires_on && (
-                <span style={{ fontFamily: font.body, fontSize: 13, color: doc.expires_on < new Date().toISOString().slice(0, 10) ? tokens.stamp : tokens.muted }} className="ml-auto mr-3">
-                  {doc.expires_on < new Date().toISOString().slice(0, 10) ? "Expired" : "Expires"} {new Date(doc.expires_on + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                </span>
-              )}
-              <button
-                onClick={() => handleDeleteDocument(doc)}
-                style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.stamp, opacity: 0.7 }}
-              >
-                Remove
-              </button>
+        </VaultSection>
+        <VaultSection id={`vet-${pet.id}`} title="Vet & emergency contact" hint={pet.vet_name || pet.emergency_contact_name ? "Saved" : "Not added"}>
+          <div className="grid gap-1.5" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>
+            <div><span style={{ color: tokens.muted }}>Vet: </span>{pet.vet_name || "Not added"}{pet.vet_phone ? <> · <a href={`tel:${pet.vet_phone.replace(/[^0-9+]/g, "")}`} style={{ color: tokens.primary, fontWeight: 700 }}>{pet.vet_phone}</a></> : null}</div>
+            <div><span style={{ color: tokens.muted }}>Emergency: </span>{pet.emergency_contact_name || "Not added"}{pet.emergency_contact_phone ? <> · <a href={`tel:${pet.emergency_contact_phone.replace(/[^0-9+]/g, "")}`} style={{ color: tokens.primary, fontWeight: 700 }}>{pet.emergency_contact_phone}</a></> : null}</div>
+            <button onClick={() => { setShowEditForm(true); document.getElementById(`pet-top-${pet.id}`)?.scrollIntoView({ behavior: "smooth" }); }} className="justify-self-start mt-1" style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 700, color: tokens.navy, textDecoration: "underline" }}>Edit</button>
+          </div>
+        </VaultSection>
+        <VaultSection id={`weight-${pet.id}`} title="Weight" hint={loadingLog ? "" : current ? `${current.value} ${current.unit || "lbs"}` : "Not logged"}>
+          {measurements.length > 0 && (
+            <div className="flex flex-col gap-1.5">
+              {measurements.slice(0, showLog ? undefined : 3).map((m) => (
+                <div key={m.id} className="flex justify-between items-center" style={{ fontFamily: font.body, fontSize: 14.5 }}>
+                  <span style={{ color: tokens.muted }}>{m.recorded_date}</span>
+                  <span className="flex items-center gap-3"><b style={{ color: tokens.navy }}>{m.value} {m.unit || "lbs"}</b>
+                    <button aria-label="Delete entry" onClick={async () => { await supabase.from("pet_measurements").delete().eq("id", m.id); loadMeasurements(); }} style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted, textDecoration: "underline" }}>Delete</button></span>
+                </div>
+              ))}
+              {measurements.length > 3 && <button onClick={() => setShowLog((v) => !v)} className="self-start" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.navy, textDecoration: "underline" }}>{showLog ? "Show less" : "Show all"}</button>}
+              {delta !== null && delta !== 0 && <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>{delta > 0 ? "+" : ""}{delta} since {previous.recorded_date}</div>}
             </div>
-          ))
-        )}
-
-        {!showUploadForm ? (
-          <button
-            onClick={() => setShowUploadForm(true)}
-            style={{ fontFamily: font.body, fontSize: 14, color: tokens.navy, fontWeight: 600 }}
-            className="mt-2 underline"
-          >
-            + Upload a document
-          </button>
-        ) : (
-          <form onSubmit={handleUpload} className="mt-3 flex flex-col gap-2">
-            <select
-              value={docType}
-              onChange={(e) => setDocType(e.target.value)}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15.5 }}
-              className="rounded-lg px-3 py-2 outline-none"
-            >
-              <option>Vaccination record</option>
-              <option>Health certificate</option>
-              <option>Training documentation</option>
-              <option>Microchip registration</option>
-              <option>Insurance policy</option>
-              <option>Pet photo</option>
-              <option>Other</option>
-            </select>
-            <input
-              type="file"
-              accept="image/*,application/pdf"
-              capture="environment"
-              onChange={(e) => setSelectedFile(e.target.files[0])}
-              style={{ fontFamily: font.body, fontSize: 14.5 }}
-            />
-            <div style={{ fontFamily: font.body, fontSize: 13, opacity: 0.55 }}>
-              On your phone, this lets you choose "Take Photo" or pick an existing file.
-            </div>
-            <label style={{ fontFamily: font.body, fontSize: 14, color: tokens.navy }} className="flex items-center gap-2 flex-wrap">
-              Expires on (optional)
-              <input type="date" value={expiresOn} onChange={(e) => setExpiresOn(e.target.value)} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }} className="rounded-lg px-3 py-1.5 outline-none" />
-              <span style={{ fontSize: 12.5, color: tokens.muted }}>Members get an email before it expires.</span>
-            </label>
-            <div className="flex gap-2 mt-1">
-              <button
-                type="submit"
-                disabled={uploading || !selectedFile}
-                style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, fontSize: 14.5 }}
-                className="rounded-lg px-4 py-2 hover:opacity-90 transition"
-              >
-                {uploading ? "Uploading…" : "Upload"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowUploadForm(false)}
-                style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}
-              >
-                Cancel
-              </button>
-            </div>
+          )}
+          <form onSubmit={handleAddWeight} className="mt-2 flex gap-2 items-center">
+            <input required type="number" step="0.1" placeholder="lbs" value={newValue} onChange={(e) => setNewValue(e.target.value)} style={{ ...field, width: 90 }} className="rounded-lg px-3 py-2 outline-none" />
+            <input type="date" value={newDate} onChange={(e) => setNewDate(e.target.value)} style={field} className="rounded-lg px-3 py-2 outline-none flex-1 min-w-0" />
+            <button type="submit" disabled={saving} className="rounded-full px-4 py-2" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 14.5, border: "none" }}>{saving ? "…" : "Log"}</button>
           </form>
-        )}
+        </VaultSection>
+        <VaultSection id={`share-${pet.id}`} title="Care Card & QR card" hint="For sitters and vets">
+          <ShareCard pet={pet} userId={userId} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
+          <WalletCard pet={pet} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
+        </VaultSection>
+        <VaultSection id={`more-${pet.id}`} title="Find a vet & travel stamps" hint="" last>
+          <FindAVet pet={pet} />
+          <TravelStamps pet={pet} />
+        </VaultSection>
       </div>
     </div>
+  );
+}
+
+function VaultSection({ id, anchor, title, hint, hintTone, children, last }) {
+  return (
+    <details id={id} data-vault-section className="group" style={{ borderBottom: last ? "none" : `1px solid ${tokens.line}`, background: "#fff" }}>
+      {anchor && <span id={anchor} />}
+      <summary className="flex items-center justify-between gap-3 px-4 py-3.5" style={{ cursor: "pointer", listStyle: "none" }}>
+        <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{title}</span>
+        <span className="flex items-center gap-2 min-w-0">
+          {hint && <span style={{ fontFamily: font.body, fontSize: 13.5, color: hintTone === "bad" ? tokens.primary : tokens.muted, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{hint}</span>}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={tokens.muted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-open:rotate-90 flex-shrink-0" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </span>
+      </summary>
+      <div className="px-4 pb-4">{children}</div>
+    </details>
   );
 }
 
@@ -1037,27 +763,34 @@ export function VaultCard({ userId, onOpenVault }) {
     const checks = [!!first.name, !!first.photo_url, !!first.microchip_number, !!first.chip_verified_at, !!first.vet_name, !!first.emergency_contact_name, (docs || 0) > 0, (health || 0) > 0];
     setPct(Math.round((checks.filter(Boolean).length / checks.length) * 100));
   })(); }, [userId]);
-  const btn = { fontFamily: font.body, fontSize: 14, fontWeight: 600, textDecoration: "none", cursor: "pointer" };
-  return (
-    <div className="rounded-2xl p-5 sm:p-6 mb-4 sm:mb-6" style={{ background: tokens.navy }}>
-      <div className="flex flex-wrap items-center gap-4 sm:gap-5">
-        <div className="rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" style={{ width: 72, height: 72, background: tokens.gold, border: "3px solid #fff" }}>
-          {pet?.photo_url ? <SignedImg value={pet.photo_url} alt={pet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : <span style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: tokens.navy }}>{(pet?.name || "P").slice(0, 1)}</span>}
-        </div>
-        <div className="flex-1 min-w-[200px]">
-          <div style={{ fontFamily: font.mono, fontSize: 11.5, color: tokens.gold, letterSpacing: "0.12em" }}>PET VAULT</div>
-          <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: "#fff" }}>Pet Vault? Start here.</div>
-          <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, opacity: 0.85 }}>{pet ? `${pet.name}’s ID, chip and vet records, all in one place.` : "Your pet’s ID, chip and vet records, all in one place."}{pct != null && pet ? ` ${pct}% set up.` : ""}</div>
-          {pct != null && pet && <div className="w-full max-w-[260px] h-[6px] rounded-full mt-2" style={{ background: "rgba(255,255,255,0.18)" }}><div className="h-full rounded-full" style={{ width: `${pct}%`, background: tokens.gold }} /></div>}
-        </div>
-        <div className="flex flex-col gap-2">
-          <button onClick={() => onOpenVault && onOpenVault()} style={{ ...btn, background: tokens.gold, color: tokens.navy, border: "none" }} className="rounded-full px-5 py-2.5 min-h-[44px] text-left">View Pet ID / QR</button>
-          <button onClick={() => onOpenVault && onOpenVault("#chip-vault")} style={{ ...btn, background: "transparent", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)" }} className="rounded-full px-5 py-2.5 min-h-[44px] text-left">Chip check</button>
-          <button onClick={() => onOpenVault && onOpenVault()} style={{ ...btn, background: "transparent", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)" }} className="rounded-full px-5 py-2.5 min-h-[44px] text-left">Upload a vet record</button>
-        </div>
+  if (pct == null) return null;
+  if (pet) return (
+    <button data-vault-card onClick={() => onOpenVault && onOpenVault()} className="w-full rounded-2xl p-4 mb-4 flex items-center gap-3 text-left" style={{ background: tokens.navy, border: "none", cursor: "pointer" }}>
+      <div className="rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" style={{ width: 52, height: 52, background: tokens.gold, border: "2px solid #fff" }}>
+        {pet.photo_url ? <SignedImg value={pet.photo_url} alt={pet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : <span style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }}>{(pet.name || "P").slice(0, 1)}</span>}
       </div>
+      <div className="flex-1 min-w-0">
+        <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: "#fff", lineHeight: 1.2 }}>{pet.name}’s Pet Vault</div>
+        <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.sky, opacity: 0.85 }}>{pct}% set up</div>
+        <div className="w-full max-w-[200px] h-[5px] rounded-full mt-1.5" style={{ background: "rgba(255,255,255,0.18)" }}><div className="h-full rounded-full" style={{ width: `${pct}%`, background: tokens.gold }} /></div>
+      </div>
+      <span className="rounded-full px-4 py-2 flex-shrink-0" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontSize: 14.5, fontWeight: 700 }}>Open</span>
+    </button>
+  );
+  return (
+    <div className="rounded-2xl p-5 mb-4" style={{ background: tokens.navy }}>
+      <div style={{ fontFamily: font.display, fontSize: 21, fontWeight: 700, color: "#fff" }}>Pet Vault? Start here.</div>
+      <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, opacity: 0.85 }} className="mb-3">{VAULT_SUB}</div>
+      <button onClick={() => onOpenVault && onOpenVault()} className="rounded-full px-5 py-2.5" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontSize: 15, fontWeight: 700, border: "none", cursor: "pointer" }}>Add your pet</button>
     </div>
   );
+}
+
+// A trip is past once its travel date (and return date, if any) is before today (PT).
+function tripIsPast(t) {
+  if (!t?.travel_date) return false;
+  const today = todayPT();
+  return t.travel_date < today && (!t.return_date || t.return_date < today);
 }
 
 // Calm overview: next-trip countdown, ONE consolidated Needs Action list
@@ -1068,12 +801,13 @@ export function DashboardTab({ userId, onOpenTrips }) {
   const [actions, setActions] = useState([]);
   const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [doneCount, setDoneCount] = useState(0);
   const pet = useTripPet(trip);
   useEffect(() => { (async () => {
     const { data: trips } = await supabase.from("trips").select("*").order("created_at", { ascending: false }).limit(1);
     const current = trips?.[0] || null; setTrip(current);
-    const list = [];
-    if (current?.paid) {
+    const list = []; let doneN = 0;
+    if (current?.paid && !tripIsPast(current)) {
       const today = todayPT();
       for (const it of reminderSchedule(current, today)) {
         const { state } = classifyReminder(it, current, { today });
@@ -1085,40 +819,37 @@ export function DashboardTab({ userId, onOpenTrips }) {
       (statusRows || []).forEach((s) => { if (s.completed) doneMap[s.requirement_id] = true; });
       const seen = new Set(list.map((a) => a.label.toLowerCase()));
       const grouped = groupCards(buildPassCards(reqs || [], current), doneMap);
+      doneN = grouped.done.length;
       for (const card of [...grouped.first, ...grouped.confirm]) {
         if (seen.has(card.shortTitle.toLowerCase())) continue;
         seen.add(card.shortTitle.toLowerCase());
         list.push({ key: `card-${card.id}`, label: card.shortTitle, hint: "Checklist" });
       }
     }
-    setActions(list); setLoading(false);
+    setActions(list); setDoneCount(doneN); setLoading(false);
   })(); }, []);
   if (loading) return <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading your dashboard…</div>;
-  const startCard = (
-    <div className="rounded-2xl p-5 sm:p-6 mb-4 sm:mb-6" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
-      <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-1">Traveling? Start here.</div>
-      <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-4">{trip ? (trip.paid ? `Next trip: ${trip.origin} → ${trip.destination}${trip.travel_date ? ` · ${trip.travel_date}` : ""}.` : `You have a trip being planned: ${trip.origin} → ${trip.destination}.`) : "See what’s included, then start a new trip plan."}</p>
-      <div className="flex flex-wrap gap-3">
-        {trip && <button onClick={onOpenTrips} className="rounded-full px-6 py-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, border: "none", cursor: "pointer" }}>Open my trip</button>}
-        <a href="/travel-pass" className="rounded-full px-6 py-3 inline-block" style={{ background: trip ? "#fff" : tokens.primary, color: trip ? tokens.navy : "#fff", border: trip ? `2px solid ${tokens.navy}` : "none", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>{trip ? "Travel Pass — see what’s included" : "See the Travel Pass"}</a>
-      </div>
-    </div>
-  );
   const visible = showAll ? actions : actions.slice(0, 4);
   return (
     <div>
-      {startCard}
-      {trip?.paid ? <TripCountdown trip={trip} pet={pet} done={0} total={actions.length} /> : (
+      {trip?.paid && tripIsPast(trip) ? (
+        <button onClick={onOpenTrips} className="w-full rounded-2xl px-4 py-3.5 mb-4 flex items-center justify-between gap-3 text-left" style={{ background: "#fff", border: `1px solid ${tokens.line}`, cursor: "pointer" }}>
+          <span className="min-w-0">
+            <span style={{ display: "block", fontFamily: font.body, fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: tokens.muted }}>PAST TRIP</span>
+            <span style={{ display: "block", fontFamily: font.body, fontSize: 15.5, fontWeight: 700, color: tokens.navy }}>{trip.origin} → {trip.destination}{trip.travel_date ? ` · ${fmtTripDate(trip.travel_date)}` : ""}</span>
+          </span>
+          <a href="/assessment" onClick={(e) => e.stopPropagation()} className="rounded-full px-4 py-2 flex-shrink-0" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontSize: 14, fontWeight: 700, textDecoration: "none" }}>Plan next trip</a>
+        </button>
+      ) : trip?.paid ? <TripCountdown trip={trip} pet={pet} done={doneCount} total={actions.length + doneCount} /> : (
         <div className="rounded-2xl p-7 mb-6 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }} className="mb-2">Where are you and your pets flying to?</div>
           <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-5">Answer a few trip questions and your plan, reminders and checklist land here.</p>
           <a href="/assessment" className="rounded-full px-6 py-3 inline-block" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Try the trip questions</a>
         </div>
       )}
-      {trip?.paid && (
-        <div className="rounded-2xl p-5 sm:p-6 mb-4 sm:mb-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-          <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 700, color: tokens.navy }} className="mb-1">Needs action</div>
-          <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-4">The few things that matter next — reminders and checklist combined, nothing duplicated.</p>
+      {trip?.paid && !tripIsPast(trip) && (
+        <div className="rounded-2xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+          <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 700, color: tokens.navy }} className="mb-3">Needs action</div>
           {actions.length === 0 ? <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Nothing needs action right now.</p> : <>
             <ul className="space-y-2">{visible.map((a) => (
               <li key={a.key} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
@@ -1426,6 +1157,14 @@ function PostTripFeedback() {
   return <FeedbackPrompt kind="post_trip" tripId={trip.id} refKey={trip.id} title="How was the trip?" blurb={`Tell us how ${trip.origin} → ${trip.destination} went. Private to PetPassGo.`} />;
 }
 
+function revealAnchor(sel) {
+  let el = null; try { el = document.querySelector(sel); } catch { return false; }
+  if (!el) return false;
+  for (let d = el.closest("details"); d; d = d.parentElement?.closest("details")) d.open = true;
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+  return true;
+}
+
 export default function AccountPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1456,12 +1195,22 @@ export default function AccountPage() {
   }
 
   // Mobile bottom tabs -> real surfaces only: Home=Dashboard, Travel=My Trips,
-  // Passport=Pet Vault Pet ID card, Health=Pet Vault health passport, More=Billing.
+  // Passport=Pet Vault Pet ID card, Health=Pet Vault health records, More=Billing.
   const bottomActive = (bottomKey === "passport" || bottomKey === "health") && activeTab === "vault" ? bottomKey : activeTab === "dashboard" ? "home" : activeTab === "trips" ? "travel" : activeTab === "billing" ? "more" : "passport";
   function openVaultAnchor(anchor) {
     setActiveTab("vault");
-    if (anchor) setTimeout(() => document.querySelector(anchor)?.scrollIntoView({ behavior: "smooth", block: "start" }), 350);
+    if (anchor) setTimeout(() => revealAnchor(anchor), 350);
   }
+  // In-page links (#chip-vault, #health-passport…) open the collapsed section they point into.
+  useEffect(() => {
+    function onClick(e) {
+      const a = e.target.closest?.('a[href^="#"]'); if (!a) return;
+      const sel = a.getAttribute("href"); if (sel.length < 2) return;
+      if (revealAnchor(sel)) e.preventDefault();
+    }
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, []);
   function handleBottomNav(key) {
     setBottomKey(key);
     if (key === "home") setActiveTab("dashboard");
@@ -1512,12 +1261,12 @@ export default function AccountPage() {
 
         {activeTab === "dashboard" && (<>
           <DashboardTab userId={user?.id} onOpenTrips={() => setActiveTab("trips")} />
-          <VaultCard userId={user?.id} onOpenVault={(anchor) => { setActiveTab("vault"); if (anchor) setTimeout(() => document.querySelector(anchor)?.scrollIntoView({ behavior: "smooth" }), 350); }} />
+          <VaultCard userId={user?.id} onOpenVault={(anchor) => { setActiveTab("vault"); if (anchor) setTimeout(() => revealAnchor(anchor), 350); window.scrollTo({ top: 0 }); }} />
         </>)}
 
         {activeTab === "vault" && (<>
-          <div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: tokens.navy }} className="mb-1">Pet Vault</div>
-          <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-6">Pet ID & QR, chip vault, vet records, health passport and documents.</p>
+          <div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: tokens.navy }}>Pet Vault</div>
+          <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-4">{VAULT_SUB}</p>
           <PetProfileTab userId={user?.id} />
         </>)}
 
