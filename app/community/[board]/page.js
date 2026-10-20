@@ -267,7 +267,7 @@ export default function BoardPage() {
       <main className="max-w-[860px] mx-auto px-6 py-12">
         <a href="/community" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.navy }}>← All boards</a>
 
-        <div className="flex flex-wrap gap-2 mt-4 mb-5 overflow-x-auto">
+        {!isLost && <div className="flex flex-wrap gap-2 mt-4 mb-5 overflow-x-auto">
           {BOARDS.filter((b) => b.airline).map((b) => (
             <a
               key={b.slug}
@@ -301,7 +301,7 @@ export default function BoardPage() {
           >
             Lost & found
           </a>
-        </div>
+        </div>}
 
         <h1 style={{ fontFamily: font.display, fontSize: 38, fontWeight: 700, color: tokens.navy }} className="mt-1 mb-2">{board.name}</h1>
         <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.muted }} className="mb-4">{board.blurb}</p>
@@ -313,16 +313,16 @@ export default function BoardPage() {
 
         {canPost && displayName === "" && <DisplayNameSetup onDone={setDisplayName} />}
         {isLost && canRead && area.ready && (
-          <div data-lf-filter className="rounded-2xl p-3 mb-4 grid gap-2" style={{ background: "#fff", border: `1px solid ${tokens.line}`, gridTemplateColumns: "1fr 1fr" }}>
-            <label style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 700, color: tokens.muted, display: "grid", gap: 4 }}>STATE
-              <select value={area.state || "all"} onChange={(e) => chooseArea({ state: e.target.value, city: "all" })} className="rounded-lg px-2 py-2" style={input}>
+          <div data-lf-filter className="rounded-2xl p-3 mb-4 grid gap-2" style={{ background: "#fff", border: `1px solid ${tokens.line}`, gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)" }}>
+            <label style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 700, color: tokens.muted, display: "grid", gap: 4, minWidth: 0 }}>STATE
+              <select value={area.state || "all"} onChange={(e) => chooseArea({ state: e.target.value, city: "all" })} className="rounded-lg px-2 py-2 w-full" style={{ ...input, minWidth: 0 }}>
                 <option value="all">All states</option>
                 {US_STATES.map(([c, n]) => <option key={c} value={c}>{n}</option>)}
               </select>
             </label>
-            <label style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 700, color: tokens.muted, display: "grid", gap: 4 }}>CITY
-              <select disabled={!area.state || area.state === "all"} value={area.city || "all"} onChange={(e) => chooseArea({ state: area.state, city: e.target.value })} className="rounded-lg px-2 py-2" style={input}>
-                <option value="all">{area.state && area.state !== "all" ? `All of ${stateName(area.state)} (nearby)` : "Pick a state first"}</option>
+            <label style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 700, color: tokens.muted, display: "grid", gap: 4, minWidth: 0 }}>CITY
+              <select disabled={!area.state || area.state === "all"} value={area.city || "all"} onChange={(e) => chooseArea({ state: area.state, city: e.target.value })} className="rounded-lg px-2 py-2 w-full" style={{ ...input, minWidth: 0 }}>
+                <option value="all">{area.state && area.state !== "all" ? `All of ${area.state} (nearby)` : "Pick a state first"}</option>
                 {citiesInState.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </label>

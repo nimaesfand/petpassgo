@@ -55,7 +55,9 @@ begin
     select display_name into nm from public.community_profiles where user_id = uid;
     nm := coalesce(nm, left(pname, 18) || '''s family');
     body := 'Last seen' || coalesce(' near ' || case when public.community_text_problem(p_area) is null then nullif(btrim(coalesce(p_area,'')), '') end, '')
-      || coalesce(' (' || concat_ws(', ', ct, st) || ')', '')
+      || coalesce(case when ct is not null and btrim(coalesce(p_area,'')) ilike '%' || ct || '%'
+                       then case when st is not null and btrim(p_area) !~* ('\m' || st || '\M') then ', ' || st end
+                       else ' (' || nullif(concat_ws(', ', ct, st), '') || ')' end, '')
       || coalesce(' on ' || to_char(p_date, 'Mon FMDD, YYYY'), '') || '.';
     if n is not null and public.community_text_problem(n) is null then body := body || E'\n\n' || left(n, 1500); end if;
     body := body || E'\n\nOpen the poster to message the owner privately.';
@@ -125,3 +127,6 @@ language sql stable security definer set search_path = public as $$
 $$;
 revoke all on function public.get_public_pet_card(uuid) from public;
 grant execute on function public.get_public_pet_card(uuid) to anon, authenticated;
+
+-- 8) community_posts uses column-level read grants (user_id stays hidden); expose the location columns.
+grant select (lost_state, lost_city) on public.community_posts to authenticated;

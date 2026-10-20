@@ -196,18 +196,20 @@ export function ActivationChecklist({ pet, userId, refreshKey }) {
   ];
   const required = steps.slice(0, 4); const done = required.filter((x) => x.done).length; const pct = Math.round((done / 4) * 100);
   if (act.dismissed_at && done < 4) return null;
-  const r = 24, c = 2 * Math.PI * r;
-  return <div className="rounded-2xl p-4 mt-3" style={{ background: "linear-gradient(135deg,#FFF9EC,#fff)", border: `1.5px solid ${tokens.gold}` }}>
-    <div className="flex items-center gap-3">
-      <svg width="58" height="58" viewBox="0 0 58 58" className="flex-shrink-0"><circle cx="29" cy="29" r={r} fill="none" stroke={tokens.line} strokeWidth="6"/><circle cx="29" cy="29" r={r} fill="none" stroke={pct === 100 ? tokens.green : tokens.stamp} strokeWidth="6" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c - c * pct / 100} transform="rotate(-90 29 29)"/><text x="29" y="34" textAnchor="middle" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 13, fill: tokens.navy }}>{pct}%</text></svg>
-      <div className="flex-1 min-w-0"><div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }}>{done === 4 ? `${pet.name}'s ID is all set` : `Finish ${pet.name}'s ID`}</div><div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>{done === 4 ? "Everything important is stored safely here, ready whenever you need it." : `${done} of 4 little steps done. No rush — each one makes the ID more useful.`}</div></div>
-      {done < 4 && <button onClick={() => save({ dismissed_at: new Date().toISOString() })} style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>Later</button>}
-    </div>
-    <div className="grid gap-2 mt-3">{steps.map((s) => <div key={s.title} className="flex items-center gap-3 rounded-xl px-3 py-2.5" style={{ background: "#fff", border: `1px solid ${tokens.line}`, opacity: s.done ? 0.72 : 1, flexWrap: "wrap" }}>
-      <span aria-hidden="true" className="rounded-full flex items-center justify-center flex-shrink-0" style={{ width: 22, height: 22, background: s.done ? tokens.green : "#fff", border: `2px solid ${s.done ? tokens.green : tokens.line}` }}>{s.done && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>}</span><div className="min-w-0" style={{ flex: "1 1 180px" }}><div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 14.5, color: tokens.navy }}>{s.title}{s.optional ? " (optional)" : ""}</div><div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>{s.text}</div></div>
-      {!s.done && <a href={s.href} className="rounded-full px-3 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 13, fontWeight: 700, textDecoration: "none" }}>{s.cta}</a>}
+  if (done === 4) return null;
+  const r = 15, c = 2 * Math.PI * r;
+  const todo = required.filter((x) => !x.done);
+  return <details className="rounded-2xl mt-3" style={{ background: "#FFF9EC", border: `1.5px solid ${tokens.gold}` }}>
+    <summary className="flex items-center gap-3 px-3 py-2.5" style={{ cursor: "pointer", listStyle: "none" }}>
+      <svg width="38" height="38" viewBox="0 0 38 38" className="flex-shrink-0" aria-label={`${pct}% done`}><circle cx="19" cy="19" r={r} fill="none" stroke={tokens.line} strokeWidth="4"/><circle cx="19" cy="19" r={r} fill="none" stroke={tokens.stamp} strokeWidth="4" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c - c * pct / 100} transform="rotate(-90 19 19)"/><text x="19" y="23" textAnchor="middle" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 10.5, fill: tokens.navy }}>{done}/4</text></svg>
+      <span className="flex-1 min-w-0" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15.5, color: tokens.navy }}>Finish {pet.name}'s ID <span style={{ fontWeight: 500, color: tokens.muted }}>· {4 - done} left</span></span>
+      <button type="button" onClick={(e) => { e.preventDefault(); save({ dismissed_at: new Date().toISOString() }); }} style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>Later</button>
+    </summary>
+    <div className="grid gap-2 px-3 pb-3">{todo.map((s) => <div key={s.title} className="flex items-center gap-3 rounded-xl px-3 py-2.5" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+      <div className="min-w-0 flex-1"><div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 14.5, color: tokens.navy }}>{s.title}</div><div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>{s.text}</div></div>
+      <a href={s.href} className="rounded-full px-3 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 13, fontWeight: 700, textDecoration: "none" }}>{s.cta}</a>
     </div>)}</div>
-  </div>;
+  </details>;
 }
 export default function PetIdV2({ pet, userId, onChanged }) {
   const [refresh, setRefresh] = useState(0);

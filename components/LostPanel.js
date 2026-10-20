@@ -208,7 +208,7 @@ export default function LostPanel({ pet, userId, onChanged }) {
       </div>
       <div className="p-4 grid gap-4">
         <div style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }}>
-          Last seen <b>{report.last_seen_area}</b>{place ? ` · ${place}` : ""}{report.last_seen_date ? ` · ${fmtDate(report.last_seen_date)}` : ""}
+          Last seen <b>{report.last_seen_area}</b>{place && !(report.last_seen_area || "").toLowerCase().includes((report.city || "").toLowerCase()) ? ` · ${place}` : report.state ? `, ${report.state}` : ""}{report.last_seen_date ? ` · ${fmtDate(report.last_seen_date)}` : ""}
           {report.trip_airline ? ` · while traveling with ${report.trip_airline}${report.trip_flight ? ` ${report.trip_flight}` : ""}${report.trip_destination ? ` to ${report.trip_destination}` : ""}` : ""}
         </div>
         {COMMUNITY_ON && report.board_post_id && (

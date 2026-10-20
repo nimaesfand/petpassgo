@@ -134,7 +134,7 @@ export function PetIdSheet({ open, onClose, card, photo, children }) {
   }, [open, onClose]);
   if (!open) return null;
   return (
-    <div role="dialog" aria-modal="true" aria-label={`${card.name}'s Pet ID`} className="fixed inset-0 z-[80] overflow-y-auto" style={{ background: "rgba(11,21,41,0.92)" }} onClick={onClose}>
+    <div role="dialog" aria-modal="true" aria-label={`${card.name}'s Pet ID`} className="fixed inset-0 z-[80] overflow-y-auto" style={{ background: "rgba(11,21,41,0.97)" }} onClick={onClose}>
       <div className="min-h-full flex flex-col items-center px-4 pt-4 pb-10" onClick={(e) => e.stopPropagation()}>
         <div className="w-full flex justify-end mb-3" style={{ maxWidth: 400 }}>
           <button onClick={onClose} aria-label="Close" className="rounded-full flex items-center justify-center" style={{ width: 40, height: 40, background: "rgba(255,255,255,0.14)", color: "#fff", border: "none", cursor: "pointer" }}>
