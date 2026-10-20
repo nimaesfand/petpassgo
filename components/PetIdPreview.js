@@ -91,7 +91,7 @@ export default function PetIdPreviewCard({ card, photo }) {
             {c.service && (
               <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 mb-1" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontSize: 10.5, fontWeight: 800, letterSpacing: "0.1em" }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-                SERVICE DOG
+                {/dog/i.test(c.animal_type || "dog") ? "SERVICE DOG" : "SERVICE ANIMAL"}
               </span>
             )}
           </div>
@@ -102,7 +102,7 @@ export default function PetIdPreviewCard({ card, photo }) {
           {c.chipLast4 && <Row label="Microchip">•••• {c.chipLast4}</Row>}
           {showRabies && <Row label="Vaccines"><span style={{ color: rab.tone === "good" ? tokens.green : rab.tone === "bad" ? tokens.primary : tokens.muted }}>{rab.text}</span></Row>}
           {c.service && <Row label="Service animal">Yes, owner-declared</Row>}
-          {c.trained != null && <Row label="Trained">{c.trained ? "Yes" : "No"}</Row>}
+          {c.trained != null && <Row label="Trained">{c.trained ? "Yes, per owner" : "No"}</Row>}
           {c.handler && <Row label={c.service ? "Handler" : "Owner"} hidden={contactHidden}>{c.handler}</Row>}
           {(c.contactName || c.contactPhone) && (
             <Row label="Emergency" hidden={contactHidden}>

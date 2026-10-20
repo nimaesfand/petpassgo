@@ -8,7 +8,7 @@ import { PUBLIC_ID_BASE } from "../lib/PetQr";
 import VetImport from "./VetImport";
 import { WhatsNeededNext, TravelStamps, FindAVet } from "./PetExtras";
 
-const AAHA = "https://www.aahanet.org/searching-for-the-microchip/";
+const AAHA = "https://www.aaha.org/for-veterinary-professionals/microchip-registry-lookup-tool-aaha-find-your-pets-microchip-registry/";
 const input = { fontFamily: font.body, fontSize: 15.5, border: `2px solid ${tokens.line}`, borderRadius: 10, padding: "9px 12px", width: "100%", background: "#fff" };
 const label = { fontFamily: font.body, fontSize: 13, fontWeight: 700, color: tokens.navy, letterSpacing: "0.02em" };
 const section = { borderTop: `1px solid ${tokens.line}`, paddingTop: 16, marginTop: 16 };

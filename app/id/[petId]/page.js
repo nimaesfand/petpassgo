@@ -6,6 +6,7 @@ import PetIdCard, { PetIllustration } from "../../../components/PetIdCard";
 import FinderMessageForm from "../../../components/FinderMessageForm";
 import ShareButtons from "../../../components/ShareButtons";
 import usePublicPet from "../../../lib/usePublicPet";
+import PetIdPreviewCard, { cardFromPublic } from "../../../components/PetIdPreview";
 import { fmtDate } from "../../../lib/lost";
 import { supabase } from "../../../lib/supabaseClient";
 import { SITE_LAUNCHED } from "../../../lib/pricing";
@@ -25,7 +26,7 @@ function PublicHealth({ petId, petName }) {
 
 function ChipLine({ pet }) {
   if (!pet.microchipped) return null;
-  return <div className="mt-4 rounded-2xl p-4 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>🔖 <b>Microchipped.</b> Any vet or shelter can scan the chip for free. The registry contacts the owner — PetPassGo never shows the chip number.</div>;
+  return <div className="mt-4 rounded-2xl p-4 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>🔖 <b>Microchipped.</b> Any vet or shelter can scan the chip for free, and the registry contacts the owner.</div>;
 }
 
 function ScanHonesty({ lostMode }) {
@@ -99,6 +100,11 @@ export default function PublicPetId({ params }) {
   // Owner's membership/trip lapsed (enforced only after launch; ?preview=lapsed pre-launch):
   // show a basic page with name, photo and the message relay instead of the full ID.
   const [basic, setBasic] = useState(false);
+  const [card, setCard] = useState(null);
+  useEffect(() => {
+    if (status !== "ok") return;
+    supabase.rpc("get_public_pet_card", { pet_id: pet.id }).then(({ data }) => { const r = Array.isArray(data) ? data[0] : data; if (r) setCard(cardFromPublic(r)); });
+  }, [status, pet?.id]);
   useEffect(() => {
     if (status !== "ok") return;
     if (lapsedPreview()) return setBasic(true);
@@ -137,8 +143,8 @@ export default function PublicPetId({ params }) {
         )}
         {status === "ok" && !lost && !basic && (
           <>
-            <PetIdCard pet={pet} showQr={false} photo={pet.photo_path ? <Photo pet={pet} size={104} /> : null} />
-            <ChipLine pet={pet} />
+            {card ? <PetIdPreviewCard card={card} photo={pet.photo_path ? <Photo pet={pet} size={96} /> : null} /> : <PetIdCard pet={pet} showQr={false} photo={pet.photo_path ? <Photo pet={pet} size={104} /> : null} />}
+            {!card && <ChipLine pet={pet} />}
             <PublicHealth petId={pet.id} petName={pet.name} />
             <ScanHonesty lostMode={false} />
             <div className="mt-4">
