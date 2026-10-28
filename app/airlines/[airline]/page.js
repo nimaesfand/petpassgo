@@ -46,7 +46,7 @@ export default function AirlineGuide({ params }) {
           <li>Destination rules (state, territory or country) that apply to your route</li>
         </ul>
         <p className="mb-8" style={{ lineHeight: 1.7, opacity: 0.85 }}>
-          Every item in a Travel Pass is checked against {a.name}&apos;s own website and official government sources. You can also read{" "}
+          A Travel Pass step is shown only when we have the official page and the date we last checked it. You can also read{" "}
           <a href={a.site} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline" }}>{a.name}&apos;s pet travel page</a> directly.
         </p>
         <div className="rounded-2xl p-6" style={{ background: "#14213D", color: "#F3F5F9" }}>

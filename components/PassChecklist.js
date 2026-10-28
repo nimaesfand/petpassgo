@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import Icon from "./Icon";
 import { tokens, font } from "../lib/theme";
 import { useTodayPT } from "../lib/useTodayPT";
-import { buildPassCards, groupCards, cardDone, dueChip } from "../lib/passCards";
+import { buildPassCards, groupCards, cardDone, dueChip, ASK_AIRLINE } from "../lib/passCards";
 import ServiceAnimalTrack from "./ServiceAnimalTrack";
 import LinkText from "./LinkText";
 import { isTel, prettyPhone } from "../lib/linkify";
@@ -24,6 +24,15 @@ function SectionLabel({ children, hint }) {
   );
 }
 
+function AskAirlineCard({ card }) {
+  return (
+    <article className="rounded-2xl mb-2 px-3 py-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+      <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, lineHeight: 1.3, color: tokens.navy }}>{card.shortTitle}</div>
+      <p style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.4, color: tokens.ink, margin: "4px 0 0" }}>{ASK_AIRLINE}</p>
+    </article>
+  );
+}
+
 function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRelief }) {
   const chip = dueChip(card.dueDate, today);
   const tone = CHIP[chip.tone] || CHIP.later;
@@ -38,7 +47,10 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRe
         style={{ minHeight: 56, background: "transparent", border: "none", cursor: "pointer" }}
       >
         <span aria-hidden className="flex items-center justify-center flex-shrink-0 rounded-xl" style={{ width: 36, height: 36, background: tokens.sky, color: tokens.navy }}><Icon name={card.icon} size={20} /></span>
-        <span className="flex-1 min-w-0" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, lineHeight: 1.25, color: tokens.navy }}>{card.shortTitle}</span>
+        <span className="flex-1 min-w-0">
+          <span className="block" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, lineHeight: 1.25, color: tokens.navy }}>{card.shortTitle}</span>
+          {card.lastChecked ? <span className="block mt-0.5" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, lineHeight: 1.3, color: tokens.muted }}>{card.lastChecked}</span> : null}
+        </span>
         {showChip && <span className="flex-shrink-0 rounded-full px-2 py-1" style={{ fontFamily: font.body, fontSize: 11.5, fontWeight: 700, background: tone.background, color: tone.color }}>{chip.label}</span>}
         <span className="flex-shrink-0 rounded-full px-2.5 py-1" style={{ fontFamily: font.body, fontSize: 12, fontWeight: 700, background: done ? "#EAF6EE" : tokens.sky, color: done ? tokens.green : tokens.navy }}>{done ? "Done" : card.fact ? "Fact" : "To do"}</span>
       </button>
@@ -131,7 +143,7 @@ export default function PassChecklist({ trip, requirements = [], statusMap = {},
   }
 
   const block = (list) => list.map((card) => (
-    <PassCard
+    card.askAirline ? <AskAirlineCard key={card.id} card={card} /> : <PassCard
       key={card.id}
       card={card}
       open={openId === card.id}

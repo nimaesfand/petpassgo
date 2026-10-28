@@ -4,6 +4,8 @@ import { startGuestCheckout } from "../lib/checkout";
 import { saveCheckoutIntent } from "../lib/resumeIntent";
 import { tokens, font } from "../lib/theme";
 import { PRICES as P } from "../lib/pricing";
+import GuaranteeLine from "./GuaranteeLine";
+import { MEMBERSHIP_TERMS } from "../lib/travelPassOffer";
 
 // One small step before Stripe for signed-out buyers: email → Continue.
 // Existing accounts are sent to log in (members get the member price); new emails go to Stripe.
@@ -53,6 +55,7 @@ export default function GuestEmailStep({ plan, trip, cancelPath, onClose }) {
         <form onSubmit={go} className="flex flex-col gap-3">
           <input type="email" required autoFocus autoComplete="email" inputMode="email" placeholder="Your email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-4 py-3 outline-none" />
           {err && <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.stamp }}>{err}</div>}
+          {plan === "membership" ? <p style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.45, color: tokens.ink, margin: 0 }}>{MEMBERSHIP_TERMS}</p> : <GuaranteeLine />}
           <button type="submit" disabled={busy} style={btn} className="btn-primary rounded-full py-3.5 text-[16px]">{busy ? "One moment…" : "Continue"}</button>
           {onClose && <button type="button" onClick={onClose} className="py-1" style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted, background: "none", border: "none" }}>Cancel</button>}
         </form>

@@ -13,6 +13,7 @@ import SiteHeader from "../../components/SiteHeader";
 import Icon from "../../components/Icon";
 import { PLAN_CTA } from "../../lib/cta";
 import { tokens, font } from "../../lib/theme";
+import GuaranteeLine from "../../components/GuaranteeLine";
 
 
 
@@ -383,6 +384,7 @@ export default function PetPassGoQuiz() {
                   <button type="button" onClick={() => handlePurchase("pass")} className="w-full mt-4 py-2" style={{ background: "none", border: "none", fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy, cursor: "pointer", textDecoration: "underline" }}>Travel Pass only · {P.pass}</button>
                 </>
               )}
+              <GuaranteeLine align="center" />
               <div className="mt-6">
                 <button onClick={back} style={{ fontFamily: font.body, color: tokens.ink, fontSize: 16 }}>← Back</button>
               </div>

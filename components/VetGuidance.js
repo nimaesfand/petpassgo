@@ -1,5 +1,6 @@
 "use client";
 import { tokens, font } from "../lib/theme";
+import { isShownRule } from "../lib/passCards";
 import Icon from "./Icon";
 
 // Builds trip-specific vet guidance ONLY from the filtered airline_requirements rows
@@ -39,9 +40,10 @@ export default function VetGuidance({ trip, requirements = [], paid }) {
   if (!trip) return null;
   if (!paid) return <LockedTeaser />;
 
-  const rows = healthRows(requirements);
-  const noCert = explicitNoHealthCert(requirements);
-  const encouraged = encouragedHealth(requirements);
+  const verified = (requirements || []).filter(isShownRule);
+  const rows = healthRows(verified);
+  const noCert = explicitNoHealthCert(verified);
+  const encouraged = encouragedHealth(verified);
   const service = isService(trip.role);
   const needsVet = rows.length > 0;
 
