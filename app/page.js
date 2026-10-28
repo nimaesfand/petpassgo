@@ -5,12 +5,13 @@ import { tokens, font } from "../lib/theme";
 import SiteHeader from "../components/SiteHeader";
 import Logo from "../components/Logo";
 import { PlanCards } from "../components/PricingPlans";
-import SamplePass from "../components/SamplePass";
 import { JOIN_CTA, PLAN_CTA } from "../lib/cta";
 import { PRICES, usd } from "../lib/pricing";
+import { VAULT_SUB } from "../lib/travelPassOffer";
 import { PetIllustration } from "../components/PetIdCard";
 import PetQr from "../lib/PetQr";
-import { AIRLINE_GUIDES, airlineCoverageHeading } from "../lib/airlineGuides";
+import { US_AIRLINES, INTERNATIONAL_AIRLINES } from "../lib/airlines";
+import { AIRLINE_GUIDES } from "../lib/airlineGuides";
 import { FAQ } from "../lib/faq";
 
 
@@ -214,18 +215,23 @@ const STEPS = [
 
 const HOME_FAQ = [FAQ[2], FAQ[6], FAQ[7]];
 
+// Same carriers as Plan my trip, in the same groups. Count comes from that list.
+const HOME_AIRLINE_GROUPS = [
+  { title: "U.S.", names: US_AIRLINES },
+  { title: "International", names: INTERNATIONAL_AIRLINES },
+];
+const HOME_AIRLINE_COUNT = HOME_AIRLINE_GROUPS.reduce((n, group) => n + group.names.length, 0);
+
+function airlineTileHref(name) {
+  const guide = AIRLINE_GUIDES.find((g) => g.name === name);
+  return guide ? `/airlines/${guide.slug}` : "/assessment";
+}
+
 function Eyebrow({ children, color = tokens.stamp }) {
   return <div style={{ fontFamily: B, color, fontSize: 13, fontWeight: 700, letterSpacing: "0.14em" }} className="mb-3">{children}</div>;
 }
 function H2({ children, light }) {
   return <h2 style={{ fontFamily: D, color: light ? "#fff" : tokens.navy, lineHeight: 1.1 }} className="text-[32px] md:text-[42px] font-bold mb-4">{children}</h2>;
-}
-function Cta({ children = PLAN_CTA, href = "/assessment" }) {
-  return (
-    <a href={href} style={{ background: tokens.stamp, color: "#fff", fontFamily: B, fontWeight: 600, textDecoration: "none", display: "inline-block" }} className="btn-primary rounded-full px-8 py-4 text-[16px]">
-      {children}
-    </a>
-  );
 }
 
 
@@ -254,14 +260,43 @@ export default function PetPassGoLanding() {
       <section className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14 pt-7 sm:pt-10 lg:pt-20 pb-10 lg:pb-20 text-center">
         <div className={`fade-up ${loaded ? "in" : ""}`}>
           <h1 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[29px] sm:text-[31px] leading-[1.08] sm:text-[52px] lg:text-[64px] font-bold mb-3 lg:mb-5">Fly with your pets, skip the guesswork.</h1>
-          <p style={{ fontFamily: B, color: tokens.muted }} className="text-[16px] lg:text-[19px] mb-5 lg:mb-8 max-w-[640px] mx-auto">A few questions. Then a checklist with dates, sources, and what to pack.</p>
-          <Cta />
-          <p style={{ fontFamily: B, fontSize: 16, color: tokens.ink, lineHeight: 1.45 }} className="mt-4 max-w-[640px] mx-auto">
-            A Travel Pass is {usd(PRICES.pass)}. Join + Pass is {usd(PRICES.joinToday)} today: {usd(PRICES.member)} for Pet Vault plus a {usd(PRICES.memberPass)} pass. Then {usd(PRICES.member)}/mo.
-          </p>
-          <p className="mt-2"><a href="/join" style={{ fontFamily: B, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{JOIN_CTA}</a></p>
+          <p style={{ fontFamily: B, color: tokens.muted }} className="text-[16px] lg:text-[19px] mb-5 lg:mb-10">Two simple ways to start. Pick one.</p>
         </div>
-        <div className="max-w-[720px] mx-auto mt-8 text-left"><SamplePass /></div>
+        <div className={`fade-up grid md:grid-cols-2 gap-3 lg:gap-5 max-w-[900px] mx-auto text-left ${loaded ? "in" : ""}`} style={{ transitionDelay: "120ms" }}>
+          {[
+            {
+              title: "Traveling? Start here.",
+              body: "A few questions about your pet and your flight, then checkout.",
+              cta: PLAN_CTA,
+              href: "/assessment",
+              lead: "",
+              price: `Travel Pass ${usd(PRICES.pass)} · members ${usd(PRICES.memberPass)}`,
+              dark: false,
+            },
+            {
+              title: "Pet Vault? Start here.",
+              body: VAULT_SUB,
+              cta: JOIN_CTA,
+              href: "/join",
+              lead: "",
+              price: `${usd(PRICES.member)}/mo · cancel anytime`,
+              dark: true,
+            },
+          ].map((door) => (
+            <div key={door.title} className="rounded-2xl p-4 sm:p-5 lg:p-7 flex flex-col h-full" style={{ background: door.dark ? tokens.navy : "#fff", border: `1px solid ${door.dark ? tokens.navy : tokens.line}`, color: door.dark ? "#fff" : tokens.navy }}>
+              <span aria-hidden="true" className="inline-flex items-center justify-center rounded-full mb-3 lg:mb-4" style={{ width: 40, height: 40, background: tokens.gold }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={tokens.navy} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{door.dark ? <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M14 10h4M14 14h3" /><circle cx="8.5" cy="11" r="2" /><path d="M5.5 16c.6-1.6 1.7-2.4 3-2.4s2.4.8 3 2.4" /></> : <path d="M2 16l20-6-20-6 3 6-3 6zM5 10h7" />}</svg>
+              </span>
+              <div style={{ fontFamily: D, fontWeight: 700 }} className="text-[22px] lg:text-[25px] mb-1.5 lg:mb-2">{door.title}</div>
+              <p style={{ fontFamily: B, opacity: 0.8, lineHeight: 1.45 }} className="text-[15px] lg:text-[16.5px] mb-4 lg:mb-6 flex-1">{door.body}</p>
+              <a href={door.href} className="btn-primary self-start rounded-full px-6 lg:px-7 py-3 lg:py-3.5 min-h-[44px]" style={{ background: door.dark ? tokens.gold : tokens.primary, color: door.dark ? tokens.navy : "#fff", fontFamily: B, fontWeight: 700, textDecoration: "none" }}>{door.cta}</a>
+              <p style={{ fontFamily: B, lineHeight: 1.4 }} className="mt-3">
+                {door.lead ? <span style={{ display: "block", fontSize: 15, fontWeight: 600, color: door.dark ? "#fff" : tokens.navy }}>{door.lead}</span> : null}
+                <span style={{ display: "block", fontSize: 15, fontWeight: 500, color: door.dark ? "#C9D3E3" : tokens.muted, marginTop: door.lead ? 2 : 0 }}>{door.price}</span>
+              </p>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* 2. HOW IT WORKS */}
@@ -290,13 +325,20 @@ export default function PetPassGoLanding() {
       <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-12 lg:py-20">
         <div className="max-w-[1240px] mx-auto px-6 md:px-14">
           <Eyebrow>AIRLINES</Eyebrow>
-          <H2>{airlineCoverageHeading()}</H2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mt-10">
-            {AIRLINE_GUIDES.map((a) => (
-              <a key={a.slug} href={`/airlines/${a.slug}`} className="airline-tile rounded-xl px-5 py-4 min-h-[48px] flex items-center justify-between gap-2" style={{ background: tokens.sky, border: `1px solid ${tokens.line}`, textDecoration: "none" }}>
-                <span style={{ fontFamily: B, fontWeight: 600, fontSize: 16, color: tokens.navy }}>{a.name}</span>
-                <span style={{ color: tokens.stamp, fontWeight: 700 }} aria-hidden="true">→</span>
-              </a>
+          <H2>{HOME_AIRLINE_COUNT} airlines across the U.S., Mexico and Canada. One place.</H2>
+          <div className="mt-10 space-y-8">
+            {HOME_AIRLINE_GROUPS.map((group) => (
+              <div key={group.title}>
+                <h3 style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-3">{group.title}</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                  {group.names.map((name) => (
+                    <a key={name} href={airlineTileHref(name)} className="airline-tile rounded-xl px-5 py-4 min-h-[48px] h-full flex items-center justify-between gap-2" style={{ background: tokens.sky, border: `1px solid ${tokens.line}`, textDecoration: "none" }}>
+                      <span style={{ fontFamily: B, fontWeight: 600, fontSize: 16, color: tokens.navy }}>{name}</span>
+                      <span style={{ color: tokens.stamp, fontWeight: 700 }} aria-hidden="true">→</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -306,7 +348,7 @@ export default function PetPassGoLanding() {
       <section id="pricing" className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14 py-10 lg:py-14">
         <Eyebrow>PRICING</Eyebrow>
         <H2>Travel Pass or Pet Vault.</H2>
-        <p style={{ fontFamily: B, fontSize: 16, lineHeight: 1.45, color: tokens.ink }} className="max-w-[640px]">Prices are in US dollars (USD). One trip is {usd(PRICES.pass)}. Together today, Pet Vault plus this trip is {usd(PRICES.joinToday)}. After that, Pet Vault is {usd(PRICES.member)}/mo and each new pass is {usd(PRICES.memberPass)}.</p>
+        <p style={{ fontFamily: B, fontSize: 16, lineHeight: 1.45, color: tokens.muted }} className="mb-2">Prices are in US dollars (USD).</p>
         <div className="mt-10"><PlanCards /></div>
       </section>
 

@@ -1,12 +1,15 @@
 import { tokens } from "../lib/theme";
 import { PRICES as P, usd } from "../lib/pricing";
-import { VAULT_NAME, VAULT_SUB } from "../lib/travelPassOffer";
-import { JOIN_CTA, PLAN_CTA } from "../lib/cta";
+import { VAULT_NAME } from "../lib/travelPassOffer";
+import { JOIN_CTA, LOGIN_CTA, PLAN_CTA } from "../lib/cta";
 const D = "var(--font-display), system-ui, sans-serif", B = "var(--font-body), system-ui, sans-serif";
 
+const PASS_ITEMS = ["Rules for your exact flight and pet", "Checked steps, with the official page and a due date", "Flight day: live status, documents, Pet ID", "Pet ID and vault until 7 days after the trip ends"];
+
 export const PLANS = [
-  { k: "member", name: VAULT_NAME, price: P.member, unit: "USD per month", blurb: VAULT_SUB, items: ["Digital Pet ID with QR", "Finder messages to you after Report lost", "Community boards", "Expiry reminders · unlimited pets", `Travel Passes just ${usd(P.memberPass)}`], cta: JOIN_CTA, href: "/join", hi: true },
-  { k: "pass", name: "Travel Pass", price: P.pass, unit: "USD per trip", blurb: "One trip, fully covered.", items: ["Rules for your exact flight and pet", "Checked steps, with the official page and a due date", "Flight day: live status, documents, Pet ID", "Pet ID and vault until 7 days after the trip ends"], cta: PLAN_CTA, href: "/assessment" },
+  { k: "member", name: VAULT_NAME, price: P.member, unit: "USD /mo", blurb: `Travel Passes ${usd(P.memberPass)} for members.`, items: ["Digital Pet ID with QR", "Finder messages to you after Report lost", "Community boards", "Expiry reminders · unlimited pets"], cta: JOIN_CTA, href: "/join", hi: true },
+  { k: "member-pass", name: "Travel Pass", price: P.memberPass, unit: "USD for members", blurb: "For members. One trip.", items: PASS_ITEMS, cta: LOGIN_CTA, href: "/login" },
+  { k: "pass", name: "Travel Pass", price: P.pass, unit: "USD · one trip", blurb: "On its own. One trip.", items: PASS_ITEMS, cta: PLAN_CTA, href: "/assessment" },
 ];
 const ROWS = [
   ["Full checklist, deadlines, sources", `${usd(P.memberPass)}/trip`, 1], ["Trip reminders", "With pass", 1],
@@ -19,16 +22,17 @@ const col = (v) => (v === 1 ? tokens.green : v === 0 ? "#B8C2D0" : tokens.navy);
 
 export function PlanCards() {
   return (
-    <div className="grid md:grid-cols-2 gap-5 items-stretch max-w-[860px] mx-auto">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
       {PLANS.map((p) => (
-        <div key={p.k} className="rounded-2xl p-7 flex flex-col relative" style={{ background: p.hi ? tokens.navy : "#fff", border: `${p.hi ? 2 : 1}px solid ${p.hi ? tokens.gold : tokens.line}`, color: p.hi ? "#fff" : tokens.navy, boxShadow: p.hi ? "0 18px 40px rgba(20,33,61,.25)" : "none" }}>
-          {p.hi && <span className="absolute -top-3.5 left-7 rounded-full px-3 py-1" style={{ background: tokens.gold, color: tokens.navy, fontFamily: B, fontWeight: 800, fontSize: 12, letterSpacing: ".08em" }}>BEST VALUE · SAVE {usd(P.savings)} ON EVERY TRIP</span>}
-          <div style={{ fontFamily: B, fontWeight: 700, fontSize: 13, letterSpacing: ".12em", color: p.hi ? tokens.gold : tokens.primary }} className="mb-3">{p.name.toUpperCase()}</div>
-          <div className="flex items-baseline gap-2 flex-wrap"><span style={{ fontFamily: D, fontSize: 44, fontWeight: 700 }}>{p.price}</span><span style={{ fontFamily: B, fontSize: 14.5, opacity: 0.7 }}>{p.unit}</span></div>
-          {p.product && <div style={{ fontFamily: D, fontSize: 22, fontWeight: 700, color: p.hi ? "#fff" : tokens.navy }} className="mt-1">{p.product}</div>}
-          <p style={{ fontFamily: B, fontSize: 15.5, opacity: 0.8 }} className="mb-5">{p.blurb}</p>
-          <ul className="space-y-2 mb-7 flex-1">{p.items.map((i) => <li key={i} className="flex gap-2" style={{ fontFamily: B, fontSize: 15 }}><span style={{ color: p.hi ? tokens.gold : tokens.green, fontWeight: 700 }}>✓</span>{i}</li>)}</ul>
-          <a href={p.href} className="btn-primary block rounded-full px-7 py-3.5 text-center" style={{ background: p.hi ? tokens.primary : "#fff", color: p.hi ? "#fff" : tokens.navy, border: p.hi ? "none" : `2px solid ${tokens.navy}`, fontFamily: B, fontWeight: 600, fontSize: 16, textDecoration: "none" }}>{p.cta}</a>
+        <div key={p.k} className="rounded-2xl p-6 sm:p-7 flex flex-col h-full" style={{ background: p.hi ? tokens.navy : "#fff", border: `1px solid ${p.hi ? tokens.navy : tokens.line}`, color: p.hi ? "#fff" : tokens.navy }}>
+          <div className="min-h-[2.5rem] mb-3" style={{ fontFamily: B, fontWeight: 700, fontSize: 13, letterSpacing: ".12em", lineHeight: 1.3, color: p.hi ? tokens.gold : tokens.primary }}>{p.name.toUpperCase()}</div>
+          <div className="flex items-baseline gap-x-2 gap-y-1 flex-wrap min-h-[4.75rem]">
+            <span style={{ fontFamily: D, fontSize: 44, fontWeight: 700, lineHeight: 1 }}>{p.price}</span>
+            <span style={{ fontFamily: B, fontSize: 15, lineHeight: 1.3, opacity: 0.7 }}>{p.unit}</span>
+          </div>
+          <p className="mb-5 min-h-[3rem]" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.45, opacity: 0.85 }}>{p.blurb}</p>
+          <ul className="space-y-2 mb-7 flex-1 min-h-[9.5rem]">{p.items.map((i) => <li key={i} className="flex gap-2" style={{ fontFamily: B, fontSize: 15, lineHeight: 1.4 }}><span style={{ color: p.hi ? tokens.gold : tokens.green, fontWeight: 700 }}>✓</span>{i}</li>)}</ul>
+          <a href={p.href} className="btn-primary mt-auto flex items-center justify-center rounded-full px-4 py-3.5 text-center min-h-[52px] w-full" style={{ background: p.hi ? tokens.primary : "#fff", color: p.hi ? "#fff" : tokens.navy, border: `2px solid ${p.hi ? tokens.primary : tokens.navy}`, fontFamily: B, fontWeight: 600, fontSize: 16, lineHeight: 1.25, textDecoration: "none" }}>{p.cta}</a>
         </div>
       ))}
     </div>
