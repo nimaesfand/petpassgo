@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { reminderSchedule, fmt, flightPhrase, daysUntil } from "../../../../lib/travelDates";
+import { sendResendEmail } from "../../../../lib/serverEmail";
 import { SITE_URL } from "../../../../lib/site";
 
 export const dynamic = "force-dynamic";
@@ -33,14 +34,11 @@ export async function GET(req) {
       const { data: u } = await sb.auth.admin.getUserById(trip.user_id);
       const to = u?.user?.email;
       if (!to) continue;
-      const r = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          from: process.env.REMINDER_FROM_EMAIL, to,
-          subject: `PetPassGo: ${it.title}`,
-          text: `${it.title} (${fmt(it.date)})\n\n${flightPhrase(daysUntil(it.leg === "return" ? trip.return_date : trip.travel_date, today)) || "Your flight"} — ${it.body}\n\nYour flight: ${trip.origin} → ${trip.destination}, ${fmt(trip.travel_date)}.${trip.return_date ? `\nReturn: ${fmt(trip.return_date)}.` : ""}\nOpen your checklist: ${SITE_URL}/account`,
-        }),
+      const r = await sendResendEmail({
+        to,
+        kind: "trip_reminder",
+        subject: `PetPassGo: ${it.title}`,
+        text: `${it.title} (${fmt(it.date)})\n\n${flightPhrase(daysUntil(it.leg === "return" ? trip.return_date : trip.travel_date, today)) || "Your flight"} — ${it.body}\n\nYour flight: ${trip.origin} → ${trip.destination}, ${fmt(trip.travel_date)}.${trip.return_date ? `\nReturn: ${fmt(trip.return_date)}.` : ""}\nOpen your checklist: ${SITE_URL}/account`,
       });
       if (r.ok) { sent++; await sb.from("trip_reminders").update({ sent_at: new Date().toISOString() }).eq("trip_id", trip.id).eq("kind", it.kind); }
       else await sb.from("trip_reminders").delete().eq("trip_id", trip.id).eq("kind", it.kind);
@@ -62,14 +60,11 @@ export async function GET(req) {
     const to = u?.user?.email;
     if (!to) continue;
     const { data: pet } = await sb.from("pets").select("name").eq("id", doc.pet_id).maybeSingle();
-    const r = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: process.env.REMINDER_FROM_EMAIL, to,
-        subject: `PetPassGo: ${pet?.name ? pet.name + "'s " : ""}${doc.document_type} expires ${fmt(doc.expires_on)}`,
-        text: `${pet?.name ? pet.name + "'s " : "Your "}${doc.document_type} expires on ${fmt(doc.expires_on)} (in ${kind === "7d" ? "7" : "30"} days).\n\nBook a vet visit if you need a renewal, then upload the new copy: ${SITE_URL}/account`,
-      }),
+    const r = await sendResendEmail({
+      to,
+      kind: "document_reminder",
+      subject: `PetPassGo: ${pet?.name ? pet.name + "'s " : ""}${doc.document_type} expires ${fmt(doc.expires_on)}`,
+      text: `${pet?.name ? pet.name + "'s " : "Your "}${doc.document_type} expires on ${fmt(doc.expires_on)} (in ${kind === "7d" ? "7" : "30"} days).\n\nBook a vet visit if you need a renewal, then upload the new copy: ${SITE_URL}/account`,
     });
     if (r.ok) { docSent++; await sb.from("document_reminders").update({ sent_at: new Date().toISOString() }).eq("document_id", doc.id).eq("kind", kind); }
     else await sb.from("document_reminders").delete().eq("document_id", doc.id).eq("kind", kind);

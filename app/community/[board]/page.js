@@ -57,7 +57,7 @@ function Composer({ board, parentId, lostPets, defaultPet, onPosted, compact, ar
     e.preventDefault(); setErr("");
     const p = textProblem(body) || textProblem(title); if (p) return setErr(p);
     if (!parentId && !postType) return setErr("Choose a post type.");
-    if (lostBoard && !parentId && (!st || !city.trim())) return setErr("Add the city and state so people nearby see it.");
+    if (lostBoard && !parentId && (!st || !city.trim())) return setErr("Add the city and state so people looking in that place see it.");
     setBusy(true);
     const { error } = lostBoard && !parentId ? await supabase.rpc("create_community_post_local", {
       board, body, title, post_type: postType, lost_state: st, lost_city: city.trim(), pet_id: petId || null,
@@ -322,7 +322,7 @@ export default function BoardPage() {
             </label>
             <label style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 700, color: tokens.muted, display: "grid", gap: 4, minWidth: 0 }}>CITY
               <select disabled={!area.state || area.state === "all"} value={area.city || "all"} onChange={(e) => chooseArea({ state: area.state, city: e.target.value })} className="rounded-lg px-2 py-2 w-full" style={{ ...input, minWidth: 0 }}>
-                <option value="all">{area.state && area.state !== "all" ? `All of ${area.state} (nearby)` : "Pick a state first"}</option>
+                <option value="all">{area.state && area.state !== "all" ? `All cities in ${area.state}` : "Pick a state first"}</option>
                 {citiesInState.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </label>

@@ -106,7 +106,7 @@ export function VaultInUseGallery() {
         </Phone>
       </GalleryItem>
 
-      <GalleryItem title="Lost-pet flyer, ready to print" caption="One tap from the Pet ID. Same QR, posted anywhere.">
+      <GalleryItem title="Lost-pet flyer, ready to print" caption="Print it and share it yourself. It is not posted for you until you tap Report lost.">
         <div className="mx-auto rounded-2xl p-5 text-center" style={{ maxWidth: 270, background: "#fff", border: `2px dashed ${tokens.line}`, boxShadow: "0 12px 26px rgba(20,33,61,.10)", minHeight: 332 }}>
           <div className="flex justify-center mb-2"><span style={badge}>EXAMPLE</span></div>
           <div style={{ fontFamily: font.mono, fontSize: 12, letterSpacing: "0.14em", color: tokens.primary, fontWeight: 700 }}>LOST DOG</div>
@@ -118,16 +118,16 @@ export function VaultInUseGallery() {
         </div>
       </GalleryItem>
 
-      <GalleryItem title="Microchip" caption="Chip, brand and registry — plus a yearly check that it still points to you.">
+      <GalleryItem title="Microchip" caption="You save the number. A note on this page asks you to confirm the registry still has your phone and email. We do not scan or verify the chip.">
         <Phone title="Buddy · Microchip">
           <div style={txt}>Microchip</div>
           <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy, letterSpacing: "0.03em" }}>•••• •••• 0000</div>
           <div className="space-y-2 mt-3">
-            {[["Brand & registry", "On file"], ["Registered to", "You ✓"], ["Last scanned check", "This year ✓"]].map(([a, b]) => (
-              <div key={a} className="flex justify-between rounded-xl px-3 py-2.5" style={{ background: tokens.paper }}><span style={txt}>{a}</span><span style={{ ...txt, fontWeight: 700, color: tokens.green }}>{b}</span></div>
+            {[["Brand & registry", "Saved by you"], ["Registry check", "You confirm it"], ["Yearly note", "In the app"]].map(([a, b]) => (
+              <div key={a} className="flex justify-between rounded-xl px-3 py-2.5" style={{ background: tokens.paper }}><span style={txt}>{a}</span><span style={{ ...txt, fontWeight: 700, color: tokens.navy }}>{b}</span></div>
             ))}
           </div>
-          <div className="rounded-xl px-3 py-2.5 mt-3" style={{ background: "#FFF7E6", ...txt, color: tokens.ink }}>🔔 Yearly reminder: ask the vet to scan the chip at Buddy’s next visit.</div>
+          <div className="rounded-xl px-3 py-2.5 mt-3" style={{ background: "#FFF7E6", ...txt, color: tokens.ink }}>In the app: ask the vet to scan the chip at Buddy’s next visit. This is not an email.</div>
         </Phone>
       </GalleryItem>
 
@@ -159,7 +159,7 @@ export function VaultInUseGallery() {
       <GalleryItem title="Reminders before it’s urgent" caption="Expiries and deadlines land while there’s still time to act.">
         <Phone title="Today">
           <div className="space-y-2.5">
-            {[["PetPassGo · now", "Rabies certificate expires in 30 days — book the vet while it’s easy."], ["PetPassGo · Tue", "Yearly chip check: ask the vet to scan Buddy’s chip."], ["PetPassGo · Trip", "Flying in 7 days — carrier check and documents, all in your pass."]].map(([a, b]) => (
+            {[["PetPassGo · now", "Rabies certificate expires in 30 days — book the vet while it’s easy."], ["In the app", "Yearly chip check sits on Buddy’s page. It is not an email."], ["PetPassGo · Trip", "Flying in 7 days — carrier check and documents, all in your pass."]].map(([a, b]) => (
               <div key={b} className="rounded-2xl px-3.5 py-3" style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}>
                 <div style={{ ...txt, fontSize: 11.5, fontWeight: 700 }}>{a}</div><div style={{ ...txt, color: tokens.ink }} className="mt-0.5">{b}</div>
               </div>

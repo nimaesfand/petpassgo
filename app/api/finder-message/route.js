@@ -30,10 +30,12 @@ export async function POST(req) {
     const msg = error.code === "P0001" ? error.message : "Couldn't send your message. Please try again.";
     return NextResponse.json({ error: msg }, { status: error.code === "P0001" ? 429 : 400 });
   }
+  // The message is already saved. A failed email is logged server-side; the finder still sees success.
   await emailPetOwner(
     petId,
     "PetPassGo: someone sent a message about {name}",
-    `Someone sent a message about {name} through the Pet ID page:\n\n"${message}"\n\nTheir contact: ${contact || "(not provided)"}\n\nSee all messages: ${SITE_URL}/account\n\nStay safe: meet in a public place and never send money before you have your pet back.`
+    `Someone sent a message about {name} through the Pet ID page:\n\n"${message}"\n\nTheir contact: ${contact || "(not provided)"}\n\nSee all messages: ${SITE_URL}/account\n\nStay safe: meet in a public place and never send money before you have your pet back.`,
+    "finder_message"
   );
   return NextResponse.json({ ok: true });
 }

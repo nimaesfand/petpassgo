@@ -5,14 +5,14 @@ const D = "var(--font-display), system-ui, sans-serif", B = "var(--font-body), s
 
 export const PLANS = [
   { k: "free", name: "Free", price: "$0", unit: "no account needed", blurb: "See what your trip needs.", items: ["Trip questions", "Preview of the steps you'll need", "Lost-pet flyer + instant sharing"], cta: "Plan your trip", href: "/assessment" },
-  { k: "member", name: "Membership", price: P.member, unit: "per month", product: VAULT_NAME, blurb: VAULT_SUB, items: ["Digital Pet ID with QR", "Lost-pet alerts + finder messages", "Community boards", "Expiry reminders · unlimited pets", `Travel Passes just ${P.memberPass}`], cta: "See the Pet Vault", href: "/pet-vault", hi: true },
+  { k: "member", name: "Membership", price: P.member, unit: "per month", product: VAULT_NAME, blurb: VAULT_SUB, items: ["Digital Pet ID with QR", "Finder messages to you after Report lost", "Community boards", "Expiry reminders · unlimited pets", `Travel Passes just ${P.memberPass}`], cta: "See the Pet Vault", href: "/pet-vault", hi: true },
   { k: "pass", name: "Travel Pass", price: P.pass, unit: "per trip, no membership", blurb: "One trip, fully covered.", items: ["Rules for your exact flight and pet", "Every step sourced, with a due date", "Flight day: live status, documents, Pet ID", "Pet ID & vault until 7 days after your trip"], cta: "Plan your trip", href: "/assessment" },
 ];
 const ROWS = [
   ["Trip questions + step preview", 1, 1, 1], ["Lost-pet flyer + social sharing", 1, 1, 1],
   ["Full checklist, deadlines, sources", 0, `${P.memberPass}/trip`, 1], ["Trip reminders", 0, "With pass", 1],
-  ["Digital Pet ID with QR", 0, 1, "Until 7 days after travel"], ["Pet vault (documents)", 0, 1, "Until 7 days after travel"],
-  ["Lost-pet alerts + finder messages", 0, 1, 0], ["Community boards", 0, 1, 0],
+  ["Digital Pet ID with QR", 0, 1, "7 days after the trip ends"], ["Pet vault (documents)", 0, 1, "7 days after the trip ends"],
+  ["Finder messages to you", 0, 1, 0], ["Community boards", 0, 1, 0],
   ["Document expiry reminders", 0, 1, 0], ["Pets", "—", "Unlimited", "1"],
 ];
 const mark = (v) => (v === 1 ? "✓" : v === 0 ? "✗" : v);

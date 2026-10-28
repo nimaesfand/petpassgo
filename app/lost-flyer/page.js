@@ -78,7 +78,7 @@ export default function LostFlyer() {
           {msg && <p role="status" className="mt-3" style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>{msg}</p>}
           <div className="rounded-2xl p-5 mt-8" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
             <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-1">Want finders to reach you without sharing your number?</div>
-            <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mb-3">Members get a QR Pet ID, private finder messages and alerts when the poster is viewed.</p>
+            <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mb-3">Finder messages come to you, and you get a note when someone opens the poster. The Lost &amp; Found board shows a pet in one state and city only after you tap Report lost.</p>
             <a href="/join" style={{ fontFamily: font.body, fontWeight: 700, color: tokens.primary }}>Membership {P.member}/mo →</a>
           </div>
         </div>

@@ -15,6 +15,7 @@ import { GuestEmailSheet } from "../../components/GuestEmailStep";
 import LinkText from "../../components/LinkText";
 import { isTel, prettyPhone } from "../../lib/linkify";
 import SiteHeader from "../../components/SiteHeader";
+import Icon from "../../components/Icon";
 import { tokens, font } from "../../lib/theme";
 
 
@@ -49,7 +50,7 @@ function OptionCard({ label, sub, selected, onClick, icon, compact }) {
         color: selected ? "#fff" : tokens.ink,
       }}
     >
-      {icon && <span className="text-xl flex-shrink-0">{icon}</span>}
+      {icon && <Icon name={icon} size={22} />}
       <div>
         <div style={{ fontFamily: font.body, fontWeight: 600, fontSize: 16, lineHeight: 1.3 }}>{label}</div>
         {sub && <div style={{ fontFamily: font.body, fontSize: 14, opacity: 0.7 }}>{sub}</div>}
@@ -94,11 +95,11 @@ const STATUS_META = {
 
 const INSIGHT_CATEGORIES = new Set(["KENNEL REQUIREMENT", "AGE REQUIREMENT", "PET FEE", "BREED RESTRICTION", "VACCINATION"]);
 const INSIGHT_ICONS = {
-  "KENNEL REQUIREMENT": "🧳",
-  "AGE REQUIREMENT": "🎂",
-  "PET FEE": "💵",
-  "BREED RESTRICTION": "🐾",
-  VACCINATION: "💉",
+  "KENNEL REQUIREMENT": "bag",
+  "AGE REQUIREMENT": "calendar",
+  "PET FEE": "dollar",
+  "BREED RESTRICTION": "ban",
+  VACCINATION: "stethoscope",
 };
 
 // Before payment the real requirement text never reaches the page (not even blurred):
@@ -116,7 +117,8 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
   if (isInsight) {
     return (
       <div className="rounded-xl p-5 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-        <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.ink, opacity: 0.45, letterSpacing: "0.08em" }} className="mb-1">
+        <div className="flex items-center gap-2 mb-1" style={{ fontFamily: font.body, fontSize: 13, fontWeight: 700, color: tokens.navy, letterSpacing: "0.06em" }}>
+          {INSIGHT_ICONS[category] && <Icon name={INSIGHT_ICONS[category]} size={16} />}
           {category}
         </div>
         {unlocked ? (
@@ -229,14 +231,15 @@ function ResultRow({ category, what, why, deadline, link, status, unlocked }) {
               }}
               className="rounded-full px-4 py-1.5 hover:opacity-90 transition"
             >
-              {isTel(link) ? `📞 Call ${prettyPhone(link)}` : "Go here →"}
+              {isTel(link) ? <span className="inline-flex items-center gap-1.5"><Icon name="phone" size={16} /> Call {prettyPhone(link)}</span> : "Go here →"}
             </a>
           )}
           </div>
         </>
       ) : (
-        <div style={{ fontFamily: font.mono, fontSize: 12.5, color: tokens.stamp, opacity: 0.8 }} className="mt-3">
-          🔒 UNLOCK TO SEE DEADLINE &amp; INSTRUCTIONS
+        <div className="mt-3 flex items-center gap-2" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, color: tokens.navy }}>
+          <Icon name="lock" size={18} />
+          Unlock to see the deadline and instructions
         </div>
       )}
     </div>
@@ -478,9 +481,9 @@ export default function PetPassGoQuiz() {
                 This changes which requirements apply to your trip.
               </p>
               <div className="flex flex-col gap-3">
-                <OptionCard icon="🐕" label="Dog" selected={answers.animal === "Dog"} onClick={() => set("animal", "Dog")} />
-                <OptionCard icon="🐈" label="Cat" selected={answers.animal === "Cat"} onClick={() => set("animal", "Cat")} />
-                <OptionCard icon="🐾" label="Other animal" selected={answers.animal === "Other"} onClick={() => set("animal", "Other")} />
+                <OptionCard icon="dog" label="Dog" selected={answers.animal === "Dog"} onClick={() => set("animal", "Dog")} />
+                <OptionCard icon="cat" label="Cat" selected={answers.animal === "Cat"} onClick={() => set("animal", "Cat")} />
+                <OptionCard icon="paw" label="Other animal" selected={answers.animal === "Other"} onClick={() => set("animal", "Other")} />
               </div>
               <NavRow onNext={next} nextDisabled={!answers.animal} />
             </>
@@ -666,7 +669,7 @@ export default function PetPassGoQuiz() {
 
               {noMatch && (
                 <div className="rounded-xl p-5 mb-4 text-center" style={{ background: "#FFF9EC", border: `1.5px solid ${tokens.gold}`, fontFamily: font.body, fontSize: 15.5, color: tokens.ink }}>
-                  <div style={{ fontFamily: font.display, fontSize: 18, color: tokens.navy }} className="mb-1">🐾 We're not there yet</div>
+                  <div className="mb-1 flex items-center justify-center gap-2" style={{ fontFamily: font.display, fontSize: 18, color: tokens.navy }}><Icon name="plane" size={18} /> We're not there yet</div>
                   {notSureAirline ? (
                     <p className="mb-3">Pick your airline to see your Travel Pass. Requirements change a lot by carrier, so we need it to build your plan.</p>
                   ) : null}
@@ -779,7 +782,7 @@ export default function PetPassGoQuiz() {
                   className="mt-5 rounded-xl p-4 text-center"
                   style={{ background: "#fff", border: `1px dashed ${tokens.green}`, fontFamily: font.body, fontSize: 14.5, color: tokens.green }}
                 >
-                  ✓ Unlocked — this is what the customer sees after paying.
+                  <span className="inline-flex items-center justify-center gap-2"><Icon name="check" size={18} /> Unlocked. This is what you see after paying.</span>
                 </div>
               )}
 

@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <LegalPage title="Terms of Service" updated="October 14, 2026">
+    <LegalPage title="Terms of Service" updated="October 28, 2026">
       <P>These Terms of Service ("Terms") govern your use of PetPassGo (the "Service"), operated by PetPassGo ("PetPassGo", "we", "us"). By creating an account or using the Service, you agree to these Terms.</P>
 
       <H>1. What PetPassGo is, and what it is not</H>
@@ -28,7 +28,7 @@ export default function TermsPage() {
       <H>4. Public Pet ID pages and lost-pet tools</H>
       <UL>
         <li>Each pet can have a public Pet ID page that anyone with the link or QR code can view. You control what appears on it.</li>
-        <li>If you mark a pet as lost, the page shows a lost-pet notice, and people who find your pet can send you a message through our relay form. Your email address is not shown to the finder.</li>
+        <li>A lost notice goes live only when you tap Report lost. Finder messages then come to you through our relay form. Your email address is not shown to the finder. If you also post to the Lost &amp; Found board, people browsing the state and city you enter can see that post. We do not use GPS, and we do not see or verify microchip scans.</li>
         <li>We do not guarantee that a lost pet will be found or that messages from finders are genuine. Use caution when meeting anyone in person.</li>
         <li>You must not use the finder message form to harass, spam or deceive anyone.</li>
       </UL>
@@ -40,8 +40,8 @@ export default function TermsPage() {
       <P>Some features may require payment. Payments will be processed by Stripe; we do not store your full card number. Planned prices (in U.S. dollars, before any applicable taxes):</P>
       <UL>
         <li>Free for everyone, no account needed: the trip questions with a locked preview of the steps you'll need, and the lost-pet flyer maker with sharing.</li>
-        <li>Membership: $6.99 per month, billed monthly. Includes the pet vault, Digital Pet ID with QR code, lost-pet alerts and finder messages, posting on the community boards, document expiry reminders, unlimited pets, and Travel Passes at the member price of $19.99 per trip. Any signed-in account can read the community boards; posting and replies require membership.</li>
-        <li>Travel Pass without membership: $49.99, one-time, per trip. Includes that trip's checklist, deadlines, sources and reminders, plus the pet vault and Digital Pet ID until 7 days after the trip's travel date. Round trip is optional. If you add a return date, that window ends 7 days after the return date instead. If you don't, the trip stays one-way and the window still ends 7 days after the outbound date.</li>
+        <li>Membership: $6.99 per month, billed monthly. Includes the pet vault, Digital Pet ID with QR code, finder messages to you after you tap Report lost, posting on the community boards (including a Lost &amp; Found post for one state and city), document expiry reminders, unlimited pets, and Travel Passes at the member price of $19.99 per trip. Any signed-in account can read the community boards; posting and replies require membership.</li>
+        <li>Travel Pass without membership: $49.99, one-time, per trip. Includes that trip's checklist, deadlines, sources and reminders, plus the pet vault and Digital Pet ID. That access stays open until 7 days after the trip ends. On a one-way trip, it ends 7 days after the travel date. If you add a return date later than the outbound date, it ends 7 days after the return date instead.</li>
       </UL>
       <P>You can cancel your membership at any time. You keep access until the end of the billing period you've paid for; after that, member features stop, and we don't give partial refunds for unused time. Your pets and documents are kept, not deleted, and come back if you rejoin; a Travel Pass you bought stays available for its trip. Lost-pet tools stay free after your membership or trip ends: you can still report a pet lost, share its poster and flyer, and receive finder messages, and its QR code shows a basic page with its name, photo and a button to message you. Prices may change; we will show the current price before you pay, and we will tell you before a membership price change takes effect.</P>
       <P><strong>Refunds.</strong> You can get a full refund within 7 days of purchase, but only if you have never opened the details of the paid Travel Pass. Once those details have been opened, the digital product has been delivered and is not refundable. To request a refund, email <Email /> from the address on your account.</P>

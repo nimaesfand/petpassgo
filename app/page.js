@@ -9,7 +9,7 @@ import { PRICES } from "../lib/pricing";
 import { VAULT_SUB } from "../lib/travelPassOffer";
 import { PetIllustration } from "../components/PetIdCard";
 import PetQr from "../lib/PetQr";
-import { AIRLINE_GUIDES } from "../lib/airlineGuides";
+import { AIRLINE_GUIDES, airlineCoverageHeading } from "../lib/airlineGuides";
 import { FAQ } from "../lib/faq";
 
 
@@ -318,7 +318,7 @@ export default function PetPassGoLanding() {
       <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-12 lg:py-20">
         <div className="max-w-[1240px] mx-auto px-6 md:px-14">
           <Eyebrow>AIRLINES</Eyebrow>
-          <H2>10 U.S. airlines. One place.</H2>
+          <H2>{airlineCoverageHeading()}</H2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mt-10">
             {AIRLINE_GUIDES.map((a) => (
               <a key={a.slug} href={`/airlines/${a.slug}`} className="airline-tile rounded-xl px-5 py-4 min-h-[48px] flex items-center justify-between gap-2" style={{ background: tokens.sky, border: `1px solid ${tokens.line}`, textDecoration: "none" }}>

@@ -20,9 +20,13 @@ export default function CommunityPaywall({ boardName, signedIn }) {
             {signedIn ? "Join to post" : "Sign in to read"}
           </div>
           <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-5">
-            {signedIn
-              ? `Browse is free with your account. Membership unlocks posting on the ${boardName || "airline"} board.`
-              : `Sign in with a free account to read tips from people who flew ${boardName || "your airline"} with their pet. Members can post and reply.`}
+            {/lost/i.test(boardName || "")
+              ? (signedIn
+                ? "Browse is free with your account. Membership unlocks posting on this board."
+                : "Sign in with a free account to read posts. Each one is for a state and city, and only after the owner taps Report lost.")
+              : (signedIn
+                ? `Browse is free with your account. Membership unlocks posting on the ${boardName || "airline"} board.`
+                : `Sign in with a free account to read tips from people who flew ${boardName || "your airline"} with their pet. Members can post and reply.`)}
           </p>
           {signedIn ? (
             <a href="/join" className="btn-primary block rounded-full py-3.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Join for {P.member}/mo</a>
@@ -33,7 +37,7 @@ export default function CommunityPaywall({ boardName, signedIn }) {
             </>
           )}
           <p style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }} className="mt-3">
-            Membership also includes Pet ID, lost-pet alerts and {P.memberPass} Travel Passes.
+            Membership also includes Pet ID, finder messages to you, and {P.memberPass} Travel Passes.
           </p>
         </div>
       </div>

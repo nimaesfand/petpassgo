@@ -28,7 +28,7 @@ export async function POST(req) {
   }
   await sb.rpc("log_pet_scan", { pet_id: petId, area });
   if (notify) {
-    await emailPetOwner(petId, "PetPassGo: {name}'s lost poster was just viewed", `Someone just opened {name}'s lost poster${area ? ` (approximate area: ${area})` : ""}.\n\nSee scans and messages: ${SITE_URL}/account`);
+    await emailPetOwner(petId, "PetPassGo: {name}'s lost poster was just viewed", `Someone just opened {name}'s lost poster${area ? ` (approximate area: ${area})` : ""}.\n\nSee scans and messages: ${SITE_URL}/account`, "lost_poster_view");
   }
   return NextResponse.json({ ok: true });
 }
