@@ -6,23 +6,28 @@ import SiteHeader from "../../components/SiteHeader";
 import GuestEmailStep from "../../components/GuestEmailStep";
 import { startStripe } from "../../lib/checkout";
 import { trackBeginCheckout } from "../../lib/analytics";
-import { PRICES as P } from "../../lib/pricing";
+import { PRICES as P, usd } from "../../lib/pricing";
 import { VAULT_NAME, VAULT_SUB } from "../../lib/travelPassOffer";
+import WithdrawalConsent from "../../components/WithdrawalConsent";
+import { WITHDRAWAL_BLOCKED } from "../../lib/withdrawal";
 import { tokens, font } from "../../lib/theme";
 
-// Membership. Signed in → straight to Stripe. Signed out → email first (existing accounts log in), then Stripe.
+// Membership. Signed out → email first. Signed in → tick the box, then Stripe.
 export default function JoinPage() {
-  const [mode, setMode] = useState("loading"); // loading | guest | error
+  const [mode, setMode] = useState("loading"); // loading | guest | ready | error
   const [err, setErr] = useState("");
+  const [consent, setConsent] = useState(false);
+  const [busy, setBusy] = useState(false);
   useEffect(() => {
-    (async () => {
-      trackBeginCheckout("membership");
-      const { data } = await supabase.auth.getSession();
-      if (!data?.session) { setMode("guest"); return; }
-      const e = await startStripe("/api/stripe/checkout", { plan: "membership" });
-      if (e) { setErr(e); setMode("error"); }
-    })();
+    supabase.auth.getSession().then(({ data }) => setMode(data?.session ? "ready" : "guest"));
   }, []);
+  async function pay() {
+    if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; }
+    setBusy(true); setErr("");
+    trackBeginCheckout("membership");
+    const e = await startStripe("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true });
+    if (e) { setErr(e); setBusy(false); }
+  }
   return (
     <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full">
       <SiteHeader />
@@ -31,17 +36,20 @@ export default function JoinPage() {
           {mode === "guest" ? (
             <>
               <h1 style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-1">Join PetPassGo</h1>
-              <p style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{VAULT_NAME} · {P.member}/mo</p>
+              <p style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{VAULT_NAME} · {usd(P.member)}/mo</p>
               <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-4">{VAULT_SUB}</p>
               <GuestEmailStep plan="membership" cancelPath="/" />
             </>
-          ) : mode === "error" ? (
-            <div className="text-center">
-              <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.navy }} className="mb-4">{err}</p>
-              <a href="/account" style={{ fontFamily: font.body, fontWeight: 600, color: tokens.navy, textDecoration: "underline" }}>Go to my account</a>
-            </div>
+          ) : mode === "ready" ? (
+            <>
+              <h1 style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-1">Join PetPassGo</h1>
+              <p style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{VAULT_NAME} · {usd(P.member)}/mo</p>
+              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-2">{VAULT_SUB} Prices are in US dollars (USD).</p>
+              <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
+              <button type="button" disabled={busy} onClick={pay} style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, border: "none" }} className="btn-primary w-full rounded-full py-3.5 text-[16px]">{busy ? "One moment…" : "Continue"}</button>
+            </>
           ) : (
-            <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="text-center">Taking you to secure checkout…</p>
+            <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="text-center">One moment…</p>
           )}
         </div>
       </div>

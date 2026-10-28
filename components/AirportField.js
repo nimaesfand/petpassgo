@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { AIRPORTS, formatAirport, foldAscii } from "../lib/airports";
+import { AIRPORTS, formatAirport, foldAscii, countryLabel } from "../lib/airports";
 import { tokens, font } from "../lib/theme";
 
 export default function AirportField({ label, value, onSelect }) {
@@ -8,7 +8,7 @@ export default function AirportField({ label, value, onSelect }) {
   const [open, setOpen] = useState(false);
   const q = foldAscii(query.trim());
   const matches = q.length > 0
-    ? AIRPORTS.filter((a) => foldAscii(a.city).includes(q) || foldAscii(a.code).includes(q) || foldAscii(a.name).includes(q))
+    ? AIRPORTS.filter((a) => foldAscii(a.city).includes(q) || foldAscii(a.code).includes(q) || foldAscii(a.name).includes(q) || foldAscii(countryLabel(a.country)).includes(q))
         .sort((a, b) => (a.rank || 999) - (b.rank || 999))
         .slice(0, 12)
     : [];
@@ -36,7 +36,7 @@ export default function AirportField({ label, value, onSelect }) {
               style={{ fontFamily: font.body, fontSize: 15, color: tokens.navy, borderBottom: `1px solid ${tokens.line}` }}
             >
               <span style={{ fontWeight: 700 }}>{a.code}</span> · {a.city}
-              <span style={{ color: tokens.muted, fontSize: 13 }}> · {a.country === "MX" ? "Mexico" : "US"} · {a.name}</span>
+              <span style={{ color: tokens.muted, fontSize: 15 }}> · {countryLabel(a.country)} · {a.name}</span>
             </button>
           ))}
         </div>

@@ -20,7 +20,7 @@ export default function GuaranteePage() {
       </UL>
 
       <H>What you get</H>
-      <P>The price you paid for that pass ($49.99, or $19.99 if you paid the member price). One refund per pass. This does not include flights, airline fees, hotels, vet visits, documents, or membership.</P>
+      <P>The price you paid for that pass ($49.99 USD, or $19.99 USD if you paid the member price). One refund per pass. This does not include flights, airline fees, hotels, vet visits, documents, or membership.</P>
 
       <H>What it does not cover</H>
       <UL>
@@ -42,6 +42,14 @@ export default function GuaranteePage() {
       <P>We reply within 24 hours. Approved refunds are issued within 24 hours of approval, back to the original card. Your bank may take a few days to show it. If we say no, we tell you why. You can send more information and we will look again.</P>
       <P>You can ask for a written copy of this policy at <Email />.</P>
       <P>This does not limit your other rights, including a dispute with your card company.</P>
+
+      <H>Customers in the EU and UK</H>
+      <P>If you live in the European Union or the United Kingdom, you have 14 days to withdraw from a purchase of digital content. That right comes from EU Directive 2011/83/EU, articles 16(m) and 8(7), and the UK Consumer Contracts Regulations 2013, regulations 16(3) and 37.</P>
+      <P>At checkout we ask for your express consent to start your Travel Pass, and your Pet Vault membership access, immediately. We also ask you to acknowledge that you lose the 14-day right to withdraw once it starts. We confirm both by email.</P>
+      <P>If you did not give that consent and that acknowledgment, you may withdraw within 14 days for a full refund.</P>
+      <P>You can cancel Pet Vault membership online at any time from account Billing. You keep access until the end of the period you have paid for.</P>
+      <P>This does not change the Flight-Ready Guarantee. We still reply within 24 hours. An approved refund still goes back to your original card within 24 hours of approval. The California law named in our Terms does not remove this right.</P>
+
       <P>PetPassGo helps you prepare. Your airline decides boarding.</P>
     </LegalPage>
   );

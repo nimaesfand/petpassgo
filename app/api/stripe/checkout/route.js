@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { stripe, priceId, userFromReq, isMember, customerFor, siteUrl, serviceClient } from "@/lib/stripeServer";
+import { consentAccepted, WITHDRAWAL_BLOCKED } from "@/lib/withdrawal";
+import { attachConsentSession, consentMetadata, recordWithdrawalConsent } from "@/lib/withdrawalRecord";
 
 export const dynamic = "force-dynamic";
 
@@ -28,10 +30,11 @@ async function handle(req) {
     if (typeof v === "string" && v) attribution[k] = v.slice(0, 200);
   }
   if (!["pass", "member_pass", "join", "membership"].includes(plan)) return NextResponse.json({ error: "Unknown plan" }, { status: 400 });
+  if (!consentAccepted(body)) return NextResponse.json({ error: WITHDRAWAL_BLOCKED }, { status: 400 });
 
   const sb = serviceClient();
   const member = await isMember(sb, user.id);
-  if (plan === "member_pass" && !member) return NextResponse.json({ error: "The $19.99 pass is for members." }, { status: 403 });
+  if (plan === "member_pass" && !member) return NextResponse.json({ error: "The $19.99 USD pass is for members." }, { status: 403 });
   if ((plan === "join" || plan === "membership") && member) return NextResponse.json({ error: "You're already a member." }, { status: 409 });
   // Members always get the member price.
   const effPlan = plan === "pass" && member ? "member_pass" : plan;
@@ -45,7 +48,8 @@ async function handle(req) {
 
   const customer = await customerFor(sb, user);
   const base = siteUrl(req);
-  const meta = { user_id: user.id, trip_id: effPlan === "membership" ? "" : tripId, plan: effPlan, ...attribution };
+  const consent = await recordWithdrawalConsent(sb, { userId: user.id, email: user.email, plan: effPlan });
+  const meta = { user_id: user.id, trip_id: effPlan === "membership" ? "" : tripId, plan: effPlan, ...attribution, ...consentMetadata(consent.id, consent.consented_at) };
   const params = {
     customer,
     client_reference_id: user.id,
@@ -66,11 +70,12 @@ async function handle(req) {
     const items = [{ price: await priceId("membership"), quantity: 1 }];
     if (effPlan === "join") items.push({ price: await priceId("member_pass"), quantity: 1 });
     Object.assign(params, {
-      mode: "subscription", line_items: items, subscription_data: { metadata: { user_id: user.id, ...attribution } },
+      mode: "subscription", line_items: items, subscription_data: { metadata: { user_id: user.id, ...attribution, ...consentMetadata(consent.id, consent.consented_at) } },
       payment_method_data: { allow_redisplay: "always" }, // card can be offered again on later Travel Pass checkouts
       saved_payment_method_options: { allow_redisplay_filters: ["always", "limited", "unspecified"] },
     });
   }
   const session = await stripe().checkout.sessions.create(params);
+  await attachConsentSession(sb, consent.id, session.id);
   return NextResponse.json({ url: session.url });
 }

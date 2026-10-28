@@ -1,15 +1,15 @@
 import { tokens } from "../lib/theme";
-import { PRICES as P } from "../lib/pricing";
+import { PRICES as P, usd } from "../lib/pricing";
 import { VAULT_NAME, VAULT_SUB } from "../lib/travelPassOffer";
 import { JOIN_CTA, PLAN_CTA } from "../lib/cta";
 const D = "var(--font-display), system-ui, sans-serif", B = "var(--font-body), system-ui, sans-serif";
 
 export const PLANS = [
-  { k: "member", name: VAULT_NAME, price: P.member, unit: "per month", blurb: VAULT_SUB, items: ["Digital Pet ID with QR", "Finder messages to you after Report lost", "Community boards", "Expiry reminders · unlimited pets", `Travel Passes just ${P.memberPass}`], cta: JOIN_CTA, href: "/join", hi: true },
-  { k: "pass", name: "Travel Pass", price: P.pass, unit: "per trip", blurb: "One trip, fully covered.", items: ["Rules for your exact flight and pet", "Checked steps, with the official page and a due date", "Flight day: live status, documents, Pet ID", "Pet ID and vault until 7 days after the trip ends"], cta: PLAN_CTA, href: "/assessment" },
+  { k: "member", name: VAULT_NAME, price: P.member, unit: "USD per month", blurb: VAULT_SUB, items: ["Digital Pet ID with QR", "Finder messages to you after Report lost", "Community boards", "Expiry reminders · unlimited pets", `Travel Passes just ${usd(P.memberPass)}`], cta: JOIN_CTA, href: "/join", hi: true },
+  { k: "pass", name: "Travel Pass", price: P.pass, unit: "USD per trip", blurb: "One trip, fully covered.", items: ["Rules for your exact flight and pet", "Checked steps, with the official page and a due date", "Flight day: live status, documents, Pet ID", "Pet ID and vault until 7 days after the trip ends"], cta: PLAN_CTA, href: "/assessment" },
 ];
 const ROWS = [
-  ["Full checklist, deadlines, sources", `${P.memberPass}/trip`, 1], ["Trip reminders", "With pass", 1],
+  ["Full checklist, deadlines, sources", `${usd(P.memberPass)}/trip`, 1], ["Trip reminders", "With pass", 1],
   ["Digital Pet ID with QR", 1, "7 days after the trip ends"], ["Pet vault (documents)", 1, "7 days after the trip ends"],
   ["Finder messages to you", 1, 0], ["Community boards", 1, 0],
   ["Document expiry reminders", 1, 0], ["Pets", "Unlimited", "1"],
@@ -22,7 +22,7 @@ export function PlanCards() {
     <div className="grid md:grid-cols-2 gap-5 items-stretch max-w-[860px] mx-auto">
       {PLANS.map((p) => (
         <div key={p.k} className="rounded-2xl p-7 flex flex-col relative" style={{ background: p.hi ? tokens.navy : "#fff", border: `${p.hi ? 2 : 1}px solid ${p.hi ? tokens.gold : tokens.line}`, color: p.hi ? "#fff" : tokens.navy, boxShadow: p.hi ? "0 18px 40px rgba(20,33,61,.25)" : "none" }}>
-          {p.hi && <span className="absolute -top-3.5 left-7 rounded-full px-3 py-1" style={{ background: tokens.gold, color: tokens.navy, fontFamily: B, fontWeight: 800, fontSize: 12, letterSpacing: ".08em" }}>BEST VALUE · SAVE {P.savings} ON EVERY TRIP</span>}
+          {p.hi && <span className="absolute -top-3.5 left-7 rounded-full px-3 py-1" style={{ background: tokens.gold, color: tokens.navy, fontFamily: B, fontWeight: 800, fontSize: 12, letterSpacing: ".08em" }}>BEST VALUE · SAVE {usd(P.savings)} ON EVERY TRIP</span>}
           <div style={{ fontFamily: B, fontWeight: 700, fontSize: 13, letterSpacing: ".12em", color: p.hi ? tokens.gold : tokens.primary }} className="mb-3">{p.name.toUpperCase()}</div>
           <div className="flex items-baseline gap-2 flex-wrap"><span style={{ fontFamily: D, fontSize: 44, fontWeight: 700 }}>{p.price}</span><span style={{ fontFamily: B, fontSize: 14.5, opacity: 0.7 }}>{p.unit}</span></div>
           {p.product && <div style={{ fontFamily: D, fontSize: 22, fontWeight: 700, color: p.hi ? "#fff" : tokens.navy }} className="mt-1">{p.product}</div>}

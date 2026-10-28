@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { PRICES as P } from "../../lib/pricing";
+import { PRICES as P, usd } from "../../lib/pricing";
 import { supabase } from "../../lib/supabaseClient";
-import { AIRLINES } from "../../lib/airlines";
+import { US_AIRLINES, INTERNATIONAL_AIRLINES, OTHER_AIRLINE } from "../../lib/airlines";
 import AirportField from "../../components/AirportField";
 import FlightLookup, { airportLabel, airlinePickerName } from "../../components/FlightLookup";
 import { fmtTripDate } from "../../lib/tripAccess";
@@ -14,6 +14,8 @@ import Icon from "../../components/Icon";
 import { PLAN_CTA } from "../../lib/cta";
 import { tokens, font } from "../../lib/theme";
 import GuaranteeLine from "../../components/GuaranteeLine";
+import WithdrawalConsent from "../../components/WithdrawalConsent";
+import { WITHDRAWAL_BLOCKED, takeWithdrawalConsent } from "../../lib/withdrawal";
 
 
 
@@ -85,10 +87,45 @@ function NavRow({ onBack, onNext, nextLabel = "Continue", nextDisabled }) {
   );
 }
 
+function AirlineGroup({ title, names, selected, onSelect, columns }) {
+  if (!names.length) return null;
+  return (
+    <div className="mb-4">
+      <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">{title}</div>
+      <div className={columns === 2 ? "grid grid-cols-2 gap-2" : "flex flex-col gap-2"}>
+        {names.map((a) => (
+          <OptionCard key={a} label={a} compact selected={selected === a} onClick={() => onSelect(a)} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AirlineChoices({ query, selected, onSelect }) {
+  const q = query.trim().toLowerCase();
+  const match = (name) => !q || name.toLowerCase().includes(q);
+  const us = US_AIRLINES.filter(match);
+  const international = INTERNATIONAL_AIRLINES.filter(match);
+  const showOther = match(OTHER_AIRLINE);
+  return (
+    <>
+      <AirlineGroup title="U.S." names={us} selected={selected} onSelect={onSelect} columns={2} />
+      <AirlineGroup title="International" names={international} selected={selected} onSelect={onSelect} columns={1} />
+      {showOther && <OptionCard label={OTHER_AIRLINE} compact selected={selected === OTHER_AIRLINE} onClick={() => onSelect(OTHER_AIRLINE)} />}
+      {!us.length && !international.length && !showOther && (
+        <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>No airline with that name. Try another spelling, or pick Other / not sure yet.</p>
+      )}
+    </>
+  );
+}
+
 export default function PetPassGoQuiz() {
   const [step, setStep] = useState(0);
   const [isMember, setIsMember] = useState(false);
   const [guestPlan, setGuestPlan] = useState(""); // signed-out buyer: email sheet open for "pass" | "join"
+  const [consent, setConsent] = useState(false);
+  const [consentErr, setConsentErr] = useState("");
+  const [airlineQuery, setAirlineQuery] = useState("");
   const [autoBuy, setAutoBuy] = useState(""); // set when returning signed in from signup/login with a saved purchase
   // Real membership status (read-only; only the server/Stripe can set it). The checkbox
   // further down is a pre-launch preview only and is hidden when NEXT_PUBLIC_SITE_LAUNCHED=true.
@@ -145,8 +182,9 @@ export default function PetPassGoQuiz() {
     next();
   }
 
-  async function handlePurchase(plan = "pass") {
+  async function handlePurchase(plan = "pass", consentOverride = false) {
     const { data } = await supabase.auth.getUser();
+    if (!consentOverride && !consent) { setConsentErr(WITHDRAWAL_BLOCKED); return; }
     if (!data.user) {
       // Pay first: ask for the email (existing accounts log in instead), then Stripe.
       // Answers stay in this browser so "Back" from Stripe returns to these results.
@@ -192,7 +230,7 @@ export default function PetPassGoQuiz() {
     const r = await fetch("/api/stripe/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" },
-      body: JSON.stringify({ plan: stripePlan, trip_id: trip.id, attribution: getAttribution() }),
+      body: JSON.stringify({ plan: stripePlan, trip_id: trip.id, attribution: getAttribution(), immediate_access_consent: true }),
     });
     const j = await r.json().catch(() => ({}));
     if (!r.ok || !j.url) { alert(j.error || "Checkout isn't available right now. Please try again."); return; }
@@ -206,7 +244,7 @@ export default function PetPassGoQuiz() {
     if (!autoBuy || autoBuyRan.current || !answers.origin) return;
     autoBuyRan.current = true;
     supabase.auth.getSession().then(({ data }) => {
-      if (data?.session) handlePurchase(autoBuy === "join" ? "member" : "pass");
+      if (data?.session && takeWithdrawalConsent()) handlePurchase(autoBuy === "join" ? "member" : "pass", true);
     });
   }, [autoBuy, answers]);
 
@@ -359,14 +397,18 @@ export default function PetPassGoQuiz() {
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
                 Which airline?
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-5">
-                Requirements vary a lot by carrier — this is what makes your plan specific to you.
+              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-4">
+                U.S. airlines first, then international. Search if you don’t see yours.
               </p>
-              <div className="grid grid-cols-2 gap-3">
-                {AIRLINES.map((a) => (
-                  <OptionCard key={a} label={a} compact selected={answers.airline === a} onClick={() => set("airline", a)} />
-                ))}
-              </div>
+              <input
+                value={airlineQuery}
+                onChange={(e) => setAirlineQuery(e.target.value)}
+                placeholder="Search airlines"
+                aria-label="Search airlines"
+                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
+                className="rounded-xl px-4 py-3 outline-none w-full mb-4"
+              />
+              <AirlineChoices query={airlineQuery} selected={answers.airline} onSelect={(name) => set("airline", name)} />
               <NavRow onBack={back} onNext={handleSeePlan} nextDisabled={!answers.airline} nextLabel="Continue" />
             </>
           )}
@@ -375,13 +417,15 @@ export default function PetPassGoQuiz() {
             <>
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-2">Choose your pass</h2>
               <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted, lineHeight: 1.5 }} className="mb-5">We have your pet, route, dates, and airline. Airline rules and the checklist are in the pass after you pay.</p>
+              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-3">Prices are in US dollars (USD).</p>
+              <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setConsentErr(""); }} error={consentErr} />
               {isMember ? (
-                <button onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16 }}>Travel Pass · {P.memberPass}</button>
+                <button onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16 }}>Travel Pass · {usd(P.memberPass)}</button>
               ) : (
                 <>
-                  <button onClick={() => handlePurchase("member")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16 }}>Join + Pass · {P.joinToday}</button>
-                  <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-2 text-center">Then {P.member}/mo for Pet Vault. Cancel anytime.</p>
-                  <button type="button" onClick={() => handlePurchase("pass")} className="w-full mt-4 py-2" style={{ background: "none", border: "none", fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy, cursor: "pointer", textDecoration: "underline" }}>Travel Pass only · {P.pass}</button>
+                  <button onClick={() => handlePurchase("member")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16 }}>Join + Pass · {usd(P.joinToday)}</button>
+                  <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mt-2 text-center">Then {usd(P.member)}/mo for Pet Vault. Cancel anytime.</p>
+                  <button type="button" onClick={() => handlePurchase("pass")} className="w-full mt-4 py-2" style={{ background: "none", border: "none", fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy, cursor: "pointer", textDecoration: "underline" }}>Travel Pass only · {usd(P.pass)}</button>
                 </>
               )}
               <GuaranteeLine align="center" />
@@ -393,7 +437,7 @@ export default function PetPassGoQuiz() {
         </div>
       </div>
       </div>
-      <GuestEmailSheet open={!!guestPlan} title={guestPlan === "join" ? `Join + Travel Pass · ${P.joinToday}` : `Travel Pass · ${P.pass}`} plan={guestPlan} trip={answers} cancelPath="/assessment?checkout=canceled" onClose={() => setGuestPlan("")} />
+      <GuestEmailSheet open={!!guestPlan} showConsent={false} title={guestPlan === "join" ? `Join + Travel Pass · ${usd(P.joinToday)}` : `Travel Pass · ${usd(P.pass)}`} plan={guestPlan} trip={answers} cancelPath="/assessment?checkout=canceled" onClose={() => setGuestPlan("")} />
     </div>
   );
 }

@@ -1,29 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import { AIRPORTS, formatAirport } from "../lib/airports";
+import { airlinePickerName } from "../lib/airlines";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
+
+export { airlinePickerName };
 
 export function airportLabel(code, fallbackName) {
   const a = AIRPORTS.find((x) => x.code === (code || "").toUpperCase());
   return a ? formatAirport(a) : fallbackName ? `${fallbackName} (${code})` : code || "";
-}
-export function airlinePickerName(name) {
-  const n = String(name || "");
-  if (/united/i.test(n)) return "United";
-  if (/american/i.test(n)) return "American Airlines";
-  if (/delta/i.test(n)) return "Delta";
-  if (/southwest/i.test(n)) return "Southwest";
-  if (/jetblue/i.test(n)) return "JetBlue";
-  if (/alaska/i.test(n)) return "Alaska Airlines";
-  if (/hawaiian/i.test(n)) return "Hawaiian Airlines";
-  if (/frontier/i.test(n)) return "Frontier";
-  if (/allegiant/i.test(n)) return "Allegiant";
-  if (/sun country/i.test(n)) return "Sun Country";
-  if (/aerom/i.test(n)) return "Aeroméxico";
-  if (/volaris/i.test(n)) return "Volaris";
-  if (/viva/i.test(n)) return "Viva Aerobus";
-  return n;
 }
 export function fmtTime(iso, tz) {
   if (!iso) return "—";

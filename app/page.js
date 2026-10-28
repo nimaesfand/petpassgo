@@ -6,7 +6,7 @@ import SiteHeader from "../components/SiteHeader";
 import Logo from "../components/Logo";
 import { PlanCards } from "../components/PricingPlans";
 import { JOIN_CTA, PLAN_CTA } from "../lib/cta";
-import { PRICES } from "../lib/pricing";
+import { PRICES, usd } from "../lib/pricing";
 import { VAULT_SUB } from "../lib/travelPassOffer";
 import { PetIllustration } from "../components/PetIdCard";
 import PetQr from "../lib/PetQr";
@@ -264,7 +264,7 @@ export default function PetPassGoLanding() {
               cta: PLAN_CTA,
               href: "/assessment",
               lead: "",
-              price: `Travel Pass ${PRICES.pass} · members ${PRICES.memberPass}`,
+              price: `Travel Pass ${usd(PRICES.pass)} · members ${usd(PRICES.memberPass)}`,
               dark: false,
             },
             {
@@ -273,7 +273,7 @@ export default function PetPassGoLanding() {
               cta: JOIN_CTA,
               href: "/join",
               lead: "",
-              price: `${PRICES.member}/mo · cancel anytime`,
+              price: `${usd(PRICES.member)}/mo · cancel anytime`,
               dark: true,
             },
           ].map((door) => (
@@ -335,6 +335,7 @@ export default function PetPassGoLanding() {
       <section id="pricing" className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14 py-10 lg:py-14">
         <Eyebrow>PRICING</Eyebrow>
         <H2>Travel Pass or Pet Vault.</H2>
+        <p style={{ fontFamily: B, fontSize: 16, lineHeight: 1.45, color: tokens.muted }} className="mb-2">Prices are in US dollars (USD).</p>
         <div className="mt-10"><PlanCards /></div>
       </section>
 

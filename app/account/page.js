@@ -9,12 +9,14 @@ import { LiveFlightCard } from "../../components/FlightLookup";
 import { supabase } from "../../lib/supabaseClient";
 import { usePetAccess } from "../../lib/access";
 import WinBack from "../../components/WinBack";
-import { PRICES as P } from "../../lib/pricing";
+import { PRICES as P, usd } from "../../lib/pricing";
+import WithdrawalConsent from "../../components/WithdrawalConsent";
+import { WITHDRAWAL_BLOCKED, WITHDRAWAL_CONFIRMED } from "../../lib/withdrawal";
 import { JOIN_CTA, PLAN_CTA } from "../../lib/cta";
 import { startStripe } from "../../lib/checkout";
 import { trackBeginCheckout, trackPurchaseOnce, getAttribution } from "../../lib/analytics";
 import { requirementAirline } from "../../lib/airlines";
-import { tripTypeForRoute, isMexicoAirport } from "../../lib/airports";
+import { tripTypeForRoute } from "../../lib/airports";
 import SiteHeader from "../../components/SiteHeader";
 import { useTripPet, isTravelDay, TripCountdown, DayOfMode, PetReliefCard, CommunityPulse, TripExtras } from "../../components/TripLive";
 import { maskChip, ChipVault, HealthPassport, ShareCard, WalletCard, ActivationChecklist } from "../../components/PetIdV2";
@@ -30,7 +32,7 @@ import TripTimeline from "../../components/TripTimeline";
 import DocCheck from "../../components/DocCheck";
 import PassChecklist from "../../components/PassChecklist";
 import RoundTripAddon from "../../components/RoundTripAddon";
-import { buildPassCards, groupCards, isServiceRole } from "../../lib/passCards";
+import { buildPassCards, groupCards, isServiceRole, matchesDestination } from "../../lib/passCards";
 import { reminderSchedule, classifyReminder, todayPT } from "../../lib/travelDates";
 import { fmtTripDate } from "../../lib/tripAccess";
 import VetGuidance from "../../components/VetGuidance";
@@ -493,14 +495,15 @@ function AccessGate() {
 function MemberUpsell() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [consent, setConsent] = useState(false);
   return (
     <div className="rounded-xl p-5 mt-3" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
       <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }} className="mb-1">Traveling with more than one animal?</div>
       <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted, lineHeight: 1.55 }} className="mb-3">
-        Your plan includes one pet. Membership ({P.member}/mo) adds unlimited pets, {P.memberPass} Travel Passes and reminders before your documents expire. {MEMBERSHIP_TERMS}
+        Your plan includes one pet. Membership ({usd(P.member)}/mo) adds unlimited pets, {usd(P.memberPass)} Travel Passes and reminders before your documents expire. {MEMBERSHIP_TERMS}
       </p>
-      <button disabled={busy} onClick={async () => { trackBeginCheckout("membership"); setBusy(true); const e = await startStripe("/api/stripe/checkout", { plan: "membership" }); if (e) { setErr(e); setBusy(false); } }} className="rounded-full px-5 py-2.5 hover:opacity-90" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontSize: 16, fontWeight: 600 }}>{JOIN_CTA}</button>
-      {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-2">{err}</div>}
+      <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
+      <button disabled={busy} onClick={async () => { if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; } trackBeginCheckout("membership"); setBusy(true); const e = await startStripe("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true }); if (e) { setErr(e); setBusy(false); } }} className="rounded-full px-5 py-2.5 hover:opacity-90" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontSize: 16, fontWeight: 600 }}>{JOIN_CTA}</button>
     </div>
   );
 }
@@ -729,12 +732,14 @@ function PetProfileTab({ userId }) {
 function UnlockTripCard({ trip }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [consent, setConsent] = useState(false);
   async function unlock() {
+    if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; }
     setBusy(true); setErr("");
     const { data: m } = await supabase.rpc("my_membership");
     const { data: s } = await supabase.auth.getSession();
     trackBeginCheckout(m ? "member_pass" : "pass");
-    const r = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ plan: m ? "member_pass" : "pass", trip_id: trip.id, attribution: getAttribution() }) });
+    const r = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ plan: m ? "member_pass" : "pass", trip_id: trip.id, attribution: getAttribution(), immediate_access_consent: true }) });
     const j = await r.json().catch(() => ({}));
     if (r.ok && j.url) window.location.href = j.url; else { setErr(j.error || "Checkout isn't available right now. Please try again."); setBusy(false); }
   }
@@ -742,9 +747,9 @@ function UnlockTripCard({ trip }) {
     <div className="rounded-xl p-6 text-center" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
       <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-1"><Icon name="lock" size={18} /> This trip isn't unlocked yet</div>
       <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, opacity: 0.8 }} className="mb-4">Your full checklist, deadlines and reminders are ready the moment you finish checkout.</p>
+      <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
       <button disabled={busy} onClick={unlock} className="rounded-full px-6 py-3" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}>Unlock this trip</button>
       <GuaranteeLine align="center" />
-      {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-3">{err}</div>}
     </div>
   );
 }
@@ -905,12 +910,7 @@ function CurrentFlightTab({ userId }) {
           })
         : { data: [] };
 
-      const destLower = (currentTrip.destination || "").toLowerCase();
-      const filtered = (reqs || []).filter((row) => {
-        if (!row.destination_match) return true;
-        const keywords = row.destination_match.split(",").map((k) => k.trim());
-        return keywords.some((k) => destLower.includes(k));
-      });
+      const filtered = (reqs || []).filter((row) => matchesDestination(row, currentTrip));
       // Official source citations are a paid feature: strip them unless this trip is paid.
       const finalResults = filtered
         .filter((r) => r.category !== "ELIGIBILITY NOTE")
@@ -1007,7 +1007,7 @@ function CurrentFlightTab({ userId }) {
           {trip.origin} → {trip.destination}
         </div>
         <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, opacity: 0.9 }} className="mb-3">
-          {trip.airline} · {trip.travel_date || "date pending"}{trip.return_date ? ` · back ${fmtTripDate(trip.return_date)}` : ""} · {isServiceRole(trip.role) ? (serviceDogMismatch ? trip.role : trip.service_kind === "psd" ? "PSD (service dog)" : "Service dog") : trip.role}{isMexicoAirport(trip.destination) || isMexicoAirport(trip.origin) ? " · International (Mexico)" : ""}
+          {trip.airline} · {trip.travel_date || "date pending"}{trip.return_date ? ` · back ${fmtTripDate(trip.return_date)}` : ""} · {isServiceRole(trip.role) ? (serviceDogMismatch ? trip.role : trip.service_kind === "psd" ? "PSD (service dog)" : "Service dog") : trip.role}{tripTypeForRoute(trip.origin, trip.destination) === "international" ? " · International" : ""}
         </div>
         {trackedTotal > 0 && <>
           <div className="flex items-center justify-between mb-1.5">
@@ -1085,7 +1085,7 @@ function CurrentFlightTab({ userId }) {
 function BillingTab({ userId }) {
   const [memberRow, setMemberRow] = useState(null); const [isMember, setIsMember] = useState(null);
   const [purchases, setPurchases] = useState([]); const [legacyTrips, setLegacyTrips] = useState([]);
-  const [busy, setBusy] = useState(false); const [err, setErr] = useState("");
+  const [busy, setBusy] = useState(false); const [err, setErr] = useState(""); const [consent, setConsent] = useState(false);
   useEffect(() => { if (!userId) return; (async () => {
     const [{ data: m }, { data: buys }, { data: trips }] = await Promise.all([
       supabase.from("memberships").select("status,current_period_end").eq("user_id", userId).maybeSingle(),
@@ -1097,22 +1097,23 @@ function BillingTab({ userId }) {
   })(); }, [userId]);
   async function go(path, body) { setBusy(true); setErr(""); const { data: s } = await supabase.auth.getSession(); const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify(body || {}) }); const j = await r.json().catch(() => ({})); if (r.ok && j.url) window.location.href = j.url; else { setErr(j.error || "Something went wrong. Please try again."); setBusy(false); } }
   const btn = { background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600 };
-  const money = (c, cur) => c == null ? "" : `$${(c / 100).toFixed(2)}`;
+  const money = (c, cur) => c == null ? "" : `$${(c / 100).toFixed(2)} ${(cur || "usd").toUpperCase()}`;
   const kindLabel = { pass: "Travel Pass", member_pass: "Travel Pass · member price", join: "Membership + Travel Pass", membership: "Membership", membership_renewal: "Membership renewal" };
   return (
     <div className="rounded-xl p-6 sm:p-8" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
       <div style={{ fontFamily: font.display, fontSize: 22, color: tokens.navy }} className="mb-2">Billing</div>
       {isMember === null ? <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div> : isMember ? <>
-          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-1">You're a PetPassGo member ({P.member}{P.memberUnit}).</p>
+          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-1">You're a PetPassGo member ({usd(P.member)}{P.memberUnit}).</p>
           {memberRow?.current_period_end && <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-3">Current period ends {new Date(memberRow.current_period_end).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.</p>}
           <button disabled={busy} onClick={() => go("/api/stripe/portal")} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Cancel membership</button>
           <p style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.45, color: tokens.ink }} className="mt-3">Cancel online here. No phone call. You keep access through the period you've paid, and you won't be charged again.</p>
           <button disabled={busy} onClick={() => go("/api/stripe/portal")} className="rounded-full px-6 py-3 mt-3" style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }}>Receipts and payment method</button>
+          {err && <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp }} className="mt-3">{err}</p>}
         </> : <>
-          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}<b>{VAULT_NAME}</b> · {P.member}{P.memberUnit}. {VAULT_SUB} Plus {P.memberPass} Travel Passes. {MEMBERSHIP_TERMS}</p>
-          <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => { trackBeginCheckout("membership"); go("/api/stripe/checkout", { plan: "membership" }); }} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">{JOIN_CTA}</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts & cards</button></div>
+          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}<b>{VAULT_NAME}</b> · {usd(P.member)}{P.memberUnit}. {VAULT_SUB} Plus {usd(P.memberPass)} Travel Passes. {MEMBERSHIP_TERMS}</p>
+          <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
+          <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => { if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; } trackBeginCheckout("membership"); go("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true }); }} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">{JOIN_CTA}</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts & cards</button></div>
         </>}
-      {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-3">{err}</div>}
       <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${tokens.line}` }}>
         <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-2">Purchase history</div>
         {purchases.length === 0 && legacyTrips.length === 0 && <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>No purchases yet. Stripe also emails a receipt for every payment.</p>}
@@ -1150,7 +1151,7 @@ function CheckoutBanner() {
     else if (q === "canceled") setMsg("Checkout canceled. You haven't been charged.");
   }, []);
   if (!msg) return null;
-  return <><div className="rounded-xl p-4 mb-6" style={{ background: "#fff", border: `1px solid ${tokens.green}`, fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{msg === "paid" ? <>Payment received. Thank you. Your trip unlocks in a few seconds. Refresh if it still looks locked. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Flight-Ready Guarantee. Conditions apply.</a></> : msg}</div>
+  return <><div className="rounded-xl p-4 mb-6" style={{ background: "#fff", border: `1px solid ${tokens.green}`, fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>{msg === "paid" ? <>Payment received. Thank you. {WITHDRAWAL_CONFIRMED} We also email that confirmation. Your trip unlocks in a few seconds. Refresh if it still looks locked. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Flight-Ready Guarantee. Conditions apply.</a></> : msg}</div>
   {sessionId && <FeedbackPrompt kind="purchase" refKey={sessionId} title="How did that feel?" blurb="A quick rating helps us make PetPassGo better." />}</>;
 }
 
