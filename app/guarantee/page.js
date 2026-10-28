@@ -20,7 +20,7 @@ export default function GuaranteePage() {
       </UL>
 
       <H>What you get</H>
-      <P>The price you paid for that pass ($49.99, or $19.99 if you paid the member price), back on the card you used, within 10 business days of approval. One refund per pass. This does not include flights, airline fees, hotels, vet visits, documents, or membership.</P>
+      <P>The price you paid for that pass ($49.99, or $19.99 if you paid the member price). One refund per pass. This does not include flights, airline fees, hotels, vet visits, documents, or membership.</P>
 
       <H>What it does not cover</H>
       <UL>
@@ -39,7 +39,7 @@ export default function GuaranteePage() {
         <li>Something from the airline showing why you were refused. A note, email, or chat is enough. If you could not get one, tell us the airport, flight, and time.</li>
         <li>Your boarding pass or booking confirmation.</li>
       </UL>
-      <P>We reply within 24 hours. If we approve the claim, the refund goes back to your card within 10 business days. If we say no, we tell you why. You can send more information and we will look again.</P>
+      <P>We reply within 24 hours. Approved refunds are issued within 24 hours of approval, back to the original card. Your bank may take a few days to show it. If we say no, we tell you why. You can send more information and we will look again.</P>
       <P>You can ask for a written copy of this policy at <Email />.</P>
       <P>This does not limit your other rights, including a dispute with your card company.</P>
       <P>PetPassGo helps you prepare. Your airline decides boarding.</P>
