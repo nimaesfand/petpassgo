@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { sendResendEmail } from "../../../lib/serverEmail";
 
 export const dynamic = "force-dynamic";
 
@@ -24,9 +25,12 @@ export async function POST(req) {
     return NextResponse.json({ error: "Couldn't save feedback. Please try again." }, { status: 500 });
   }
   if (process.env.RESEND_API_KEY && process.env.REMINDER_FROM_EMAIL) {
-    try {
-      await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: process.env.REMINDER_FROM_EMAIL, to: "support@petpassgo.com", subject: `PetPassGo feedback (${kind}) — ${rating}/5`, text: `New private feedback from account ${u.user.email || u.user.id}\nKind: ${kind}\nRating: ${rating}/5\n${comment ? `Comment: ${comment}\n` : ""}\nStored in the feedback table. Not published.` }) });
-    } catch {}
+    await sendResendEmail({
+      to: "support@petpassgo.com",
+      kind: "feedback",
+      subject: `PetPassGo feedback (${kind}) — ${rating}/5`,
+      text: `New private feedback from account ${u.user.email || u.user.id}\nKind: ${kind}\nRating: ${rating}/5\n${comment ? `Comment: ${comment}\n` : ""}\nStored in the feedback table. Not published.`,
+    });
   }
   return NextResponse.json({ ok: true });
 }

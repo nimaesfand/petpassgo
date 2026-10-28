@@ -52,8 +52,8 @@ export function ChipVault({ pet, userId, onChanged, bare = false }) {
     if (!form.microchip_number) return null;
     if (!form.chip_verified_at) return { tone: "warn", text: "Registration check due — not recorded yet" };
     const next = plusYear(form.chip_verified_at); const days = Math.round((next - new Date(`${todayISO()}T12:00:00`)) / 86400000);
-    if (days < 0) return { tone: "bad", text: `Yearly chip check was due ${fmtDate(next.toISOString().slice(0, 10))}` };
-    if (days <= 30) return { tone: "warn", text: `Yearly chip check due ${fmtDate(next.toISOString().slice(0, 10))}` };
+    if (days < 0) return { tone: "bad", text: `In the app: yearly chip check was due ${fmtDate(next.toISOString().slice(0, 10))}` };
+    if (days <= 30) return { tone: "warn", text: `In the app: yearly chip check due ${fmtDate(next.toISOString().slice(0, 10))}` };
     return { tone: "good", text: `Checked ${fmtDate(form.chip_verified_at)} · next check ${fmtDate(next.toISOString().slice(0, 10))}` };
   }, [form.microchip_number, form.chip_verified_at]);
 
@@ -97,7 +97,7 @@ export function ChipVault({ pet, userId, onChanged, bare = false }) {
           <li><b>1. Have the number handy.</b> It's {form.microchip_number ? `the one ending ${maskChip(form.microchip_number)} above` : "on your vet paperwork, or your vet can scan for it free"}.</li>
           <li><b>2. Look up which registry holds it.</b> <a href={AAHA} target="_blank" rel="noopener noreferrer" style={{ color: tokens.primary, fontWeight: 700 }}>Open the AAHA microchip lookup</a> and enter the full number there. AAHA points to the registry; it doesn't show owner details.</li>
           <li><b>3. Confirm at that registry.</b> Sign in or call them and check the phone, email and emergency contact they would use if {pet.name} were found. Update anything old there — that's the official record.</li>
-          <li><b>4. Come back and tap “I checked it today.”</b> We'll remind you again in a year, and before a trip. No chip yet? A vet or shelter can implant one in a quick visit, then register the new number right away.</li>
+          <li><b>4. Come back and tap “I checked it today.”</b> This page shows an in-app note again in a year, and before a trip. We do not email a chip reminder. No chip yet? A vet or shelter can implant one in a quick visit, then register the new number right away.</li>
         </ol>
       )}
       <p style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }} className="mt-2">We're not a chip registry. A vet or shelter that scans the chip contacts the registry.</p>

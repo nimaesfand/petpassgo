@@ -19,7 +19,7 @@ Both DOT forms are free to download. A letter from a website doesn't replace the
 
 ## We don't sell one
 
-If you searched "buy a PSD letter" and landed here: we don't sell one, because you don't need one. [Start a trip](/assessment) and we'll show you the form your airline uses, or the pet plan if that's the better fit.
+If you searched "buy a PSD letter" and landed here: we don't sell one, because you don't need one. [Plan my trip](/assessment) and the Travel Pass has the form your airline uses, after you pay.
 
 Also read: [Service dog vs ESA vs PSD](/blog/service-dog-vs-esa-vs-psd-flying) and [the DOT service animal form, explained](/blog/dot-service-animal-form).
 

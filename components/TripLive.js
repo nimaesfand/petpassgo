@@ -10,7 +10,7 @@ import { PET_RELIEF } from "../lib/petRelief";
 import { AIRLINE_GUIDES } from "../lib/airlineGuides";
 import { getSignedUrl, SignedImg } from "../lib/storage";
 import { LiveFlightCard } from "./FlightLookup";
-import { PRICES as P } from "../lib/pricing";
+import { JOIN_CTA } from "../lib/cta";
 import { cargoTempCopy } from "../lib/passCards";
 
 // The trip's pet (or the owner's first pet), for names and photos throughout.
@@ -114,38 +114,37 @@ export function CommunityPulse({ trip, isMember }) {
   const guide = AIRLINE_GUIDES.find((g) => g.name === trip.airline);
   const [state, setState] = useState(null);
   useEffect(() => {
-    if (!guide) return;
+    if (!guide || !isMember) return;
     (async () => {
       const since = new Date(Date.now() - 7 * 864e5).toISOString();
       const { count } = await supabase.from("community_posts").select("id", { count: "exact", head: true }).eq("board", guide.slug).is("parent_id", null).gte("created_at", since);
-      let newest = null;
-      if (isMember) {
-        const { data } = await supabase.from("community_posts").select("title,body,author_name,created_at").eq("board", guide.slug).is("parent_id", null).eq("post_type", "tip").order("created_at", { ascending: false }).limit(1);
-        newest = data?.[0] || null;
-      }
-      setState({ count: count || 0, newest });
+      const { data } = await supabase.from("community_posts").select("title,body,author_name,created_at").eq("board", guide.slug).is("parent_id", null).eq("post_type", "tip").order("created_at", { ascending: false }).limit(1);
+      setState({ count: count || 0, newest: data?.[0] || null });
     })();
   }, [guide?.slug, isMember]);
-  if (!guide || !state) return null;
+  if (!guide) return null;
+  if (!isMember) {
+    return (
+      <div className="rounded-xl p-5 mb-4" style={{ background: tokens.sky, border: `1px solid ${tokens.line}` }}>
+        <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-3">Pet Vault members can read and post on the {guide.name} board.</p>
+        <a href="/join" className="inline-block rounded-full px-5 py-2.5" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>{JOIN_CTA}</a>
+      </div>
+    );
+  }
+  if (!state) return null;
   const n = state.count;
   return (
     <div className="rounded-xl p-5 mb-4" style={{ background: tokens.sky, border: `1px solid ${tokens.line}` }}>
       <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>
         {n === 0 ? `Be the first to share a tip about ${guide.name} this week` : `${n} traveler${n === 1 ? "" : "s"} posted about ${guide.name} this week`}
       </div>
-      {isMember ? (
-        <>
-          {state.newest && (
-            <blockquote className="mt-2 rounded-lg p-3" style={{ background: "#fff", fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>
-              {state.newest.title && <b>{state.newest.title}. </b>}{String(state.newest.body || "").slice(0, 220)}
-              <div style={{ fontSize: 12.5, color: tokens.muted }} className="mt-1">— {state.newest.author_name || "A member"}</div>
-            </blockquote>
-          )}
-          <a href={`/community/${guide.slug}`} className="inline-block mt-3 rounded-full px-5 py-2" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600, fontSize: 14.5, textDecoration: "none" }}>Open the {guide.name} board</a>
-        </>
-      ) : (
-        <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">Members can read the newest tips and post their own. Membership is {P.member}/mo.</div>
+      {state.newest && (
+        <blockquote className="mt-2 rounded-lg p-3" style={{ background: "#fff", fontFamily: font.body, fontSize: 15, color: tokens.ink }}>
+          {state.newest.title && <b>{state.newest.title}. </b>}{String(state.newest.body || "").slice(0, 220)}
+          <div style={{ fontSize: 14, color: tokens.muted }} className="mt-1">— {state.newest.author_name || "A member"}</div>
+        </blockquote>
       )}
+      <a href={`/community/${guide.slug}`} className="inline-block mt-3 rounded-full px-5 py-2" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600, fontSize: 15, textDecoration: "none" }}>Open the {guide.name} board</a>
     </div>
   );
 }

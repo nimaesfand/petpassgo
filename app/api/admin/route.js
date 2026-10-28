@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { serviceClient } from "../../../lib/serverEmail";
+import { sendResendEmail, serviceClient } from "../../../lib/serverEmail";
 
 export const dynamic = "force-dynamic";
 const OWNER_EMAIL = "nimaesfand@gmail.com";
@@ -75,7 +75,7 @@ export async function POST(req) {
       const links = ["https://petpassgo.com/login", "https://petpassgo.com/assessment", "https://petpassgo.com/account", "mailto:support@petpassgo.com"];
       let sent = false;
       if (process.env.RESEND_API_KEY && process.env.REMINDER_FROM_EMAIL && c.email) {
-        const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: process.env.REMINDER_FROM_EMAIL, to: c.email, subject: "PetPassGo help links", text: `Hi from PetPassGo support,\n\nHere are the links you asked for:\n${links.join("\n")}\n\nIf you still need help, reply to this email.\n\n— PetPassGo` }) });
+        const r = await sendResendEmail({ to: c.email, kind: "help_links", subject: "PetPassGo help links", text: `Hi from PetPassGo support,\n\nHere are the links you asked for:\n${links.join("\n")}\n\nIf you still need help, reply to this email.\n\n— PetPassGo` });
         sent = r.ok;
       }
       await audit(ctx, target, "resend_help_links", { sent, email_configured: !!(process.env.RESEND_API_KEY && process.env.REMINDER_FROM_EMAIL) });

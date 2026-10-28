@@ -1,5 +1,5 @@
 import { tokens, font } from "../lib/theme";
-import { PRICES as P } from "../lib/pricing";
+import { JOIN_CTA } from "../lib/cta";
 
 // Droopy-eared, slightly sad dog. Pure SVG, no stock images.
 export function SadDog({ size = 112 }) {
@@ -36,7 +36,7 @@ export default function WinBack({ area = "petid", petName, compact }) {
         <div style={{ fontFamily: font.display, fontSize: compact ? 19 : 23, fontWeight: 700, color: tokens.navy, lineHeight: 1.2 }} className="mb-1.5">{title}</div>
         <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted, lineHeight: 1.5 }} className="mb-1">{body}</p>
         <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.green, fontWeight: 600 }} className="mb-4">Everything is kept safe, not deleted.</p>
-        <a href="/join" className="btn-primary inline-block rounded-full px-6 py-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Come back for {P.member}/mo</a>
+        <a href="/join" className="btn-primary inline-block rounded-full px-6 py-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>{JOIN_CTA}</a>
       </div>
     </div>
   );
