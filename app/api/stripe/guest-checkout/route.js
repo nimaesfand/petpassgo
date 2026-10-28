@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { stripe, priceId, siteUrl, serviceClient, isMember } from "@/lib/stripeServer";
 import { cleanTrip, userIdByEmail } from "@/lib/guestCheckout";
+import { consentAccepted, WITHDRAWAL_BLOCKED } from "@/lib/withdrawal";
+import { attachConsentSession, consentMetadata, recordWithdrawalConsent } from "@/lib/withdrawalRecord";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +27,7 @@ async function handle(req) {
   try { body = await req.json(); } catch { return NextResponse.json({ error: "Bad request" }, { status: 400 }); }
   const plan = body?.plan;
   if (!["pass", "join", "membership"].includes(plan)) return NextResponse.json({ error: "Unknown plan" }, { status: 400 });
+  if (!consentAccepted(body)) return NextResponse.json({ error: WITHDRAWAL_BLOCKED }, { status: 400 });
   const trip = plan === "membership" ? null : cleanTrip(body?.trip);
   if (plan !== "membership" && !trip) return NextResponse.json({ error: "Please finish your trip details first." }, { status: 400 });
   const attribution = {};
@@ -51,8 +54,9 @@ async function handle(req) {
   const { data: row, error } = await sb.from("guest_checkouts").insert({ plan, trip, attribution }).select("id").single();
   if (error) throw error;
 
+  const consent = await recordWithdrawalConsent(sb, { email, plan, guestCheckoutId: row.id });
   const base = siteUrl(req);
-  const meta = { guest: "1", guest_checkout_id: row.id, plan, ...attribution };
+  const meta = { guest: "1", guest_checkout_id: row.id, plan, ...attribution, ...consentMetadata(consent.id, consent.consented_at) };
   const params = {
     metadata: meta,
     client_reference_id: row.id,
@@ -76,11 +80,12 @@ async function handle(req) {
     Object.assign(params, {
       mode: "subscription",
       line_items: items,
-      subscription_data: { metadata: { guest_checkout_id: row.id, ...attribution } },
+      subscription_data: { metadata: { guest_checkout_id: row.id, ...attribution, ...consentMetadata(consent.id, consent.consented_at) } },
       payment_method_data: { allow_redisplay: "always" },
     });
   }
   const session = await stripe().checkout.sessions.create(params);
   await sb.from("guest_checkouts").update({ stripe_checkout_session_id: session.id }).eq("id", row.id);
+  await attachConsentSession(sb, consent.id, session.id);
   return NextResponse.json({ action: "checkout", url: session.url });
 }

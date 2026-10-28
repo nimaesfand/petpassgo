@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { stripe, serviceClient, syncSubscription, userIdForCustomer } from "@/lib/stripeServer";
 import { recordGuestPayment } from "@/lib/guestCheckout";
+import { sendPurchaseConfirmation } from "@/lib/purchaseEmail";
 
 export const dynamic = "force-dynamic";
 
@@ -46,7 +47,11 @@ export async function POST(req) {
       case "checkout.session.completed":
       case "checkout.session.async_payment_succeeded": {
         if (o.payment_status !== "paid" && o.payment_status !== "no_payment_required") break;
-        if (o.metadata?.guest_checkout_id && !o.metadata?.user_id) { await recordGuestPayment(sb, o); break; }
+        if (o.metadata?.guest_checkout_id && !o.metadata?.user_id) {
+          await recordGuestPayment(sb, o);
+          await sendPurchaseConfirmation(sb, o);
+          break;
+        }
         const tripId = o.metadata?.trip_id;
         const userId = o.metadata?.user_id;
         if (tripId && userId) {
@@ -59,6 +64,7 @@ export async function POST(req) {
         if (o.mode === "subscription" && o.subscription) {
           await syncSubscription(sb, await stripe().subscriptions.retrieve(o.subscription));
         }
+        await sendPurchaseConfirmation(sb, o);
         break;
       }
       case "customer.subscription.created":

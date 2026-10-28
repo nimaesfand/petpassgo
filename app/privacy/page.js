@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <LegalPage title="Privacy Policy" updated="October 14, 2026">
+    <LegalPage title="Privacy Policy" updated="October 28, 2026">
       <P>This policy explains what information PetPassGo, operated by PetPassGo ("we", "us"), collects, how we use it, and the choices you have. Questions: <Email />.</P>
 
       <H>1. Information we collect</H>
@@ -22,14 +22,15 @@ export default function PrivacyPage() {
         <li><strong>Free lost pet flyer maker:</strong> the flyer is built entirely in your browser. The photo and details you enter are not uploaded to or stored by us.</li>
         <li><strong>Document expiry dates:</strong> if you add one to an uploaded document, so members can get a reminder before it expires.</li>
         <li><strong>AI feature inputs:</strong> if you use the optional AI document check or chat, the documents and messages you submit to it.</li>
-        <li><strong>Payment information (when payments launch):</strong> handled by Stripe. We receive payment status and limited details (for example, the last four card digits), not your full card number.</li>
+        <li><strong>Payment information:</strong> handled by Stripe. We receive payment status and limited details (for example, the last four card digits), not your full card number.</li>
+        <li><strong>Checkout consent:</strong> if you agree to start your Travel Pass or Pet Vault access immediately, we store the time, your email, the plan, and the policy version. We email you a confirmation of that agreement.</li>
         <li><strong>Technical data:</strong> standard logs from our hosting providers (Vercel and Supabase), such as IP address, browser type and request times, used for security and reliability.</li>
       </UL>
 
       <H>2. How we use it</H>
       <UL>
         <li>To provide the Service: build your checklist, store your records, and show your trip status.</li>
-        <li>To send reminder emails about upcoming deadlines (delivered through our email provider, Resend), and messages about your account.</li>
+        <li>To send reminder emails about upcoming deadlines (delivered through our email provider, Resend), messages about your account, and the email that confirms you agreed to start access immediately.</li>
         <li>To forward finder messages to you when your pet is marked lost.</li>
         <li>To run optional AI features you choose to use.</li>
         <li>To process payments, prevent fraud, secure the Service and fix problems.</li>

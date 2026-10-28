@@ -3,7 +3,7 @@ import { TrackOnMount } from "../../components/Analytics";
 
 import { SampleTravelPass } from "../../components/SalesSamples";
 import { PassEdge, PassIncluded } from "../../components/TravelPassOffer";
-import { PRICES as P } from "../../lib/pricing";
+import { PRICES as P, usd } from "../../lib/pricing";
 import { PLAN_CTA } from "../../lib/cta";
 import { tokens, font } from "../../lib/theme";
 import GuaranteeLine from "../../components/GuaranteeLine";
@@ -27,7 +27,7 @@ export default function TravelPassPage() {
         <PassIncluded />
         <div className="text-center mt-7">
           <a href="/assessment" className="btn-primary inline-block rounded-full px-8 py-4 min-h-[48px]" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>{PLAN_CTA}</a>
-          <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-3">A few questions, then checkout. Travel Pass {P.pass}, or {P.joinToday} with Pet Vault. Members pay {P.memberPass}.</p>
+          <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mt-3">A few questions, then checkout. Prices are in US dollars (USD). Travel Pass {usd(P.pass)}, or {usd(P.joinToday)} with Pet Vault. Members pay {usd(P.memberPass)}.</p>
         </div>
         <GuaranteeLine align="center" />
         <h2 style={h2} className="mt-8 mb-2.5">An example pass</h2>

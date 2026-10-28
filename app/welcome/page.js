@@ -5,6 +5,7 @@ import { supabase } from "../../lib/supabaseClient";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
 import GuaranteeLine from "../../components/GuaranteeLine";
+import { WITHDRAWAL_CONFIRMED, clearWithdrawalConsent } from "../../lib/withdrawal";
 
 const card = { background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.06)" };
 const h = { fontFamily: font.display, fontSize: 26, fontWeight: 700, color: tokens.navy };
@@ -13,6 +14,7 @@ const btn = { background: tokens.stamp, color: "#fff", fontFamily: font.body, fo
 
 function clearSaved() {
   try { ["petpassgo_pending_trip", "petpassgo_purchase_intent", "petpassgo_checkout_intent"].forEach((k) => localStorage.removeItem(k)); } catch {}
+  clearWithdrawalConsent();
 }
 
 export default function WelcomePage() {
@@ -55,7 +57,7 @@ export default function WelcomePage() {
           ) : s === "new" ? (
             <>
               <h1 style={h} className="mb-1">You're in{info.first_name ? `, ${info.first_name}` : ""}!</h1>
-              <p style={p} className="mb-3">Payment received. Create a password to finish.</p>
+              <p style={{ ...p, fontSize: 16, color: tokens.ink }} className="mb-3">Payment received. {WITHDRAWAL_CONFIRMED} We also email that confirmation. Create a password to finish.</p>
               {(info.plan === "pass" || info.plan === "join") && <div className="mb-4"><GuaranteeLine /></div>}
               <form onSubmit={finish} className="flex flex-col gap-3">
                 <input type="email" value={info.email || ""} readOnly aria-label="Email" style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, background: "#F5F7FA", color: tokens.navy }} className="rounded-xl px-4 py-3 outline-none" />
