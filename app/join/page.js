@@ -32,7 +32,7 @@ export default function JoinPage() {
             <>
               <h1 style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-1">Join PetPassGo</h1>
               <p style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{VAULT_NAME} · {P.member}/mo</p>
-              <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-4">{VAULT_SUB} Cancel anytime.</p>
+              <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-4">{VAULT_SUB}</p>
               <GuestEmailStep plan="membership" cancelPath="/" />
             </>
           ) : mode === "error" ? (

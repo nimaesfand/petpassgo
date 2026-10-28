@@ -11,7 +11,7 @@ import { AIRLINE_GUIDES } from "../lib/airlineGuides";
 import { getSignedUrl, SignedImg } from "../lib/storage";
 import { LiveFlightCard } from "./FlightLookup";
 import { PRICES as P } from "../lib/pricing";
-import { cargoTempCopy } from "../lib/passCards";
+import { cargoTempCopy, lastCheckedLabel } from "../lib/passCards";
 
 // The trip's pet (or the owner's first pet), for names and photos throughout.
 export function useTripPet(trip) {
@@ -82,7 +82,7 @@ export function TripCountdown({ trip, pet, done, total }) {
 export function PetReliefCard({ airportLabel, title }) {
   const a = findAirport(airportLabel);
   const data = a && PET_RELIEF[a.code];
-  if (!data) return null;
+  if (!data?.source || !data?.checked) return null;
   const groups = [["before", "Before security"], ["after", "After security"]];
   return (
     <details className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
@@ -103,7 +103,7 @@ export function PetReliefCard({ airportLabel, title }) {
       })}
       <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }} className="mt-3">
         <a href={data.source} target="_blank" rel="noopener noreferrer" className="inline-block py-2" style={{ color: tokens.primary, fontWeight: 700, fontSize: 15, textDecoration: "underline" }}>Official airport page ↗</a>
-        {data.checked ? ` · checked ${data.checked}` : ""}
+        {data.source && data.checked ? ` · ${lastCheckedLabel(data.checked)}` : ""}
       </div>
     </details>
   );
@@ -273,15 +273,17 @@ export function CargoTempCheck({ x, trip, name }) {
     <div className="mt-3 rounded-lg p-3" style={{ background: tokens.sky }}>
       <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, color: tokens.navy }}>Cargo temperature check</div>
       <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, marginTop: 4, lineHeight: 1.45 }}>{copy.lead}</div>
-      <details className="mt-2">
-        <summary style={{ fontFamily: font.body, fontWeight: 700, fontSize: 14, color: tokens.navy, cursor: "pointer" }}>Cargo limits</summary>
-        <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, marginTop: 6, lineHeight: 1.45 }}>{copy.detail}</p>
-        {copy.sourceUrl && (
+      {copy.sourceUrl ? (
+        <details className="mt-2">
+          <summary style={{ fontFamily: font.body, fontWeight: 700, fontSize: 14, color: tokens.navy, cursor: "pointer" }}>Cargo limits</summary>
+          <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, marginTop: 6, lineHeight: 1.45 }}>{copy.detail}</p>
           <a href={copy.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-block py-2" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.primary, textDecoration: "underline" }}>
-            Source: {airline}{copy.verifiedAt ? ` · checked ${copy.verifiedAt}` : ""}
+            Official source{copy.lastChecked ? ` · ${copy.lastChecked}` : ""}
           </a>
-        )}
-      </details>
+        </details>
+      ) : (
+        <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, margin: "6px 0 0", lineHeight: 1.4 }}>{copy.detail}</p>
+      )}
     </div>
   );
 }

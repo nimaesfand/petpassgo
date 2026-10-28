@@ -4,7 +4,7 @@ import { TrackOnMount } from "../../components/Analytics";
 import Logo from "../../components/Logo";
 import { SamplePetIdCard, VaultInUseGallery } from "../../components/SalesSamples";
 import { PRICES as P } from "../../lib/pricing";
-import { VAULT_NAME, VAULT_SUB } from "../../lib/travelPassOffer";
+import { VAULT_NAME, VAULT_SUB, MEMBERSHIP_TERMS } from "../../lib/travelPassOffer";
 import { tokens, font } from "../../lib/theme";
 
 // The gallery above shows most features in use; these three don't photograph well.
@@ -55,7 +55,7 @@ export default function PetVaultPage() {
         <div className="rounded-3xl p-7 sm:p-9 text-center" style={{ background: tokens.navy }}>
           <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold, letterSpacing: "0.12em" }} className="mb-2">MEMBERSHIP · {VAULT_NAME.toUpperCase()}</div>
           <div style={{ fontFamily: font.display, fontSize: 34, fontWeight: 700, color: "#fff" }}>{P.member}<span style={{ fontSize: 16, fontWeight: 500, opacity: 0.8 }}>/month</span></div>
-          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.sky }} className="mt-2 mb-7 max-w-[480px] mx-auto">{VAULT_SUB} Plus every Travel Pass at {P.memberPass} instead of {P.pass}. Monthly, cancel anytime.</p>
+          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.sky }} className="mt-2 mb-7 max-w-[480px] mx-auto">{VAULT_SUB} Plus every Travel Pass at {P.memberPass} instead of {P.pass}. {MEMBERSHIP_TERMS}</p>
           <a href="/join" className="btn-primary rounded-full px-8 py-4 inline-block min-h-[48px]" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Join Membership — {P.member}/mo</a>
           <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.sky }} className="mt-4">Next: secure checkout, then set your password.</p>
           <div className="mt-3"><a href="/account?tab=vault" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, textDecoration: "underline" }}>Already a member? Open your vault →</a></div>

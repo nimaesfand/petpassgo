@@ -2,7 +2,8 @@
 
 import Icon from "../../components/Icon";
 import { telHref } from "../../lib/linkify";
-import { VAULT_NAME, VAULT_SUB } from "../../lib/travelPassOffer";
+import { VAULT_NAME, VAULT_SUB, MEMBERSHIP_TERMS } from "../../lib/travelPassOffer";
+import GuaranteeLine from "../../components/GuaranteeLine";
 import React, { useEffect, useState } from "react";
 import { LiveFlightCard } from "../../components/FlightLookup";
 import { supabase } from "../../lib/supabaseClient";
@@ -495,7 +496,7 @@ function MemberUpsell() {
     <div className="rounded-xl p-5 mt-3" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
       <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }} className="mb-1">Traveling with more than one animal?</div>
       <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted, lineHeight: 1.55 }} className="mb-3">
-        Your plan includes one pet. Membership ({P.member}/mo) adds unlimited pets, {P.memberPass} Travel Passes and reminders before your documents expire.
+        Your plan includes one pet. Membership ({P.member}/mo) adds unlimited pets, {P.memberPass} Travel Passes and reminders before your documents expire. {MEMBERSHIP_TERMS}
       </p>
       <button disabled={busy} onClick={async () => { trackBeginCheckout("membership"); setBusy(true); const e = await startStripe("/api/stripe/checkout", { plan: "membership" }); if (e) { setErr(e); setBusy(false); } }} className="rounded-full px-5 py-2.5 hover:opacity-90" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontSize: 14.5, fontWeight: 600 }}>Become a member · {P.member}/mo</button>
       {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-2">{err}</div>}
@@ -741,6 +742,7 @@ function UnlockTripCard({ trip }) {
       <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-1"><Icon name="lock" size={18} /> This trip isn't unlocked yet</div>
       <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, opacity: 0.8 }} className="mb-4">Your full checklist, deadlines and reminders are ready the moment you finish checkout.</p>
       <button disabled={busy} onClick={unlock} className="rounded-full px-6 py-3" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}>Unlock this trip</button>
+      <GuaranteeLine align="center" />
       {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-3">{err}</div>}
     </div>
   );
@@ -913,7 +915,6 @@ function CurrentFlightTab({ userId }) {
         .filter((r) => r.category !== "ELIGIBILITY NOTE")
         .map((r) => (currentTrip.paid ? r : { ...r, source_url: null, verified_at: null }));
       setResults(finalResults);
-      // Refund rule: record (server-side, once) the first time paid details are opened.
       if (currentTrip.paid && !currentTrip.details_first_viewed_at) supabase.rpc("mark_trip_details_viewed", { p_trip_id: currentTrip.id });
 
       const { data: statusRows } = await supabase
@@ -1102,10 +1103,12 @@ function BillingTab({ userId }) {
       <div style={{ fontFamily: font.display, fontSize: 22, color: tokens.navy }} className="mb-2">Billing</div>
       {isMember === null ? <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div> : isMember ? <>
           <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-1">You're a PetPassGo member ({P.member}{P.memberUnit}).</p>
-          {memberRow?.current_period_end && <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-4">Current period ends {new Date(memberRow.current_period_end).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.</p>}
-          <button disabled={busy} onClick={() => go("/api/stripe/portal")} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Manage, receipts or cancel</button>
+          {memberRow?.current_period_end && <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-3">Current period ends {new Date(memberRow.current_period_end).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.</p>}
+          <button disabled={busy} onClick={() => go("/api/stripe/portal")} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Cancel membership</button>
+          <p style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.45, color: tokens.ink }} className="mt-3">Cancel online here. No phone call. You keep access through the period you've paid, and you won't be charged again.</p>
+          <button disabled={busy} onClick={() => go("/api/stripe/portal")} className="rounded-full px-6 py-3 mt-3" style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }}>Receipts and payment method</button>
         </> : <>
-          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}<b>{VAULT_NAME}</b> · {P.member}{P.memberUnit}. {VAULT_SUB} Plus {P.memberPass} Travel Passes. Cancel anytime.</p>
+          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}<b>{VAULT_NAME}</b> · {P.member}{P.memberUnit}. {VAULT_SUB} Plus {P.memberPass} Travel Passes. {MEMBERSHIP_TERMS}</p>
           <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => { trackBeginCheckout("membership"); go("/api/stripe/checkout", { plan: "membership" }); }} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Become a member</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts & cards</button></div>
         </>}
       {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-3">{err}</div>}
@@ -1119,7 +1122,7 @@ function BillingTab({ userId }) {
           <div><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>Travel Pass</div><div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>{t.origin} → {t.destination}{t.paid_at ? ` · ${new Date(t.paid_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` : ""}</div></div>
           <button onClick={() => go("/api/stripe/portal")} className="rounded-full px-3.5 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 13.5, fontWeight: 700 }}>Receipts</button>
         </div>)}</div>
-        <p style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.muted }} className="mt-3">Receipts open in Stripe. “Receipts & cards” manages payment methods and cancellations.</p>
+        <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-3">Receipts open in Stripe. Cancel membership is online on this page.</p>
       </div>
     </div>
   );
@@ -1130,7 +1133,7 @@ function CheckoutBanner() {
   useEffect(() => {
     const u = new URLSearchParams(window.location.search); const q = u.get("checkout");
     if (q === "success") {
-      setMsg("Payment received. Thank you! Your trip unlocks in a few seconds. Refresh if it still looks locked.");
+      setMsg("paid");
       const sid = u.get("session_id"); setSessionId(sid);
       // Fire Purchase (and MembershipStart for membership kinds) once, with the
       // real amount/kind from the purchases row written by the Stripe webhook.
@@ -1146,7 +1149,7 @@ function CheckoutBanner() {
     else if (q === "canceled") setMsg("Checkout canceled. You haven't been charged.");
   }, []);
   if (!msg) return null;
-  return <><div className="rounded-xl p-4 mb-6" style={{ background: "#fff", border: `1px solid ${tokens.green}`, fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{msg}</div>
+  return <><div className="rounded-xl p-4 mb-6" style={{ background: "#fff", border: `1px solid ${tokens.green}`, fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{msg === "paid" ? <>Payment received. Thank you. Your trip unlocks in a few seconds. Refresh if it still looks locked. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Flight-Ready Guarantee. Conditions apply.</a></> : msg}</div>
   {sessionId && <FeedbackPrompt kind="purchase" refKey={sessionId} title="How did that feel?" blurb="A quick rating helps us make PetPassGo better." />}</>;
 }
 

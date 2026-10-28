@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <LegalPage title="Terms of Service" updated="October 14, 2026">
+    <LegalPage title="Terms of Service" updated="October 28, 2026">
       <P>These Terms of Service ("Terms") govern your use of PetPassGo (the "Service"), operated by PetPassGo ("PetPassGo", "we", "us"). By creating an account or using the Service, you agree to these Terms.</P>
 
       <H>1. What PetPassGo is, and what it is not</H>
@@ -43,19 +43,20 @@ export default function TermsPage() {
         <li>Membership: $6.99 per month, billed monthly. Includes the pet vault, Digital Pet ID with QR code, lost-pet alerts and finder messages, posting on the community boards, document expiry reminders, unlimited pets, and Travel Passes at the member price of $19.99 per trip. Any signed-in account can read the community boards; posting and replies require membership.</li>
         <li>Travel Pass without membership: $49.99, one-time, per trip. Includes that trip's checklist, deadlines, sources and reminders, plus the pet vault and Digital Pet ID until 7 days after the trip's travel date. Round trip is optional. If you add a return date, that window ends 7 days after the return date instead. If you don't, the trip stays one-way and the window still ends 7 days after the outbound date.</li>
       </UL>
-      <P>You can cancel your membership at any time. You keep access until the end of the billing period you've paid for; after that, member features stop, and we don't give partial refunds for unused time. Your pets and documents are kept, not deleted, and come back if you rejoin; a Travel Pass you bought stays available for its trip. Lost-pet tools stay free after your membership or trip ends: you can still report a pet lost, share its poster and flyer, and receive finder messages, and its QR code shows a basic page with its name, photo and a button to message you. Prices may change; we will show the current price before you pay, and we will tell you before a membership price change takes effect.</P>
-      <P><strong>Refunds.</strong> You can get a full refund within 7 days of purchase, but only if you have never opened the details of the paid Travel Pass. Once those details have been opened, the digital product has been delivered and is not refundable. To request a refund, email <Email /> from the address on your account.</P>
-      <P><strong>Exception for inaccurate information.</strong> At PetPassGo's sole discretion, we may issue a refund if information we showed you was inaccurate and directly caused a documented problem, such as being denied boarding. To ask for this, email <Email /> within 14 days of your travel date and include:</P>
-      <UL>
-        <li>your booking confirmation or itinerary;</li>
-        <li>the specific PetPassGo information you relied on;</li>
-        <li>written proof from the airline or authority showing the actual requirement or the denial (for example, a denial notice, a written statement from the airline, or a receipt); and</li>
-        <li>a description of what happened.</li>
-      </UL>
-      <P>This exception does not apply if the information was correct when we showed it but the airline or authority changed its rules later, or if you did not follow the information we provided.</P>
-      <P>Approved refunds are paid to the original payment method, and your access to that trip is removed.</P>
+      <P>Membership is $6.99 per month and renews each month until you cancel. You can cancel online at any time from account Billing. You do not have to call. You keep access until the end of the billing period you've paid for, and you won't be charged again. We don't refund partial months except where the law requires it. Membership fees are not covered by the Flight-Ready Guarantee in section 7. Your pets and documents are kept, not deleted, and come back if you rejoin; a Travel Pass you bought stays available for its trip. Lost-pet tools stay free after your membership or trip ends: you can still report a pet lost, share its poster and flyer, and receive finder messages, and its QR code shows a basic page with its name, photo and a button to message you. Prices may change; we will show the current price before you pay, and we will tell you before a membership price change takes effect. Travel Pass refunds are only as section 7 describes.</P>
 
-      <H>7. Community boards</H>
+      <H>7. Refunds and the Flight-Ready Guarantee</H>
+      <P><strong>7.1 Flight-Ready Guarantee.</strong> Travel Pass purchases are covered by our <a href="/guarantee">Flight-Ready Guarantee</a> (<a href="/guarantee">Conditions apply</a>). The Guarantee is part of these Terms. If your pet is refused boarding because a requirement in that Travel Pass was wrong as of the Last checked date shown for it, we refund the price you paid for that Travel Pass, as the Guarantee describes. If these Terms and the Guarantee conflict, the Guarantee controls for Travel Pass refunds.</P>
+      <P><strong>7.2 Other Travel Pass refunds.</strong> Except under the Guarantee, or where the law requires a refund, Travel Pass fees aren't refundable once the Travel Pass has been delivered. We may issue other refunds at our discretion. One of those refunds doesn't create a right to another.</P>
+      <P><strong>7.3 Membership.</strong> Membership fees are not covered by the Guarantee. Cancellation works as section 6 describes.</P>
+      <P><strong>7.4 What the refund covers.</strong> The refund is the price you paid for that Travel Pass ($49.99, or $19.99 at the member price), paid to the original card within 10 business days of approval, and never more than that price. One refund per Travel Pass. It does not include flights, airline pet fees, change fees, hotels, transport, vet visits, documents, membership, or any other cost.</P>
+      <P>All three of these must be true: a requirement in the Travel Pass for that airline and route was wrong or missing; it was wrong on the Last checked date shown in the pass; and your pet was refused boarding, or check-in with your pet was refused, because of that requirement.</P>
+      <P>The Guarantee does not cover a rule that changed after the Last checked date; steps you did not follow, or details that did not match what you entered; mistakes on documents from a vet, a lab, or a government office; a decision the airline or officials make that day (health, behavior, a full pet limit, weather, or an aircraft change); anything the pass marks “Check with your airline,” and fares, fees, or seat availability; or a different airline, route, or date than the pass was built for.</P>
+      <P>To claim, email <Email /> within 30 days after the refusal, with the subject “Flight-Ready Guarantee claim,” your order number or the email you used, something from the airline showing the reason (or a clear account of the airport, flight, and time if you could not get one), and your boarding pass or booking confirmation. We reply within 24 hours. If we decline the claim, we say why. You can reply with more information and we will look again. You can request a written copy of the Guarantee at <Email />.</P>
+      <P><strong>7.5 Limits.</strong> The Guarantee is our only commitment about boarding outcomes. To the extent the law allows, our total liability for a claim about a Travel Pass is limited to the amount you paid for that Travel Pass. Nothing in these Terms limits a right the law says cannot be limited, including your right to dispute a charge with your card issuer or bank.</P>
+      <P><strong>7.6 A preparation tool.</strong> PetPassGo is not an airline, a government agency, a veterinarian, or a certifying authority. We do not issue health or travel documents or decide boarding. A requirement is shown only when it has an official source and a Last checked date. If either is missing, the pass says “Check with your airline for this item,” and that item is not covered by the Guarantee.</P>
+
+      <H>8. Community boards</H>
       <UL>
         <li>When the community boards are available, any signed-in account can read posts. Members can post tips, experiences, questions and replies under a display name. Your email address is never shown.</li>
         <li>Community posts come from travelers and are not verified by PetPassGo. Always follow your PetPassGo checklist and your airline's rules.</li>
@@ -64,29 +65,29 @@ export default function TermsPage() {
         <li>You keep ownership of your posts and give us permission to display them on the Service, including publicly.</li>
       </UL>
 
-      <H>8. Acceptable use</H>
+      <H>9. Acceptable use</H>
       <P>Do not misuse the Service. That includes: breaking the law; uploading content you have no right to share; uploading malware; trying to access other users' data; scraping or reselling our content; or interfering with the Service's security or operation.</P>
 
-      <H>9. Our content</H>
+      <H>10. Our content</H>
       <P>The Service's software, design, checklists and written guidance belong to PetPassGo or its licensors. Except for your own content, you may not copy or redistribute them without our permission.</P>
 
-      <H>10. Disclaimers</H>
-      <P>The Service is provided "as is" and "as available". To the fullest extent permitted by law, we disclaim all warranties, express or implied, including warranties of accuracy, fitness for a particular purpose and non-infringement. We are not responsible for decisions made by airlines, airports, government agencies or veterinarians, including denied boarding, quarantine, or travel delays.</P>
+      <H>11. Disclaimers</H>
+      <P>The Service is provided "as is" and "as available". To the fullest extent permitted by law, we disclaim all warranties, express or implied, including warranties of accuracy, fitness for a particular purpose and non-infringement. We do not make boarding decisions. Airline, airport, government, and veterinary decisions are outside the Guarantee, except for a Travel Pass refund the Guarantee itself requires.</P>
 
-      <H>11. Limitation of liability</H>
-      <P>To the fullest extent permitted by law, PetPassGo will not be liable for indirect, incidental, special or consequential damages, or for lost travel costs. Our total liability for any claim relating to the Service is limited to the amount you paid us in the 12 months before the claim. Some jurisdictions do not allow these limits, so they may not apply to you.</P>
+      <H>12. Limitation of liability</H>
+      <P>To the fullest extent permitted by law, PetPassGo will not be liable for indirect, incidental, special or consequential damages, or for lost travel costs. A claim about a Travel Pass is limited as section 7.5 describes. For any other claim, our total liability is limited to the amount you paid us in the 12 months before the claim. Some jurisdictions do not allow these limits, so they may not apply to you. Nothing here limits a right the law says cannot be limited, including a dispute with your card issuer or bank.</P>
 
-      <H>12. Ending your use</H>
+      <H>13. Ending your use</H>
       <P>You can stop using the Service and ask us to delete your account at any time by emailing <Email />. We may suspend or end accounts that break these Terms.</P>
 
-      <H>13. Changes to these Terms</H>
+      <H>14. Changes to these Terms</H>
       <P>We may update these Terms. If a change is material, we will notify you by email or in the app before it takes effect. If you keep using the Service after that, you accept the updated Terms.</P>
 
-      <H>14. Governing law</H>
+      <H>15. Governing law</H>
       <P>These Terms are governed by the laws of the State of California, without regard to its conflict-of-law rules.</P>
 
-      <H>15. Contact</H>
-      <P>Questions about these Terms: <Email />.</P>
+      <H>16. Contact</H>
+      <P>PetPassGo. Questions about these Terms: <Email />.</P>
     </LegalPage>
   );
 }

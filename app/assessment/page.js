@@ -16,6 +16,7 @@ import LinkText from "../../components/LinkText";
 import { isTel, prettyPhone } from "../../lib/linkify";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
+import GuaranteeLine from "../../components/GuaranteeLine";
 
 
 
@@ -733,6 +734,7 @@ export default function PetPassGoQuiz() {
                     >
                       Unlock your Travel Pass — {P.memberPass} member price
                     </button>
+                    <GuaranteeLine align="center" />
                     <div className="mt-3 rounded-xl p-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
                       <PlanPoints points={["This trip’s full Travel Pass", "Your pet’s records and Pet ID carried over"]} />
                     </div>
@@ -770,7 +772,8 @@ export default function PetPassGoQuiz() {
                         </button>
                       </div>
                     </div>
-                    <p style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }} className="mt-3 text-center">Nothing is charged until checkout.</p>
+                    <GuaranteeLine align="center" />
+                    <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-2 text-center">Nothing is charged until checkout.</p>
 
                   </div>
                 )

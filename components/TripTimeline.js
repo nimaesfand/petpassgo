@@ -2,12 +2,14 @@
 import { useState } from "react";
 import { tokens, font } from "../lib/theme";
 import { reminderSchedule, classifyReminder, daysUntil, fmt, flightPhrase } from "../lib/travelDates";
+import { isShownRule } from "../lib/passCards";
 import { useTodayPT } from "../lib/useTodayPT";
 
 // A reminder counts as "done" when every HEALTH DOCUMENTATION / REQUIRED FORM /
 // VACCINATION / SUBMISSION requirement on the trip is checked off (or there are none
 // of those and the user marks it done). Day-of packing (d1) is manual.
 function relatedDone(item, requirements, statusMap) {
+  requirements = (requirements || []).filter(isShownRule);
   if (item.kind === "d1") return false;
   if (item.kind === "dot48" || item.kind === "rdot48") {
     const forms = (requirements || []).filter((r) => /REQUIRED FORM|SUBMISSION/i.test(r.category || ""));

@@ -156,7 +156,7 @@ export default function SignupPage() {
                 <a href="/assessment?plan=pass" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }} className="btn-primary block text-center rounded-full py-3.5 text-[16px]">Start your trip · {P.pass}</a>
               )}
               <p style={{ fontFamily: font.body, fontSize: 13, opacity: 0.7 }} className="text-center mt-3">
-                {plan === "member" ? "Monthly, cancel anytime. Pay first, then set your password. " : ""}By continuing you agree to our{" "}
+                {plan === "member" ? "Pay first, then set your password. " : ""}By continuing you agree to our{" "}
                 <a href="/terms" style={{ color: tokens.navy, textDecoration: "underline" }}>Terms of Service</a> and{" "}
                 <a href="/privacy" style={{ color: tokens.navy, textDecoration: "underline" }}>Privacy Policy</a>.
               </p>

@@ -6,6 +6,7 @@ import { PassEdge, PassIncluded, PlanPoints } from "../../components/TravelPassO
 import { JOIN_PASS_POINTS, JOIN_PASS_NOTE, passOnlyPoints } from "../../lib/travelPassOffer";
 import { PRICES as P } from "../../lib/pricing";
 import { tokens, font } from "../../lib/theme";
+import GuaranteeLine from "../../components/GuaranteeLine";
 
 // Purchase options live here, but there is no orphan checkout: picking one
 // carries the choice into the trip questionnaire (/assessment?plan=…), the
@@ -38,7 +39,8 @@ export default function TravelPassPage() {
             <a href="/assessment?plan=pass" className="btn-primary rounded-full px-6 py-3.5 text-center min-h-[48px] mt-5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Choose Travel Pass only — {P.pass}</a>
           </div>
         </div>
-        <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="text-center mt-4">Next: answer the trip questions (about 3 minutes), then check out. Members pay {P.memberPass} automatically.</p>
+        <GuaranteeLine align="center" />
+        <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="text-center mt-3">Next: answer the trip questions (about 3 minutes), then check out. Members pay {P.memberPass} automatically.</p>
         <details className="mt-6 rounded-2xl" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           <summary className="px-5 py-4" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy, cursor: "pointer", minHeight: 48 }}>See an example pass</summary>
           <div className="px-2 pb-2 sm:px-3 sm:pb-3"><SampleTravelPass /></div>
