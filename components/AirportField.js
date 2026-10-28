@@ -33,10 +33,10 @@ export default function AirportField({ label, value, onSelect }) {
               type="button"
               onClick={() => { const lab = formatAirport(a); setQuery(lab); onSelect(lab); setOpen(false); }}
               className="w-full text-left px-4 py-2.5 hover:bg-gray-50"
-              style={{ fontFamily: font.body, fontSize: 15, color: tokens.navy, borderBottom: `1px solid ${tokens.line}` }}
+              style={{ fontFamily: font.body, fontSize: 16, color: tokens.navy, borderBottom: `1px solid ${tokens.line}` }}
             >
               <span style={{ fontWeight: 700 }}>{a.code}</span> · {a.city}
-              <span style={{ color: tokens.muted, fontSize: 15 }}> · {countryLabel(a.country)} · {a.name}</span>
+              <span style={{ color: tokens.muted, fontSize: 16 }}> · {countryLabel(a.country)} · {a.name}</span>
             </button>
           ))}
         </div>

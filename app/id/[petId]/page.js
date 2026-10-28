@@ -20,7 +20,7 @@ function PublicHealth({ petId, petName }) {
   return <div className="mt-4 rounded-2xl p-5" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body }}>
     <div style={{ fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Health notes {petName ? `for ${petName}` : ""}</div>
     <div className="space-y-1">{rows.map((r, i) => <div key={i} style={{ fontSize: 14.5, color: tokens.ink }}>{icon[r.kind] || "•"} <b>{r.name}</b>{r.expires_on ? ` · expires ${fmtDate(r.expires_on)}` : ""}</div>)}</div>
-    <div style={{ fontSize: 12.5, color: tokens.muted }} className="mt-2">Owner-entered and shared by the owner. Not verified by PetPassGo.</div>
+    <div style={{ fontSize: 15, color: tokens.muted }} className="mt-2">The owner typed this. PetPassGo did not check it.</div>
   </div>;
 }
 
@@ -31,7 +31,7 @@ function ChipLine({ pet }) {
 
 function ScanHonesty({ lostMode }) {
   return <div className="mt-4 rounded-2xl p-4" style={{ background: "#FFF9EC", border: `1px solid ${tokens.line}`, fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>
-    {lostMode ? <>🐾 <b>Found this pet?</b> Message the owner below. Opening this page while lost mode is on can alert the owner through PetPassGo right away. A vet scanning the implanted chip contacts the chip registry instead — PetPassGo can't see chip scans, and chips have no GPS.</> : <>Message the owner below if you found this pet. If they're ever marked lost here, opening this page can alert the owner through PetPassGo. A vet scanning an implanted chip contacts the chip registry — chips have no GPS.</>}
+    {lostMode ? <>Found this pet? Send a message below. If the owner marked them lost, opening this page can alert the owner. A chip has no GPS, and PetPassGo cannot see a vet’s chip scan.</> : <>Send a message if you found this pet. A chip has no GPS, and PetPassGo cannot see a vet’s chip scan.</>}
   </div>;
 }
 

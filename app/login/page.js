@@ -13,7 +13,36 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [mode, setMode] = useState("login");
   useEffect(() => { const e = new URLSearchParams(window.location.search).get("email"); if (e) setEmail(e); }, []);
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") setMode("reset");
+    });
+    return () => sub?.subscription?.unsubscribe();
+  }, []);
+
+  async function handleForgot(e) {
+    e.preventDefault();
+    setStatus("loading");
+    setErrorMsg("");
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/login` });
+    if (error) { setStatus("error"); setErrorMsg(error.message); return; }
+    setStatus("idle");
+    setMode("sent");
+  }
+
+  async function handleReset(e) {
+    e.preventDefault();
+    setStatus("loading");
+    setErrorMsg("");
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) { setStatus("error"); setErrorMsg(error.message); return; }
+    setStatus("idle");
+    setMode("login");
+    setErrorMsg("");
+    await resumeAfterAuth();
+  }
 
   async function handleLogin(e) {
     e.preventDefault();
@@ -51,7 +80,11 @@ export default function LoginPage() {
             Log in to see your pet's profile and trips.
           </p>
 
-          <form onSubmit={handleLogin} className="flex flex-col gap-3">
+          <style>{`@keyframes ppgspin{to{transform:rotate(360deg)}} .ppg-spin{width:18px;height:18px;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;display:inline-block;animation:ppgspin .7s linear infinite;vertical-align:-3px;margin-right:8px}`}</style>
+          {mode === "sent" ? (
+            <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink, lineHeight: 1.45 }}>Check {email} for a link to choose a new password.</p>
+          ) : (
+          <form onSubmit={mode === "forgot" ? handleForgot : mode === "reset" ? handleReset : handleLogin} className="flex flex-col gap-3">
             <input
               type="email"
               required
@@ -61,18 +94,20 @@ export default function LoginPage() {
               style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
               className="rounded-xl px-4 py-3 outline-none"
             />
+            {mode !== "forgot" && (
             <input
               type="password"
               required
-              placeholder="Password"
+              placeholder={mode === "reset" ? "New password" : "Password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
               className="rounded-xl px-4 py-3 outline-none"
             />
+            )}
 
             {status === "error" && (
-              <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.stamp }}>{errorMsg}</div>
+              <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.stamp }}>{errorMsg}</div>
             )}
 
             <button
@@ -81,9 +116,16 @@ export default function LoginPage() {
               style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}
               className="btn-primary rounded-full py-3.5 text-[16px] mt-2"
             >
-              {status === "loading" ? "Logging in…" : "Log in"}
+              {status === "loading" && <span className="ppg-spin" aria-hidden="true" />}
+              {status === "loading" ? (mode === "forgot" ? "Sending…" : mode === "reset" ? "Saving…" : "Logging in…") : mode === "forgot" ? "Send reset link" : mode === "reset" ? "Save new password" : "Log in"}
             </button>
+            {mode === "login" && (
+              <button type="button" onClick={() => { setMode("forgot"); setErrorMsg(""); setStatus("idle"); }} style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
+                Forgot password
+              </button>
+            )}
           </form>
+          )}
 
           <div style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="text-center mt-5">
             <a href="/assessment" style={{ color: tokens.navy, fontWeight: 600, textDecoration: "underline" }}>

@@ -20,7 +20,7 @@ async function weather(code, date) {
   const c = AIRPORT_COORDS[code];
   if (!c || !date) return null;
   const data = await cached(`met:${code}`, 60 * 60 * 1000, async () => {
-    const r = await fetch(`https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${c[0]}&lon=${c[1]}`, { headers: { "User-Agent": UA }, next: { revalidate: 3600 } });
+    const r = await fetch(`https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${c[0]}&lon=${c[1]}`, { headers: { "User-Agent": UA }, next: { revalidate: 3600 }, signal: AbortSignal.timeout(8000) });
     return r.ok ? r.json() : null;
   });
   const ts = data?.properties?.timeseries;

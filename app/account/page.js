@@ -18,7 +18,7 @@ import { trackBeginCheckout, trackPurchaseOnce, getAttribution } from "../../lib
 import { requirementAirline } from "../../lib/airlines";
 import { tripTypeForRoute } from "../../lib/airports";
 import SiteHeader from "../../components/SiteHeader";
-import { useTripPet, isTravelDay, TripCountdown, DayOfMode, PetReliefCard, CommunityPulse, TripExtras } from "../../components/TripLive";
+import { useTripPet, isTravelDay, TripCountdown, DayOfMode, PetReliefCard, TripExtras } from "../../components/TripLive";
 import { maskChip, ChipVault, HealthPassport, ShareCard, WalletCard, ActivationChecklist } from "../../components/PetIdV2";
 import { WhatsNeededNext, TravelStamps, FindAVet } from "../../components/PetExtras";
 import VetImport from "../../components/VetImport";
@@ -33,6 +33,7 @@ import DocCheck from "../../components/DocCheck";
 import PassChecklist from "../../components/PassChecklist";
 import RoundTripAddon from "../../components/RoundTripAddon";
 import { buildPassCards, groupCards, isServiceRole, matchesDestination } from "../../lib/passCards";
+import { pickTripPet } from "../../lib/tripPet";
 import { reminderSchedule, classifyReminder, todayPT } from "../../lib/travelDates";
 import { fmtTripDate } from "../../lib/tripAccess";
 import VetGuidance from "../../components/VetGuidance";
@@ -100,6 +101,10 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
     role: pet.role || "Pet",
     breed: pet.breed || "",
     sex: pet.sex || "",
+    weight_lb: pet.weight_lb ?? "",
+    carrier_length_in: pet.carrier_length_in ?? "",
+    carrier_width_in: pet.carrier_width_in ?? "",
+    carrier_height_in: pet.carrier_height_in ?? "",
     date_of_birth: pet.date_of_birth || "",
     vet_name: pet.vet_name || "",
     vet_phone: pet.vet_phone || "",
@@ -123,6 +128,10 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         role: editForm.role,
         breed: editForm.breed || null,
         sex: editForm.sex || null,
+        weight_lb: editForm.weight_lb === "" ? null : Number(editForm.weight_lb),
+        carrier_length_in: editForm.carrier_length_in === "" ? null : Number(editForm.carrier_length_in),
+        carrier_width_in: editForm.carrier_width_in === "" ? null : Number(editForm.carrier_width_in),
+        carrier_height_in: editForm.carrier_height_in === "" ? null : Number(editForm.carrier_height_in),
         date_of_birth: editForm.date_of_birth || null,
         vet_name: editForm.vet_name || null,
         vet_phone: editForm.vet_phone || null,
@@ -274,13 +283,15 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
   async function handleAddWeight(e) {
     e.preventDefault();
     setSaving(true);
+    const pounds = parseFloat(newValue);
     const { error } = await supabase.from("pet_measurements").insert({
       user_id: userId,
       pet_id: pet.id,
       metric_type: "weight",
-      value: parseFloat(newValue),
+      value: pounds,
       recorded_date: newDate,
     });
+    if (!error) await supabase.from("pets").update({ weight_lb: pounds }).eq("id", pet.id);
     setSaving(false);
     if (!error) {
       setNewValue("");
@@ -318,7 +329,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         <div className="flex-1 min-w-0">
           <div style={{ fontFamily: font.display, fontSize: 21, fontWeight: 700, color: tokens.navy, lineHeight: 1.15 }}>{pet.name}</div>
           <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>
-            {[pet.breed || pet.animal_type, pet.sex, calculateAge(pet.date_of_birth), isService(pet.role) ? "Service dog" : null].filter(Boolean).join(" · ")}
+            {[pet.breed || pet.animal_type, pet.sex, calculateAge(pet.date_of_birth), pet.weight_lb ? `${pet.weight_lb} lb` : null, isService(pet.role) ? "Service dog" : null].filter(Boolean).join(" · ")}
           </div>
           {pet.passport_no && <div style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 700, color: tokens.navy, letterSpacing: "0.04em" }}>No. {pet.passport_no}</div>}
         </div>
@@ -336,6 +347,13 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
             <select value={editForm.role} onChange={(e) => setEditForm((f) => ({ ...f, role: e.target.value }))} style={field} className={fieldCls}><option>Pet</option><option>Service animal</option></select>
           </div>
           <input placeholder="Breed" value={editForm.breed} onChange={(e) => setEditForm((f) => ({ ...f, breed: e.target.value }))} style={field} className={fieldCls} />
+          <div className="grid grid-cols-2 gap-2">
+            <input type="number" step="0.1" min="0.1" placeholder="Weight (lb)" aria-label="Weight in pounds" value={editForm.weight_lb} onChange={(e) => setEditForm((f) => ({ ...f, weight_lb: e.target.value }))} style={field} className={fieldCls} />
+            <input type="number" step="0.1" min="0.1" placeholder="Carrier length (in)" aria-label="Carrier length in inches" value={editForm.carrier_length_in} onChange={(e) => setEditForm((f) => ({ ...f, carrier_length_in: e.target.value }))} style={field} className={fieldCls} />
+            <input type="number" step="0.1" min="0.1" placeholder="Carrier width (in)" aria-label="Carrier width in inches" value={editForm.carrier_width_in} onChange={(e) => setEditForm((f) => ({ ...f, carrier_width_in: e.target.value }))} style={field} className={fieldCls} />
+            <input type="number" step="0.1" min="0.1" placeholder="Carrier height (in)" aria-label="Carrier height in inches" value={editForm.carrier_height_in} onChange={(e) => setEditForm((f) => ({ ...f, carrier_height_in: e.target.value }))} style={field} className={fieldCls} />
+          </div>
+          <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Weight and carrier size are used to check a limit only when the airline published one.</p>
           <div className="grid grid-cols-2 gap-2">
             <select value={editForm.sex} onChange={(e) => setEditForm((f) => ({ ...f, sex: e.target.value }))} style={field} className={fieldCls}><option value="">Sex</option><option>Male</option><option>Female</option></select>
             <input type="date" aria-label="Date of birth" value={editForm.date_of_birth} onChange={(e) => setEditForm((f) => ({ ...f, date_of_birth: e.target.value }))} style={field} className={fieldCls} />
@@ -452,7 +470,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
           <ShareCard pet={pet} userId={userId} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
           <WalletCard pet={pet} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
         </VaultSection>
-        <VaultSection id={`more-${pet.id}`} title="Find a vet & travel stamps" hint="" last>
+        <VaultSection id={`more-${pet.id}`} title="Find a vet and trips flown" hint="" last>
           <FindAVet pet={pet} />
           <TravelStamps pet={pet} />
         </VaultSection>
@@ -513,7 +531,8 @@ function PetProfileTab({ userId }) {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ name: "", animal_type: "Dog", role: "Pet", breed: "", sex: "" });
+  const blankPet = { name: "", animal_type: "Dog", role: "Pet", breed: "", sex: "", weight_lb: "", carrier_length_in: "", carrier_width_in: "", carrier_height_in: "" };
+  const [form, setForm] = useState(blankPet);
   const [isMember, setIsMember] = useState(false);
   const [limitHit, setLimitHit] = useState(false);
   const access = usePetAccess(userId);
@@ -557,18 +576,26 @@ function PetProfileTab({ userId }) {
   async function handleAddPet(e) {
     e.preventDefault();
     setSaving(true);
-    const { error } = await supabase.from("pets").insert({
+    const pounds = form.weight_lb === "" ? null : Number(form.weight_lb);
+    const { data: created, error } = await supabase.from("pets").insert({
       user_id: userId,
       name: form.name,
       animal_type: form.animal_type,
       role: form.role,
       breed: form.breed || null,
       sex: form.sex || null,
-    });
+      weight_lb: pounds,
+      carrier_length_in: form.carrier_length_in === "" ? null : Number(form.carrier_length_in),
+      carrier_width_in: form.carrier_width_in === "" ? null : Number(form.carrier_width_in),
+      carrier_height_in: form.carrier_height_in === "" ? null : Number(form.carrier_height_in),
+    }).select("id").single();
+    if (!error && created && pounds) {
+      await supabase.from("pet_measurements").insert({ user_id: userId, pet_id: created.id, metric_type: "weight", value: pounds, recorded_date: new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" }) });
+    }
     setSaving(false);
     if (error && /PET_LIMIT/.test(error.message || "")) { setShowForm(false); setLimitHit(true); return; }
     if (!error) {
-      setForm({ name: "", animal_type: "Dog", role: "Pet", breed: "", sex: "" });
+      setForm(blankPet);
       setShowForm(false);
       loadPets();
     }
@@ -704,6 +731,13 @@ function PetProfileTab({ userId }) {
               <option>Male</option>
               <option>Female</option>
             </select>
+            <input type="number" step="0.1" min="0.1" placeholder="Weight in pounds (optional)" aria-label="Weight in pounds" value={form.weight_lb} onChange={(e) => setForm((f) => ({ ...f, weight_lb: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-4 py-3 outline-none" />
+            <div className="grid grid-cols-3 gap-2">
+              <input type="number" step="0.1" min="0.1" placeholder="Length (in)" aria-label="Carrier length in inches" value={form.carrier_length_in} onChange={(e) => setForm((f) => ({ ...f, carrier_length_in: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-3 py-3 outline-none" />
+              <input type="number" step="0.1" min="0.1" placeholder="Width (in)" aria-label="Carrier width in inches" value={form.carrier_width_in} onChange={(e) => setForm((f) => ({ ...f, carrier_width_in: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-3 py-3 outline-none" />
+              <input type="number" step="0.1" min="0.1" placeholder="Height (in)" aria-label="Carrier height in inches" value={form.carrier_height_in} onChange={(e) => setForm((f) => ({ ...f, carrier_height_in: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-3 py-3 outline-none" />
+            </div>
+            <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Carrier size is length, width, and height. We use it only when the airline published a limit.</p>
           </div>
           <div className="flex gap-3 mt-4">
             <button
@@ -810,6 +844,7 @@ export function DashboardTab({ userId, onOpenTrips }) {
   const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(true);
   const [doneCount, setDoneCount] = useState(0);
+  const [stepTotal, setStepTotal] = useState(0);
   const pet = useTripPet(trip);
   useEffect(() => { (async () => {
     const { data: trips } = await supabase.from("trips").select("*").order("created_at", { ascending: false }).limit(1);
@@ -819,7 +854,8 @@ export function DashboardTab({ userId, onOpenTrips }) {
       const today = todayPT();
       for (const it of reminderSchedule(current, today)) {
         const { state } = classifyReminder(it, current, { today });
-        if (state === "do_now" || state === "today") list.push({ key: `rem-${it.kind}`, label: it.title, hint: state === "today" ? "Due today" : "Catch up" });
+        const genericLate = state === "do_now" && /Open your checklist|Confirm carrier fit|Pack your documents and carrier/.test(it.body || "");
+        if (!genericLate && (state === "do_now" || state === "today")) list.push({ key: `rem-${it.kind}`, label: it.title, hint: state === "today" ? "Due today" : "Do this before you fly" });
       }
       const { data: reqs } = await supabase.rpc("get_trip_requirements", { p_trip_id: current.id, p_trip_types: tripTypeForRoute(current.origin, current.destination) === "international" ? ["international", "domestic"] : ["domestic"] });
       const { data: statusRows } = await supabase.from("trip_requirement_status").select("*").eq("trip_id", current.id);
@@ -828,13 +864,14 @@ export function DashboardTab({ userId, onOpenTrips }) {
       const seen = new Set(list.map((a) => a.label.toLowerCase()));
       const grouped = groupCards(buildPassCards(reqs || [], current), doneMap);
       doneN = grouped.done.length;
+      setStepTotal(grouped.first.length + grouped.confirm.length + grouped.done.length);
       for (const card of [...grouped.first, ...grouped.confirm]) {
         if (seen.has(card.shortTitle.toLowerCase())) continue;
         seen.add(card.shortTitle.toLowerCase());
         list.push({ key: `card-${card.id}`, label: card.shortTitle, hint: "Checklist" });
       }
     }
-    setActions(list); setDoneCount(doneN); setLoading(false);
+    setActions(list); setDoneCount(doneN); if (!current?.paid) setStepTotal(0); setLoading(false);
   })(); }, []);
   if (loading) return <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading your dashboard…</div>;
   const visible = showAll ? actions : actions.slice(0, 4);
@@ -848,7 +885,7 @@ export function DashboardTab({ userId, onOpenTrips }) {
           </span>
           <a href="/assessment" onClick={(e) => e.stopPropagation()} className="rounded-full px-4 py-2 flex-shrink-0" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontSize: 15, fontWeight: 700, textDecoration: "none" }}>{PLAN_CTA}</a>
         </button>
-      ) : trip?.paid ? <TripCountdown trip={trip} pet={pet} done={doneCount} total={actions.length + doneCount} /> : (
+      ) : trip?.paid ? <TripCountdown trip={trip} pet={pet} done={doneCount} total={stepTotal} /> : (
         <div className="rounded-2xl p-7 mb-6 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }} className="mb-2">Where are you and your pets flying to?</div>
           <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-5">Answer a few trip questions and your plan, reminders and checklist land here.</p>
@@ -883,7 +920,19 @@ function CurrentFlightTab({ userId }) {
   const [showFull, setShowFull] = useState(false);
   const [section, setSection] = useState("overview");
   const [showAllActions, setShowAllActions] = useState(false);
+  const [petChoices, setPetChoices] = useState([]);
   const petForTrip = useTripPet(trip);
+  useEffect(() => {
+    if (!trip?.id || trip.pet_id) { setPetChoices([]); return; }
+    supabase.from("pets").select("id,name,animal_type").then(async ({ data }) => {
+      const pets = data || [];
+      const pick = pickTripPet(pets, trip);
+      if (pick) {
+        const { error } = await supabase.from("trips").update({ pet_id: pick.id }).eq("id", trip.id);
+        if (!error) setTrip((t) => (t ? { ...t, pet_id: pick.id } : t));
+      } else setPetChoices(pets);
+    });
+  }, [trip?.id, trip?.pet_id]);
   useEffect(() => { supabase.rpc("my_membership").then(({ data }) => setIsMember(!!data)); }, []);
 
   useEffect(() => {
@@ -977,7 +1026,7 @@ function CurrentFlightTab({ userId }) {
     );
   }
 
-  const passCards = buildPassCards(results, trip);
+  const passCards = buildPassCards(results, { ...trip, pet: tripPet });
   const passGroups = groupCards(passCards, statusMap);
   const actionItems = [...passGroups.first, ...passGroups.confirm];
   const tripPet = petForTrip;
@@ -1007,8 +1056,22 @@ function CurrentFlightTab({ userId }) {
           {trip.origin} → {trip.destination}
         </div>
         <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, opacity: 0.9 }} className="mb-3">
-          {trip.airline} · {trip.travel_date || "date pending"}{trip.return_date ? ` · back ${fmtTripDate(trip.return_date)}` : ""} · {isServiceRole(trip.role) ? (serviceDogMismatch ? trip.role : trip.service_kind === "psd" ? "PSD (service dog)" : "Service dog") : trip.role}{tripTypeForRoute(trip.origin, trip.destination) === "international" ? " · International" : ""}
+          {trip.airline} · {trip.travel_date ? fmtTripDate(trip.travel_date) : "date not set"}{trip.return_date ? ` · back ${fmtTripDate(trip.return_date)}` : ""} · {tripPet?.name || trip.animal_type || "Pet not linked"}{isServiceRole(trip.role) ? (serviceDogMismatch ? "" : trip.service_kind === "psd" ? " · PSD" : " · Service dog") : ""}{tripTypeForRoute(trip.origin, trip.destination) === "international" ? " · International" : ""}
         </div>
+        {!trip.pet_id && petChoices.length > 1 && (
+          <label className="block mb-3" style={{ fontFamily: font.body, fontSize: 16, color: "#fff" }}>
+            Which pet is flying?
+            <select className="mt-1 w-full rounded-xl px-3 py-3" style={{ fontFamily: font.body, fontSize: 16, color: tokens.navy }} defaultValue="" onChange={async (e) => {
+              const id = e.target.value;
+              if (!id) return;
+              const { error } = await supabase.from("trips").update({ pet_id: id }).eq("id", trip.id);
+              if (!error) setTrip((t) => ({ ...t, pet_id: id }));
+            }}>
+              <option value="">Choose a pet</option>
+              {petChoices.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+          </label>
+        )}
         {trackedTotal > 0 && <>
           <div className="flex items-center justify-between mb-1.5">
             <span style={{ fontFamily: font.mono, fontSize: 12, color: tokens.sky, opacity: 0.7, letterSpacing: "0.08em" }}>TRIP READINESS</span>
@@ -1043,7 +1106,7 @@ function CurrentFlightTab({ userId }) {
             <div className="mt-3"><button onClick={() => setSection("checklist")} className="rounded-full px-5 py-2.5" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600, border: "none", cursor: "pointer" }}>Open the checklist →</button></div>
           </div>
         )}
-        <CommunityPulse trip={trip} isMember={isMember} />
+        {!isMember && <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-4">Pet Vault keeps this pet’s records for the next trip.</p>}
       </>)}
       {trip.paid && section === "flight" && (<>
         <LiveFlightCard trip={trip} />
@@ -1102,29 +1165,31 @@ function BillingTab({ userId }) {
   return (
     <div className="rounded-xl p-6 sm:p-8" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
       <div style={{ fontFamily: font.display, fontSize: 22, color: tokens.navy }} className="mb-2">Billing</div>
+      <div className="mb-6">
+        <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-2">Purchase history</div>
+        {purchases.length === 0 && legacyTrips.length === 0 && <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }}>No purchases yet. Stripe also emails a receipt for every payment.</p>}
+        <div className="space-y-2">{purchases.map((x) => <div key={x.id} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
+          <div><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>{kindLabel[x.kind] || "Purchase"}</div><div style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>{new Date(x.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}{x.amount_cents != null ? ` · ${money(x.amount_cents, x.currency)}` : ""}</div></div>
+          {x.receipt_url ? <a href={x.receipt_url} target="_blank" rel="noopener noreferrer" className="rounded-full px-3.5 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 15, fontWeight: 700, textDecoration: "none" }}>Receipt</a> : <button onClick={() => go("/api/stripe/portal")} className="rounded-full px-3.5 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 15, fontWeight: 700 }}>Receipts</button>}
+        </div>)}{legacyTrips.map((t) => <div key={t.id} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
+          <div><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>Travel Pass</div><div style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>{t.origin} → {t.destination}{t.paid_at ? ` · ${new Date(t.paid_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` : ""}</div></div>
+          <button onClick={() => go("/api/stripe/portal")} className="rounded-full px-3.5 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 15, fontWeight: 700 }}>Receipts</button>
+        </div>)}</div>
+        <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mt-3">Receipts open in Stripe.</p>
+      </div>
+      <div className="pt-5" style={{ borderTop: `1px solid ${tokens.line}` }}>
       {isMember === null ? <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div> : isMember ? <>
-          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-1">You're a PetPassGo member ({usd(P.member)}{P.memberUnit}).</p>
-          {memberRow?.current_period_end && <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-3">Current period ends {new Date(memberRow.current_period_end).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.</p>}
+          <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-1">You're a PetPassGo member ({usd(P.member)}{P.memberUnit}).</p>
+          {memberRow?.current_period_end && <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-3">Current period ends {new Date(memberRow.current_period_end).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.</p>}
           <button disabled={busy} onClick={() => go("/api/stripe/portal")} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Cancel membership</button>
-          <p style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.45, color: tokens.ink }} className="mt-3">Cancel online here. No phone call. You keep access through the period you've paid, and you won't be charged again.</p>
+          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }} className="mt-3">Cancel online here. No phone call. You keep access through the period you've paid, and you won't be charged again.</p>
           <button disabled={busy} onClick={() => go("/api/stripe/portal")} className="rounded-full px-6 py-3 mt-3" style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }}>Receipts and payment method</button>
           {err && <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp }} className="mt-3">{err}</p>}
         </> : <>
-          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}<b>{VAULT_NAME}</b> · {usd(P.member)}{P.memberUnit}. {VAULT_SUB} Plus {usd(P.memberPass)} Travel Passes. {MEMBERSHIP_TERMS}</p>
+          <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}<b>{VAULT_NAME}</b> · {usd(P.member)}{P.memberUnit}. {VAULT_SUB} Plus {usd(P.memberPass)} Travel Passes. {MEMBERSHIP_TERMS}</p>
           <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
-          <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => { if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; } trackBeginCheckout("membership"); go("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true }); }} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">{JOIN_CTA}</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts & cards</button></div>
+          <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => { if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; } trackBeginCheckout("membership"); go("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true }); }} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">{JOIN_CTA}</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts and cards</button></div>
         </>}
-      <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${tokens.line}` }}>
-        <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-2">Purchase history</div>
-        {purchases.length === 0 && legacyTrips.length === 0 && <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>No purchases yet. Stripe also emails a receipt for every payment.</p>}
-        <div className="space-y-2">{purchases.map((x) => <div key={x.id} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
-          <div><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>{kindLabel[x.kind] || "Purchase"}</div><div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>{new Date(x.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}{x.amount_cents != null ? ` · ${money(x.amount_cents, x.currency)}` : ""}</div></div>
-          {x.receipt_url ? <a href={x.receipt_url} target="_blank" rel="noopener noreferrer" className="rounded-full px-3.5 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 13.5, fontWeight: 700, textDecoration: "none" }}>Receipt</a> : <button onClick={() => go("/api/stripe/portal")} className="rounded-full px-3.5 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 13.5, fontWeight: 700 }}>Receipts</button>}
-        </div>)}{legacyTrips.map((t) => <div key={t.id} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
-          <div><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>Travel Pass</div><div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>{t.origin} → {t.destination}{t.paid_at ? ` · ${new Date(t.paid_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` : ""}</div></div>
-          <button onClick={() => go("/api/stripe/portal")} className="rounded-full px-3.5 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 13.5, fontWeight: 700 }}>Receipts</button>
-        </div>)}</div>
-        <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-3">Receipts open in Stripe. Cancel membership is online on this page.</p>
       </div>
     </div>
   );

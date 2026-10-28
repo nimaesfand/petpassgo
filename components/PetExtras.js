@@ -91,7 +91,7 @@ export function TravelStamps({ pet }) {
     if (!stamps?.length) return; setBusy(true);
     try {
       const canvas = document.createElement("canvas"); canvas.width = 900; canvas.height = 560; const c = canvas.getContext("2d");
-      c.fillStyle = "#14213D"; c.fillRect(0, 0, 900, 560); c.fillStyle = "#F2B84B"; c.font = "700 24px system-ui"; c.fillText("PETPASSGO · TRAVEL STAMPS", 44, 62);
+      c.fillStyle = "#14213D"; c.fillRect(0, 0, 900, 560); c.fillStyle = "#F2B84B"; c.font = "700 24px system-ui"; c.fillText("PETPASSGO · TRIPS FLOWN", 44, 62);
       c.fillStyle = "#fff"; c.font = "700 44px system-ui"; c.fillText(`${pet.name}'s trips`, 44, 122);
       c.font = "24px system-ui"; let y = 180;
       for (const s of stamps.slice(0, 6)) { c.fillText(`✈  ${s.origin} → ${s.destination} · ${fmtDate(s.travelDate)}`, 44, y); y += 44; }
@@ -101,16 +101,16 @@ export function TravelStamps({ pet }) {
   }
   if (stamps === null) return null;
   return (
-    <section style={section} aria-label="Travel stamps">
+    <section style={section} aria-label="Trips flown">
       <details>
-        <summary style={{ ...h3, cursor: "pointer" }}>{pet.name}'s travel stamps{stamps.length ? ` (${stamps.length})` : ""}</summary>
+        <summary style={{ ...h3, cursor: "pointer" }}>{pet.name}'s trips flown{stamps.length ? ` (${stamps.length})` : ""}</summary>
         {stamps.length === 0 ? (
-          <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-2">No travel stamps yet — they appear here after a Travel Pass trip.</p>
+          <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mt-2">No trips flown yet. They show up here after a Travel Pass trip.</p>
         ) : <>
           <div className="flex flex-wrap gap-2 mt-3">{stamps.map((s) => (
             <span key={s.id} className="rounded-full px-3.5 py-2" style={{ background: tokens.sky, border: `1.5px dashed ${tokens.navy}`, fontFamily: font.body, fontSize: 13.5, fontWeight: 700, color: tokens.navy }}><Icon name="plane" size={14} /> {s.origin} → {s.destination} · {fmtDate(s.travelDate)}</span>
           ))}</div>
-          <button type="button" disabled={busy} onClick={shareImage} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="mt-3">{busy ? "Making image…" : "Download stamps image"}</button>
+          <button type="button" disabled={busy} onClick={shareImage} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="mt-3">{busy ? "Making image…" : "Download image"}</button>
         </>}
       </details>
     </section>

@@ -19,11 +19,11 @@ export function useTripPet(trip) {
   useEffect(() => {
     if (!trip) return;
     (async () => {
-      const q = supabase.from("pets").select("id,name,photo_url,animal_type");
+      const q = supabase.from("pets").select("id,name,photo_url,animal_type,weight_lb,carrier_length_in,carrier_width_in,carrier_height_in");
       const { data } = trip.pet_id ? await q.eq("id", trip.pet_id).limit(1) : await q.order("created_at").limit(1);
       setPet((data && data[0]) || null);
     })();
-  }, [trip?.id]);
+  }, [trip?.id, trip?.pet_id]);
   return pet;
 }
 
@@ -92,7 +92,7 @@ export function PetReliefCard({ airportLabel, title }) {
         if (!rows.length) return null;
         return (
           <div key={k} className="mt-3">
-            <div style={{ fontFamily: font.mono, fontSize: 12, letterSpacing: "0.08em", color: tokens.stamp }} className="mb-1">{label.toUpperCase()}</div>
+            <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 800, letterSpacing: "0.04em", color: tokens.stamp }} className="mb-1">{label}</div>
             <ul className="space-y-1">
               {rows.map((x, i) => (
                 <li key={i} style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}><b>{x.terminal}:</b> {x.spot}</li>
@@ -101,10 +101,8 @@ export function PetReliefCard({ airportLabel, title }) {
           </div>
         );
       })}
-      <div style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }} className="mt-3">
-        <a href={data.source} target="_blank" rel="noopener noreferrer" className="inline-block py-2" style={{ color: tokens.primary, fontWeight: 700, fontSize: 15, textDecoration: "underline" }}>Official airport page ↗</a>
-        {data.source && data.checked ? ` · ${lastCheckedLabel(data.checked)}` : ""}
-      </div>
+      <a href={data.source} target="_blank" rel="noopener noreferrer" className="inline-block mt-3 py-2" style={{ fontFamily: font.body, color: tokens.primary, fontWeight: 700, fontSize: 16, textDecoration: "underline" }}>{data.linkText || `Open ${a.code} animal relief areas`}</a>
+      {data.checked ? <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-1">{lastCheckedLabel(data.checked)}</div> : null}
     </details>
   );
 }
@@ -292,18 +290,25 @@ export function TripExtras({ trip, pet }) {
   const [filter, setFilter] = useState("all");
   const [spotsData, setSpotsData] = useState(null);
   useEffect(() => {
+    let gone = false;
+    const slow = setTimeout(() => { if (!gone) setX((cur) => cur || { failed: true }); }, 12000);
     (async () => {
       const { data: s } = await supabase.auth.getSession();
       const h = { headers: { "x-sb-token": s?.session?.access_token || "" } };
-      const r = await fetch(`/api/trip-extras?trip_id=${trip.id}`, h).catch(() => null);
-      setX(r && r.ok ? await r.json() : { failed: true });
-      const r2 = await fetch(`/api/trip-extras?trip_id=${trip.id}&part=spots`, h).catch(() => null);
-      const j2 = r2 && r2.ok ? await r2.json() : null;
+      const weatherP = fetch(`/api/trip-extras?trip_id=${trip.id}`, { ...h, signal: AbortSignal.timeout(10000) }).catch(() => null);
+      const spotsP = fetch(`/api/trip-extras?trip_id=${trip.id}&part=spots`, { ...h, signal: AbortSignal.timeout(12000) }).catch(() => null);
+      const r = await weatherP;
+      if (gone) return;
+      setX(r && r.ok ? await r.json().catch(() => ({ failed: true })) : { failed: true });
+      const r2 = await spotsP;
+      if (gone) return;
+      const j2 = r2 && r2.ok ? await r2.json().catch(() => null) : null;
       setSpotsData(j2?.spots || []);
     })();
+    return () => { gone = true; clearTimeout(slow); };
   }, [trip.id]);
-  if (!x) return <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body, color: tokens.muted }}>Checking the weather and nearby spots…</div>;
-  if (x.failed || (!x.origin && !x.destination)) return null;
+  if (!x) return <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body, fontSize: 16, color: tokens.ink }}>Checking the weather…</div>;
+  if (x.failed || (!x.origin && !x.destination)) return <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body, fontSize: 16, color: tokens.ink }}>Weather isn’t available right now. Pet relief areas are listed below when we have them from the airport’s site.</div>;
   const temps = [x.origin?.weather, x.destination?.weather].filter((w) => w?.status === "ok");
   const hot = temps.some((w) => w.highF >= 85), cold = temps.some((w) => w.lowF <= 45);
   const name = pet?.name || "your pet";
