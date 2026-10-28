@@ -10,6 +10,7 @@ import { supabase } from "../../lib/supabaseClient";
 import { usePetAccess } from "../../lib/access";
 import WinBack from "../../components/WinBack";
 import { PRICES as P } from "../../lib/pricing";
+import { JOIN_CTA, PLAN_CTA } from "../../lib/cta";
 import { startStripe } from "../../lib/checkout";
 import { trackBeginCheckout, trackPurchaseOnce, getAttribution } from "../../lib/analytics";
 import { requirementAirline } from "../../lib/airlines";
@@ -482,8 +483,8 @@ function AccessGate() {
         They're included with Membership, or with a Travel Pass until 7 days after you fly (7 days after your return, if you added one). Your pets and documents are kept safe and come back as soon as you rejoin.
       </p>
       <div className="flex gap-3 justify-center flex-wrap">
-        <a href="/join" className="btn-primary rounded-full px-6 py-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Join for {P.member}/mo</a>
-        <a href="/assessment" className="rounded-full px-6 py-3" style={{ border: `2px solid ${tokens.navy}`, color: tokens.navy, fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Plan your trip</a>
+        <a href="/join" className="btn-primary rounded-full px-6 py-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>{JOIN_CTA}</a>
+        <a href="/assessment" style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{PLAN_CTA}</a>
       </div>
     </div>
   );
@@ -498,7 +499,7 @@ function MemberUpsell() {
       <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted, lineHeight: 1.55 }} className="mb-3">
         Your plan includes one pet. Membership ({P.member}/mo) adds unlimited pets, {P.memberPass} Travel Passes and reminders before your documents expire. {MEMBERSHIP_TERMS}
       </p>
-      <button disabled={busy} onClick={async () => { trackBeginCheckout("membership"); setBusy(true); const e = await startStripe("/api/stripe/checkout", { plan: "membership" }); if (e) { setErr(e); setBusy(false); } }} className="rounded-full px-5 py-2.5 hover:opacity-90" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontSize: 14.5, fontWeight: 600 }}>Become a member · {P.member}/mo</button>
+      <button disabled={busy} onClick={async () => { trackBeginCheckout("membership"); setBusy(true); const e = await startStripe("/api/stripe/checkout", { plan: "membership" }); if (e) { setErr(e); setBusy(false); } }} className="rounded-full px-5 py-2.5 hover:opacity-90" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontSize: 16, fontWeight: 600 }}>{JOIN_CTA}</button>
       {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-2">{err}</div>}
     </div>
   );
@@ -581,7 +582,7 @@ function PetProfileTab({ userId }) {
             <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }}>{pet.name}</div>
           </div>
           <WinBack area="vault" petName={pet.name} compact />
-          <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>Lost-pet tools stay free, always:</div>
+          <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Report lost</div>
           <LostPanel pet={pet} userId={userId} />
         </div>
       ))}
@@ -840,13 +841,13 @@ export function DashboardTab({ userId, onOpenTrips }) {
             <span style={{ display: "block", fontFamily: font.body, fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: tokens.muted }}>PAST TRIP</span>
             <span style={{ display: "block", fontFamily: font.body, fontSize: 15.5, fontWeight: 700, color: tokens.navy }}>{trip.origin} → {trip.destination}{trip.travel_date ? ` · ${fmtTripDate(trip.travel_date)}` : ""}</span>
           </span>
-          <a href="/assessment" onClick={(e) => e.stopPropagation()} className="rounded-full px-4 py-2 flex-shrink-0" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontSize: 14, fontWeight: 700, textDecoration: "none" }}>Plan next trip</a>
+          <a href="/assessment" onClick={(e) => e.stopPropagation()} className="rounded-full px-4 py-2 flex-shrink-0" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontSize: 15, fontWeight: 700, textDecoration: "none" }}>{PLAN_CTA}</a>
         </button>
       ) : trip?.paid ? <TripCountdown trip={trip} pet={pet} done={doneCount} total={actions.length + doneCount} /> : (
         <div className="rounded-2xl p-7 mb-6 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }} className="mb-2">Where are you and your pets flying to?</div>
           <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-5">Answer a few trip questions and your plan, reminders and checklist land here.</p>
-          <a href="/assessment" className="rounded-full px-6 py-3 inline-block" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>Try the trip questions</a>
+          <a href="/assessment" className="rounded-full px-6 py-3 inline-block" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>{PLAN_CTA}</a>
         </div>
       )}
       {trip?.paid && !tripIsPast(trip) && (
@@ -963,14 +964,14 @@ function CurrentFlightTab({ userId }) {
           No trip yet
         </div>
         <div style={{ fontFamily: font.body, fontSize: 15.5, opacity: 0.7 }} className="mb-4">
-          Plan your trip to get your Travel Pass, and it'll show up here.
+          Plan my trip to get your Travel Pass, and it'll show up here.
         </div>
         <a
           href="/assessment"
           style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}
           className="rounded-full px-6 py-2.5 text-[14px] hover:opacity-90 transition inline-block"
         >
-          Start your Travel Pass
+          {PLAN_CTA}
         </a>
       </div>
     );
@@ -1109,7 +1110,7 @@ function BillingTab({ userId }) {
           <button disabled={busy} onClick={() => go("/api/stripe/portal")} className="rounded-full px-6 py-3 mt-3" style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }}>Receipts and payment method</button>
         </> : <>
           <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}<b>{VAULT_NAME}</b> · {P.member}{P.memberUnit}. {VAULT_SUB} Plus {P.memberPass} Travel Passes. {MEMBERSHIP_TERMS}</p>
-          <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => { trackBeginCheckout("membership"); go("/api/stripe/checkout", { plan: "membership" }); }} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Become a member</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts & cards</button></div>
+          <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => { trackBeginCheckout("membership"); go("/api/stripe/checkout", { plan: "membership" }); }} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">{JOIN_CTA}</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts & cards</button></div>
         </>}
       {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-3">{err}</div>}
       <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${tokens.line}` }}>

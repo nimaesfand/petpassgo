@@ -86,9 +86,8 @@ export default function LoginPage() {
           </form>
 
           <div style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="text-center mt-5">
-            Don't have an account?{" "}
-            <a href="/signup" style={{ color: tokens.navy, fontWeight: 600, textDecoration: "underline" }}>
-              Sign up
+            <a href="/assessment" style={{ color: tokens.navy, fontWeight: 600, textDecoration: "underline" }}>
+              Plan my trip
             </a>
           </div>
         </div>

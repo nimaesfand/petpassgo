@@ -27,7 +27,7 @@ The rule covers dogs only, and service animals in training are not covered. A ca
 
 ## What PetPassGo will and won't do
 
-We don't sell, sign, or attest a service-animal form, and we never ask you to buy a certificate or a letter. Your [Travel Pass](/travel-pass) uses the official DOT forms, links to the airline's own page, and tells you what to send and when.
+We don't sell, sign, or attest a service-animal form, and we never ask you to buy a certificate or a letter. Your Travel Pass uses the official DOT forms after you [Plan my trip](/assessment) and pay. It links to the airline's own page and tells you what to send and when.
 
 Also read: [Do you need a PSD letter to fly?](/blog/do-you-need-a-psd-letter) and [the DOT service animal form, explained](/blog/dot-service-animal-form).
 

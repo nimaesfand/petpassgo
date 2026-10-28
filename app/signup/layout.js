@@ -1,8 +1,8 @@
 export const metadata = {
   title: "Create your account",
-  description: "Choose Membership or a Travel Pass and create your PetPassGo account.",
+  description: "Plan a trip or join Pet Vault. Pay first, then set your password.",
   alternates: { canonical: "/signup" },
-  openGraph: { title: "Create your account | PetPassGo", description: "Choose Membership or a Travel Pass and create your PetPassGo account.", url: "/signup" },
+  openGraph: { title: "Get started | PetPassGo", description: "Plan a trip or join Pet Vault.", url: "/signup" },
   robots: { index: false, follow: true },
 };
 export default function Layout({ children }) {
