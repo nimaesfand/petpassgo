@@ -34,7 +34,7 @@ function AskAirlineCard({ card }) {
 }
 
 function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRelief }) {
-  const chip = dueChip(card.dueDate, today);
+  const chip = dueChip(card.dueDate, today, { suggested: card.dueSuggested, dayOf: card.dueKind === "dayof" });
   const tone = CHIP[chip.tone] || CHIP.later;
   const showChip = !card.fact || !!card.dueDate;
   return (
@@ -51,13 +51,14 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRe
           <span className="block" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, lineHeight: 1.25, color: tokens.navy }}>{card.shortTitle}</span>
           {card.lastChecked ? <span className="block mt-0.5" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, lineHeight: 1.3, color: tokens.muted }}>{card.lastChecked}</span> : null}
         </span>
-        {showChip && <span className="flex-shrink-0 rounded-full px-2 py-1" style={{ fontFamily: font.body, fontSize: 11.5, fontWeight: 700, background: tone.background, color: tone.color }}>{chip.label}</span>}
-        <span className="flex-shrink-0 rounded-full px-2.5 py-1" style={{ fontFamily: font.body, fontSize: 12, fontWeight: 700, background: done ? "#EAF6EE" : tokens.sky, color: done ? tokens.green : tokens.navy }}>{done ? "Done" : card.fact ? "Fact" : "To do"}</span>
+        {showChip && <span className="flex-shrink-0 rounded-full px-2 py-1" style={{ fontFamily: font.body, fontSize: 13, fontWeight: 700, background: tone.background, color: tone.color }}>{chip.label}</span>}
+        <span className="flex-shrink-0 rounded-full px-2.5 py-1" style={{ fontFamily: font.body, fontSize: 13, fontWeight: 700, background: done ? "#EAF6EE" : tokens.sky, color: done ? tokens.green : tokens.navy }}>{done ? "Done" : card.fact ? "Fact" : "To do"}</span>
       </button>
       {open && (
         <div className="px-3 pb-3">
           <div className="rounded-xl p-3 mb-2" style={{ background: tokens.paper }}>
             <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", color: tokens.muted }}>WHAT TO DO</div>
+            {card.dueNote && <p style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy, lineHeight: 1.4 }} className="mt-1">{card.dueNote}</p>}
             <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }} className="mt-1"><LinkText text={card.what} /></p>
           </div>
           {card.why && (
@@ -78,7 +79,7 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRe
                       </li>
                     ))}
                   </ul>
-                  <a href={a.source} target="_blank" rel="noopener noreferrer" className="inline-block py-2" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.primary, textDecoration: "underline" }}>Official {a.code} page ↗</a>
+                  <a href={a.source} target="_blank" rel="noopener noreferrer" className="inline-block py-2" style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.primary, textDecoration: "underline" }}>{a.linkText || `Open ${a.code} animal relief areas`}</a>
                 </div>
               ))}
               {onOpenRelief && (
@@ -172,7 +173,7 @@ export default function PassChecklist({ trip, requirements = [], statusMap = {},
       {block(groups.first)}
       {groups.confirm.length > 0 && <SectionLabel hint="Confirm, then check off">Check & confirm</SectionLabel>}
       {block(groups.confirm)}
-      {groups.know.length > 0 && <SectionLabel hint="No checkbox">Good to know</SectionLabel>}
+      {groups.know.length > 0 && <SectionLabel hint="Reference">Good to know</SectionLabel>}
       {block(groups.know)}
       <SectionLabel hint={groups.done.length ? `${groups.done.length} checked` : "Nothing yet"}>Done</SectionLabel>
       <button type="button" onClick={() => setDoneOpen((v) => !v)} className="w-full rounded-2xl px-4 py-3 text-left flex items-center justify-between" style={{ background: "#fff", border: `1px solid ${tokens.line}`, cursor: "pointer" }}>

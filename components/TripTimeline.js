@@ -38,8 +38,10 @@ export default function TripTimeline({ trip, requirements = [], statusMap = {} }
 
   if (!rows.length) return null;
 
-  const doNow = rows.filter((r) => r.state === "do_now");
-  const rest = rows.filter((r) => r.state !== "do_now");
+  const generic = (r) => /Open your checklist|Confirm carrier fit|Pack your documents and carrier/.test(r.body || "");
+  const doNow = rows.filter((r) => r.state === "do_now" && !generic(r));
+  const hiddenGeneric = rows.filter((r) => r.state === "do_now" && generic(r)).map((r) => r.kind);
+  const rest = rows.filter((r) => r.state !== "do_now" && !hiddenGeneric.includes(r.kind));
 
   function markDone(kind) {
     setDismissed((prev) => {
@@ -78,7 +80,7 @@ export default function TripTimeline({ trip, requirements = [], statusMap = {} }
       <div className="flex-1" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>
         <b style={{ color: tokens.navy }}>{alert ? (flightPhrase(flightDays) || "Do this before you fly") : r.title}</b>
         <div style={{ opacity: 0.8, marginTop: 2, lineHeight: 1.45 }}>{alert ? r.body : r.body}</div>
-        {alert && <div style={{ fontSize: 12.5, color: tokens.muted, marginTop: 2 }}>Was due {fmt(r.date)} ({r.title})</div>}
+        {alert && <div style={{ fontSize: 15, color: tokens.ink, marginTop: 2 }}>You bought this pass after {fmt(r.date)}. Do it before you fly. This is not a missed deadline.</div>}
         {alert && (
           <button type="button" onClick={() => markDone(r.kind)} className="mt-2" style={{ fontFamily: font.body, fontSize: 13, fontWeight: 600, color: tokens.navy, background: "none", border: "none", padding: 0, textDecoration: "underline", cursor: "pointer" }}>
             Mark done

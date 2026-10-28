@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { AIRPORTS, formatAirport } from "../lib/airports";
-import { airlinePickerName } from "../lib/airlines";
+import { airlinePickerName, OTHER_AIRLINE } from "../lib/airlines";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
 
@@ -10,6 +10,14 @@ export { airlinePickerName };
 export function airportLabel(code, fallbackName) {
   const a = AIRPORTS.find((x) => x.code === (code || "").toUpperCase());
   return a ? formatAirport(a) : fallbackName ? `${fallbackName} (${code})` : code || "";
+}
+export function airlineFromFlight(f) {
+  if (!f) return "";
+  const main = airlinePickerName(f.airline, f.airline_iata);
+  if (main && main !== OTHER_AIRLINE) return main;
+  const operated = airlinePickerName(f.codeshare?.airline_name, f.codeshare?.airline_iata);
+  if (operated && operated !== OTHER_AIRLINE) return operated;
+  return "";
 }
 export function fmtTime(iso, tz) {
   if (!iso) return "—";
@@ -34,6 +42,7 @@ export function FlightSummary({ f }) {
       <div>{f.departure?.iata} {f.departure?.airport || ""} → {f.arrival?.iata} {f.arrival?.airport || ""}</div>
       <div style={{ color: tokens.muted }}>Departs {fmtTime(f.departure?.estimated || f.departure?.scheduled, f.departure?.timezone)}{f.departure?.terminal ? ` · Terminal ${f.departure.terminal}` : ""}{f.departure?.gate ? ` · Gate ${f.departure.gate}` : ""}</div>
       <div style={{ color: tokens.muted }}>Arrives {fmtTime(f.arrival?.estimated || f.arrival?.scheduled, f.arrival?.timezone)}{f.arrival?.terminal ? ` · Terminal ${f.arrival.terminal}` : ""}{f.arrival?.gate ? ` · Gate ${f.arrival.gate}` : ""}</div>
+      {!f.departure?.terminal && !f.arrival?.terminal && <div style={{ color: tokens.muted }}>Terminal and gate show here when the airline publishes them.</div>}
     </div>
   );
 }

@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function GuaranteePage() {
   return (
-    <LegalPage title="Flight-Ready Guarantee" updated="October 28, 2026">
+    <LegalPage title="Flight-Ready Guarantee" updated="October 27, 2026">
       <P><strong>If your pet is refused boarding because a requirement in your Travel Pass was wrong, we refund that Travel Pass.</strong></P>
 
       <H>When it applies</H>

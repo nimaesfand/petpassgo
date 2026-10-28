@@ -4,8 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { PRICES as P, usd } from "../../lib/pricing";
 import { supabase } from "../../lib/supabaseClient";
 import { US_AIRLINES, INTERNATIONAL_AIRLINES, OTHER_AIRLINE } from "../../lib/airlines";
+import { pickTripPet } from "../../lib/tripPet";
 import AirportField from "../../components/AirportField";
-import FlightLookup, { airportLabel, airlinePickerName } from "../../components/FlightLookup";
+import FlightLookup, { airportLabel, airlineFromFlight } from "../../components/FlightLookup";
+import SamplePass from "../../components/SamplePass";
 import { fmtTripDate } from "../../lib/tripAccess";
 import { trackEvent, trackBeginCheckout, getAttribution } from "../../lib/analytics";
 import { GuestEmailSheet } from "../../components/GuestEmailStep";
@@ -207,6 +209,9 @@ export default function PetPassGoQuiz() {
       role: answers.role,
       status: "ready",
     };
+    const { data: pets } = await supabase.from("pets").select("id,animal_type").eq("user_id", data.user.id);
+    const linked = pickTripPet(pets, { animal_type: answers.animal });
+    if (linked) baseTrip.pet_id = linked.id;
     // New columns are optional. One-way trips omit them so a trip still saves
     // if the return-date migration has not been applied yet.
     const extras = {};
@@ -339,11 +344,16 @@ export default function PetPassGoQuiz() {
               <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-5">
                 City or airport code is fine.
               </p>
-              <FlightLookup date={answers.date} onFill={(f) => setAnswers((a) => ({ ...a, flight_number: f.flight_iata || a.flight_number, flight_snapshot: f, origin: airportLabel(f.departure?.iata, f.departure?.airport) || a.origin, destination: airportLabel(f.arrival?.iata, f.arrival?.airport) || a.destination, airline: airlinePickerName(f.airline) || a.airline, date: f.date_was_requested ? (f.flight_date || a.date) : a.date }))} />
               <div className="flex flex-col gap-3" style={{ position: "relative", zIndex: 1 }}>
                 <AirportField key={`o-${answers.origin}`} label="Departing from (type a city)" value={answers.origin} onSelect={(v) => set("origin", v)} />
                 <AirportField key={`d-${answers.destination}`} label="Flying to (type a city)" value={answers.destination} onSelect={(v) => set("destination", v)} />
               </div>
+              <details className="mt-4">
+                <summary style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy, cursor: "pointer" }}>Optional: look up a flight number</summary>
+                <div className="mt-3">
+                  <FlightLookup date={answers.date} onFill={(f) => setAnswers((a) => ({ ...a, flight_number: f.flight_iata || a.flight_number, flight_snapshot: f, origin: airportLabel(f.departure?.iata, f.departure?.airport) || a.origin, destination: airportLabel(f.arrival?.iata, f.arrival?.airport) || a.destination, airline: airlineFromFlight(f) || a.airline, date: f.date_was_requested ? (f.flight_date || a.date) : a.date }))} />
+                </div>
+              </details>
               <NavRow onBack={back} onNext={next} nextDisabled={!answers.origin || !answers.destination} />
             </>
           )}
@@ -351,10 +361,10 @@ export default function PetPassGoQuiz() {
           {step === 3 && (
             <>
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
-                When are you traveling?
+                When do you leave?
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-4">
-                One way is the normal trip: from, to, and one date. Round trip is optional — tap it only if you’re flying back.
+              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-4">
+                One way is the usual trip. Choose round trip only if you fly back.
               </p>
               <div className="flex gap-2 mb-4">
                 <button type="button" onClick={() => setAnswers((a) => ({ ...a, round_trip: false, return_date: "", return_flight_number: "", return_flight_snapshot: null }))} className="rounded-full px-4 py-2.5" style={{ fontFamily: font.body, fontWeight: 700, background: !answers.round_trip ? tokens.navy : "#fff", color: !answers.round_trip ? "#fff" : tokens.navy, border: `2px solid ${tokens.navy}`, cursor: "pointer" }}>One way</button>
@@ -398,8 +408,9 @@ export default function PetPassGoQuiz() {
                 Which airline?
               </h2>
               <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-4">
-                U.S. airlines first, then international. Search if you don’t see yours.
+                {answers.flight_snapshot && answers.airline ? `Filled in from your flight number: ${answers.airline}. Change it if that’s wrong.` : "U.S. airlines first, then international. Search if you don’t see yours."}
               </p>
+              <div className="mb-4"><SamplePass compact /></div>
               <input
                 value={airlineQuery}
                 onChange={(e) => setAirlineQuery(e.target.value)}
@@ -424,7 +435,7 @@ export default function PetPassGoQuiz() {
               ) : (
                 <>
                   <button onClick={() => handlePurchase("member")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16 }}>Join + Pass · {usd(P.joinToday)}</button>
-                  <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mt-2 text-center">Then {usd(P.member)}/mo for Pet Vault. Cancel anytime.</p>
+                  <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mt-2 text-center">{usd(P.joinToday)} today is {usd(P.member)} for Pet Vault plus a {usd(P.memberPass)} pass. Then {usd(P.member)}/mo. Cancel anytime.</p>
                   <button type="button" onClick={() => handlePurchase("pass")} className="w-full mt-4 py-2" style={{ background: "none", border: "none", fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy, cursor: "pointer", textDecoration: "underline" }}>Travel Pass only · {usd(P.pass)}</button>
                 </>
               )}
