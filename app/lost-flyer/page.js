@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
-import { PRICES as P } from "../../lib/pricing";
+import { JOIN_CTA } from "../../lib/cta";
 
 // Free for everyone, no account. Everything stays in the browser: nothing is uploaded or saved.
 const W = 1080, H = 1350;
@@ -79,7 +79,7 @@ export default function LostFlyer() {
           <div className="rounded-2xl p-5 mt-8" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
             <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-1">Want finders to reach you without sharing your number?</div>
             <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mb-3">Finder messages come to you, and you get a note when someone opens the poster. The Lost &amp; Found board shows a pet in one state and city only after you tap Report lost.</p>
-            <a href="/join" style={{ fontFamily: font.body, fontWeight: 700, color: tokens.primary }}>Membership {P.member}/mo →</a>
+            <a href="/join" className="btn-primary inline-block rounded-full px-6 py-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>{JOIN_CTA}</a>
           </div>
         </div>
         <canvas ref={canvas} width={W} height={H} className="w-full rounded-xl" style={{ boxShadow: "0 10px 30px rgba(20,33,61,.15)", background: "#fff" }} aria-label="Flyer preview" role="img" />

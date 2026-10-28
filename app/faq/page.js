@@ -24,7 +24,7 @@ export default function FaqPage() {
             {f.guide && <p className="mt-2"><a href={f.guide.href} style={{ color: "#14213D", fontWeight: 600 }}>{f.guide.label} →</a></p>}
           </details>
         ))}
-        <p className="mt-10"><a href="/assessment" style={{ color: "#14213D", fontWeight: 600 }}>Start planning your trip →</a></p>
+        <p className="mt-10"><a href="/assessment" className="btn-primary inline-block rounded-full px-6 py-3" style={{ background: "#C2410C", color: "#fff", fontWeight: 700, textDecoration: "none" }}>Plan my trip</a></p>
       </Prose>
     </>
   );

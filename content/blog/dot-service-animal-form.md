@@ -19,7 +19,7 @@ It isn't "always 48 hours before." The rule works like this:
 - If you booked closer to departure than that, the airline can't require it ahead of time, but it can ask you to fill it out and hand it over at the departure gate.
 - When an airline asks for it in advance, it has to let you send it electronically or on paper.
 
-Check your airline's page for how it wants the form. Your [Travel Pass](/travel-pass) links straight to it.
+Check your airline's page for how it wants the form. Your Travel Pass links straight to it after you [Plan my trip](/assessment) and pay.
 
 ## One task, not four
 

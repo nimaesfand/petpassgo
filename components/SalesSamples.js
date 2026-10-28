@@ -190,7 +190,7 @@ export function SampleTravelPass() {
         <span style={badge}>EXAMPLE TRAVEL PASS</span>
         <span style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>Buddy’s trip</span>
       </div>
-      <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mb-4">Made-up details so you can see everything inside. Your pass is built for your real trip — airline-specific steps stay locked until you unlock.</p>
+      <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-4">Made-up details so you can see the layout. Your checklist is in the Travel Pass after you pay.</p>
       <div role="tablist" aria-label="Example Travel Pass sections" className="flex flex-wrap gap-1 mb-4 p-1 rounded-full" style={{ background: tokens.sky }}>
         {SAMPLE_TABS.map(([k, l]) => (
           <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className="rounded-full px-4 py-2 min-h-[40px]" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, background: tab === k ? tokens.navy : "transparent", color: tab === k ? "#fff" : tokens.ink, border: "none", cursor: "pointer" }}>{l}</button>

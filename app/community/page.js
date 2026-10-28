@@ -1,15 +1,14 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import SiteHeader from "../../components/SiteHeader";
-import CommunityNotice from "../../components/CommunityNotice";
-import { PRICES as P } from "../../lib/pricing";
+import CommunityPaywall from "../../components/CommunityPaywall";
+import { VAULT_SUB } from "../../lib/travelPassOffer";
 import { supabase } from "../../lib/supabaseClient";
 import { BOARDS, formatBoardLatest } from "../../lib/community";
 import { tokens, font } from "../../lib/theme";
 
 export default function CommunityHome() {
   const [meta, setMeta] = useState({}); // slug -> { count, latest }
-  const [signedIn, setSignedIn] = useState(null);
   const [member, setMember] = useState(null);
   const [filter, setFilter] = useState("all"); // all | airlines | lost
   const airlines = useMemo(() => BOARDS.filter((b) => b.airline), []);
@@ -17,10 +16,10 @@ export default function CommunityHome() {
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
-      setSignedIn(!!data?.session);
       if (!data?.session) { setMember(false); return; }
       const { data: ok } = await supabase.rpc("can_use_community");
       setMember(!!ok);
+      if (!ok) return;
       const { data: rows } = await supabase
         .from("community_posts")
         .select("board,created_at")
@@ -45,32 +44,13 @@ export default function CommunityHome() {
       <main className="max-w-[1100px] mx-auto px-6 py-12">
         <h1 style={{ fontFamily: font.display, fontSize: 40, fontWeight: 700, color: tokens.navy }} className="mb-2">Community</h1>
         <p style={{ fontFamily: font.body, fontSize: 18, color: tokens.muted }} className="mb-4">
-          Swap tips with people who've flown your airline with their animal. Signed-in accounts can read; members can post.
+          {VAULT_SUB} Boards are for Pet Vault members.
         </p>
-        <CommunityNotice />
-
-        {signedIn === false && (
-          <div className="rounded-2xl p-6 mb-6 flex items-center justify-between gap-4 flex-wrap" style={{ background: tokens.navy, color: "#fff" }}>
-            <div>
-              <div style={{ fontFamily: font.display, fontSize: 21, fontWeight: 700 }}>Sign in to read the boards</div>
-              <div style={{ fontFamily: font.body, fontSize: 15, color: "#C9D3E3" }}>Any free account can browse. Membership {P.member}/mo unlocks posting, plus Pet ID and {P.memberPass} Travel Passes.</div>
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              <a href="/login" className="rounded-full px-5 py-3" style={{ background: "#fff", color: tokens.navy, fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Log in</a>
-              <a href="/join" className="btn-primary rounded-full px-6 py-3" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Join for {P.member}/mo</a>
-            </div>
-          </div>
-        )}
-        {signedIn && member === false && (
-          <div className="rounded-2xl p-5 mb-6 flex items-center justify-between gap-4 flex-wrap" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-            <div style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }}>
-              You're signed in — browse any board. <strong style={{ color: tokens.navy }}>Join to post</strong> for {P.member}/mo.
-            </div>
-            <a href="/join" className="rounded-full px-5 py-2.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none", fontSize: 14.5 }}>Join to post</a>
-          </div>
+        {member !== true && (
+          <div className="mb-6"><CommunityPaywall /></div>
         )}
 
-        <div className="mb-5">
+        {member === true && <div className="mb-5">
           <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-2">Pick an airline</div>
           <div className="flex flex-wrap gap-2 mb-3">
             {[
@@ -120,9 +100,9 @@ export default function CommunityHome() {
               </a>
             ))}
           </div>
-        </div>
+        </div>}
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {member === true && <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {shown.map((b) => (
             <a
               key={b.slug}
@@ -146,7 +126,7 @@ export default function CommunityHome() {
               )}
             </a>
           ))}
-        </div>
+        </div>}
       </main>
     </div>
   );

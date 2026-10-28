@@ -39,11 +39,11 @@ export default function TermsPage() {
       <H>6. Payments</H>
       <P>Some features may require payment. Payments will be processed by Stripe; we do not store your full card number. Planned prices (in U.S. dollars, before any applicable taxes):</P>
       <UL>
-        <li>Free for everyone, no account needed: the trip questions with a locked preview of the steps you'll need, and the lost-pet flyer maker with sharing.</li>
-        <li>Membership: $6.99 per month, billed monthly. Includes the pet vault, Digital Pet ID with QR code, finder messages to you after you tap Report lost, posting on the community boards (including a Lost &amp; Found post for one state and city), document expiry reminders, unlimited pets, and Travel Passes at the member price of $19.99 per trip. Any signed-in account can read the community boards; posting and replies require membership.</li>
+        <li>Lost-pet flyer maker: no account and no payment. The flyer is built in your browser and can be shared from your device. Nothing else on the Service is free.</li>
+        <li>Pet Vault: $6.99 per month, billed monthly. Your pet's records, ID and more. Includes the Digital Pet ID with QR code, finder messages to you after you tap Report lost, reading and posting on the community boards (including a Lost &amp; Found post for one state and city), document expiry reminders, unlimited pets, and Travel Passes at $19.99 per trip.</li>
         <li>Travel Pass without membership: $49.99, one-time, per trip. Includes that trip's checklist, deadlines, sources and reminders, plus the pet vault and Digital Pet ID. That access stays open until 7 days after the trip ends. On a one-way trip, it ends 7 days after the travel date. If you add a return date later than the outbound date, it ends 7 days after the return date instead.</li>
       </UL>
-      <P>You can cancel your membership at any time. You keep access until the end of the billing period you've paid for; after that, member features stop, and we don't give partial refunds for unused time. Your pets and documents are kept, not deleted, and come back if you rejoin; a Travel Pass you bought stays available for its trip. Lost-pet tools stay free after your membership or trip ends: you can still report a pet lost, share its poster and flyer, and receive finder messages, and its QR code shows a basic page with its name, photo and a button to message you. Prices may change; we will show the current price before you pay, and we will tell you before a membership price change takes effect.</P>
+      <P>You can cancel Pet Vault at any time. You keep access until the end of the billing period you've paid for; after that, Pet Vault features stop, and we don't give partial refunds for unused time. Your pets and documents are kept, not deleted, and come back if you rejoin. A Travel Pass you bought stays available for its trip through the access window above. The printable lost-pet flyer can still be made with no account. Prices may change; we will show the current price before you pay, and we will tell you before a Pet Vault price change takes effect.</P>
       <P><strong>Refunds.</strong> You can get a full refund within 7 days of purchase, but only if you have never opened the details of the paid Travel Pass. Once those details have been opened, the digital product has been delivered and is not refundable. To request a refund, email <Email /> from the address on your account.</P>
       <P><strong>Exception for inaccurate information.</strong> At PetPassGo's sole discretion, we may issue a refund if information we showed you was inaccurate and directly caused a documented problem, such as being denied boarding. To ask for this, email <Email /> within 14 days of your travel date and include:</P>
       <UL>
@@ -57,7 +57,7 @@ export default function TermsPage() {
 
       <H>7. Community boards</H>
       <UL>
-        <li>When the community boards are available, any signed-in account can read posts. Members can post tips, experiences, questions and replies under a display name. Your email address is never shown.</li>
+        <li>When the community boards are available, Pet Vault members can read and post tips, experiences, questions and replies under a display name. Your email address is never shown.</li>
         <li>Community posts come from travelers and are not verified by PetPassGo. Always follow your PetPassGo checklist and your airline's rules.</li>
         <li>Don't post links, email addresses, phone numbers, offensive language, or anything illegal, harassing or misleading. We may limit how often you post.</li>
         <li>Anyone can report a post. We may hide or delete posts, and suspend accounts that break these rules, at our discretion.</li>

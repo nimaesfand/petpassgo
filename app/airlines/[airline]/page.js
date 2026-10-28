@@ -50,9 +50,8 @@ export default function AirlineGuide({ params }) {
           <a href={a.site} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline" }}>{a.name}&apos;s pet travel page</a> directly.
         </p>
         <div className="rounded-2xl p-6" style={{ background: "#14213D", color: "#F3F5F9" }}>
-          <div style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: 22 }} className="mb-2">Get your {a.name} checklist</div>
-          <p className="mb-4" style={{ opacity: 0.85 }}>Answer a few questions about your trip, then unlock a verified, step-by-step Travel Pass for your exact trip.</p>
-          <a href="/assessment" className="btn-primary inline-block rounded-full px-6 py-3" style={{ background: "#C2410C", color: "#fff", fontWeight: 600, textDecoration: "none" }}>Plan your trip</a>
+          <p className="mb-4" style={{ opacity: 0.85, fontSize: 16, lineHeight: 1.5 }}>A few questions about your pet and this trip, then checkout. The checklist is in your Travel Pass after you pay.</p>
+          <a href="/assessment" className="btn-primary inline-block rounded-full px-6 py-3" style={{ background: "#C2410C", color: "#fff", fontWeight: 700, textDecoration: "none" }}>Plan my trip</a>
         </div>
       </Prose>
     </>

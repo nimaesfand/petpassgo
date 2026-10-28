@@ -6,7 +6,6 @@ import CommunityNotice from "../../../components/CommunityNotice";
 import CommunityPaywall from "../../../components/CommunityPaywall";
 import WinBack from "../../../components/WinBack";
 import { lapsedPreview } from "../../../lib/access";
-import { PRICES as P } from "../../../lib/pricing";
 import { supabase } from "../../../lib/supabaseClient";
 import { BOARDS, boardBySlug, textProblem, friendly, formatPostWhen, POST_TYPES, LOST_POST_TYPES, postTypeLabel } from "../../../lib/community";
 import { US_STATES, stateName, titleCase, visitorArea } from "../../../lib/places";
@@ -34,17 +33,6 @@ function DisplayNameSetup({ onDone }) {
   );
 }
 
-function JoinToPost() {
-  return (
-    <div className="rounded-2xl p-5 mb-6 flex items-center justify-between gap-4 flex-wrap" style={{ background: tokens.navy, color: "#fff" }}>
-      <div>
-        <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700 }}>Join to post</div>
-        <div style={{ fontFamily: font.body, fontSize: 14.5, color: "#C9D3E3" }}>You can read every board with your account. Membership {P.member}/mo unlocks posting and replies.</div>
-      </div>
-      <a href="/join" className="rounded-full px-5 py-2.5" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Join for {P.member}/mo</a>
-    </div>
-  );
-}
 
 function Composer({ board, parentId, lostPets, defaultPet, onPosted, compact, area }) {
   const lostBoard = board === "lost-and-found";
@@ -205,10 +193,11 @@ export default function BoardPage() {
     supabase.auth.getSession().then(async ({ data }) => {
       const s = data?.session || null; setSession(s);
       if (!s) { setLoading(false); setCanRead(false); setCanPost(false); return; }
-      setCanRead(true);
       const { data: ok } = await supabase.rpc("can_use_community");
       const postOk = !!ok && !lapsedPreview();
+      setCanRead(postOk);
       setCanPost(postOk);
+      if (!postOk) { setLoading(false); return; }
       load();
       if (postOk) {
         supabase.from("community_profiles").select("display_name").maybeSingle().then(({ data: p }) => setDisplayName(p?.display_name || ""));
@@ -307,8 +296,7 @@ export default function BoardPage() {
         <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.muted }} className="mb-4">{board.blurb}</p>
         <CommunityNotice />
 
-        {canRead === false && <CommunityPaywall boardName={board.name} signedIn={!!session} />}
-        {canRead && !canPost && <JoinToPost />}
+        {canRead === false && <CommunityPaywall />}
         {canPost && lapsedPreview() && <WinBack area="community" />}
 
         {canPost && displayName === "" && <DisplayNameSetup onDone={setDisplayName} />}
@@ -357,11 +345,6 @@ export default function BoardPage() {
                 {canPost && displayName && (openReply === t.id
                   ? <Composer board={slug} parentId={t.id} lostPets={[]} onPosted={() => { setOpenReply(null); load(); }} compact />
                   : <button onClick={() => setOpenReply(t.id)} className="mt-3" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy, background: "none", border: "none", cursor: "pointer", padding: 0 }}>Reply</button>)}
-                {canRead && !canPost && (
-                  <div className="mt-3" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>
-                    <a href="/join" style={{ color: tokens.navy, fontWeight: 600 }}>Join to post</a> a reply
-                  </div>
-                )}
               </article>
             ))}
           </div>

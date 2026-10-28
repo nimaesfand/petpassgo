@@ -2,9 +2,9 @@ import SiteHeader from "../../components/SiteHeader";
 import { TrackOnMount } from "../../components/Analytics";
 
 import { SampleTravelPass } from "../../components/SalesSamples";
-import { PassEdge, PassIncluded, PlanPoints } from "../../components/TravelPassOffer";
-import { JOIN_PASS_POINTS, JOIN_PASS_NOTE, passOnlyPoints } from "../../lib/travelPassOffer";
+import { PassEdge, PassIncluded } from "../../components/TravelPassOffer";
 import { PRICES as P } from "../../lib/pricing";
+import { PLAN_CTA } from "../../lib/cta";
 import { tokens, font } from "../../lib/theme";
 
 // Purchase options live here, but there is no orphan checkout: picking one
@@ -24,25 +24,12 @@ export default function TravelPassPage() {
         <PassEdge />
         <h2 style={h2} className="mt-7 mb-2.5">What’s inside</h2>
         <PassIncluded />
-        <div className="grid sm:grid-cols-2 gap-3 sm:gap-4 mt-7">
-          <div className="rounded-3xl p-6 flex flex-col" style={{ background: tokens.navy }}>
-            <div style={{ fontFamily: font.mono, fontSize: 11.5, color: tokens.gold, letterSpacing: "0.1em" }}>JOIN + TRAVEL PASS · BEST VALUE</div>
-            <div style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700, color: "#fff" }} className="mt-1">{P.joinToday} <span style={{ fontSize: 15, fontWeight: 500, opacity: 0.8 }}>today</span></div>
-            <PlanPoints dark points={JOIN_PASS_POINTS} note={JOIN_PASS_NOTE} />
-            <a href="/assessment?plan=join" className="rounded-full px-6 py-3.5 text-center min-h-[48px] mt-5" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Choose Join + Pass — {P.joinToday} today</a>
-          </div>
-          <div className="rounded-3xl p-6 flex flex-col" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-            <div style={{ fontFamily: font.mono, fontSize: 11.5, color: tokens.primary, letterSpacing: "0.1em" }}>TRAVEL PASS ONLY</div>
-            <div style={{ fontFamily: font.display, fontSize: 30, fontWeight: 700, color: tokens.navy }} className="mt-1">{P.pass} <span style={{ fontSize: 15, fontWeight: 500, color: tokens.muted }}>per trip</span></div>
-            <PlanPoints points={passOnlyPoints()} />
-            <a href="/assessment?plan=pass" className="btn-primary rounded-full px-6 py-3.5 text-center min-h-[48px] mt-5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Choose Travel Pass only — {P.pass}</a>
-          </div>
+        <div className="text-center mt-7">
+          <a href="/assessment" className="btn-primary inline-block rounded-full px-8 py-4 min-h-[48px]" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>{PLAN_CTA}</a>
+          <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-3">A few questions, then checkout. Travel Pass {P.pass}, or {P.joinToday} with Pet Vault. Members pay {P.memberPass}.</p>
         </div>
-        <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="text-center mt-4">Next: answer the trip questions (about 3 minutes), then check out. Members pay {P.memberPass} automatically.</p>
-        <details className="mt-6 rounded-2xl" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-          <summary className="px-5 py-4" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy, cursor: "pointer", minHeight: 48 }}>See an example pass</summary>
-          <div className="px-2 pb-2 sm:px-3 sm:pb-3"><SampleTravelPass /></div>
-        </details>
+        <h2 style={h2} className="mt-8 mb-2.5">An example pass</h2>
+        <SampleTravelPass />
       </main>
     </div>
   );

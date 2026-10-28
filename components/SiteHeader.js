@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
 import Logo from "./Logo";
+import { LOGIN_CTA, PLAN_CTA } from "../lib/cta";
 
 // Airlines, Blog, and FAQ. Blog is listed because the owner approved the
 // service-dog posts on 2026-10-19. Outlines in content/drafts stay unpublished.
@@ -15,7 +16,7 @@ export const NAV_LINKS = [
 
 const link = { fontFamily: font.body, fontSize: 15, fontWeight: 500, color: tokens.navy, textDecoration: "none", whiteSpace: "nowrap" };
 
-// One header for every page. Shows Account/Log out when signed in, Log in/Sign up otherwise.
+// One header for every page. Signed out: Log in and Plan my trip. Signed in: account links.
 export default function SiteHeader({ onLogout }) {
   const [signedIn, setSignedIn] = useState(false);
   useEffect(() => {
@@ -44,11 +45,10 @@ export default function SiteHeader({ onLogout }) {
             </>
           ) : (
             <>
-              <a href="/login" style={link}>Log in</a>
-              <a href="/signup" style={link}>Sign up</a>
+              <a href="/login" style={link}>{LOGIN_CTA}</a>
             </>
           )}
-          <a href="/assessment" className="btn-primary rounded-full px-5 py-2.5 hidden md:inline-block" style={{ ...link, background: tokens.primary, color: "#fff", fontWeight: 600 }}>Plan your trip</a>
+          <a href="/assessment" className="btn-primary rounded-full px-5 py-2.5" style={{ ...link, background: tokens.primary, color: "#fff", fontWeight: 600 }}>{PLAN_CTA}</a>
         </div>
       </nav>
     </header>
