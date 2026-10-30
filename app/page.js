@@ -1,208 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { tokens, font } from "../lib/theme";
+import { tokens } from "../lib/theme";
 import SiteHeader from "../components/SiteHeader";
 import Logo from "../components/Logo";
 import { PlanCards } from "../components/PricingPlans";
-import { JOIN_CTA, PLAN_CTA } from "../lib/cta";
-import { PRICES, usd } from "../lib/pricing";
-import { VAULT_SUB } from "../lib/travelPassOffer";
-import { PetIllustration } from "../components/PetIdCard";
-import PetQr from "../lib/PetQr";
+import TripHero from "../components/TripHero";
 import { US_AIRLINES, INTERNATIONAL_AIRLINES } from "../lib/airlines";
 import { AIRLINE_GUIDES } from "../lib/airlineGuides";
 import { FAQ } from "../lib/faq";
 
 
-function Perforation() {
-  return (
-    <div className="flex items-center gap-[6px] px-2" aria-hidden="true">
-      {Array.from({ length: 22 }).map((_, i) => (
-        <span
-          key={i}
-          style={{ background: tokens.sky, borderColor: tokens.navy }}
-          className="w-[7px] h-[7px] rounded-full border"
-        />
-      ))}
-    </div>
-  );
-}
-
-function Stamp() {
-  return (
-    <div
-      className="absolute -rotate-12 select-none"
-      style={{
-        top: "18px",
-        right: "18px",
-        border: `2px solid ${tokens.stamp}`,
-        color: tokens.stamp,
-        borderRadius: "9999px",
-        padding: "6px 14px",
-        fontFamily: "var(--font-body), system-ui, sans-serif",
-        fontSize: "11px",
-        letterSpacing: "0.12em",
-        fontWeight: 700,
-      }}
-    >
-      READY TO TRAVEL
-    </div>
-  );
-}
-
-function BoardingCard() {
-  return (
-    <div
-      className="relative rounded-2xl shadow-2xl overflow-hidden w-full max-w-[460px] mx-auto lg:mx-0"
-      style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}
-    >
-      <div
-        className="flex items-center justify-between px-6 py-4"
-        style={{ background: tokens.navy, color: tokens.sky }}
-      >
-        <div>
-          <div
-            style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: "20px", fontWeight: 600 }}
-          >
-            PetPassGo
-          </div>
-          <div
-            style={{
-              fontFamily: "var(--font-body), system-ui, sans-serif",
-              fontSize: "10px",
-              letterSpacing: "0.14em",
-              color: tokens.gold,
-            }}
-          >
-            TRAVEL PASS
-          </div>
-        </div>
-        <div
-          style={{
-            fontFamily: "var(--font-body), system-ui, sans-serif",
-            fontSize: "11px",
-            color: tokens.sky,
-            opacity: 0.7,
-          }}
-        >
-          NO. PPG-0417
-        </div>
-      </div>
-
-      <div className="relative px-6 pt-5 pb-4">
-        <Stamp />
-        <div className="flex gap-4 items-center">
-          <div
-            className="rounded-full flex items-center justify-center flex-shrink-0"
-            style={{
-              width: 56,
-              height: 56,
-              background: tokens.sky,
-              border: `1px solid ${tokens.line}`,
-              fontSize: 26,
-            }}
-          >
-            🐾
-          </div>
-          <div>
-            <div
-              style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: "22px", color: tokens.ink }}
-            >
-              Mochi
-            </div>
-            <div
-              style={{
-                fontFamily: "var(--font-body), system-ui, sans-serif",
-                fontSize: "11px",
-                color: tokens.ink,
-                opacity: 0.6,
-              }}
-            >
-              Cavalier King Charles · M
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-3 gap-3 mt-5">
-          {[
-            ["FROM", "TPA"],
-            ["TO", "JFK"],
-            ["DATE", "09.14"],
-          ].map(([label, val]) => (
-            <div key={label}>
-              <div
-                style={{
-                  fontFamily: "var(--font-body), system-ui, sans-serif",
-                  fontSize: "10px",
-                  letterSpacing: "0.1em",
-                  color: tokens.ink,
-                  opacity: 0.5,
-                }}
-              >
-                {label}
-              </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-body), system-ui, sans-serif",
-                  fontSize: "17px",
-                  color: tokens.navy,
-                  fontWeight: 700,
-                }}
-              >
-                {val}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="px-6">
-        <Perforation />
-      </div>
-
-      <div className="px-6 py-4 flex items-center justify-between">
-        <div>
-          <div
-            style={{
-              fontFamily: "var(--font-body), system-ui, sans-serif",
-              fontSize: "10px",
-              letterSpacing: "0.1em",
-              color: tokens.ink,
-              opacity: 0.55,
-            }}
-          >
-            TRIP READINESS
-          </div>
-          <div
-            style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: "26px", color: tokens.navy }}
-          >
-            90%
-          </div>
-        </div>
-        <svg viewBox="0 0 29 29" style={{ width: 64, height: 64 }} className="rounded-md">
-          <rect width="29" height="29" fill={tokens.ink} />
-          {[[1, 1], [22, 1], [1, 22]].map(([x, y]) => (
-            <g key={`${x}-${y}`}>
-              <rect x={x} y={y} width="6" height="6" fill="#fff" />
-              <rect x={x + 1.3} y={y + 1.3} width="3.4" height="3.4" fill={tokens.ink} />
-              <rect x={x + 2} y={y + 2} width="2" height="2" fill="#fff" />
-            </g>
-          ))}
-          {[
-            [10, 2], [13, 3], [16, 1], [19, 4], [10, 5], [15, 6],
-            [2, 10], [5, 12], [3, 15], [7, 16], [1, 18], [5, 19],
-            [10, 10], [13, 11], [11, 14], [16, 12], [14, 16], [18, 9],
-            [22, 10], [25, 12], [23, 15], [26, 17], [21, 18], [24, 20],
-            [10, 22], [13, 24], [16, 21], [11, 26], [18, 23], [15, 27],
-          ].map(([x, y], i) => (
-            <rect key={i} x={x} y={y} width="1.3" height="1.3" fill="#fff" />
-          ))}
-        </svg>
-      </div>
-    </div>
-  );
-}
 
 const D = "var(--font-display), system-ui, sans-serif";
 const B = "var(--font-body), system-ui, sans-serif";
@@ -228,7 +36,39 @@ function airlineTileHref(name) {
 }
 
 function Eyebrow({ children, color = tokens.stamp }) {
-  return <div style={{ fontFamily: B, color, fontSize: 13, fontWeight: 700, letterSpacing: "0.14em" }} className="mb-3">{children}</div>;
+  return <div style={{ fontFamily: B, color, fontSize: 15, fontWeight: 700, letterSpacing: "0.08em" }} className="mb-3">{children}</div>;
+}
+
+const PASS_BENEFITS = [
+  ["Checklist you check off", "Each step can be marked done. What is left stays on the pass."],
+  ["Carrier size and weight", "When a pass shows a published limit, it compares that limit with the weight and carrier size saved on the pet in Pet Vault."],
+  ["Weather and cargo temperature", "Weather at both airports, and a cargo temperature check when a forecast is in."],
+  ["Vets and pet stores", "Nearby vets and pet stores for where you land."],
+  ["Flight-day status", "Flight status, your documents, and Pet ID on the flight-day screen."],
+];
+
+const VAULT_BENEFITS = [
+  ["Pet ID with a QR code", "A digital Pet ID. The QR code opens the public page for that pet."],
+  ["Finder messages", "Someone who finds your pet can message you through PetPassGo."],
+  ["Report lost and a flyer", "Report lost starts the lost-pet flyer you can print and share."],
+  ["Documents", "Files you add stay with the pet."],
+  ["Reminders", "Reminders before a saved document expires."],
+];
+
+function BenefitList({ items, card = "#fff" }) {
+  return (
+    <ul className="grid gap-3">
+      {items.map(([title, body]) => (
+        <li key={title} className="rounded-2xl p-4 sm:p-5 flex gap-3" style={{ background: card, border: `1px solid ${tokens.line}` }}>
+          <span aria-hidden="true" className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: 28, height: 28, marginTop: 2, background: "#EAF6EE", color: tokens.green, fontFamily: B, fontWeight: 800, fontSize: 16 }}>✓</span>
+          <span>
+            <span style={{ display: "block", fontFamily: D, fontWeight: 700, fontSize: 18, color: tokens.navy, lineHeight: 1.3 }}>{title}</span>
+            <span style={{ display: "block", fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink, marginTop: 4 }}>{body}</span>
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
 }
 function H2({ children, light }) {
   return <h2 style={{ fontFamily: D, color: light ? "#fff" : tokens.navy, lineHeight: 1.1 }} className="text-[32px] md:text-[42px] font-bold mb-4">{children}</h2>;
@@ -256,46 +96,21 @@ export default function PetPassGoLanding() {
 
       <SiteHeader />
 
-      {/* 1. HERO — two paths */}
-      <section className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14 pt-7 sm:pt-10 lg:pt-20 pb-10 lg:pb-20 text-center">
-        <div className={`fade-up ${loaded ? "in" : ""}`}>
-          <h1 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[29px] sm:text-[31px] leading-[1.08] sm:text-[52px] lg:text-[64px] font-bold mb-3 lg:mb-5">Fly with your pets, skip the guesswork.</h1>
-          <p style={{ fontFamily: B, color: tokens.muted }} className="text-[16px] lg:text-[19px] mb-5 lg:mb-10">Two simple ways to start. Pick one.</p>
-        </div>
-        <div className={`fade-up grid md:grid-cols-2 gap-3 lg:gap-5 max-w-[900px] mx-auto text-left ${loaded ? "in" : ""}`} style={{ transitionDelay: "120ms" }}>
-          {[
-            {
-              title: "Traveling? Start here.",
-              body: "A few questions about your pet and your flight, then checkout.",
-              cta: PLAN_CTA,
-              href: "/assessment",
-              lead: "",
-              price: `Travel Pass ${usd(PRICES.pass)} · members ${usd(PRICES.memberPass)}`,
-              dark: false,
-            },
-            {
-              title: "Pet Vault? Start here.",
-              body: VAULT_SUB,
-              cta: JOIN_CTA,
-              href: "/join",
-              lead: "",
-              price: `${usd(PRICES.member)}/mo · cancel anytime`,
-              dark: true,
-            },
-          ].map((door) => (
-            <div key={door.title} className="rounded-2xl p-4 sm:p-5 lg:p-7 flex flex-col h-full" style={{ background: door.dark ? tokens.navy : "#fff", border: `1px solid ${door.dark ? tokens.navy : tokens.line}`, color: door.dark ? "#fff" : tokens.navy }}>
-              <span aria-hidden="true" className="inline-flex items-center justify-center rounded-full mb-3 lg:mb-4" style={{ width: 40, height: 40, background: tokens.gold }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={tokens.navy} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{door.dark ? <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M14 10h4M14 14h3" /><circle cx="8.5" cy="11" r="2" /><path d="M5.5 16c.6-1.6 1.7-2.4 3-2.4s2.4.8 3 2.4" /></> : <path d="M2 16l20-6-20-6 3 6-3 6zM5 10h7" />}</svg>
-              </span>
-              <div style={{ fontFamily: D, fontWeight: 700 }} className="text-[22px] lg:text-[25px] mb-1.5 lg:mb-2">{door.title}</div>
-              <p style={{ fontFamily: B, opacity: 0.8, lineHeight: 1.45 }} className="text-[15px] lg:text-[16.5px] mb-4 lg:mb-6 flex-1">{door.body}</p>
-              <a href={door.href} className="btn-primary self-start rounded-full px-6 lg:px-7 py-3 lg:py-3.5 min-h-[44px]" style={{ background: door.dark ? tokens.gold : tokens.primary, color: door.dark ? tokens.navy : "#fff", fontFamily: B, fontWeight: 700, textDecoration: "none" }}>{door.cta}</a>
-              <p style={{ fontFamily: B, lineHeight: 1.4 }} className="mt-3">
-                {door.lead ? <span style={{ display: "block", fontSize: 15, fontWeight: 600, color: door.dark ? "#fff" : tokens.navy }}>{door.lead}</span> : null}
-                <span style={{ display: "block", fontSize: 15, fontWeight: 500, color: door.dark ? "#C9D3E3" : tokens.muted, marginTop: door.lead ? 2 : 0 }}>{door.price}</span>
-              </p>
-            </div>
-          ))}
+      <section className={`fade-up max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14 pt-7 sm:pt-10 lg:pt-16 pb-8 lg:pb-14 ${loaded ? "in" : ""}`}>
+        <TripHero />
+      </section>
+
+      <section className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14 py-10 lg:py-14">
+        <Eyebrow>TRAVEL PASS</Eyebrow>
+        <H2>What Travel Pass gives you</H2>
+        <BenefitList items={PASS_BENEFITS} />
+      </section>
+
+      <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-10 lg:py-14">
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14">
+          <Eyebrow>PET VAULT</Eyebrow>
+          <H2>What Pet Vault keeps safe</H2>
+          <BenefitList items={VAULT_BENEFITS} card={tokens.sky} />
         </div>
       </section>
 

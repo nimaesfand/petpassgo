@@ -16,7 +16,15 @@ h1, h2, h3, h4 { font-family: var(--font-display), system-ui, sans-serif; letter
 .btn-primary { transition: background .15s ease, transform .15s ease; }
 .btn-primary:hover { background: #9A3412 !important; }
 .btn-primary:active { transform: translateY(1px); }
-a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid #C2410C55; outline-offset: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible, .ppg-choice:focus-within { outline: 3px solid #C2410C55; outline-offset: 2px; }
+.ppg-plane-still { visibility: hidden; }
+.ppg-route { stroke-dasharray: 2 8; animation: ppg-dash 22s linear infinite; }
+@keyframes ppg-dash { to { stroke-dashoffset: -180; } }
+@media (prefers-reduced-motion: reduce) {
+  .ppg-motion { display: none; }
+  .ppg-plane-still { visibility: visible; }
+  .ppg-route { animation: none; }
+}
 .btn-secondary { transition: background .15s ease; }
 .btn-secondary:hover { background: #EEF2F7 !important; }
 .blog-body p { margin: 0 0 1em; }
