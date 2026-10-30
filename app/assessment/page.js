@@ -7,7 +7,7 @@ import { US_AIRLINES, INTERNATIONAL_AIRLINES, OTHER_AIRLINE } from "../../lib/ai
 import { pickTripPet } from "../../lib/tripPet";
 import AirportField from "../../components/AirportField";
 import FlightLookup, { airportLabel, airlineFromFlight } from "../../components/FlightLookup";
-import SamplePass from "../../components/SamplePass";
+import { readTripIntent } from "../../lib/tripIntent";
 import { fmtTripDate } from "../../lib/tripAccess";
 import { trackEvent, trackBeginCheckout, getAttribution } from "../../lib/analytics";
 import { GuestEmailSheet } from "../../components/GuestEmailStep";
@@ -103,18 +103,29 @@ function AirlineGroup({ title, names, selected, onSelect, columns }) {
   );
 }
 
-function AirlineChoices({ query, selected, onSelect }) {
+const CANADA_MEXICO = ["Air Canada", "Aeroméxico", "Volaris", "Viva Aerobus"];
+
+function AirlineChoices({ query, selected, onSelect, region }) {
   const q = query.trim().toLowerCase();
   const match = (name) => !q || name.toLowerCase().includes(q);
   const us = US_AIRLINES.filter(match);
   const international = INTERNATIONAL_AIRLINES.filter(match);
+  const near = CANADA_MEXICO.filter((name) => international.includes(name));
+  const farther = international.filter((name) => !CANADA_MEXICO.includes(name));
   const showOther = match(OTHER_AIRLINE);
+  const groups = region === "domestic"
+    ? [["U.S.", us, 2], ["Canada and Mexico", near, 1], ["Other international", farther, 1]]
+    : region === "international"
+      ? [["International", international, 1], ["U.S.", us, 2]]
+      : [["U.S.", us, 2], ["International", international, 1]];
+  const any = us.length || international.length || showOther;
   return (
     <>
-      <AirlineGroup title="U.S." names={us} selected={selected} onSelect={onSelect} columns={2} />
-      <AirlineGroup title="International" names={international} selected={selected} onSelect={onSelect} columns={1} />
+      {groups.map(([title, names, columns]) => (
+        <AirlineGroup key={title} title={title} names={names} selected={selected} onSelect={onSelect} columns={columns} />
+      ))}
       {showOther && <OptionCard label={OTHER_AIRLINE} compact selected={selected === OTHER_AIRLINE} onClick={() => onSelect(OTHER_AIRLINE)} />}
-      {!us.length && !international.length && !showOther && (
+      {!any && (
         <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>No airline with that name. Try another spelling, or pick Other / not sure yet.</p>
       )}
     </>
@@ -129,6 +140,9 @@ export default function PetPassGoQuiz() {
   const [consentErr, setConsentErr] = useState("");
   const [airlineQuery, setAirlineQuery] = useState("");
   const [autoBuy, setAutoBuy] = useState(""); // set when returning signed in from signup/login with a saved purchase
+  const [booted, setBooted] = useState(false);
+  const [regionHint, setRegionHint] = useState("");
+  const [prefilled, setPrefilled] = useState(false);
   // Real membership status (read-only; only the server/Stripe can set it). The checkbox
   // further down is a pre-launch preview only and is hidden when NEXT_PUBLIC_SITE_LAUNCHED=true.
   useEffect(() => {
@@ -159,25 +173,41 @@ export default function PetPassGoQuiz() {
   const set = (k, v) => setAnswers((a) => ({ ...a, [k]: v }));
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
-  // Resume a trip that was in progress if the person just came back from signup/login
+  // Resume a trip that was in progress if the person just came back from signup/login.
+  // Otherwise a homepage chooser can pre-fill pet type and which airline group to show.
   useEffect(() => {
-    const pending = localStorage.getItem("petpassgo_pending_trip");
-    if (pending) {
-      try {
-        const savedAnswers = JSON.parse(pending);
-        setAnswers(savedAnswers);
-        setStep(5);
-        const intent = localStorage.getItem("petpassgo_purchase_intent");
-        if (intent === "join" || intent === "pass") setAutoBuy(intent);
-        localStorage.removeItem("petpassgo_purchase_intent");
-      } catch (e) {
-        // ignore corrupted storage
+    try {
+      const pending = localStorage.getItem("petpassgo_pending_trip");
+      if (pending) {
+        try {
+          const savedAnswers = JSON.parse(pending);
+          setAnswers(savedAnswers);
+          setStep(5);
+          const intent = localStorage.getItem("petpassgo_purchase_intent");
+          if (intent === "join" || intent === "pass") setAutoBuy(intent);
+          localStorage.removeItem("petpassgo_purchase_intent");
+        } catch (e) {
+          // ignore corrupted storage
+        }
+        localStorage.removeItem("petpassgo_pending_trip");
+        return;
       }
-      localStorage.removeItem("petpassgo_pending_trip");
+      const intent = readTripIntent(window.location.search);
+      if (intent.region) setRegionHint(intent.region);
+      if (intent.pet) {
+        setAnswers((a) => ({ ...a, ...intent.answers }));
+        setPrefilled(true);
+      } else if (intent.region) setPrefilled(true);
+      if (intent.step) setStep(intent.step);
+    } finally {
+      setBooted(true);
     }
   }, []);
 
-  const next = () => setStep((s) => Math.min(s + 1, TOTAL_STEPS));
+  const next = () => setStep((s) => {
+    if (s === 0 && answers.esa && answers.role === "Pet") return 2;
+    return Math.min(s + 1, TOTAL_STEPS);
+  });
 
   // Questions lead straight to checkout. Pay-first email and Stripe stay in handlePurchase.
   async function handleSeePlan() {
@@ -274,16 +304,27 @@ export default function PetPassGoQuiz() {
           <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-4 text-center">A few questions about your pet, route, and airline. Then checkout. The checklist is in your pass after you pay.</p>
         )}
         <div className="rounded-2xl p-6 md:p-9" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.06)" }}>
+          {!booted ? (
+            <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }}>Loading your questions…</p>
+          ) : (<>
           {step < TOTAL_STEPS && <ProgressStub step={step} />}
+          {prefilled && step < 5 && (
+            <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.navy, fontWeight: 600 }} className="mb-4">
+              {[regionHint === "domestic" ? "Domestic: U.S., Canada and Mexico" : regionHint === "international" ? "International" : "", answers.role === "Service animal" ? "Service animal" : answers.esa ? "ESA" : answers.animal].filter(Boolean).join(" · ") || "Your choices"}. Change any answer.
+            </p>
+          )}
 
           {step === 0 && (
             <>
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
                 What are you traveling with?
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-5">
+              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-5">
                 This changes which requirements apply to your trip.
               </p>
+              {answers.esa && (
+                <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }} className="mb-4">ESA is selected. Choose dog or cat. An emotional support animal flies as a pet.</p>
+              )}
               <div className="flex flex-col gap-3">
                 <OptionCard icon="dog" label="Dog" selected={answers.animal === "Dog"} onClick={() => set("animal", "Dog")} />
                 <OptionCard icon="cat" label="Cat" selected={answers.animal === "Cat"} onClick={() => set("animal", "Cat")} />
@@ -341,8 +382,10 @@ export default function PetPassGoQuiz() {
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
                 Where are you flying from and to?
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-5">
+              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-5">
                 City or airport code is fine.
+                {regionHint === "domestic" ? " Domestic: U.S., Canada and Mexico." : ""}
+                {regionHint === "international" ? " International." : ""}
               </p>
               <div className="flex flex-col gap-3" style={{ position: "relative", zIndex: 1 }}>
                 <AirportField key={`o-${answers.origin}`} label="Departing from (type a city)" value={answers.origin} onSelect={(v) => set("origin", v)} />
@@ -408,9 +451,8 @@ export default function PetPassGoQuiz() {
                 Which airline?
               </h2>
               <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-4">
-                {answers.flight_snapshot && answers.airline ? `Filled in from your flight number: ${answers.airline}. Change it if that’s wrong.` : "U.S. airlines first, then international. Search if you don’t see yours."}
+                {answers.flight_snapshot && answers.airline ? `Filled in from your flight number: ${answers.airline}. Change it if that’s wrong.` : regionHint === "domestic" ? "Domestic starts with U.S., Canada and Mexico airlines. You can still pick another." : regionHint === "international" ? "International airlines are listed first. You can still pick a U.S. airline." : "U.S. airlines first, then international. Search if you don’t see yours."}
               </p>
-              <div className="mb-4"><SamplePass compact /></div>
               <input
                 value={airlineQuery}
                 onChange={(e) => setAirlineQuery(e.target.value)}
@@ -419,7 +461,7 @@ export default function PetPassGoQuiz() {
                 style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
                 className="rounded-xl px-4 py-3 outline-none w-full mb-4"
               />
-              <AirlineChoices query={airlineQuery} selected={answers.airline} onSelect={(name) => set("airline", name)} />
+              <AirlineChoices query={airlineQuery} selected={answers.airline} onSelect={(name) => set("airline", name)} region={regionHint} />
               <NavRow onBack={back} onNext={handleSeePlan} nextDisabled={!answers.airline} nextLabel="Continue" />
             </>
           )}
@@ -445,6 +487,7 @@ export default function PetPassGoQuiz() {
               </div>
             </>
           )}
+          </>)}
         </div>
       </div>
       </div>
