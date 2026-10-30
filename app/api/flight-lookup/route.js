@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { explicitFlightDate } from "../../../lib/flightDate";
+import { allowRequest, clientIp } from "../../../lib/rateLimit";
+import { requireUser, userIsPaid } from "../../../lib/paidUser";
+import { serviceClient as makeService } from "../../../lib/serverEmail";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +17,7 @@ export const dynamic = "force-dynamic";
 
 function serviceClient() {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) return null;
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
+  return makeService();
 }
 
 function normalizeFlight(raw) {
@@ -65,7 +67,21 @@ export async function POST(req) {
     if (!flight) return NextResponse.json({ configured: true, found: false, error: "Enter a flight number like UA1234." }, { status: 400 });
     if (!date) return NextResponse.json({ configured: true, found: false, error: "Pick the flight date first. We won't assume today or set your travel date for you." }, { status: 400 });
 
-    const sb = serviceClient();
+    const { user, sb: authSb } = await requireUser(req);
+    if (!user) return NextResponse.json({ configured: true, found: false, error: "Sign in to look up a flight." }, { status: 401 });
+    const sb = authSb || serviceClient();
+    if (!sb || !(await userIsPaid(sb, user.id))) {
+      return NextResponse.json({ configured: true, found: false, error: "Flight lookup is available on a paid Travel Pass or Pet Vault." }, { status: 403 });
+    }
+    const ip = clientIp(req);
+    const [userOk, ipOk] = await Promise.all([
+      allowRequest(sb, `flight_lookup:user:${user.id}`, 20, 600),
+      allowRequest(sb, `flight_lookup:ip:${ip}`, 40, 600),
+    ]);
+    if (!userOk || !ipOk) {
+      return NextResponse.json({ configured: true, found: false, error: "Too many flight lookups. Try again in a few minutes." }, { status: 429 });
+    }
+
     // 1) Cache first — a fresh hit never spends API quota.
     if (sb) {
       const { data: hit } = await sb.from("flight_lookups").select("found,payload,fetched_at,expires_at").eq("flight_iata", flight).eq("flight_date", date).maybeSingle();
@@ -96,16 +112,8 @@ export async function POST(req) {
       );
     }
 
-    // 4) Optionally attach to a trip the caller owns.
-    if (body.trip_id && shaped) {
-      const token = req.headers.get("x-sb-token") || "";
-      if (token && sb && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        const anon = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, { auth: { persistSession: false } });
-        const { data: u } = await anon.auth.getUser(token);
-        if (u?.user) {
-          await sb.from("trips").update({ flight_number: flight, flight_snapshot: shaped, flight_checked_at: fetchedAt }).eq("id", body.trip_id).eq("user_id", u.user.id);
-        }
-      }
+    if (body.trip_id && shaped && sb) {
+      await sb.from("trips").update({ flight_number: flight, flight_snapshot: shaped, flight_checked_at: fetchedAt }).eq("id", body.trip_id).eq("user_id", user.id).eq("paid", true);
     }
 
     return NextResponse.json({ configured: true, found: !!shaped, flight: shaped, cached: false, fetched_at: fetchedAt });

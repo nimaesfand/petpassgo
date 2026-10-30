@@ -27,7 +27,9 @@ export function fmtTime(iso, tz) {
 export async function lookupFlight(flight, date, tripId) {
   const { data: s } = await supabase.auth.getSession().catch(() => ({ data: null }));
   const r = await fetch("/api/flight-lookup", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ flight, date: date || undefined, trip_id: tripId || undefined }) });
-  return r.json().catch(() => ({ configured: true, found: false }));
+  const j = await r.json().catch(() => ({ configured: true, found: false }));
+  if (r.status === 401 || r.status === 403 || r.status === 429) return { ...j, configured: true, found: false, error: j.error || "Flight lookup is available on a paid Travel Pass or Pet Vault." };
+  return j;
 }
 
 export function FlightSummary({ f }) {

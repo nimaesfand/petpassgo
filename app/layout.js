@@ -4,6 +4,7 @@ import { SITE_URL, SITE_NAME } from "../lib/site";
 import ChatWidget from "../components/ChatWidget";
 import Analytics from "../components/Analytics";
 import AuthResume from "../components/AuthResume";
+import JsonLd from "../components/JsonLd";
 
 const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["500", "600", "700", "800"], variable: "--font-display", display: "swap" });
 const body = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-body", display: "swap" });
@@ -24,6 +25,14 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable}`}>
       <body>
+        <JsonLd data={{
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: SITE_NAME,
+          url: SITE_URL,
+          email: "support@petpassgo.com",
+          contactPoint: { "@type": "ContactPoint", contactType: "customer support", email: "support@petpassgo.com" },
+        }} />
         {children}
         <Analytics />
         <AuthResume />

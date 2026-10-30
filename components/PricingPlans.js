@@ -1,14 +1,13 @@
 import { tokens } from "../lib/theme";
 import { PRICES as P, usd } from "../lib/pricing";
 import { VAULT_NAME } from "../lib/travelPassOffer";
-import { JOIN_CTA, PLAN_CTA } from "../lib/cta";
 const D = "var(--font-display), system-ui, sans-serif", B = "var(--font-body), system-ui, sans-serif";
 
 const PASS_ITEMS = ["Rules for your exact flight and pet", "Checked steps, with the official page and a due date", "Flight day: live status, documents, Pet ID", "Pet ID and vault until 7 days after the trip ends"];
 
 export const PLANS = [
-  { k: "member", name: VAULT_NAME, price: P.member, unit: "USD /mo", blurb: `Members can add a Travel Pass for just ${usd(P.memberPass)} more per trip (vs ${usd(P.pass)} without membership).`, items: ["Digital Pet ID with QR", "Finder messages to you after Report lost", "Community boards", "Expiry reminders · unlimited pets"], cta: JOIN_CTA, href: "/join", hi: true },
-  { k: "pass", name: "Travel Pass", price: P.pass, unit: "USD · one trip", blurb: "On its own. One trip.", items: PASS_ITEMS, cta: PLAN_CTA, href: "/assessment" },
+  { k: "member", name: VAULT_NAME, price: P.member, unit: "USD /mo", blurb: `Members can add a Travel Pass for just ${usd(P.memberPass)} more per trip (vs ${usd(P.pass)} without membership).`, items: ["Digital Pet ID with QR", "Finder messages to you after Report lost", "Community boards", "Expiry reminders · unlimited pets"], cta: "See Pet Vault", href: "/pet-vault", hi: true },
+  { k: "pass", name: "Travel Pass", price: P.pass, unit: "USD · one trip", blurb: "On its own. One trip.", items: PASS_ITEMS, cta: "See Travel Pass", href: "/travel-pass" },
 ];
 const ROWS = [
   ["Full checklist, deadlines, sources", `${usd(P.memberPass)}/trip`, 1], ["Trip reminders", "With pass", 1],

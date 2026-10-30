@@ -136,9 +136,21 @@ export function HealthPassport({ pet, userId, refreshKey = 0, bare = false, onRo
 }
 
 export function WalletCard({ pet, onDone, bare = false }) {
-  const [busy, setBusy] = useState(false);
-  async function download() {
-    setBusy(true);
+  const [busy, setBusy] = useState("");
+  const [wallet, setWallet] = useState(false);
+  const [err, setErr] = useState("");
+  useEffect(() => {
+    let live = true;
+    supabase.auth.getSession().then(async ({ data }) => {
+      const r = await fetch("/api/pet-wallet", { headers: { "x-sb-token": data?.session?.access_token || "" } });
+      const j = await r.json().catch(() => ({}));
+      if (live) setWallet(!!j.available);
+    }).catch(() => { if (live) setWallet(false); });
+    return () => { live = false; };
+  }, [pet.id]);
+  async function downloadPng() {
+    setBusy("png");
+    setErr("");
     try {
       const qr = await QRCode.toDataURL(`${PUBLIC_ID_BASE}${pet.id}`, { width: 360, margin: 1, errorCorrectionLevel: "M" });
       const canvas = document.createElement("canvas"); canvas.width = 900; canvas.height = 540; const c = canvas.getContext("2d");
@@ -151,9 +163,42 @@ export function WalletCard({ pet, onDone, bare = false }) {
       c.font = "22px system-ui"; c.fillStyle = "#52606D"; c.fillText("Message the owner through PetPassGo.", 42, 390); c.fillText("No chip number or owner phone is shown.", 42, 425);
       const img = new Image(); await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = qr; }); c.drawImage(img, 590, 160, 260, 260);
       const a = document.createElement("a"); a.download = `${(pet.name || "pet").replace(/[^a-z0-9]+/gi, "-")}-petpassgo-id.png`; a.href = canvas.toDataURL("image/png"); a.click(); onDone?.();
-    } finally { setBusy(false); }
+    } finally { setBusy(""); }
   }
-  return <section id="wallet-card" style={bare ? { marginTop: 16 } : section}><div style={h3}>QR card for your phone</div><p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">Save {pet.name}'s QR to your photos for one-tap access.</p><button disabled={busy} onClick={download} style={{ ...btn, background: tokens.navy, color: "#fff" }} className="mt-2">{busy ? "Making card…" : "Download QR card"}</button></section>;
+  async function downloadPass() {
+    setBusy("wallet");
+    setErr("");
+    try {
+      const { data } = await supabase.auth.getSession();
+      const r = await fetch("/api/pet-wallet", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": data?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id }) });
+      if (!r.ok) {
+        setWallet(false);
+        const j = await r.json().catch(() => ({}));
+        setErr(j.error || "Apple Wallet is not available. Save the image instead.");
+        return;
+      }
+      const blob = await r.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${(pet.name || "pet").replace(/[^a-z0-9]+/gi, "-")}-pet-id.pkpass`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      onDone?.();
+    } catch {
+      setErr("The Wallet pass could not be created. Save the image instead.");
+    } finally { setBusy(""); }
+  }
+  return (
+    <section id="wallet-card" style={bare ? { marginTop: 16 } : section}>
+      <div style={h3}>Pet ID card</div>
+      <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }} className="mt-1">The QR code opens {pet.name ? `${pet.name}'s` : "this pet's"} public page. Save the image to your phone.</p>
+      <div className="flex flex-wrap gap-2 mt-3">
+        <button type="button" disabled={!!busy} onClick={downloadPng} style={{ ...btn, fontSize: 16, background: tokens.navy, color: "#fff", minHeight: 48 }}>{busy === "png" ? "Saving…" : "Save to phone"}</button>
+        {wallet && <button type="button" disabled={!!busy} onClick={downloadPass} style={{ ...btn, fontSize: 16, background: tokens.primary, color: "#fff", minHeight: 48 }}>{busy === "wallet" ? "Preparing…" : "Add to Apple Wallet"}</button>}
+      </div>
+      {err && <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.primary }} className="mt-2">{err}</p>}
+    </section>
+  );
 }
 
 export function ShareCard({ pet, userId, onDone, bare = false }) {
