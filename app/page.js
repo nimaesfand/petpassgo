@@ -6,8 +6,7 @@ import SiteHeader from "../components/SiteHeader";
 import Logo from "../components/Logo";
 import { PlanCards } from "../components/PricingPlans";
 import TripHero from "../components/TripHero";
-import { US_AIRLINES, INTERNATIONAL_AIRLINES } from "../lib/airlines";
-import { AIRLINE_GUIDES } from "../lib/airlineGuides";
+import { US_AIRLINES, INTERNATIONAL_AIRLINES, airlineCoverageHeading } from "../lib/airlines";
 import { FAQ } from "../lib/faq";
 
 
@@ -28,13 +27,6 @@ const HOME_AIRLINE_GROUPS = [
   { title: "U.S.", names: US_AIRLINES },
   { title: "International", names: INTERNATIONAL_AIRLINES },
 ];
-const HOME_AIRLINE_COUNT = HOME_AIRLINE_GROUPS.reduce((n, group) => n + group.names.length, 0);
-
-function airlineTileHref(name) {
-  const guide = AIRLINE_GUIDES.find((g) => g.name === name);
-  return guide ? `/airlines/${guide.slug}` : "/assessment";
-}
-
 function Eyebrow({ children, color = tokens.stamp }) {
   return <div style={{ fontFamily: B, color, fontSize: 15, fontWeight: 700, letterSpacing: "0.08em" }} className="mb-3">{children}</div>;
 }
@@ -140,16 +132,15 @@ export default function PetPassGoLanding() {
       <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-12 lg:py-20">
         <div className="max-w-[1240px] mx-auto px-6 md:px-14">
           <Eyebrow>AIRLINES</Eyebrow>
-          <H2>{HOME_AIRLINE_COUNT} airlines across the U.S., Mexico and Canada. One place.</H2>
+          <H2>{airlineCoverageHeading()}</H2>
           <div className="mt-10 space-y-8">
             {HOME_AIRLINE_GROUPS.map((group) => (
               <div key={group.title}>
                 <h3 style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-3">{group.title}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                   {group.names.map((name) => (
-                    <a key={name} href={airlineTileHref(name)} className="airline-tile rounded-xl px-5 py-4 min-h-[48px] h-full flex items-center justify-between gap-2" style={{ background: tokens.sky, border: `1px solid ${tokens.line}`, textDecoration: "none" }}>
+                    <a key={name} href="/assessment" className="airline-tile rounded-xl px-5 py-4 min-h-[48px] h-full flex items-center" style={{ background: tokens.sky, border: `1px solid ${tokens.line}`, textDecoration: "none" }}>
                       <span style={{ fontFamily: B, fontWeight: 600, fontSize: 16, color: tokens.navy }}>{name}</span>
-                      <span style={{ color: tokens.stamp, fontWeight: 700 }} aria-hidden="true">→</span>
                     </a>
                   ))}
                 </div>
@@ -184,7 +175,7 @@ export default function PetPassGoLanding() {
       <footer className="px-6 md:px-14 py-8 text-center" style={{ borderTop: `1px solid ${tokens.line}`, fontFamily: B, fontSize: 15, lineHeight: 1.5, color: tokens.muted }}>
         <div className="flex justify-center mb-3"><Logo size={30} /></div>
         PetPassGo is a preparation tool, not a certifying authority. Requirements are set by airlines and government agencies.
-        <div className="mt-2"><a href="/lost-flyer" style={{ color: tokens.navy, textDecoration: "underline" }}>Free lost pet flyer</a>{" · "}<a href="/guarantee" style={{ color: tokens.navy, textDecoration: "underline" }}>Flight-Ready Guarantee</a>. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Conditions apply</a>{" · "}<a href="/terms" style={{ color: tokens.navy, textDecoration: "underline" }}>Terms of Service</a>{" · "}<a href="/privacy" style={{ color: tokens.navy, textDecoration: "underline" }}>Privacy Policy</a></div>
+        <div className="mt-2"><a href="/lost-flyer" style={{ color: tokens.navy, textDecoration: "underline" }}>Free lost pet flyer</a>{" · "}<a href="mailto:support@petpassgo.com" style={{ color: tokens.navy, textDecoration: "underline" }}>support@petpassgo.com</a>{" · "}<a href="/guarantee" style={{ color: tokens.navy, textDecoration: "underline" }}>Flight-Ready Guarantee</a>. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Conditions apply</a>{" · "}<a href="/terms" style={{ color: tokens.navy, textDecoration: "underline" }}>Terms of Service</a>{" · "}<a href="/privacy" style={{ color: tokens.navy, textDecoration: "underline" }}>Privacy Policy</a></div>
       </footer>
     </div>
   );

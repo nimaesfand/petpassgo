@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
 import Logo from "./Logo";
 import { LOGIN_CTA, PLAN_CTA } from "../lib/cta";
+import { readHomeIntentHref } from "../lib/tripIntent";
 
 // Airlines, Blog, and FAQ. Blog is listed because the owner approved the
 // service-dog posts on 2026-10-19. Outlines in content/drafts stay unpublished.
@@ -48,7 +49,7 @@ export default function SiteHeader({ onLogout }) {
               <a href="/login" style={link}>{LOGIN_CTA}</a>
             </>
           )}
-          <a href="/assessment" className="btn-primary rounded-full px-5 py-2.5" style={{ ...link, background: tokens.primary, color: "#fff", fontWeight: 600 }}>{PLAN_CTA}</a>
+          <a href="/assessment" onClick={(e) => { const href = readHomeIntentHref(); if (href !== "/assessment") { e.preventDefault(); window.location.href = href; } }} className="btn-primary rounded-full px-5 py-2.5" style={{ ...link, background: tokens.primary, color: "#fff", fontWeight: 600 }}>{PLAN_CTA}</a>
         </div>
       </nav>
     </header>

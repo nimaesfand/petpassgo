@@ -118,7 +118,7 @@ export default function TravelPassPreview() {
         <Shell>
           <Title>Checklist</Title>
           <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mb-3">
-            You check steps off on the pass. The step text is your airline’s, and it is hidden here. Marking this row does not save.
+            After you pay, steps split into Do these first and General prep. A ring shows how much is checked. When every step is checked, the pass says Travel Pass complete and keeps the list. The step text is hidden here. Marking this row does not save.
           </p>
           <article className="rounded-2xl overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
             <button type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)} className="w-full flex items-center gap-2.5 px-3 py-3 text-left" style={{ minHeight: 56, background: "transparent", border: "none", cursor: "pointer" }}>

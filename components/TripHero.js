@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { tokens, font } from "../lib/theme";
 import { PLAN_CTA, JOIN_CTA, LOGIN_CTA } from "../lib/cta";
-import { PET_CHOICES, REGION_CHOICES, planTripHref } from "../lib/tripIntent";
+import { PET_CHOICES, REGION_CHOICES, planTripHref, writeHomeIntent } from "../lib/tripIntent";
 import FlightPathMap from "./FlightPathMap";
 
 const D = font.display;
@@ -31,6 +31,7 @@ export default function TripHero() {
   const [region, setRegion] = useState("");
   const [pet, setPet] = useState("");
   const href = planTripHref(region, pet);
+  useEffect(() => { writeHomeIntent(region, pet); }, [region, pet]);
 
   return (
     <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.08fr)_minmax(280px,0.92fr)] lg:gap-12 lg:items-center">

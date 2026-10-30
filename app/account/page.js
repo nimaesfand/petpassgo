@@ -32,7 +32,7 @@ import TripTimeline from "../../components/TripTimeline";
 import DocCheck from "../../components/DocCheck";
 import PassChecklist from "../../components/PassChecklist";
 import RoundTripAddon from "../../components/RoundTripAddon";
-import { buildPassCards, groupCards, isServiceRole, matchesDestination } from "../../lib/passCards";
+import { buildPassCards, groupCards, isServiceRole, matchesDestination, passProgress } from "../../lib/passCards";
 import { pickTripPet } from "../../lib/tripPet";
 import { reminderSchedule, classifyReminder, todayPT } from "../../lib/travelDates";
 import { fmtTripDate } from "../../lib/tripAccess";
@@ -309,6 +309,10 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
   useEffect(() => { supabase.from("pet_health_records").select("kind,name,expires_on").eq("pet_id", pet.id).then(({ data }) => setHealthRows(data || [])); }, [pet.id, healthKey]);
   const card = cardFromPet(pet, healthRows);
   const rab = rabiesLine(card.rabiesExpires);
+  const reminders = [
+    ...documents.filter((d) => d.expires_on).map((d) => ({ id: `doc-${d.id}`, label: d.document_type, date: d.expires_on })),
+    ...healthRows.filter((h) => h.expires_on).map((h, i) => ({ id: `health-${i}-${h.name}`, label: h.name, date: h.expires_on })),
+  ].sort((a, b) => String(a.date).localeCompare(String(b.date)));
   const field = { fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 };
   const fieldCls = "rounded-lg px-3 py-2 outline-none w-full";
   const sub = (t) => <div style={{ fontFamily: font.body, fontSize: 13, fontWeight: 700, color: tokens.navy }} className="mt-2">{t}</div>;
@@ -382,7 +386,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         <span className="rounded-lg p-1 flex-shrink-0" style={{ background: "#fff" }}><PetQr petId={pet.id} size={40} color={tokens.navy} /></span>
         <span className="flex-1 min-w-0">
           <span style={{ display: "block", fontFamily: font.body, fontWeight: 800, fontSize: 16, color: "#fff" }}>Preview Pet ID</span>
-          <span style={{ display: "block", fontFamily: font.body, fontSize: 13.5, color: tokens.sky, opacity: 0.85 }}>What a finder sees when they scan</span>
+          <span style={{ display: "block", fontFamily: font.body, fontSize: 15, color: tokens.sky }}>What a finder sees when they scan</span>
         </span>
         <span style={{ color: tokens.gold, fontSize: 22, fontWeight: 700 }} aria-hidden="true">›</span>
       </button>
@@ -403,13 +407,16 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
       <ActivationChecklist pet={pet} userId={userId} refreshKey={healthKey} />
       <WhatsNeededNext pet={pet} />
 
+      <div className="grid grid-cols-3 gap-2 mt-3">
+        {[["pet-id", "Pet ID"], ["docs", "Documents"], ["reminders", "Reminders"]].map(([id, label]) => (
+          <a key={id} href={`#${id}-${pet.id}`} className="rounded-xl px-2 py-3 text-center" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontWeight: 700, fontSize: 15, textDecoration: "none", minHeight: 48 }}>{label}</a>
+        ))}
+      </div>
+
       <div className="mt-3 rounded-2xl overflow-hidden" style={{ border: `1px solid ${tokens.line}` }}>
-        <VaultSection id={`chip-${pet.id}`} title="Microchip" hint={pet.microchip_number ? `•••• ${String(pet.microchip_number).replace(/[^0-9A-Za-z]/g, "").slice(-4)}` : "Not added"}>
-          <ChipVault pet={pet} userId={userId} onChanged={onPhotoUpdated} bare />
-        </VaultSection>
-        <VaultSection id={`health-${pet.id}`} anchor="health-passport" title="Health records" hint={rab.tone === "good" ? "Rabies current" : healthRows.length ? `${healthRows.length} record${healthRows.length === 1 ? "" : "s"}` : "None yet"} hintTone={rab.tone === "bad" ? "bad" : null}>
-          <HealthPassport pet={pet} userId={userId} refreshKey={healthKey} bare onRows={(rows) => setHealthRows(rows)} />
-          <VetImport pet={pet} userId={userId} onSaved={() => { setHealthKey((v) => v + 1); onPhotoUpdated(); }} />
+        <VaultSection id={`pet-id-${pet.id}`} title="Pet ID card" hint="QR code">
+          <WalletCard pet={pet} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
+          <div className="mt-4"><ShareCard pet={pet} userId={userId} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} /></div>
         </VaultSection>
         <VaultSection id={`docs-${pet.id}`} title="Documents" hint={loadingDocs ? "" : documents.length ? `${documents.length} file${documents.length === 1 ? "" : "s"}` : "None yet"}>
           <div id={`documents-${pet.id}`}>
@@ -439,6 +446,24 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
           )}
           </div>
         </VaultSection>
+        <VaultSection id={`reminders-${pet.id}`} title="Reminders" hint={reminders.length ? `${reminders.length} dated` : "None yet"}>
+          {reminders.length === 0 ? (
+            <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>No expiry dates yet. Add one on a document or a health record and it shows up here.</p>
+          ) : (
+            <ul className="grid gap-2">
+              {reminders.map((item) => (
+                <li key={item.id} className="flex items-center justify-between gap-3 rounded-xl px-3 py-3" style={{ background: tokens.paper }}>
+                  <span style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{item.label}</span>
+                  <span style={{ fontFamily: font.body, fontSize: 15, color: item.date < new Date().toISOString().slice(0, 10) ? tokens.stamp : tokens.ink }}>{item.date < new Date().toISOString().slice(0, 10) ? "Expired" : "Expires"} {new Date(item.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </VaultSection>
+        <VaultSection id={`health-${pet.id}`} anchor="health-passport" title="Health records" hint={rab.tone === "good" ? "Rabies current" : healthRows.length ? `${healthRows.length} record${healthRows.length === 1 ? "" : "s"}` : "None yet"} hintTone={rab.tone === "bad" ? "bad" : null}>
+          <HealthPassport pet={pet} userId={userId} refreshKey={healthKey} bare onRows={(rows) => setHealthRows(rows)} />
+          <VetImport pet={pet} userId={userId} onSaved={() => { setHealthKey((v) => v + 1); onPhotoUpdated(); }} />
+        </VaultSection>
         <VaultSection id={`vet-${pet.id}`} title="Vet & emergency contact" hint={pet.vet_name || pet.emergency_contact_name ? "Saved" : "Not added"}>
           <div className="grid gap-1.5" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>
             <div><span style={{ color: tokens.muted }}>Vet: </span>{pet.vet_name || "Not added"}{pet.vet_phone ? <> · <a href={`tel:${pet.vet_phone.replace(/[^0-9+]/g, "")}`} style={{ color: tokens.primary, fontWeight: 700 }}>{pet.vet_phone}</a></> : null}</div>
@@ -466,9 +491,8 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
             <button type="submit" disabled={saving} className="rounded-full px-4 py-2" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 14.5, border: "none" }}>{saving ? "…" : "Log"}</button>
           </form>
         </VaultSection>
-        <VaultSection id={`share-${pet.id}`} title="Care Card & QR card" hint="For sitters and vets">
-          <ShareCard pet={pet} userId={userId} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
-          <WalletCard pet={pet} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
+        <VaultSection id={`chip-${pet.id}`} title="Microchip" hint={pet.microchip_number ? `•••• ${String(pet.microchip_number).replace(/[^0-9A-Za-z]/g, "").slice(-4)}` : "Not added"}>
+          <ChipVault pet={pet} userId={userId} onChanged={onPhotoUpdated} bare />
         </VaultSection>
         <VaultSection id={`more-${pet.id}`} title="Find a vet and trips flown" hint="" last>
           <FindAVet pet={pet} />
@@ -479,14 +503,14 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
   );
 }
 
-function VaultSection({ id, anchor, title, hint, hintTone, children, last }) {
+function VaultSection({ id, anchor, title, hint, hintTone, children, last, open }) {
   return (
-    <details id={id} data-vault-section className="group" style={{ borderBottom: last ? "none" : `1px solid ${tokens.line}`, background: "#fff" }}>
+    <details id={id} open={open} data-vault-section className="group" style={{ borderBottom: last ? "none" : `1px solid ${tokens.line}`, background: "#fff" }}>
       {anchor && <span id={anchor} />}
       <summary className="flex items-center justify-between gap-3 px-4 py-3.5" style={{ cursor: "pointer", listStyle: "none" }}>
         <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{title}</span>
         <span className="flex items-center gap-2 min-w-0">
-          {hint && <span style={{ fontFamily: font.body, fontSize: 13.5, color: hintTone === "bad" ? tokens.primary : tokens.muted, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{hint}</span>}
+          {hint && <span style={{ fontFamily: font.body, fontSize: 15, color: hintTone === "bad" ? tokens.primary : tokens.muted, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{hint}</span>}
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={tokens.muted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-open:rotate-90 flex-shrink-0" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
         </span>
       </summary>
@@ -835,7 +859,7 @@ function tripIsPast(t) {
   return t.travel_date < today && (!t.return_date || t.return_date < today);
 }
 
-// Calm overview: next-trip countdown, ONE consolidated Needs Action list
+// Dashboard overview: next-trip countdown, ONE consolidated Needs Action list
 // (time-sensitive reminders first, then open checklist steps, de-duplicated),
 // then the vault. Everything detailed lives under My Trips.
 export function DashboardTab({ userId, onOpenTrips }) {
@@ -864,8 +888,8 @@ export function DashboardTab({ userId, onOpenTrips }) {
       const seen = new Set(list.map((a) => a.label.toLowerCase()));
       const grouped = groupCards(buildPassCards(reqs || [], current), doneMap);
       doneN = grouped.done.length;
-      setStepTotal(grouped.first.length + grouped.confirm.length + grouped.done.length);
-      for (const card of [...grouped.first, ...grouped.confirm]) {
+      setStepTotal(passProgress(grouped).total);
+      for (const card of [...grouped.first, ...grouped.general]) {
         if (seen.has(card.shortTitle.toLowerCase())) continue;
         seen.add(card.shortTitle.toLowerCase());
         list.push({ key: `card-${card.id}`, label: card.shortTitle, hint: "Checklist" });
@@ -1026,13 +1050,14 @@ function CurrentFlightTab({ userId }) {
     );
   }
 
+  const tripPet = petForTrip;
   const passCards = buildPassCards(results, { ...trip, pet: tripPet });
   const passGroups = groupCards(passCards, statusMap);
-  const actionItems = [...passGroups.first, ...passGroups.confirm];
-  const tripPet = petForTrip;
-  const trackedTotal = actionItems.length + passGroups.done.length;
-  const trackedDone = passGroups.done.length;
-  const progressPct = trackedTotal > 0 ? Math.round((trackedDone / trackedTotal) * 100) : 0;
+  const actionItems = [...passGroups.first, ...passGroups.general];
+  const progress = passProgress(passGroups);
+  const trackedTotal = progress.total;
+  const trackedDone = progress.done;
+  const progressPct = progress.pct;
   const serviceDogMismatch = trip.paid && isServiceRole(trip.role) && trip.animal_type && !/dog/i.test(trip.animal_type);
 
   if (trip.paid && isTravelDay(trip) && !showFull) {
@@ -1080,8 +1105,7 @@ function CurrentFlightTab({ userId }) {
           <div className="w-full h-[6px] rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.15)" }}>
             <div className="h-full rounded-full transition-all duration-500" style={{ width: `${progressPct}%`, background: progressPct >= 100 ? "#7DCEA0" : tokens.stamp }} />
           </div>
-          {progressPct >= 100 && <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.gold }} className="mt-2">100% — you’re ready to fly.</div>}
-          {progressPct >= 50 && progressPct < 100 && <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.gold }} className="mt-2">50% milestone — halfway there.</div>}
+          {progress.complete && <div style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.gold }} className="mt-2">Travel Pass complete</div>}
         </>}
       </div>
 

@@ -64,7 +64,7 @@ export function TripCountdown({ trip, pet, done, total }) {
       <div className="flex-1 min-w-0">
         <div style={{ fontFamily: font.display, fontSize: 21, fontWeight: 700, color: tokens.navy, lineHeight: 1.2 }}>{headline}</div>
         <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">
-          {total > 0 ? (done === total ? "Every step is checked off. Great job!" : `${done} of ${total} steps done. Check them off below as you go.`) : "Your checklist is below."}
+          {total > 0 ? (done === total ? "Travel Pass complete. Every step stays saved on this pass." : `${done} of ${total} steps done.`) : "Your checklist is below."}
         </div>
       </div>
       {total > 0 && (

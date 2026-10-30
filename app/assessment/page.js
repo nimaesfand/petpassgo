@@ -6,7 +6,6 @@ import { supabase } from "../../lib/supabaseClient";
 import { US_AIRLINES, INTERNATIONAL_AIRLINES, OTHER_AIRLINE } from "../../lib/airlines";
 import { pickTripPet } from "../../lib/tripPet";
 import AirportField from "../../components/AirportField";
-import FlightLookup, { airportLabel, airlineFromFlight } from "../../components/FlightLookup";
 import { readTripIntent } from "../../lib/tripIntent";
 import { fmtTripDate } from "../../lib/tripAccess";
 import { trackEvent, trackBeginCheckout, getAttribution } from "../../lib/analytics";
@@ -339,37 +338,30 @@ export default function PetPassGoQuiz() {
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
                 Pet, service dog, or ESA?
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="mb-5">
-                A psychiatric service dog (PSD) is a service dog. An emotional support animal is not.{" "}
-                <a href="/blog/service-dog-vs-esa-vs-psd-flying" style={{ color: tokens.navy, fontWeight: 600 }}>How they differ when you fly.</a>
+              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-5">
+                A psychiatric service dog (PSD) is a service dog. An emotional support animal is not.
               </p>
               <div className="flex flex-col gap-3">
                 <OptionCard label="Pet" sub="Traveling for companionship, not task-trained" selected={answers.role === "Pet" && !answers.esa} onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: false, psd: false }))} />
                 <OptionCard label="Service dog" sub="Task-trained dog, including a psychiatric service dog (PSD)" selected={answers.role === "Service animal"} onClick={() => setAnswers((a) => ({ ...a, role: "Service animal", esa: false }))} />
-                <OptionCard label="Emotional support animal" sub="Flies as a pet since 2021 — carrier and the airline pet fee" selected={answers.role === "Pet" && answers.esa} onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: true, psd: false }))} />
+                <OptionCard label="Emotional support animal" sub="Flies as a pet" selected={answers.role === "Pet" && answers.esa} onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: true, psd: false }))} />
               </div>
               {answers.esa && (
                 <div className="rounded-xl p-4 mt-4" style={{ background: tokens.sky }}>
-                  <div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>Your ESA flies as a pet</div>
-                  <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, lineHeight: 1.45 }} className="mt-1">Since 2021, U.S. airlines don’t treat emotional support animals as service animals. You’ll follow the pet path: a carrier under the seat and the airline’s pet fee. No DOT service-animal form.</p>
+                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>Your ESA flies as a pet</div>
+                  <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink, lineHeight: 1.45 }} className="mt-1">The Travel Pass uses the pet path after you pay.</p>
                 </div>
               )}
               {answers.role === "Service animal" && answers.animal === "Dog" && (
                 <label className="flex items-start gap-3 mt-4 rounded-xl p-4" style={{ background: tokens.sky, cursor: "pointer" }}>
                   <input type="checkbox" checked={!!answers.psd} onChange={(e) => set("psd", e.target.checked)} className="mt-1" />
-                  <span style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}><b>This is a PSD.</b> A psychiatric service dog is a service dog trained to do work for a psychiatric disability. Same DOT form as any service dog. Not an ESA, and not a letter you buy.</span>
+                  <span style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}><b>This is a PSD.</b> A psychiatric service dog is a service dog. It is not an emotional support animal.</span>
                 </label>
-              )}
-              {answers.role === "Service animal" && answers.animal === "Dog" && (
-                <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-3">
-                  The airline can ask for the <a href="/blog/dot-service-animal-form" style={{ color: tokens.navy, fontWeight: 600 }}>DOT service animal form</a>.
-                  {answers.psd ? <> A PSD does not need a <a href="/blog/do-you-need-a-psd-letter" style={{ color: tokens.navy, fontWeight: 600 }}>letter or certificate</a>.</> : null}
-                </p>
               )}
               {answers.role === "Service animal" && answers.animal && answers.animal !== "Dog" && (
                 <div className="rounded-xl p-4 mt-4" style={{ background: "#FFF7F2", border: `1px solid ${tokens.primary}` }}>
-                  <div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>U.S. airlines only recognize dogs as service animals</div>
-                  <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, lineHeight: 1.45 }} className="mt-1 mb-3">A cat or other animal can’t fly as a service animal. They fly as pets (carrier and pet fee). You can switch to the pet path and keep going, or go back and choose Dog.</p>
+                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>U.S. airlines recognize dogs as service animals</div>
+                  <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink, lineHeight: 1.45 }} className="mt-1 mb-3">A cat or other animal flies as a pet. Switch to the pet path, or go back and choose Dog.</p>
                   <button type="button" onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: false, psd: false }))} className="rounded-full px-5 py-3" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, border: "none", cursor: "pointer" }}>Switch to the pet path</button>
                 </div>
               )}
@@ -391,12 +383,6 @@ export default function PetPassGoQuiz() {
                 <AirportField key={`o-${answers.origin}`} label="Departing from (type a city)" value={answers.origin} onSelect={(v) => set("origin", v)} />
                 <AirportField key={`d-${answers.destination}`} label="Flying to (type a city)" value={answers.destination} onSelect={(v) => set("destination", v)} />
               </div>
-              <details className="mt-4">
-                <summary style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy, cursor: "pointer" }}>Optional: look up a flight number</summary>
-                <div className="mt-3">
-                  <FlightLookup date={answers.date} onFill={(f) => setAnswers((a) => ({ ...a, flight_number: f.flight_iata || a.flight_number, flight_snapshot: f, origin: airportLabel(f.departure?.iata, f.departure?.airport) || a.origin, destination: airportLabel(f.arrival?.iata, f.arrival?.airport) || a.destination, airline: airlineFromFlight(f) || a.airline, date: f.date_was_requested ? (f.flight_date || a.date) : a.date }))} />
-                </div>
-              </details>
               <NavRow onBack={back} onNext={next} nextDisabled={!answers.origin || !answers.destination} />
             </>
           )}
@@ -435,10 +421,7 @@ export default function PetPassGoQuiz() {
                 <div className="mt-4">
                   <label style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.navy }}>Return date</label>
                   <input type="date" value={answers.return_date} min={answers.date || undefined} onChange={(e) => set("return_date", e.target.value)} aria-label="Return date" className="rounded-xl px-4 outline-none w-full mt-1" style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, height: 52 }} />
-                  <div className="mt-3">
-                    <FlightLookup mode="return" date={answers.return_date} onFill={(f) => setAnswers((a) => ({ ...a, return_flight_number: f.flight_iata || a.return_flight_number, return_flight_snapshot: f, return_date: f.date_was_requested ? (f.flight_date || a.return_date) : a.return_date }))} />
-                  </div>
-                  {answers.return_date && <p style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>Back {fmtTripDate(answers.return_date)}</p>}
+                  {answers.return_date && <p style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mt-2">Back {fmtTripDate(answers.return_date)}</p>}
                 </div>
               )}
               <NavRow onBack={back} onNext={next} nextDisabled={!answers.date || (answers.round_trip && !answers.return_date)} />

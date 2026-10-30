@@ -1,15 +1,32 @@
+import fs from "fs";
+import path from "path";
 import { SITE_URL } from "../lib/site";
 import { AIRLINE_GUIDES } from "../lib/airlineGuides";
 import { getAllPosts } from "../lib/blog";
 
+const APP = path.join(process.cwd(), "app");
+
+function pageExists(segments) {
+  return fs.existsSync(path.join(APP, ...segments, "page.js"));
+}
+
+function entry(urlPath, now, changeFrequency, priority) {
+  return { url: `${SITE_URL}${urlPath}`, lastModified: now, changeFrequency, priority };
+}
+
+// Only routes that have a page. There is no /contact page.
+// Customer contact is support@petpassgo.com (see the site Organization markup).
 export default function sitemap() {
   const now = new Date();
-  const pages = ["", "/assessment", "/airlines", "/blog", "/faq", "/pet-vault", "/travel-pass"].map((p) => ({
-    url: `${SITE_URL}${p}`, lastModified: now, changeFrequency: "weekly", priority: p === "" ? 1 : 0.7,
-  }));
-  const extra = ["/lost-flyer"].map((p) => ({ url: `${SITE_URL}${p}`, lastModified: now, changeFrequency: "monthly", priority: 0.6 }));
-  const legal = ["/terms", "/privacy", "/guarantee"].map((p) => ({ url: `${SITE_URL}${p}`, lastModified: new Date("2026-10-28"), changeFrequency: "yearly", priority: 0.3 }));
-  const airlines = AIRLINE_GUIDES.map((a) => ({ url: `${SITE_URL}/airlines/${a.slug}`, lastModified: now, changeFrequency: "monthly", priority: 0.6 }));
-  const posts = getAllPosts().map((p) => ({ url: `${SITE_URL}/blog/${p.slug}`, lastModified: new Date(p.date || now), changeFrequency: "monthly", priority: 0.5 }));
-  return [...pages, ...extra, ...legal, ...airlines, ...posts];
+  const staticPaths = ["", "/assessment", "/airlines", "/blog", "/faq", "/pet-vault", "/travel-pass", "/lost-flyer", "/terms", "/privacy", "/guarantee"];
+  const pages = staticPaths
+    .filter((p) => pageExists(p.split("/").filter(Boolean)))
+    .map((p) => entry(p, now, p === "/terms" || p === "/privacy" || p === "/guarantee" ? "yearly" : p === "/lost-flyer" ? "monthly" : "weekly", p === "" ? 1 : p === "/terms" || p === "/privacy" || p === "/guarantee" ? 0.3 : p === "/lost-flyer" ? 0.6 : 0.7));
+  const airlines = pageExists(["airlines", "[airline]"])
+    ? AIRLINE_GUIDES.filter((a) => /^[a-z0-9-]+$/.test(a.slug)).map((a) => entry(`/airlines/${a.slug}`, now, "monthly", 0.6))
+    : [];
+  const posts = pageExists(["blog", "[slug]"])
+    ? getAllPosts().map((p) => entry(`/blog/${p.slug}`, new Date(p.date || now), "monthly", 0.5))
+    : [];
+  return [...pages, ...airlines, ...posts];
 }
