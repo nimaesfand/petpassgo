@@ -3,7 +3,6 @@
 import Icon from "../../components/Icon";
 import { telHref } from "../../lib/linkify";
 import { VAULT_NAME, VAULT_SUB, MEMBERSHIP_TERMS } from "../../lib/travelPassOffer";
-import GuaranteeLine from "../../components/GuaranteeLine";
 import TrustBadges from "../../components/TrustBadges";
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
@@ -670,7 +669,6 @@ function UnlockTripCard({ trip }) {
       <MarketingOptIn checked={tips} onChange={setTips} />
       <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
       <button disabled={busy} onClick={unlock} className="rounded-full px-6 py-3" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}>Unlock this trip</button>
-      <GuaranteeLine align="center" />
       <TrustBadges className="mt-4 text-left" />
     </div>
   );
@@ -775,8 +773,7 @@ export function DashboardTab({ userId, onOpenTrips }) {
         </button>
       ) : trip?.paid ? <TripCountdown trip={trip} pet={pet} done={doneCount} total={stepTotal} /> : (
         <div className="rounded-2xl p-7 mb-6 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-          <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }} className="mb-2">Where are you and your pets flying to?</div>
-          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-5">Answer a few trip questions and your plan, reminders and checklist land here.</p>
+          <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }} className="mb-5">Where are you and your pets flying to?</div>
           <a href="/assessment" className="rounded-full px-6 py-3 inline-block" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>{PLAN_CTA}</a>
         </div>
       )}
@@ -894,11 +891,8 @@ function CurrentFlightTab({ userId }) {
   if (!trip) {
     return (
       <div className="rounded-xl p-8 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}` }}>
-        <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-2">
+        <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-4">
           No trip yet
-        </div>
-        <div style={{ fontFamily: font.body, fontSize: 15.5, opacity: 0.7 }} className="mb-4">
-          Plan my trip to get your Travel Pass, and it'll show up here.
         </div>
         <a
           href="/assessment"

@@ -72,7 +72,7 @@ export async function POST(req) {
     }
     if (b.action === "help_links") {
       const c = await customer(ctx.admin, target); if (!c) return NextResponse.json({ error: "Customer not found" }, { status: 404 });
-      const links = ["https://petpassgo.com/login", "https://petpassgo.com/assessment", "https://petpassgo.com/account", "mailto:support@petpassgo.com"];
+      const links = ["https://petpassgo.com/login", "https://petpassgo.com/assessment", "https://petpassgo.com/account", "https://petpassgo.com/contact"];
       let sent = false;
       if (process.env.RESEND_API_KEY && process.env.REMINDER_FROM_EMAIL && c.email) {
         const r = await sendResendEmail({ to: c.email, kind: "help_links", subject: "PetPassGo help links", text: `Hi from PetPassGo support,\n\nHere are the links you asked for:\n${links.join("\n")}\n\nIf you still need help, reply to this email.\n\n— PetPassGo` });

@@ -11,7 +11,7 @@ const TILES = [
 
 export default function VaultCluster() {
   return (
-    <figure>
+    <div>
       <div className="grid grid-cols-2 gap-3">
         {TILES.map((tile) => (
           <div key={tile.label} className="rounded-2xl p-3.5 flex items-center gap-3 min-h-[72px]" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 8px 20px rgba(20,33,61,0.05)" }}>
@@ -34,8 +34,8 @@ export default function VaultCluster() {
               <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }} className="mt-1">Dog</div>
             </div>
           </div>
-          <div className="mt-3 rounded-xl px-3 py-2.5" style={{ border: `2px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 15, lineHeight: 1.4, color: tokens.muted }}>
-            QR code appears after you add a pet.
+          <div className="mt-3 rounded-xl px-3 py-2.5" style={{ border: `2px dashed ${tokens.line}`, fontFamily: font.body, fontWeight: 700, fontSize: 15, letterSpacing: "0.06em", lineHeight: 1.4, color: tokens.navy }}>
+            QR CODE
           </div>
         </div>
         <div className="rounded-2xl px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: `linear-gradient(160deg, ${tokens.navy} 0%, ${tokens.navyDeep} 100%)`, boxShadow: "0 12px 28px rgba(20,33,61,0.16)" }} aria-hidden="true">
@@ -46,9 +46,6 @@ export default function VaultCluster() {
           <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 15, color: "#fff", lineHeight: 1.2 }} className="mt-1">PetPassGo</span>
         </div>
       </div>
-      <figcaption style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.45, color: tokens.muted }} className="mt-3">
-        Example profile. Not a real pet. Your name, photo, and QR code show up after you add one.
-      </figcaption>
-    </figure>
+    </div>
   );
 }

@@ -39,11 +39,6 @@ export default function TravelPassPreview() {
 
   return (
     <div className="mt-8">
-      <p className="mb-3" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>
-        <span className="rounded-full px-3 py-1 mr-2" style={{ background: tokens.gold, color: tokens.navy, fontWeight: 700 }}>Preview</span>
-        Sample trip only. Airline rules, real dates, and flight details stay hidden until you pay.
-      </p>
-
       <div className="rounded-3xl p-5 sm:p-6 mb-4" style={{ background: tokens.navy }}>
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -83,7 +78,6 @@ export default function TravelPassPreview() {
           <SoftCard title="Flight status" action={<StatusChip>On schedule</StatusChip>}>
             <RouteLine from="LAX" to="JFK" />
             <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mt-3">Apr 18 · 9:10 AM sample · Nonstop · 5h 15m</p>
-            <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-1">Sample status. A live flight shows here after you pay and add a flight number.</p>
             <div className="mt-3"><TextButton onClick={() => setSection("flight")}>View full flight details</TextButton></div>
           </SoftCard>
           <SoftCard title="Weather at destination">
@@ -95,7 +89,6 @@ export default function TravelPassPreview() {
               </div>
             </div>
             <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mt-3">High 72° · Low 54° · Wind 9 mph</p>
-            <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-1">Sample weather. The paid pass shows live weather at both airports, plus a cargo heat and cold check.</p>
           </SoftCard>
           <SoftCard title="Vets and pet stores" action={null}>
             <div className="flex gap-4">
@@ -106,7 +99,6 @@ export default function TravelPassPreview() {
                 </div>
               ))}
             </div>
-            <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-3">Names stay hidden until you pay. They come from public map data near arrival and departure.</p>
             <div className="mt-3"><TextButton onClick={() => setSection("destination")}>View map & locations</TextButton></div>
           </SoftCard>
           <SoftCard title="Travel checklist">
@@ -133,7 +125,6 @@ export default function TravelPassPreview() {
                 </li>
               ))}
             </ul>
-            <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-3">Sample dates. On a paid pass, reminders use your travel date and any Vault expiration dates.</p>
           </SoftCard>
           <SoftCard title="Your documents">
             <div className="grid grid-cols-2 gap-2">
@@ -144,7 +135,6 @@ export default function TravelPassPreview() {
                 </div>
               ))}
             </div>
-            <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-3">The DOT form is a PDF for a service-dog trip you mark yourself. PetPassGo does not decide that status.</p>
           </SoftCard>
         </div>
       )}
@@ -152,13 +142,12 @@ export default function TravelPassPreview() {
       {section === "flight" && (
         <SoftCard title="Flight and weather">
           <RouteLine from="LAX" to="JFK" />
-          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mt-3">After you pay, this screen shows live flight status when you add a flight number, weather at both airports, and a cargo temperature check for heat and cold. No airline page is linked on this preview.</p>
+          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mt-3">Live flight status, weather at both airports, and a cargo heat and cold check.</p>
         </SoftCard>
       )}
 
       {section === "checklist" && (
         <SoftCard title="Checklist">
-          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mb-3">These rows are a sample of the layout. They are not airline rules, and marking one does not save. After you pay, steps split into Do these first and General prep, with due dates and a progress count.</p>
           <ul className="space-y-2">
             {DEMO_STEPS.map((step, i) => (
               <li key={step}>
@@ -191,7 +180,6 @@ export default function TravelPassPreview() {
 
       {section === "documents" && (
         <SoftCard title="Documents">
-          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mb-3">Your Pet ID opens from the paid pass. This preview is not a real ID, and nothing here is verified.</p>
           <ul className="space-y-2">
             {["Pet ID", "Vaccination records", "DOT service animal form, when the trip is a service dog", "Travel Pass summary"].map((label) => (
               <li key={label} className="rounded-xl px-4 py-3" style={{ background: tokens.paper, fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{label}</li>
@@ -202,7 +190,7 @@ export default function TravelPassPreview() {
 
       {section === "destination" && (
         <SoftCard title="Destination">
-          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>Vets and pet stores near where you land, and near where you leave, from public map data. Place names are not shown until the trip is paid.</p>
+          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>Vets and pet stores near where you land, and near where you leave.</p>
           <div className="flex gap-4 mt-4">
             {[["stethoscope", "Vets"], ["bag", "Pet stores"]].map(([icon, label]) => (
               <div key={label} className="flex flex-col items-center gap-2">

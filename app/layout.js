@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
           name: SITE_NAME,
           url: SITE_URL,
           email: "support@petpassgo.com",
-          contactPoint: { "@type": "ContactPoint", contactType: "customer support", email: "support@petpassgo.com" },
+          contactPoint: { "@type": "ContactPoint", contactType: "customer support", email: "support@petpassgo.com", url: `${SITE_URL}/contact` },
         }} />
         {children}
         <Analytics />

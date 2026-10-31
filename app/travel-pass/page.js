@@ -1,7 +1,6 @@
 import SiteHeader from "../../components/SiteHeader";
 import { TrackOnMount } from "../../components/Analytics";
 import TravelPassPreview from "../../components/TravelPassPreview";
-import GuaranteeLine from "../../components/GuaranteeLine";
 import TrustBadges from "../../components/TrustBadges";
 import Icon from "../../components/Icon";
 import { PRICES as P } from "../../lib/pricing";
@@ -62,7 +61,6 @@ export default function TravelPassPage() {
             Includes Pet Vault until 7 days after the trip. If you add a return date, that runs until 7 days after you fly back. Members add a Travel Pass for {P.memberPass}.
           </p>
           <a href="/assessment" className="btn-primary inline-flex items-center justify-center rounded-full px-8 py-4 w-full sm:w-auto min-h-[56px]" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 18, textDecoration: "none" }}>{PLAN_CTA}</a>
-          <GuaranteeLine align="center" tone="light" />
         </div>
       </section>
       <div className="max-w-[1100px] mx-auto px-4 sm:px-6 py-8">

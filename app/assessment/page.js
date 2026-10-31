@@ -14,7 +14,6 @@ import SiteHeader from "../../components/SiteHeader";
 import Icon from "../../components/Icon";
 import { PLAN_CTA } from "../../lib/cta";
 import { tokens, font } from "../../lib/theme";
-import GuaranteeLine from "../../components/GuaranteeLine";
 import TrustBadges from "../../components/TrustBadges";
 import WithdrawalConsent from "../../components/WithdrawalConsent";
 import MarketingOptIn from "../../components/MarketingOptIn";
@@ -144,7 +143,6 @@ export default function PetPassGoQuiz() {
   const [autoBuy, setAutoBuy] = useState(""); // set when returning signed in from signup/login with a saved purchase
   const [booted, setBooted] = useState(false);
   const [regionHint, setRegionHint] = useState("");
-  const [prefilled, setPrefilled] = useState(false);
   // Real membership status (read-only; only the server/Stripe can set it). The checkbox
   // further down is a pre-launch preview only and is hidden when NEXT_PUBLIC_SITE_LAUNCHED=true.
   useEffect(() => {
@@ -196,10 +194,7 @@ export default function PetPassGoQuiz() {
       }
       const intent = readTripIntent(window.location.search);
       if (intent.region) setRegionHint(intent.region);
-      if (intent.pet) {
-        setAnswers((a) => ({ ...a, ...intent.answers }));
-        setPrefilled(true);
-      } else if (intent.region) setPrefilled(true);
+      if (intent.pet) setAnswers((a) => ({ ...a, ...intent.answers }));
       if (intent.step) setStep(intent.step);
     } finally {
       setBooted(true);
@@ -302,19 +297,11 @@ export default function PetPassGoQuiz() {
 
         </div>
 
-        {step < 5 && (
-          <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-4 text-center">A few questions about your pet, route, and airline. Then checkout. The checklist is in your pass after you pay.</p>
-        )}
         <div className="rounded-2xl p-6 md:p-9" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.06)" }}>
           {!booted ? (
             <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }}>Loading your questions…</p>
           ) : (<>
           {step < TOTAL_STEPS && <ProgressStub step={step} />}
-          {prefilled && step < 5 && (
-            <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.navy, fontWeight: 600 }} className="mb-4">
-              {[regionHint === "domestic" ? "Domestic: U.S., Canada and Mexico" : regionHint === "international" ? "International" : "", answers.role === "Service animal" ? "Service animal" : answers.esa ? "ESA" : answers.animal].filter(Boolean).join(" · ") || "Your choices"}. Change any answer.
-            </p>
-          )}
 
           {step === 0 && (
             <>
@@ -374,14 +361,9 @@ export default function PetPassGoQuiz() {
 
           {step === 2 && (
             <>
-              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
+              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-5">
                 Where are you flying from and to?
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-5">
-                City or airport code is fine.
-                {regionHint === "domestic" ? " Domestic: U.S., Canada and Mexico." : ""}
-                {regionHint === "international" ? " International." : ""}
-              </p>
               <div className="flex flex-col gap-3" style={{ position: "relative", zIndex: 1 }}>
                 <AirportField key={`o-${answers.origin}`} label="Departing from (type a city)" value={answers.origin} onSelect={(v) => set("origin", v)} />
                 <AirportField key={`d-${answers.destination}`} label="Flying to (type a city)" value={answers.destination} onSelect={(v) => set("destination", v)} />
@@ -436,9 +418,11 @@ export default function PetPassGoQuiz() {
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
                 Which airline?
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-4">
-                {answers.flight_snapshot && answers.airline ? `Filled in from your flight number: ${answers.airline}. Change it if that’s wrong.` : regionHint === "domestic" ? "Domestic starts with U.S., Canada and Mexico airlines. You can still pick another." : regionHint === "international" ? "International airlines are listed first. You can still pick a U.S. airline." : "U.S. airlines first, then international. Search if you don’t see yours."}
-              </p>
+              {answers.flight_snapshot && answers.airline ? (
+                <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-4">
+                  Filled in from your flight number: {answers.airline}. Change it if that’s wrong.
+                </p>
+              ) : null}
               <input
                 value={airlineQuery}
                 onChange={(e) => setAirlineQuery(e.target.value)}
@@ -455,8 +439,7 @@ export default function PetPassGoQuiz() {
           {step === 5 && (
             <>
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-2">Choose your pass</h2>
-              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted, lineHeight: 1.5 }} className="mb-5">We have your pet, route, dates, and airline. Airline rules and the checklist are in the pass after you pay.</p>
-              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-3">Prices are in US dollars (USD).</p>
+              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-5">Prices are in US dollars (USD).</p>
               <MarketingOptIn checked={tips} onChange={setTips} />
               <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setConsentErr(""); }} error={consentErr} />
               {isMember ? (
@@ -468,7 +451,6 @@ export default function PetPassGoQuiz() {
                   <button type="button" onClick={() => handlePurchase("pass")} className="w-full mt-4 py-2" style={{ background: "none", border: "none", fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy, cursor: "pointer", textDecoration: "underline" }}>Travel Pass only · {usd(P.pass)}</button>
                 </>
               )}
-              <GuaranteeLine align="center" />
               <TrustBadges className="mt-4 text-left" />
               <div className="mt-6">
                 <button onClick={back} style={{ fontFamily: font.body, color: tokens.ink, fontSize: 16 }}>← Back</button>

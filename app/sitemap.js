@@ -14,11 +14,10 @@ function entry(urlPath, now, changeFrequency, priority) {
   return { url: `${SITE_URL}${urlPath}`, lastModified: now, changeFrequency, priority };
 }
 
-// Only routes that have a page. There is no /contact page.
-// Customer contact is support@petpassgo.com (see the site Organization markup).
+// Only routes that have a page.
 export default function sitemap() {
   const now = new Date();
-  const staticPaths = ["", "/assessment", "/airlines", "/blog", "/faq", "/pet-vault", "/travel-pass", "/lost-flyer", "/terms", "/privacy", "/guarantee"];
+  const staticPaths = ["", "/assessment", "/airlines", "/blog", "/faq", "/contact", "/pet-vault", "/travel-pass", "/lost-flyer", "/terms", "/privacy", "/guarantee"];
   const pages = staticPaths
     .filter((p) => pageExists(p.split("/").filter(Boolean)))
     .map((p) => entry(p, now, p === "/terms" || p === "/privacy" || p === "/guarantee" ? "yearly" : p === "/lost-flyer" ? "monthly" : "weekly", p === "" ? 1 : p === "/terms" || p === "/privacy" || p === "/guarantee" ? 0.3 : p === "/lost-flyer" ? 0.6 : 0.7));

@@ -7,9 +7,11 @@ const BADGES = [
   { icon: "lock", title: "Secure checkout with Stripe", line: "Card payments go through Stripe. We don’t store your full card number." },
   { icon: "link", title: "Rules checked on official airline sites", line: "Each rule in a Travel Pass shows its source and the Last checked date." },
   { icon: "shield", title: "Your info stays private", line: "Finder messages never show your phone number." },
-  { icon: "message", title: "Real support", line: "Email support@petpassgo.com and a person replies." },
-  { icon: "checkCircle", title: "Flight-Ready Guarantee", line: "If a requirement we showed was wrong and your pet was refused boarding, we refund that Travel Pass." },
+  { icon: "message", title: "Real support", line: "Questions answered within 24 hours.", href: "/contact" },
+  { icon: "checkCircle", title: "Flight-Ready Guarantee", line: "If a requirement we showed was wrong and your pet was refused boarding, we refund that Travel Pass.", link: { href: "/guarantee", label: "See terms", testId: "guarantee-link" } },
 ];
+
+const linkStyle = { color: tokens.navy, fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 3 };
 
 export default function TrustBadges({ className = "" }) {
   return (
@@ -21,7 +23,16 @@ export default function TrustBadges({ className = "" }) {
           </span>
           <span className="min-w-0">
             <span className="block" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, lineHeight: 1.3, color: tokens.navy }}>{b.title}</span>
-            <span className="block mt-1" style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.45, color: tokens.ink }}>{b.line}</span>
+            <span className="block mt-1" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>
+              {b.href ? (
+                <a href={b.href} style={linkStyle}>{b.line}</a>
+              ) : (
+                <>
+                  {b.line}
+                  {b.link ? <>{" "}<a href={b.link.href} data-testid={b.link.testId} style={linkStyle}>{b.link.label}</a></> : null}
+                </>
+              )}
+            </span>
           </span>
         </li>
       ))}

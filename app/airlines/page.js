@@ -19,7 +19,7 @@ export default function AirlinesIndex() {
       <SiteHeader />
       <Prose>
         <h1 style={{ fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: 40, color: "#14213D" }} className="mb-3">Airlines</h1>
-        <p className="mb-8" style={{ fontSize: 17, lineHeight: 1.5 }}>{coverage}. The checklist for your airline and route is in the Travel Pass after you pay.</p>
+        <p className="mb-8" style={{ fontSize: 17, lineHeight: 1.5 }}>{coverage}.</p>
         <div className="grid grid-cols-2 gap-3">
           {coveredAirlineNames().map((name) => {
             const guide = guideByName.get(name);

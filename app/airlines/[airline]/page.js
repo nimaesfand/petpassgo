@@ -32,10 +32,8 @@ export default function AirlineGuide({ params }) {
         {a.note && <p className="mb-4 rounded-xl p-4" style={{ background: "#F3F5F9", fontSize: 16, lineHeight: 1.5 }}>{a.note}</p>}
         <p className="mb-6" style={{ lineHeight: 1.7, fontSize: 16 }}>
           {a.name} sets its own rules for pets and service dogs, and those rules change. Your route can add more.
-          The checklist for this airline and your route is in the Travel Pass after you plan the trip and pay.
         </p>
         <div className="rounded-2xl p-6" style={{ background: "#14213D", color: "#F3F5F9" }}>
-          <p className="mb-4" style={{ fontSize: 16, lineHeight: 1.5 }}>A few questions about your pet and this trip, then checkout.</p>
           <a href="/assessment" className="btn-primary inline-block rounded-full px-6 py-3" style={{ background: "#C2410C", color: "#fff", fontWeight: 700, textDecoration: "none" }}>Plan my trip</a>
         </div>
       </Prose>
