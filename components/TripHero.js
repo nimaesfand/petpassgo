@@ -5,6 +5,7 @@ import { tokens, font } from "../lib/theme";
 import { PLAN_CTA } from "../lib/cta";
 import { PET_CHOICES, REGION_CHOICES, planTripHref, writeHomeIntent } from "../lib/tripIntent";
 import FlightPathMap from "./FlightPathMap";
+import ExampleRouteCard from "./home/ExampleRouteCard";
 
 const D = font.display;
 const B = font.body;
@@ -35,47 +36,54 @@ export default function TripHero() {
   useEffect(() => { writeHomeIntent(region, pet); }, [region, pet]);
 
   return (
-    <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.08fr)_minmax(280px,0.92fr)] lg:gap-12 lg:items-center">
-      <div className="contents lg:flex lg:flex-col lg:gap-6">
-        <div className="order-1 lg:order-none">
-          <h1 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[32px] sm:text-[48px] lg:text-[60px] font-bold">
-            Flying with your pet? Skip the guesswork.
-          </h1>
-          <p style={{ fontFamily: B, color: tokens.ink, fontSize: 16, lineHeight: 1.5 }} className="mt-3 max-w-[36rem]">
-            Get the exact steps for your trip, your airline, and your pet.
-          </p>
-        </div>
+    <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.95fr)] lg:gap-x-12 lg:gap-y-0 lg:items-start">
+      <div className="order-1 lg:col-start-1 lg:row-start-1">
+        <h1 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05, textWrap: "balance" }} className="text-[32px] sm:text-[48px] lg:text-[56px] font-bold">
+          <span className="block">Travel with your pet.</span>
+          <span className="block" style={{ color: tokens.primary }}>Without the stress.</span>
+        </h1>
+        <p style={{ fontFamily: B, color: tokens.ink, fontSize: 18, lineHeight: 1.5 }} className="mt-4 max-w-[36rem]">
+          Get the exact steps for your trip, your airline, and your pet.
+        </p>
+      </div>
 
-        <div className="order-3 lg:order-none grid gap-5">
-          <fieldset className="grid gap-2" style={{ border: "none", margin: 0, padding: 0 }}>
-            <legend style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Where are you flying to?</legend>
-            <div className="grid gap-2">
-              {REGION_CHOICES.map((c) => (
-                <Choice key={c.id} name="ppg-region" value={c.id} checked={region === c.id} onChange={() => setRegion(c.id)} label={c.label} hint={c.hint} />
-              ))}
-            </div>
-          </fieldset>
-          <fieldset className="grid gap-2" style={{ border: "none", margin: 0, padding: 0 }}>
-            <legend style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Who’s flying?</legend>
-            <div className="grid grid-cols-2 gap-2">
-              {PET_CHOICES.map((c) => (
-                <Choice key={c.id} name="ppg-pet" value={c.id} checked={pet === c.id} onChange={() => setPet(c.id)} label={c.label} scale />
-              ))}
-            </div>
-          </fieldset>
+      <div className="order-2 lg:col-start-2 lg:row-start-1 lg:row-span-2">
+        <FlightPathMap route={region} />
+        <div className="relative z-10 -mt-10 flex justify-end px-2 sm:px-4">
+          <div className="w-full max-w-[380px]">
+            <ExampleRouteCard />
+          </div>
         </div>
+        <p style={{ fontFamily: B, fontSize: 15, lineHeight: 1.45, color: tokens.muted }} className="mt-3">
+          Example routes. Not a live flight.
+        </p>
+      </div>
 
-        <div className="order-4 lg:order-none">
-          <a href={href} className="btn-primary inline-flex items-center justify-center rounded-full px-8 py-3.5 min-h-[52px] w-full sm:w-auto" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>
+      <div className="order-3 lg:col-start-1 lg:row-start-2 grid gap-5 lg:mt-6">
+        <fieldset className="grid gap-2" style={{ border: "none", margin: 0, padding: 0 }}>
+          <legend style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Where are you flying to?</legend>
+          <div className="grid gap-2">
+            {REGION_CHOICES.map((c) => (
+              <Choice key={c.id} name="ppg-region" value={c.id} checked={region === c.id} onChange={() => setRegion(c.id)} label={c.label} hint={c.hint} />
+            ))}
+          </div>
+        </fieldset>
+        <fieldset className="grid gap-2" style={{ border: "none", margin: 0, padding: 0 }}>
+          <legend style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Who’s flying?</legend>
+          <div className="grid grid-cols-2 gap-2">
+            {PET_CHOICES.map((c) => (
+              <Choice key={c.id} name="ppg-pet" value={c.id} checked={pet === c.id} onChange={() => setPet(c.id)} label={c.label} scale />
+            ))}
+          </div>
+        </fieldset>
+        <div>
+          <a href={href} data-testid="hero-plan" className="btn-primary inline-flex items-center justify-center rounded-full px-8 py-3.5 min-h-[52px] w-full sm:w-auto" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>
             {PLAN_CTA}
           </a>
           {(region || pet) ? (
             <p style={{ fontFamily: B, fontSize: 15, lineHeight: 1.45, color: tokens.muted }} className="mt-3">Your choices are filled in on the next page. You can change any answer.</p>
           ) : null}
         </div>
-      </div>
-      <div className="order-2 lg:order-none">
-        <FlightPathMap route={region} />
       </div>
     </div>
   );

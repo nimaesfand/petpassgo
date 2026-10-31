@@ -1,18 +1,46 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
-import { tokens } from "../lib/theme";
+import { tokens, font } from "../lib/theme";
 import SiteHeader from "../components/SiteHeader";
 import Logo from "../components/Logo";
-import { PlanCards } from "../components/PricingPlans";
+import Icon from "../components/Icon";
 import TripHero from "../components/TripHero";
+import PassPhone from "../components/home/PassPhone";
+import VaultCluster from "../components/home/VaultCluster";
+import HomePricing from "../components/home/HomePricing";
+import PlanTripButton from "../components/home/PlanTripButton";
 import { US_AIRLINES, INTERNATIONAL_AIRLINES } from "../lib/airlines";
 import { FAQ } from "../lib/faq";
+import { PRICES as P } from "../lib/pricing";
 
+const D = font.display;
+const B = font.body;
 
+export const metadata = {
+  title: "Travel with your pet",
+  description: "Get the exact steps for your trip, your airline, and your pet. A Travel Pass is $49.99 for one trip. Pet Vault is $6.99 a month.",
+};
 
-const D = "var(--font-display), system-ui, sans-serif";
-const B = "var(--font-body), system-ui, sans-serif";
+const STRIP = [
+  { icon: "plane", label: "Airline requirements" },
+  { icon: "check", label: "Step-by-step checklist" },
+  { icon: "cloudSun", label: "Weather and cargo safety" },
+  { icon: "stethoscope", label: "Vets and pet stores" },
+  { icon: "file", label: "Documents in one place" },
+];
+
+const PASS_BENEFITS = [
+  { icon: "check", title: "Your step-by-step checklist", body: "Everything your pet needs for this trip, in order. Check things off as you go and watch your progress fill up." },
+  { icon: "scale", title: "Will your pet fit?", body: "Enter your pet's weight and carrier size, and we'll tell you if they meet your airline's limits." },
+  { icon: "cloudSun", title: "Weather and cargo safety", body: "Live weather at both airports, plus a heads-up if it's too hot or cold for pets flying in cargo." },
+  { icon: "stethoscope", title: "Vets and pet stores where you land", body: "Find vets and pet stores near you the moment you arrive." },
+  { icon: "smartphone", title: "Everything in one place on travel day", body: "Flight status, your pet's documents and Pet ID, ready to show at the counter." },
+];
+
+const VAULT_BENEFITS = [
+  { icon: "passport", title: "Digital Pet ID", body: "Your pet's profile in one place: name, breed, weight, and whether they're a pet or a service animal, plus your contact info. Show the Pet ID from your phone, or share it with a QR code scan." },
+  { icon: "pin", title: "Lost pet help", body: "If your pet goes missing, report them lost and get a printable flyer to share. Anyone who scans your pet's QR code can message you right away, and that message does not show your phone number." },
+  { icon: "file", title: "Documents", body: "Keep vaccination records, health records and vet records ready whenever you need them." },
+  { icon: "clock", title: "Reminders", body: "We'll remind you before something expires, like a rabies vaccine or a health certificate, so you're never caught off guard." },
+];
 
 const STEPS = [
   { n: "1", title: "Answer 6 quick questions", body: "Tell us about your flight and your pet.", icon: "M4 6h16M4 12h10M4 18h7" },
@@ -20,160 +48,259 @@ const STEPS = [
   { n: "3", title: "Check it off and fly", body: "Follow the steps and keep your pet's ID and documents ready in your Pet Vault.", icon: "M5 13l4 4L19 7" },
 ];
 
-const HOME_FAQ = [FAQ[2], FAQ[6], FAQ[7]];
-
-// Same carriers as Plan my trip, in the same groups. Count comes from that list.
 const HOME_AIRLINE_GROUPS = [
   { title: "U.S.", names: US_AIRLINES },
   { title: "International", names: INTERNATIONAL_AIRLINES },
 ];
+
+const HOME_FAQ = [
+  {
+    q: FAQ[2].q,
+    a: "$49.99 for one trip, or $19.99 if you already have Pet Vault. You get the requirements for your airline, route, and animal, plus a checklist with deadlines and reminders. A step is shown only when we have the official page and the date we last checked it. Without Pet Vault, your Digital Pet ID and document vault stay open until 7 days after the trip ends. That is 7 days after the travel date on a one-way trip, or 7 days after the return date if you add a later return. One-way trips stay one date.",
+  },
+  { q: FAQ[6].q, a: FAQ[6].a },
+  {
+    q: "What if an airline requirement changes?",
+    a: "Airline rules change, and they aren't the same on every route. Your Travel Pass shows a step when we have the official page and the date we last checked it. If we don't have it, the pass says to check with your airline. Fees, forms, and carrier sizes are in the pass after you pay, not here.",
+  },
+  {
+    q: "Is this a subscription?",
+    a: `A Travel Pass is a one-time purchase for one trip. Pet Vault is ${P.member} a month. It renews each month until you cancel, and you can cancel online anytime in account Billing. No phone call. Members can add a Travel Pass for ${P.memberPass} per trip.`,
+  },
+];
+
+const WRAP = "max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14";
+
 function Eyebrow({ children, color = tokens.stamp }) {
-  return <div style={{ fontFamily: B, color, fontSize: 15, fontWeight: 700, letterSpacing: "0.08em" }} className="mb-3">{children}</div>;
+  return <p style={{ fontFamily: B, color, fontSize: 15, fontWeight: 700, letterSpacing: "0.08em" }} className="mb-3">{children}</p>;
 }
 
-const PASS_BENEFITS = [
-  ["Your step-by-step checklist", "Everything your pet needs for this trip, in order. Check things off as you go and watch your progress fill up."],
-  ["Will your pet fit?", "Enter your pet's weight and carrier size, and we'll tell you if they meet your airline's limits."],
-  ["Weather and cargo safety", "Live weather at both airports, plus a heads-up if it's too hot or cold for pets flying in cargo."],
-  ["Vets and pet stores where you land", "Find vets and pet stores near you the moment you arrive."],
-  ["Everything in one place on travel day", "Flight status, your pet's documents and Pet ID, ready to show at the counter."],
-];
+function H2({ children, light, id }) {
+  return <h2 id={id} style={{ fontFamily: D, color: light ? "#fff" : tokens.navy, lineHeight: 1.12 }} className="text-[32px] md:text-[42px] font-bold">{children}</h2>;
+}
 
-const VAULT_BENEFITS = [
-  ["Digital Pet ID", "Your pet's profile in one place: name, breed, weight, and whether they're a pet or a service animal, plus your contact info. Show the Pet ID from your phone, or share it with a QR code scan."],
-  ["Lost pet help", "If your pet goes missing, report them lost and get a printable flyer to share. Anyone who scans your pet's QR code can message you right away, and that message does not show your phone number."],
-  ["Documents", "Keep vaccination records, health records and vet records ready whenever you need them."],
-  ["Reminders", "We'll remind you before something expires, like a rabies vaccine or a health certificate, so you're never caught off guard."],
-];
-
-function BenefitList({ items, card = "#fff" }) {
+function Rows({ items, card }) {
   return (
-    <ul className="grid gap-3">
-      {items.map(([title, body]) => (
-        <li key={title} className="rounded-2xl p-4 sm:p-5 flex gap-3" style={{ background: card, border: `1px solid ${tokens.line}` }}>
-          <span aria-hidden="true" className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: 28, height: 28, marginTop: 2, background: "#EAF6EE", color: tokens.green, fontFamily: B, fontWeight: 800, fontSize: 16 }}>✓</span>
-          <span>
-            <span style={{ display: "block", fontFamily: D, fontWeight: 700, fontSize: 18, color: tokens.navy, lineHeight: 1.3 }}>{title}</span>
-            <span style={{ display: "block", fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink, marginTop: 4 }}>{body}</span>
+    <ul className="grid">
+      {items.map((item, i) => (
+        <li key={item.title} className="flex gap-3.5 py-4" style={{ borderTop: i === 0 && !card ? "none" : `1px solid ${tokens.line}`, background: card || "transparent", borderRadius: card ? 16 : 0, padding: card ? 16 : undefined, marginTop: card && i ? 12 : 0, border: card ? `1px solid ${tokens.line}` : undefined }}>
+          <span aria-hidden="true" className="flex items-center justify-center rounded-xl flex-shrink-0" style={{ width: 44, height: 44, background: "#FDE8E2", color: tokens.primary }}>
+            <Icon name={item.icon} size={22} />
+          </span>
+          <span className="min-w-0">
+            <span style={{ display: "block", fontFamily: D, fontWeight: 700, fontSize: 18, color: tokens.navy, lineHeight: 1.3 }}>{item.title}</span>
+            <span style={{ display: "block", fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink, marginTop: 4 }}>{item.body}</span>
           </span>
         </li>
       ))}
     </ul>
   );
 }
-function H2({ children, light }) {
-  return <h2 style={{ fontFamily: D, color: light ? "#fff" : tokens.navy, lineHeight: 1.1 }} className="text-[32px] md:text-[42px] font-bold mb-4">{children}</h2>;
-}
 
-
-
+const FOOTER_LINKS = [
+  { href: "/travel-pass", label: "Travel Pass" },
+  { href: "/pet-vault", label: "Pet Vault" },
+  { href: "/airlines", label: "Airlines" },
+  { href: "/blog", label: "Blog" },
+  { href: "#pricing", label: "Pricing" },
+  { href: "/faq", label: "FAQ" },
+  { href: "mailto:support@petpassgo.com", label: "Contact" },
+  { href: "/lost-flyer", label: "Free lost pet flyer" },
+  { href: "/guarantee", label: "Flight-Ready Guarantee" },
+  { href: "/terms", label: "Terms" },
+  { href: "/privacy", label: "Privacy" },
+];
 
 export default function PetPassGoLanding() {
-  const [loaded, setLoaded] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setLoaded(true), 60); return () => clearTimeout(t); }, []);
-
   return (
-    <div style={{ background: tokens.sky, color: tokens.ink }} className="min-h-screen w-full">
+    <div style={{ background: tokens.sky, color: tokens.ink }} className="min-h-screen w-full overflow-x-hidden">
       <style>{`
-        * { box-sizing: border-box; }
-        body { margin: 0; }
-        .fade-up { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
-        .fade-up.in { opacity: 1; transform: translateY(0); }
-        h1, h2, h3, h4 { font-variant-ligatures: none; -webkit-font-variant-ligatures: none; }
         .airline-tile { transition: border-color .15s ease, transform .15s ease; }
         .airline-tile:hover { border-color: ${tokens.stamp}; transform: translateY(-2px); }
-        @media (prefers-reduced-motion: reduce) { .fade-up { transition: none; opacity: 1; transform: none; } .airline-tile:hover { transform: none; } }
+        .home-faq summary { list-style: none; }
+        .home-faq summary::-webkit-details-marker { display: none; }
+        .home-faq summary span[aria-hidden] { display: inline-block; transition: transform .15s ease; }
+        .home-faq details[open] summary span[aria-hidden] { transform: rotate(45deg); }
+        @media (prefers-reduced-motion: reduce) { .airline-tile:hover { transform: none; } }
       `}</style>
 
       <SiteHeader />
 
-      <section className={`fade-up max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14 pt-7 sm:pt-10 lg:pt-16 pb-8 lg:pb-14 ${loaded ? "in" : ""}`}>
+      <section className={`${WRAP} pt-7 sm:pt-10 lg:pt-14 pb-8 lg:pb-12`}>
         <TripHero />
       </section>
 
-      <section className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14 py-10 lg:py-14">
-        <Eyebrow>TRAVEL PASS</Eyebrow>
-        <H2>What's included in your Travel Pass</H2>
-        <BenefitList items={PASS_BENEFITS} />
+      <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-8 lg:py-10">
+        <ul className={`${WRAP} grid grid-cols-2 lg:grid-cols-5 gap-x-4 gap-y-6`}>
+          {STRIP.map((item, i) => (
+            <li key={item.label} className={`flex flex-col items-center text-center gap-2.5 min-w-0 ${i === STRIP.length - 1 ? "col-span-2 lg:col-span-1" : ""}`}>
+              <span aria-hidden="true" className="flex items-center justify-center rounded-2xl" style={{ width: 52, height: 52, background: "#FDE8E2", color: tokens.primary }}>
+                <Icon name={item.icon} size={24} />
+              </span>
+              <span style={{ fontFamily: B, fontWeight: 700, fontSize: 16, lineHeight: 1.35, color: tokens.navy }}>{item.label}</span>
+            </li>
+          ))}
+        </ul>
       </section>
 
-      <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-10 lg:py-14">
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14">
-          <Eyebrow>PET VAULT</Eyebrow>
-          <H2>What's in your Pet Vault</H2>
-          <BenefitList items={VAULT_BENEFITS} card={tokens.sky} />
-        </div>
-      </section>
-
-      {/* 2. HOW IT WORKS */}
-      <section style={{ background: tokens.navy }} className="py-12 lg:py-20">
-        <div className="max-w-[1240px] mx-auto px-6 md:px-14">
-          <Eyebrow color={tokens.gold}>HOW IT WORKS</Eyebrow>
-          <H2 light>3 easy steps to takeoff</H2>
-          <div className="grid md:grid-cols-3 gap-5 mt-10">
-            {STEPS.map((s) => (
-              <div key={s.n} className="rounded-2xl p-7" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}>
-                <div className="flex items-center justify-between mb-6">
-                  <span className="inline-flex items-center justify-center rounded-full" style={{ width: 52, height: 52, background: tokens.gold }}>
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={tokens.navy} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={s.icon} /></svg>
-                  </span>
-                  <span style={{ fontFamily: D, color: "rgba(255,255,255,0.18)", fontSize: 56, fontWeight: 800, lineHeight: 1 }}>{s.n}</span>
-                </div>
-                <h3 style={{ fontFamily: D, color: "#fff", fontSize: 23, fontWeight: 700 }} className="mb-2">{s.title}</h3>
-                <p style={{ fontFamily: B, color: "#C9D3E3", fontSize: 16, lineHeight: 1.55 }}>{s.body}</p>
-              </div>
-            ))}
+      <section className={`${WRAP} py-12 lg:py-16`}>
+        <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)] lg:gap-x-14 lg:gap-y-6 lg:items-start">
+          <div className="order-1 lg:col-start-2 lg:row-start-1">
+            <Eyebrow>TRAVEL PASS</Eyebrow>
+            <H2>What's included in your Travel Pass</H2>
+            <p style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }} className="mt-3 max-w-[40rem]">
+              Tell us about your flight and your pet. The pass is built for your airline, route, and pet.
+            </p>
+          </div>
+          <div className="order-2 lg:col-start-1 lg:row-start-1 lg:row-span-2">
+            <PassPhone />
+          </div>
+          <div className="order-3 lg:col-start-2 lg:row-start-2">
+            <Rows items={PASS_BENEFITS} />
           </div>
         </div>
       </section>
 
-      {/* 4. AIRLINES */}
-      <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-12 lg:py-20">
-        <div className="max-w-[1240px] mx-auto px-6 md:px-14">
+      <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-12 lg:py-16">
+        <div className={`${WRAP} flex flex-col gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(280px,440px)] lg:gap-x-14 lg:items-center`}>
+          <div className="order-1 lg:col-start-1 lg:row-start-1">
+            <Eyebrow>PET VAULT</Eyebrow>
+            <H2>What's in your Pet Vault</H2>
+            <p style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }} className="mt-3">
+              Your pet's records, ID, and lost-pet help, kept in one place.
+            </p>
+          </div>
+          <div className="order-2 lg:col-start-2 lg:row-start-1 lg:row-span-3">
+            <VaultCluster />
+          </div>
+          <div className="order-3 lg:col-start-1">
+            <Rows items={VAULT_BENEFITS} card="#fff" />
+          </div>
+          <div className="order-4 lg:col-start-1">
+            <a href="/join" className="home-navy-btn inline-flex items-center justify-center rounded-full px-8 py-3.5 min-h-[52px] w-full sm:w-auto" style={{ background: tokens.navy, color: "#fff", fontFamily: B, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>Create your Pet Vault</a>
+            <p style={{ fontFamily: B, fontSize: 16, lineHeight: 1.45, color: tokens.ink }} className="mt-3">{P.member}/mo. Members add a Travel Pass for {P.memberPass} per trip.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className={`${WRAP} py-12 lg:py-16`}>
+        <Eyebrow>HOW IT WORKS</Eyebrow>
+        <H2>3 easy steps to takeoff.</H2>
+        <div className="grid md:grid-cols-3 gap-4 mt-8">
+          {STEPS.map((s) => (
+            <div key={s.n} className="rounded-2xl p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+              <div className="flex items-center justify-between mb-5">
+                <span className="inline-flex items-center justify-center rounded-full" style={{ width: 52, height: 52, background: "#FDE8E2" }}>
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={tokens.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={s.icon} /></svg>
+                </span>
+                <span style={{ fontFamily: D, color: tokens.line, fontSize: 48, fontWeight: 800, lineHeight: 1 }}>{s.n}</span>
+              </div>
+              <h3 style={{ fontFamily: D, color: tokens.navy, fontSize: 22, fontWeight: 700, lineHeight: 1.25 }} className="mb-2">{s.title}</h3>
+              <p style={{ fontFamily: B, color: tokens.ink, fontSize: 16, lineHeight: 1.55 }}>{s.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-12 lg:py-16">
+        <div className={WRAP}>
           <Eyebrow>AIRLINES</Eyebrow>
           <H2>Wherever you're flying, we've got you covered.</H2>
-          <div className="mt-10 space-y-8">
+          <p style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }} className="max-w-[40rem]">
+            These are the airlines in Plan my trip. The checklist for your airline and route is in the Travel Pass after you pay.
+          </p>
+          <div className="mt-8 space-y-8">
             {HOME_AIRLINE_GROUPS.map((group) => (
               <div key={group.title}>
                 <h3 style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-3">{group.title}</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                   {group.names.map((name) => (
-                    <a key={name} href="/assessment" className="airline-tile rounded-xl px-5 py-4 min-h-[48px] h-full flex items-center" style={{ background: tokens.sky, border: `1px solid ${tokens.line}`, textDecoration: "none" }}>
-                      <span style={{ fontFamily: B, fontWeight: 600, fontSize: 16, color: tokens.navy }}>{name}</span>
-                    </a>
+                    <li key={name}>
+                      <a href="/assessment" className="airline-tile rounded-xl px-4 py-3 min-h-[52px] h-full flex items-center" style={{ background: tokens.sky, border: `1px solid ${tokens.line}`, textDecoration: "none" }}>
+                        <span style={{ fontFamily: B, fontWeight: 600, fontSize: 16, lineHeight: 1.35, color: tokens.navy }}>{name}</span>
+                      </a>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 5. PRICING */}
-      <section id="pricing" className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14 py-10 lg:py-14">
-        <Eyebrow>PRICING</Eyebrow>
-        <H2>Pick your plan.</H2>
-        <div className="mt-8"><PlanCards /></div>
-      </section>
-
-      {/* 6. FAQ TEASER */}
-      <section className="max-w-3xl mx-auto px-4 sm:px-6 md:px-14 pb-12 lg:pb-20">
-        <H2>Quick answers</H2>
-        <div className="mt-6">
-          {HOME_FAQ.map((f) => (
-            <details key={f.q} className="mb-3 rounded-xl p-5" style={{ border: `1px solid ${tokens.line}`, background: "#fff" }}>
-              <summary className="cursor-pointer" style={{ fontFamily: B, fontWeight: 600, color: tokens.navy, fontSize: 17 }}>{f.q}</summary>
-              <p className="mt-3" style={{ fontFamily: B, color: tokens.muted, lineHeight: 1.6 }}>{f.a}</p>
-            </details>
-          ))}
+      <section id="pricing" style={{ background: tokens.navy }} className="py-12 lg:py-16">
+        <div className={WRAP}>
+          <Eyebrow color={tokens.gold}>PRICING</Eyebrow>
+          <H2 light>Pick your plan.</H2>
+          <div className="mt-8">
+            <HomePricing />
+          </div>
         </div>
-        <a href="/faq" style={{ fontFamily: B, color: tokens.navy, fontWeight: 600 }} className="inline-block mt-3">All questions →</a>
       </section>
 
-      <footer className="px-6 md:px-14 py-8 text-center" style={{ borderTop: `1px solid ${tokens.line}`, fontFamily: B, fontSize: 15, lineHeight: 1.5, color: tokens.muted }}>
-        <div className="flex justify-center mb-3"><Logo size={30} /></div>
-        PetPassGo is a preparation tool, not a certifying authority. Requirements are set by airlines and government agencies.
-        <div className="mt-2"><a href="/lost-flyer" style={{ color: tokens.navy, textDecoration: "underline" }}>Free lost pet flyer</a>{" · "}<a href="mailto:support@petpassgo.com" style={{ color: tokens.navy, textDecoration: "underline" }}>support@petpassgo.com</a>{" · "}<a href="/guarantee" style={{ color: tokens.navy, textDecoration: "underline" }}>Flight-Ready Guarantee</a>. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Conditions apply</a>{" · "}<a href="/terms" style={{ color: tokens.navy, textDecoration: "underline" }}>Terms of Service</a>{" · "}<a href="/privacy" style={{ color: tokens.navy, textDecoration: "underline" }}>Privacy Policy</a></div>
+      <section style={{ background: "#fff", borderBottom: `1px solid ${tokens.line}` }} className="py-6 lg:py-8">
+        <div className={`${WRAP} flex gap-4 items-start`}>
+          <span aria-hidden="true" className="flex items-center justify-center rounded-2xl flex-shrink-0" style={{ width: 48, height: 48, background: tokens.navy, color: tokens.gold }}>
+            <Icon name="shield" size={24} />
+          </span>
+          <div className="min-w-0">
+            <h2 style={{ fontFamily: D, fontWeight: 700, fontSize: 20, color: tokens.navy, lineHeight: 1.3 }}>Flight-Ready Guarantee</h2>
+            <p style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mt-1">
+              If a requirement we showed was wrong and your pet was refused boarding, we refund your pass.{" "}
+              <a data-testid="guarantee-link" href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Conditions apply</a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className={`${WRAP} py-12 lg:py-16`}>
+        <div className="max-w-3xl">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-6">
+            <H2>Quick answers</H2>
+            <a href="/faq" style={{ fontFamily: B, color: tokens.navy, fontWeight: 700, fontSize: 16, textDecoration: "none" }} className="underline underline-offset-4">View all questions</a>
+          </div>
+          <div className="home-faq">
+            {HOME_FAQ.map((f) => (
+              <details key={f.q} className="mb-3 rounded-2xl px-5 py-4" style={{ border: `1px solid ${tokens.line}`, background: "#fff" }}>
+                <summary className="cursor-pointer flex items-center justify-between gap-4 min-h-[48px]" style={{ fontFamily: B, fontWeight: 600, color: tokens.navy, fontSize: 17, lineHeight: 1.35 }}>
+                  <span>{f.q}</span>
+                  <span aria-hidden="true" style={{ fontFamily: D, fontSize: 26, fontWeight: 500, color: tokens.muted, lineHeight: 1 }}>+</span>
+                </summary>
+                <p className="mt-3 pr-6" style={{ fontFamily: B, color: tokens.ink, fontSize: 16, lineHeight: 1.55 }}>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ background: tokens.navy }} className="py-14 lg:py-20">
+        <div className={`${WRAP} text-center max-w-[760px]`}>
+          <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.12 }} className="text-[32px] md:text-[44px] font-bold">Make travel easier for you and your pet.</h2>
+          <p style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: "#E7EDF6" }} className="mt-4 mb-7 mx-auto max-w-[36rem]">
+            Get the steps for this trip, then keep your pet's ID and records in one place.
+          </p>
+          <PlanTripButton />
+        </div>
+      </section>
+
+      <footer className="px-4 sm:px-6 md:px-14 py-10" style={{ background: tokens.navyDeep, color: "#D5DEEB" }}>
+        <div className="max-w-[1240px] mx-auto">
+          <div className="flex items-center gap-2 mb-5">
+            <Logo size={34} />
+            <span style={{ fontFamily: D, fontWeight: 700, fontSize: 20, color: "#fff" }}>PetPassGo</span>
+          </div>
+          <nav className="flex flex-wrap gap-x-4 gap-y-2" aria-label="Footer">
+            {FOOTER_LINKS.map((l) => (
+              <a key={l.href} href={l.href} style={{ fontFamily: B, fontSize: 16, color: "#E7EDF6", textDecoration: "underline", textUnderlineOffset: 3 }}>{l.label}</a>
+            ))}
+          </nav>
+          <p style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: "#C9D3E3" }} className="mt-6 max-w-[46rem]">
+            PetPassGo is a preparation tool, not a certifying authority. Requirements are set by airlines and government agencies.
+          </p>
+          <p style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5 }} className="mt-3">
+            <a href="mailto:support@petpassgo.com" style={{ color: "#fff" }}>support@petpassgo.com</a>
+          </p>
+        </div>
       </footer>
     </div>
   );
