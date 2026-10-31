@@ -15,6 +15,7 @@ import Icon from "../../components/Icon";
 import { PLAN_CTA } from "../../lib/cta";
 import { tokens, font } from "../../lib/theme";
 import GuaranteeLine from "../../components/GuaranteeLine";
+import TrustBadges from "../../components/TrustBadges";
 import WithdrawalConsent from "../../components/WithdrawalConsent";
 import MarketingOptIn from "../../components/MarketingOptIn";
 import { WITHDRAWAL_BLOCKED, takeWithdrawalConsent } from "../../lib/withdrawal";
@@ -468,6 +469,7 @@ export default function PetPassGoQuiz() {
                 </>
               )}
               <GuaranteeLine align="center" />
+              <TrustBadges className="mt-4 text-left" />
               <div className="mt-6">
                 <button onClick={back} style={{ fontFamily: font.body, color: tokens.ink, fontSize: 16 }}>← Back</button>
               </div>

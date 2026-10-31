@@ -5,6 +5,7 @@ import { tokens } from "../lib/theme";
 import SiteHeader from "../components/SiteHeader";
 import Logo from "../components/Logo";
 import { PlanCards } from "../components/PricingPlans";
+import TrustBadges from "../components/TrustBadges";
 import TripHero from "../components/TripHero";
 import { US_AIRLINES, INTERNATIONAL_AIRLINES } from "../lib/airlines";
 import { FAQ } from "../lib/faq";
@@ -154,6 +155,7 @@ export default function PetPassGoLanding() {
         <Eyebrow>PRICING</Eyebrow>
         <H2>Pick your plan.</H2>
         <div className="mt-8"><PlanCards /></div>
+        <TrustBadges className="mt-6" />
       </section>
 
       {/* 6. FAQ TEASER */}
@@ -173,7 +175,7 @@ export default function PetPassGoLanding() {
       <footer className="px-6 md:px-14 py-8 text-center" style={{ borderTop: `1px solid ${tokens.line}`, fontFamily: B, fontSize: 15, lineHeight: 1.5, color: tokens.muted }}>
         <div className="flex justify-center mb-3"><Logo size={30} /></div>
         PetPassGo is a preparation tool, not a certifying authority. Requirements are set by airlines and government agencies.
-        <div className="mt-2"><a href="/lost-flyer" style={{ color: tokens.navy, textDecoration: "underline" }}>Free lost pet flyer</a>{" · "}<a href="mailto:support@petpassgo.com" style={{ color: tokens.navy, textDecoration: "underline" }}>support@petpassgo.com</a>{" · "}<a href="/guarantee" style={{ color: tokens.navy, textDecoration: "underline" }}>Flight-Ready Guarantee</a>. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Conditions apply</a>{" · "}<a href="/terms" style={{ color: tokens.navy, textDecoration: "underline" }}>Terms of Service</a>{" · "}<a href="/privacy" style={{ color: tokens.navy, textDecoration: "underline" }}>Privacy Policy</a></div>
+        <div className="mt-2"><a href="/lost-flyer" style={{ color: tokens.navy, textDecoration: "underline" }}>Free lost pet flyer</a>{" · "}<a href="mailto:support@petpassgo.com" style={{ color: tokens.navy, textDecoration: "underline" }}>support@petpassgo.com</a>{" · "}<a href="/guarantee" style={{ color: tokens.navy, textDecoration: "underline" }}>Flight-Ready Guarantee</a>. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Terms</a>{" · "}<a href="/terms" style={{ color: tokens.navy, textDecoration: "underline" }}>Terms of Service</a>{" · "}<a href="/privacy" style={{ color: tokens.navy, textDecoration: "underline" }}>Privacy Policy</a></div>
       </footer>
     </div>
   );
