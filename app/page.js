@@ -15,9 +15,9 @@ const D = "var(--font-display), system-ui, sans-serif";
 const B = "var(--font-body), system-ui, sans-serif";
 
 const STEPS = [
-  { n: "1", title: "Answer 6 questions", body: "Tell us about your flight and your pets.", icon: "M4 6h16M4 12h10M4 18h7" },
-  { n: "2", title: "Check out", body: "Travel Pass for this trip, or Pet Vault plus this trip. The checklist is in the pass after you pay.", icon: "M5 4h14v16H5zM8 9h8M8 13h8M8 17h5" },
-  { n: "3", title: "Check it off and fly", body: "Reminders before each deadline. Documents, forms, and everything you need in one vault.", icon: "M5 13l4 4L19 7" },
+  { n: "1", title: "Answer 6 quick questions", body: "Tell us about your flight and your pet.", icon: "M4 6h16M4 12h10M4 18h7" },
+  { n: "2", title: "Get your Travel Pass", body: "Your step-by-step checklist built for your airline, route and pet.", icon: "M5 4h14v16H5zM8 9h8M8 13h8M8 17h5" },
+  { n: "3", title: "Check it off and fly", body: "Follow the steps and keep your pet's ID and documents ready in your Pet Vault.", icon: "M5 13l4 4L19 7" },
 ];
 
 const HOME_FAQ = [FAQ[2], FAQ[6], FAQ[7]];
@@ -109,7 +109,7 @@ export default function PetPassGoLanding() {
       <section style={{ background: tokens.navy }} className="py-12 lg:py-20">
         <div className="max-w-[1240px] mx-auto px-6 md:px-14">
           <Eyebrow color={tokens.gold}>HOW IT WORKS</Eyebrow>
-          <H2 light>Three steps to the gate.</H2>
+          <H2 light>3 easy steps to takeoff</H2>
           <div className="grid md:grid-cols-3 gap-5 mt-10">
             {STEPS.map((s) => (
               <div key={s.n} className="rounded-2xl p-7" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}>
