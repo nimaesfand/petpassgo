@@ -14,7 +14,7 @@ export default function PetVaultPage() {
       <main className="max-w-[720px] mx-auto px-4 sm:px-6 py-8 lg:py-12">
         <h1 style={{ fontFamily: font.display, fontWeight: 700, color: tokens.navy, lineHeight: 1.1 }} className="text-[32px] lg:text-[44px]">{VAULT_NAME}</h1>
         <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mt-3 mb-6">
-          Pet ID with a QR code, finder messages, Report lost and a lost-pet flyer, documents, and reminders. {usd(P.member)} a month.
+          Digital Pet ID, lost pet help with a printable flyer and private finder messages, vaccination records, health records and vet records, and reminders. {usd(P.member)} a month.
         </p>
         <VaultPreview />
         <div className="rounded-3xl p-6 sm:p-8 mt-8 text-center" style={{ background: tokens.navy }}>

@@ -2,26 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { tokens, font } from "../lib/theme";
-import { PLAN_CTA, JOIN_CTA, LOGIN_CTA } from "../lib/cta";
+import { PLAN_CTA } from "../lib/cta";
 import { PET_CHOICES, REGION_CHOICES, planTripHref, writeHomeIntent } from "../lib/tripIntent";
 import FlightPathMap from "./FlightPathMap";
 
 const D = font.display;
 const B = font.body;
 
-function Choice({ name, value, checked, onChange, label, hint }) {
+function Choice({ name, value, checked, onChange, label, hint, scale }) {
   return (
     <label
-      className="ppg-choice rounded-2xl px-4 py-3 min-h-[52px] flex flex-col justify-center cursor-pointer"
+      className={`ppg-choice rounded-2xl py-3 min-h-[52px] min-w-0 h-full flex flex-col justify-center cursor-pointer ${scale ? "px-3 sm:px-4" : "px-4"}`}
       style={{
         background: checked ? tokens.navy : "#fff",
         color: checked ? "#fff" : tokens.navy,
         border: `2px solid ${checked ? tokens.navy : tokens.line}`,
         fontFamily: B,
+        containerType: scale ? "inline-size" : undefined,
       }}
     >
       <input type="radio" name={name} value={value} checked={checked} onChange={onChange} className="sr-only" />
-      <span style={{ fontWeight: 700, fontSize: 16, lineHeight: 1.3 }}>{label}</span>
+      <span style={{ fontWeight: 700, fontSize: scale ? "clamp(14px, 11cqi, 16px)" : 16, lineHeight: scale ? 1.25 : 1.3, textWrap: scale ? "balance" : undefined, minWidth: 0 }}>{label}</span>
       {hint ? <span style={{ fontSize: 15, lineHeight: 1.35, marginTop: 2, opacity: 0.8 }}>{hint}</span> : null}
     </label>
   );
@@ -38,16 +39,16 @@ export default function TripHero() {
       <div className="contents lg:flex lg:flex-col lg:gap-6">
         <div className="order-1 lg:order-none">
           <h1 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[32px] sm:text-[48px] lg:text-[60px] font-bold">
-            Fly with your pets, skip the guesswork.
+            Flying with your pet? Skip the guesswork.
           </h1>
           <p style={{ fontFamily: B, color: tokens.ink, fontSize: 16, lineHeight: 1.5 }} className="mt-3 max-w-[36rem]">
-            U.S., Canada and Mexico, plus international. Choose the trip and the pet, then plan it.
+            Get the exact steps for your trip, your airline, and your pet.
           </p>
         </div>
 
         <div className="order-3 lg:order-none grid gap-5">
           <fieldset className="grid gap-2" style={{ border: "none", margin: 0, padding: 0 }}>
-            <legend style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Where are you flying?</legend>
+            <legend style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Where are you flying to?</legend>
             <div className="grid gap-2">
               {REGION_CHOICES.map((c) => (
                 <Choice key={c.id} name="ppg-region" value={c.id} checked={region === c.id} onChange={() => setRegion(c.id)} label={c.label} hint={c.hint} />
@@ -58,7 +59,7 @@ export default function TripHero() {
             <legend style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Who’s flying?</legend>
             <div className="grid grid-cols-2 gap-2">
               {PET_CHOICES.map((c) => (
-                <Choice key={c.id} name="ppg-pet" value={c.id} checked={pet === c.id} onChange={() => setPet(c.id)} label={c.label} />
+                <Choice key={c.id} name="ppg-pet" value={c.id} checked={pet === c.id} onChange={() => setPet(c.id)} label={c.label} scale />
               ))}
             </div>
           </fieldset>
@@ -71,10 +72,6 @@ export default function TripHero() {
           {(region || pet) ? (
             <p style={{ fontFamily: B, fontSize: 15, lineHeight: 1.45, color: tokens.muted }} className="mt-3">Your choices are filled in on the next page. You can change any answer.</p>
           ) : null}
-          <div className="flex flex-col items-start gap-1 mt-4">
-            <a href="/join" className="inline-flex items-center min-h-[44px]" style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: tokens.navy, textDecoration: "underline", textUnderlineOffset: 3 }}>{JOIN_CTA}</a>
-            <a href="/login" className="inline-flex items-center min-h-[44px]" style={{ fontFamily: B, fontWeight: 600, fontSize: 16, color: tokens.navy, textDecoration: "underline", textUnderlineOffset: 3 }}>{LOGIN_CTA}</a>
-          </div>
         </div>
       </div>
       <div className="order-2 lg:order-none">
