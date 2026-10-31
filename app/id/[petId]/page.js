@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { tokens, font } from "../../../lib/theme";
-import PetIdCard, { PetIllustration } from "../../../components/PetIdCard";
+import { PetIllustration } from "../../../components/PetIdCard";
 import FinderMessageForm from "../../../components/FinderMessageForm";
 import ShareButtons from "../../../components/ShareButtons";
 import usePublicPet from "../../../lib/usePublicPet";
-import PetIdPreviewCard, { cardFromPublic } from "../../../components/PetIdPreview";
+import PetProfileExperience from "../../../components/PetProfileExperience";
 import { fmtDate } from "../../../lib/lost";
 import { supabase } from "../../../lib/supabaseClient";
 import { SITE_LAUNCHED } from "../../../lib/pricing";
@@ -100,11 +100,6 @@ export default function PublicPetId({ params }) {
   // Owner's membership/trip lapsed (enforced only after launch; ?preview=lapsed pre-launch):
   // show a basic page with name, photo and the message relay instead of the full ID.
   const [basic, setBasic] = useState(false);
-  const [card, setCard] = useState(null);
-  useEffect(() => {
-    if (status !== "ok") return;
-    supabase.rpc("get_public_pet_card", { pet_id: pet.id }).then(({ data }) => { const r = Array.isArray(data) ? data[0] : data; if (r) setCard(cardFromPublic(r)); });
-  }, [status, pet?.id]);
   useEffect(() => {
     if (status !== "ok") return;
     if (lapsedPreview()) return setBasic(true);
@@ -124,7 +119,7 @@ export default function PublicPetId({ params }) {
   return (
     <main className="min-h-screen flex flex-col items-center px-4 py-8 sm:py-14" style={{ background: `linear-gradient(180deg, ${tokens.navy} 0, ${tokens.navy} 220px, ${tokens.sky} 220px)` }}>
       <a href="/" className="mb-6" style={{ fontFamily: font.display, fontWeight: 700, fontSize: 22, color: "#fff", textDecoration: "none" }}>PetPassGo</a>
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-3xl">
         {status === "loading" && <div className="rounded-2xl p-8 text-center" style={{ background: "#fff", fontFamily: font.body, color: tokens.muted }}>Loading…</div>}
         {status === "notfound" && (
           <div className="rounded-2xl p-8 text-center" style={{ background: "#fff", fontFamily: font.body, color: tokens.ink }}>
@@ -136,20 +131,16 @@ export default function PublicPetId({ params }) {
           <div className="rounded-2xl p-7 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
             <div className="flex justify-center mb-3">{pet.photo_path ? <Photo pet={pet} size={128} /> : <PetIllustration type={pet.animal_type} size={128} />}</div>
             <div style={{ fontFamily: font.display, fontSize: 34, fontWeight: 700, color: tokens.navy }} className="mb-1">{pet.name}</div>
-            {pet.passport_no && <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mb-1">Passport No. {pet.passport_no}</div>}
+            {pet.passport_no && <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.navy }} className="mb-1">PetPassGo ID {pet.passport_no}</div>}
             <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-5">Found this pet, or need to reach the owner? Send a message. Your note goes straight to them.</p>
             <div className="text-left"><ScanHonesty lostMode={false} /><div className="mt-4"><FinderMessageForm petId={pet.id} petName={pet.name} /></div></div>
           </div>
         )}
         {status === "ok" && !lost && !basic && (
           <>
-            {card ? <PetIdPreviewCard card={card} photo={pet.photo_path ? <Photo pet={pet} size={96} /> : null} /> : <PetIdCard pet={pet} showQr={false} photo={pet.photo_path ? <Photo pet={pet} size={104} /> : null} />}
-            {!card && <ChipLine pet={pet} />}
-            <PublicHealth petId={pet.id} petName={pet.name} />
-            <ScanHonesty lostMode={false} />
-            <div className="mt-4">
-              {pet.emergency_contact_name || pet.emergency_contact_phone ? <ContactBox pet={pet} /> : <FinderMessageForm petId={pet.id} petName={pet.name} />}
-            </div>
+            <PetProfileExperience pet={pet} mode="public" />
+            <div className="mt-4"><ScanHonesty lostMode={false} /></div>
+            <div className="mt-4"><FinderMessageForm petId={pet.id} petName={pet.name} /></div>
           </>
         )}
         {status === "ok" && <p className="text-center mt-6" style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>Digital Pet ID by <a href="/" style={{ color: tokens.navy, fontWeight: 600 }}>PetPassGo</a></p>}

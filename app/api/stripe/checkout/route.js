@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { stripe, priceId, userFromReq, isMember, customerFor, siteUrl, serviceClient } from "@/lib/stripeServer";
 import { consentAccepted, WITHDRAWAL_BLOCKED } from "@/lib/withdrawal";
 import { attachConsentSession, consentMetadata, recordWithdrawalConsent } from "@/lib/withdrawalRecord";
+import { saveMarketingConsent } from "@/lib/marketingServer";
+import { marketingSourceForPlan } from "@/lib/marketing";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +50,9 @@ async function handle(req) {
 
   const customer = await customerFor(sb, user);
   const base = siteUrl(req);
+  if (body?.marketing_opt_in === true) {
+    await saveMarketingConsent(sb, user.id, { optIn: true, source: marketingSourceForPlan(effPlan) });
+  }
   const consent = await recordWithdrawalConsent(sb, { userId: user.id, email: user.email, plan: effPlan });
   const meta = { user_id: user.id, trip_id: effPlan === "membership" ? "" : tripId, plan: effPlan, ...attribution, ...consentMetadata(consent.id, consent.consented_at) };
   const params = {

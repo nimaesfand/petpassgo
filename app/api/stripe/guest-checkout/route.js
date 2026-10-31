@@ -51,7 +51,7 @@ async function handle(req) {
   const uid = await userIdByEmail(sb, email);
   if (uid) return NextResponse.json({ action: "login", member: await isMember(sb, uid) });
 
-  const { data: row, error } = await sb.from("guest_checkouts").insert({ plan, trip, attribution }).select("id").single();
+  const { data: row, error } = await sb.from("guest_checkouts").insert({ plan, trip, attribution, marketing_opt_in: body?.marketing_opt_in === true }).select("id").single();
   if (error) throw error;
 
   const consent = await recordWithdrawalConsent(sb, { email, plan, guestCheckoutId: row.id });

@@ -45,7 +45,7 @@ export async function GET(req, { params }) {
         <p class="muted">Shared by the owner as this pet's Care Card. This link expires ${esc(new Date(card.expires_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }))}. Health details are owner-entered and not verified by PetPassGo.</p>
         ${emergency && (pet.emergency_contact_name || pet.emergency_contact_phone) ? `<p style="background:#FDE8E2;border-radius:12px;padding:12px"><b>Who to call:</b> ${esc([pet.emergency_contact_name, pet.emergency_contact_phone].filter(Boolean).join(" · "))}</p>` : ""}
         <dl class="facts">
-          ${pet.passport_no ? `<dt>Passport No.</dt><dd>${esc(pet.passport_no)}</dd>` : ""}
+          ${pet.passport_no ? `<dt>PetPassGo ID</dt><dd>${esc(pet.passport_no)}</dd>` : ""}
           <dt>Microchip</dt><dd>${last4(pet.microchip_number)}</dd>
           ${pet.vet_name || pet.vet_phone ? `<dt>Vet</dt><dd>${esc([pet.vet_name, pet.vet_phone].filter(Boolean).join(" · "))}</dd>` : ""}
           ${pet.emergency_contact_name || pet.emergency_contact_phone ? `<dt>Emergency</dt><dd>${esc([pet.emergency_contact_name, pet.emergency_contact_phone].filter(Boolean).join(" · "))}</dd>` : ""}

@@ -34,7 +34,7 @@ export function PetIllustration({ type, size = 96 }) {
 export default function PetIdCard({ pet, photo, showQr = true, children }) {
   const details = [
     ["Sex", pet.sex],
-    ["Passport No.", pet.passport_no],
+    ["PetPassGo ID", pet.passport_no],
   ].filter(([, v]) => v);
   return (
     <div data-pet-passport className="rounded-2xl overflow-hidden w-full" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.10)" }}>
