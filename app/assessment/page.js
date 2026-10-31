@@ -16,6 +16,7 @@ import { PLAN_CTA } from "../../lib/cta";
 import { tokens, font } from "../../lib/theme";
 import GuaranteeLine from "../../components/GuaranteeLine";
 import WithdrawalConsent from "../../components/WithdrawalConsent";
+import MarketingOptIn from "../../components/MarketingOptIn";
 import { WITHDRAWAL_BLOCKED, takeWithdrawalConsent } from "../../lib/withdrawal";
 
 
@@ -136,6 +137,7 @@ export default function PetPassGoQuiz() {
   const [isMember, setIsMember] = useState(false);
   const [guestPlan, setGuestPlan] = useState(""); // signed-out buyer: email sheet open for "pass" | "join"
   const [consent, setConsent] = useState(false);
+  const [tips, setTips] = useState(false);
   const [consentErr, setConsentErr] = useState("");
   const [airlineQuery, setAirlineQuery] = useState("");
   const [autoBuy, setAutoBuy] = useState(""); // set when returning signed in from signup/login with a saved purchase
@@ -264,7 +266,7 @@ export default function PetPassGoQuiz() {
     const r = await fetch("/api/stripe/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" },
-      body: JSON.stringify({ plan: stripePlan, trip_id: trip.id, attribution: getAttribution(), immediate_access_consent: true }),
+      body: JSON.stringify({ plan: stripePlan, trip_id: trip.id, attribution: getAttribution(), immediate_access_consent: true, marketing_opt_in: tips }),
     });
     const j = await r.json().catch(() => ({}));
     if (!r.ok || !j.url) { alert(j.error || "Checkout isn't available right now. Please try again."); return; }
@@ -454,6 +456,7 @@ export default function PetPassGoQuiz() {
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-2">Choose your pass</h2>
               <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted, lineHeight: 1.5 }} className="mb-5">We have your pet, route, dates, and airline. Airline rules and the checklist are in the pass after you pay.</p>
               <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-3">Prices are in US dollars (USD).</p>
+              <MarketingOptIn checked={tips} onChange={setTips} />
               <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setConsentErr(""); }} error={consentErr} />
               {isMember ? (
                 <button onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16 }}>Travel Pass · {usd(P.memberPass)}</button>
@@ -474,7 +477,7 @@ export default function PetPassGoQuiz() {
         </div>
       </div>
       </div>
-      <GuestEmailSheet open={!!guestPlan} showConsent={false} title={guestPlan === "join" ? `Join + Travel Pass · ${usd(P.joinToday)}` : `Travel Pass · ${usd(P.pass)}`} plan={guestPlan} trip={answers} cancelPath="/assessment?checkout=canceled" onClose={() => setGuestPlan("")} />
+      <GuestEmailSheet open={!!guestPlan} showConsent={false} showMarketing={false} marketingOptIn={tips} title={guestPlan === "join" ? `Join + Travel Pass · ${usd(P.joinToday)}` : `Travel Pass · ${usd(P.pass)}`} plan={guestPlan} trip={answers} cancelPath="/assessment?checkout=canceled" onClose={() => setGuestPlan("")} />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { serviceClient } from "@/lib/stripeServer";
 import { loadPaidGuestSession, userIdByEmail, claimGuestCheckout } from "@/lib/guestCheckout";
+import { saveMarketingConsent } from "@/lib/marketingServer";
 
 export const dynamic = "force-dynamic";
 
@@ -18,19 +19,27 @@ export async function POST(req) {
     if (row.claimed_at) return NextResponse.json({ state: "claimed", email: row.email }, { status: 409 });
     if (!row.email) return NextResponse.json({ error: "We couldn't read the email from your payment." }, { status: 400 });
     const existing = await userIdByEmail(sb, row.email);
-    if (existing) { await claimGuestCheckout(sb, row, existing, session); return NextResponse.json({ state: "exists", email: row.email }, { status: 409 }); }
+    if (existing) {
+      await claimGuestCheckout(sb, row, existing, session);
+      if (body.marketing_opt_in === true) await saveMarketingConsent(sb, existing, { optIn: true, source: "signup" });
+      return NextResponse.json({ state: "exists", email: row.email }, { status: 409 });
+    }
     const meta = { first_name: row.first_name || "", last_name: row.last_name || "", full_name: [row.first_name, row.last_name].filter(Boolean).join(" ") };
     const { data, error } = await sb.auth.admin.createUser({ email: row.email, password, email_confirm: true, user_metadata: meta });
     if (error) {
       if (error.code === "email_exists" || error.status === 422) {
         const uid = await userIdByEmail(sb, row.email);
-        if (uid) await claimGuestCheckout(sb, row, uid, session);
+        if (uid) {
+          await claimGuestCheckout(sb, row, uid, session);
+          if (body.marketing_opt_in === true) await saveMarketingConsent(sb, uid, { optIn: true, source: "signup" });
+        }
         return NextResponse.json({ state: "exists", email: row.email }, { status: 409 });
       }
       if (error.code === "weak_password") return NextResponse.json({ error: error.message }, { status: 400 });
       throw error;
     }
     const r = await claimGuestCheckout(sb, row, data.user.id, session);
+    if (body.marketing_opt_in === true) await saveMarketingConsent(sb, data.user.id, { optIn: true, source: "signup" });
     return NextResponse.json({ state: "created", email: row.email, plan: row.plan, trip_id: r.tripId || null });
   } catch (e) {
     console.error("welcome claim", e?.message);
