@@ -6,7 +6,7 @@ import SiteHeader from "../components/SiteHeader";
 import Logo from "../components/Logo";
 import { PlanCards } from "../components/PricingPlans";
 import TripHero from "../components/TripHero";
-import { US_AIRLINES, INTERNATIONAL_AIRLINES, airlineCoverageHeading } from "../lib/airlines";
+import { US_AIRLINES, INTERNATIONAL_AIRLINES } from "../lib/airlines";
 import { FAQ } from "../lib/faq";
 
 
@@ -131,7 +131,7 @@ export default function PetPassGoLanding() {
       <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-12 lg:py-20">
         <div className="max-w-[1240px] mx-auto px-6 md:px-14">
           <Eyebrow>AIRLINES</Eyebrow>
-          <H2>{airlineCoverageHeading()}</H2>
+          <H2>Wherever you're flying, we've got you covered.</H2>
           <div className="mt-10 space-y-8">
             {HOME_AIRLINE_GROUPS.map((group) => (
               <div key={group.title}>
