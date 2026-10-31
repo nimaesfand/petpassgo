@@ -281,7 +281,7 @@ export default function PetPassGoLanding() {
         </div>
       </section>
 
-      <footer className="px-4 sm:px-6 md:px-14 py-10" style={{ background: tokens.navyDeep, color: "#D5DEEB" }}>
+      <footer className="px-4 sm:px-6 md:px-14 pt-10 pb-28 md:pb-10" style={{ background: tokens.navyDeep, color: "#D5DEEB" }}>
         <div className="max-w-[1240px] mx-auto">
           <div className="flex items-center gap-2 mb-5">
             <Logo size={34} />

@@ -1083,7 +1083,7 @@ export default function AccountPage() {
       {loading ? (
         <div className="flex items-center justify-center py-24" style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div>
       ) : (
-      <div className="w-full max-w-[1100px] mx-auto px-4 md:px-8 pt-8 md:pt-12 pb-28 md:pb-12">
+      <div className="w-full max-w-[1100px] mx-auto px-4 md:px-8 pt-8 md:pt-12 ppg-account-clear">
         <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
           <div>
             <h1 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 34, color: tokens.navy, lineHeight: 1.1 }}>Your dashboard</h1>

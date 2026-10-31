@@ -31,7 +31,7 @@ export default function JoinPage() {
     if (e) { setErr(e); setBusy(false); }
   }
   return (
-    <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full">
+    <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full ppg-fab-clear">
       <SiteHeader />
       <div className="w-full flex justify-center px-4 py-10 md:py-16">
         <div className="w-full max-w-[440px] rounded-2xl p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
