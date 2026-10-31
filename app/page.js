@@ -32,19 +32,18 @@ function Eyebrow({ children, color = tokens.stamp }) {
 }
 
 const PASS_BENEFITS = [
-  ["Checklist you check off", "Each step can be marked done. What is left stays on the pass."],
-  ["Carrier size and weight", "When a pass shows a published limit, it compares that limit with the weight and carrier size saved on the pet in Pet Vault."],
-  ["Weather and cargo temperature", "Weather at both airports, and a cargo temperature check when a forecast is in."],
-  ["Vets and pet stores", "Nearby vets and pet stores for where you land."],
-  ["Flight-day status", "Flight status, your documents, and Pet ID on the flight-day screen."],
+  ["Your step-by-step checklist", "Everything your pet needs for this trip, in order. Check things off as you go and watch your progress fill up."],
+  ["Will your pet fit?", "Enter your pet's weight and carrier size, and we'll tell you if they meet your airline's limits."],
+  ["Weather and cargo safety", "Live weather at both airports, plus a heads-up if it's too hot or cold for pets flying in cargo."],
+  ["Vets and pet stores where you land", "Find vets and pet stores near you the moment you arrive."],
+  ["Everything in one place on travel day", "Flight status, your pet's documents and Pet ID, ready to show at the counter."],
 ];
 
 const VAULT_BENEFITS = [
-  ["Pet ID with a QR code", "A digital Pet ID. The QR code opens the public page for that pet."],
-  ["Finder messages", "Someone who finds your pet can message you through PetPassGo."],
-  ["Report lost and a flyer", "Report lost starts the lost-pet flyer you can print and share."],
-  ["Documents", "Files you add stay with the pet."],
-  ["Reminders", "Reminders before a saved document expires."],
+  ["Digital Pet ID", "Your pet's profile in one place: name, breed, weight, and whether they're a pet or a service animal, plus your contact info. Show the Pet ID from your phone, or share it with a QR code scan."],
+  ["Lost pet help", "If your pet goes missing, report them lost and get a printable flyer to share. Anyone who scans your pet's QR code can message you right away, and that message does not show your phone number."],
+  ["Documents", "Keep vaccination records, health records and vet records ready whenever you need them."],
+  ["Reminders", "We'll remind you before something expires, like a rabies vaccine or a health certificate, so you're never caught off guard."],
 ];
 
 function BenefitList({ items, card = "#fff" }) {
@@ -94,14 +93,14 @@ export default function PetPassGoLanding() {
 
       <section className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14 py-10 lg:py-14">
         <Eyebrow>TRAVEL PASS</Eyebrow>
-        <H2>What Travel Pass gives you</H2>
+        <H2>What's included in your Travel Pass</H2>
         <BenefitList items={PASS_BENEFITS} />
       </section>
 
       <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-10 lg:py-14">
         <div className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14">
           <Eyebrow>PET VAULT</Eyebrow>
-          <H2>What Pet Vault keeps safe</H2>
+          <H2>What's in your Pet Vault</H2>
           <BenefitList items={VAULT_BENEFITS} card={tokens.sky} />
         </div>
       </section>

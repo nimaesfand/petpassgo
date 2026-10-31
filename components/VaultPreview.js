@@ -66,8 +66,8 @@ export default function VaultPreview() {
 
       <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${tokens.line}` }}>
         <Section title="Documents" hint="None yet" open>
-          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>None yet. Files you add stay with the pet.</p>
-          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mt-2">Reminders go out before a saved document expires.</p>
+          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>None yet. Keep vaccination records, health records and vet records ready whenever you need them.</p>
+          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mt-2">We'll remind you before something expires, like a rabies vaccine or a health certificate, so you're never caught off guard.</p>
         </Section>
         <Section title="Pet ID page" hint="After you add a pet">
           <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>The public page is the one a finder sees from the QR code. It is created for your pet, not shown here.</p>

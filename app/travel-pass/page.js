@@ -14,7 +14,7 @@ export default function TravelPassPage() {
       <main className="max-w-[720px] mx-auto px-4 sm:px-6 py-8 lg:py-12">
         <h1 style={{ fontFamily: font.display, fontWeight: 700, color: tokens.navy, lineHeight: 1.1 }} className="text-[32px] lg:text-[44px]">Travel Pass</h1>
         <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mt-3 mb-6">
-          One trip. After you pay, the pass has the checklist you check off, flight-day status, weather, a cargo temperature check, and nearby vets and pet stores.
+          One trip. After you pay, the pass includes your step-by-step checklist, whether your pet will fit, weather and cargo safety, vets and pet stores where you land, and everything in one place on travel day.
         </p>
         <TravelPassPreview />
         <div className="rounded-3xl p-6 sm:p-8 mt-8 text-center" style={{ background: tokens.navy }}>
