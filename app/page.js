@@ -1,7 +1,10 @@
+import Image from "next/image";
 import { tokens, font } from "../lib/theme";
 import SiteHeader from "../components/SiteHeader";
 import Logo from "../components/Logo";
 import Icon from "../components/Icon";
+import TrustBadges from "../components/TrustBadges";
+import GuaranteeLine from "../components/GuaranteeLine";
 import TripHero from "../components/TripHero";
 import PassPhone from "../components/home/PassPhone";
 import VaultCluster from "../components/home/VaultCluster";
@@ -235,21 +238,10 @@ export default function PetPassGoLanding() {
           <div className="mt-8">
             <HomePricing />
           </div>
-        </div>
-      </section>
-
-      <section style={{ background: "#fff", borderBottom: `1px solid ${tokens.line}` }} className="py-6 lg:py-8">
-        <div className={`${WRAP} flex gap-4 items-start`}>
-          <span aria-hidden="true" className="flex items-center justify-center rounded-2xl flex-shrink-0" style={{ width: 48, height: 48, background: tokens.navy, color: tokens.gold }}>
-            <Icon name="shield" size={24} />
-          </span>
-          <div className="min-w-0">
-            <h2 style={{ fontFamily: D, fontWeight: 700, fontSize: 20, color: tokens.navy, lineHeight: 1.3 }}>Flight-Ready Guarantee</h2>
-            <p style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mt-1">
-              If a requirement we showed was wrong and your pet was refused boarding, we refund your pass.{" "}
-              <a data-testid="guarantee-link" href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Conditions apply</a>
-            </p>
+          <div className="mt-6 max-w-[40rem]" data-testid="guarantee-link">
+            <GuaranteeLine tone="light" />
           </div>
+          <TrustBadges className="mt-6" />
         </div>
       </section>
 
@@ -273,13 +265,24 @@ export default function PetPassGoLanding() {
         </div>
       </section>
 
-      <section style={{ background: tokens.navy }} className="py-14 lg:py-20">
-        <div className={`${WRAP} text-center max-w-[760px]`}>
-          <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.12 }} className="text-[32px] md:text-[44px] font-bold">Make travel easier for you and your pet.</h2>
-          <p style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: "#E7EDF6" }} className="mt-4 mb-7 mx-auto max-w-[36rem]">
-            Get the steps for this trip, then keep your pet's ID and records in one place.
-          </p>
-          <PlanTripButton />
+      <section className="relative overflow-hidden min-h-[520px] lg:min-h-[440px]" style={{ background: tokens.navyDeep }}>
+        <Image
+          src="/images/hero-golden-retriever.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover object-[78%_32%]"
+        />
+        <div className="absolute inset-0 lg:hidden" style={{ background: "linear-gradient(to top, rgba(11,21,41,0.96) 0%, rgba(11,21,41,0.9) 34%, rgba(11,21,41,0.28) 68%, rgba(11,21,41,0.12) 100%)" }} aria-hidden="true" />
+        <div className="absolute inset-0 hidden lg:block" style={{ background: "linear-gradient(90deg, rgba(11,21,41,0.94) 0%, rgba(11,21,41,0.84) 40%, rgba(11,21,41,0.22) 100%)" }} aria-hidden="true" />
+        <div className={`relative ${WRAP} py-16 lg:py-20 min-h-[520px] lg:min-h-[440px] flex flex-col justify-end lg:justify-center`}>
+          <div className="max-w-[36rem]">
+            <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.12 }} className="text-[32px] md:text-[44px] font-bold">Make travel easier for you and your pet.</h2>
+            <p style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: "#E7EDF6" }} className="mt-4 mb-7">
+              Get the steps for this trip, then keep your pet's ID and records in one place.
+            </p>
+            <PlanTripButton />
+          </div>
         </div>
       </section>
 

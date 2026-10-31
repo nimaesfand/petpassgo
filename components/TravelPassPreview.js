@@ -1,160 +1,217 @@
 "use client";
 
 import { useState } from "react";
-import { tokens, font } from "../lib/theme";
 import Icon from "./Icon";
-import MaskedLine from "./MaskedLine";
+import { tokens, font } from "../lib/theme";
+import { PASS_TAB_LIST, PassTabs, RouteLine, SoftCard, StatusChip, TextButton } from "./travelPassUi";
 
-const TABS = [
-  ["overview", "Overview"],
-  ["flight", "Flight & weather"],
-  ["checklist", "Checklist"],
-  ["reminders", "Reminders"],
+const DEMO_STEPS = [
+  "Add your pet",
+  "Save the travel date",
+  "Check whether your pet will fit",
+  "Look up the flight",
+  "Pack your documents",
+  "Read your reminders",
 ];
 
-function Shell({ children }) {
+const DEMO_REMINDERS = [
+  { icon: "calendar", title: "30 days before you fly", when: "Mar 19 · sample" },
+  { icon: "check", title: "A week before you fly", when: "Apr 11 · sample" },
+  { icon: "plane", title: "Flight day", when: "Apr 18 · sample" },
+];
+
+function CheckMark({ on }) {
   return (
-    <div className="rounded-2xl p-4 sm:p-5 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-      {children}
-    </div>
+    <span aria-hidden className="flex items-center justify-center flex-shrink-0 rounded-full" style={{ width: 28, height: 28, background: on ? "#EAF6EE" : tokens.sky, color: on ? tokens.green : tokens.muted }}>
+      <Icon name={on ? "check" : "clock"} size={16} />
+    </span>
   );
-}
-
-function Title({ children }) {
-  return <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 18, color: tokens.navy }} className="mb-2">{children}</div>;
-}
-
-function Note({ children }) {
-  return <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mt-2">{children}</p>;
 }
 
 export default function TravelPassPreview() {
   const [section, setSection] = useState("overview");
-  const [open, setOpen] = useState(true);
-  const [done, setDone] = useState(false);
+  const [done, setDone] = useState(() => DEMO_STEPS.map((_, i) => i < 4));
+  const complete = done.filter(Boolean).length;
+
+  function toggle(i) {
+    setDone((rows) => rows.map((v, n) => (n === i ? !v : v)));
+  }
 
   return (
-    <div>
-      <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.muted }} className="mb-4">
-        This is the Travel Pass layout. It is not a trip. Airline rules, dates, and flight details stay hidden until you pay.
+    <div className="mt-8">
+      <p className="mb-3" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>
+        <span className="rounded-full px-3 py-1 mr-2" style={{ background: tokens.gold, color: tokens.navy, fontWeight: 700 }}>Preview</span>
+        Sample trip only. Airline rules, real dates, and flight details stay hidden until you pay.
       </p>
 
-      <div className="rounded-xl p-5 mb-4" style={{ background: tokens.navy }}>
-        <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, letterSpacing: "0.08em", color: tokens.gold }}>YOUR TRAVEL PASS</div>
-        <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: "#fff" }} className="mt-1">Your trip</div>
-        <div className="flex items-center gap-2 flex-wrap mt-3" style={{ color: "#fff" }}>
-          <MaskedLine label="Departure, after you pay" width="88px" />
-          <span aria-hidden="true" style={{ fontFamily: font.body, fontSize: 16 }}>→</span>
-          <MaskedLine label="Arrival, after you pay" width="88px" />
+      <div className="rounded-3xl p-5 sm:p-6 mb-4" style={{ background: tokens.navy }}>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="rounded-full flex items-center justify-center flex-shrink-0" style={{ width: 64, height: 64, background: tokens.gold, color: tokens.navy }}>
+              <Icon name="paw" size={30} />
+            </div>
+            <div className="min-w-0">
+              <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, letterSpacing: "0.08em", color: tokens.gold }}>YOUR TRIP · SAMPLE</div>
+              <div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: "#fff", lineHeight: 1.15 }}>Maple</div>
+              <div className="flex flex-wrap items-center gap-2 mt-1">
+                <span style={{ fontFamily: font.body, fontSize: 16, color: tokens.sky }}>Golden retriever · 64 lb</span>
+                <span className="rounded-full px-3 py-1" style={{ background: "rgba(255,255,255,0.12)", color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 15 }}>Dog</span>
+              </div>
+            </div>
+          </div>
+          <div className="sm:text-right">
+            <div style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: "#fff" }}>Apr 18 · sample</div>
+            <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.sky }}>LAX to JFK · Nonstop · 5h 15m</div>
+          </div>
         </div>
-        <div className="mt-3"><MaskedLine label="Airline and date, after you pay" width="180px" /></div>
         <div className="mt-4">
-          <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, letterSpacing: "0.06em", color: tokens.sky }}>TRIP READINESS</div>
-          <div className="w-full h-[6px] rounded-full mt-2" style={{ background: "rgba(255,255,255,0.15)" }} />
-          <p style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.45, color: tokens.sky }} className="mt-2">The bar fills as you check steps off, after you pay.</p>
+          <div className="flex items-center justify-between gap-3 mb-1.5">
+            <span style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.sky }}>Trip readiness</span>
+            <span style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: "#fff" }}>{complete} of {DEMO_STEPS.length} steps complete</span>
+          </div>
+          <div className="w-full h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.18)" }}>
+            <div className="h-full rounded-full" style={{ width: `${Math.round((complete / DEMO_STEPS.length) * 100)}%`, background: "#7DCEA0" }} />
+          </div>
         </div>
+        <button type="button" onClick={() => setSection("documents")} className="mt-4 w-full sm:w-auto rounded-full px-5 py-3" style={{ background: "#fff", color: tokens.navy, fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer", minHeight: 48 }}>View your Pet ID</button>
       </div>
 
-      <div role="tablist" aria-label="Travel Pass sections" className="flex flex-wrap gap-1 mb-4 p-1 rounded-2xl" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-        {TABS.map(([k, label]) => (
-          <button key={k} type="button" role="tab" aria-selected={section === k} onClick={() => setSection(k)} className="rounded-full px-4 py-2 min-h-[44px]" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, background: section === k ? tokens.navy : "transparent", color: section === k ? "#fff" : tokens.ink, border: "none", cursor: "pointer" }}>
-            {label}
-          </button>
-        ))}
-      </div>
+      <PassTabs tabs={PASS_TAB_LIST} value={section} onChange={setSection} label="Travel Pass preview sections" />
 
       {section === "overview" && (
-        <>
-          <Shell>
-            <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, letterSpacing: "0.08em", color: tokens.muted }}>FLIGHT STATUS</div>
-            <div className="mt-2"><MaskedLine label="Flight status, after you pay" width="160px" /></div>
-            <Note>Flight-day status shows here when a flight number is on the pass, with your documents and Pet ID on that screen.</Note>
-          </Shell>
-          <Shell>
-            <Title>Needs action</Title>
-            <div className="rounded-xl px-4 py-3" style={{ background: tokens.paper }}><MaskedLine label="Checklist step, after you pay" width="78%" /></div>
-            <button type="button" onClick={() => setSection("checklist")} className="rounded-full px-5 py-3 mt-3 min-h-[48px]" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>Open the checklist</button>
-          </Shell>
-        </>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <SoftCard title="Flight status" action={<StatusChip>On schedule</StatusChip>}>
+            <RouteLine from="LAX" to="JFK" />
+            <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mt-3">Apr 18 · 9:10 AM sample · Nonstop · 5h 15m</p>
+            <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-1">Sample status. A live flight shows here after you pay and add a flight number.</p>
+            <div className="mt-3"><TextButton onClick={() => setSection("flight")}>View full flight details</TextButton></div>
+          </SoftCard>
+          <SoftCard title="Weather at destination">
+            <div className="flex items-center gap-3">
+              <span style={{ color: tokens.navy }}><Icon name="cloudSun" size={36} /></span>
+              <div>
+                <div style={{ fontFamily: font.display, fontSize: 32, fontWeight: 700, color: tokens.navy, lineHeight: 1 }}>68°</div>
+                <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>New York · Partly cloudy</div>
+              </div>
+            </div>
+            <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mt-3">High 72° · Low 54° · Wind 9 mph</p>
+            <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-1">Sample weather. The paid pass shows live weather at both airports, plus a cargo heat and cold check.</p>
+          </SoftCard>
+          <SoftCard title="Vets and pet stores" action={null}>
+            <div className="flex gap-4">
+              {[["stethoscope", "Vets"], ["bag", "Pet stores"]].map(([icon, label]) => (
+                <div key={label} className="flex flex-col items-center gap-2">
+                  <span className="flex items-center justify-center rounded-full" style={{ width: 64, height: 64, background: tokens.sky, color: tokens.navy }}><Icon name={icon} size={28} /></span>
+                  <span style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>{label}</span>
+                </div>
+              ))}
+            </div>
+            <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-3">Names stay hidden until you pay. They come from public map data near arrival and departure.</p>
+            <div className="mt-3"><TextButton onClick={() => setSection("destination")}>View map & locations</TextButton></div>
+          </SoftCard>
+          <SoftCard title="Travel checklist">
+            <p style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.green }} className="mb-2">{complete} of {DEMO_STEPS.length} complete</p>
+            <ul className="space-y-2">
+              {DEMO_STEPS.slice(0, 4).map((step, i) => (
+                <li key={step} className="flex items-center gap-2">
+                  <CheckMark on={done[i]} />
+                  <span style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>{step}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-3"><TextButton onClick={() => setSection("checklist")}>Open the checklist</TextButton></div>
+          </SoftCard>
+          <SoftCard title="Important reminders">
+            <ul className="space-y-3">
+              {DEMO_REMINDERS.map((r) => (
+                <li key={r.title} className="flex items-center gap-3">
+                  <span className="flex items-center justify-center rounded-xl flex-shrink-0" style={{ width: 40, height: 40, background: tokens.sky, color: tokens.navy }}><Icon name={r.icon} size={20} /></span>
+                  <span>
+                    <span className="block" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{r.title}</span>
+                    <span className="block" style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>{r.when}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-3">Sample dates. On a paid pass, reminders use your travel date and any Vault expiration dates.</p>
+          </SoftCard>
+          <SoftCard title="Your documents">
+            <div className="grid grid-cols-2 gap-2">
+              {[["Pet ID", true], ["Vaccination records", true], ["DOT form", false], ["Travel Pass summary", true]].map(([label, on]) => (
+                <div key={label} className="rounded-xl p-3" style={{ background: tokens.paper }}>
+                  <CheckMark on={on} />
+                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, color: tokens.navy }} className="mt-2">{label}</div>
+                </div>
+              ))}
+            </div>
+            <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-3">The DOT form is a PDF for a service-dog trip you mark yourself. PetPassGo does not decide that status.</p>
+          </SoftCard>
+        </div>
       )}
 
       {section === "flight" && (
-        <>
-          <Shell>
-            <Title>Weather on travel day</Title>
-            <div className="flex gap-3 flex-wrap">
-              {["Depart", "Arrive"].map((label) => (
-                <div key={label} className="rounded-xl p-4 flex-1 min-w-[140px]" style={{ background: tokens.sky }}>
-                  <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.muted }}>{label}</div>
-                  <div className="mt-2"><MaskedLine label={`${label} weather, after you pay`} width="72px" /></div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-3 rounded-lg p-3" style={{ background: tokens.sky }}>
-              <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>Cargo temperature check</div>
-              <div className="mt-2"><MaskedLine label="Cargo temperature note, after you pay" width="86%" /></div>
-            </div>
-            <Note>Weather at both airports, and a cargo temperature check, appear here for the trip. No airline page is linked on this preview.</Note>
-          </Shell>
-          <Shell>
-            <Title>Nearby</Title>
-            <div className="flex gap-2 flex-wrap mb-3">
-              {["Vets", "Pet stores"].map((label) => (
-                <span key={label} className="rounded-full px-3.5 py-2" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, background: tokens.sky, color: tokens.navy }}>{label}</span>
-              ))}
-            </div>
-            {["Vet", "Pet store"].map((label) => (
-              <div key={label} className="flex items-center justify-between gap-3 py-3" style={{ borderTop: `1px solid ${tokens.line}` }}>
-                <span style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{label}</span>
-                <MaskedLine label={`${label} name, after you pay`} width="46%" />
-              </div>
-            ))}
-            <Note>Vets and pet stores near where you land. Names are not shown until the trip is paid.</Note>
-          </Shell>
-        </>
+        <SoftCard title="Flight and weather">
+          <RouteLine from="LAX" to="JFK" />
+          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mt-3">After you pay, this screen shows live flight status when you add a flight number, weather at both airports, and a cargo temperature check for heat and cold. No airline page is linked on this preview.</p>
+        </SoftCard>
       )}
 
       {section === "checklist" && (
-        <Shell>
-          <Title>Checklist</Title>
-          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mb-3">
-            After you pay, steps split into Do these first and General prep. A ring shows how much is checked. When every step is checked, the pass says Travel Pass complete and keeps the list. The step text is hidden here. Marking this row does not save.
-          </p>
-          <article className="rounded-2xl overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-            <button type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)} className="w-full flex items-center gap-2.5 px-3 py-3 text-left" style={{ minHeight: 56, background: "transparent", border: "none", cursor: "pointer" }}>
-              <span aria-hidden className="flex items-center justify-center flex-shrink-0 rounded-xl" style={{ width: 36, height: 36, background: tokens.sky, color: tokens.navy }}><Icon name="check" size={20} /></span>
-              <span className="flex-1 min-w-0"><MaskedLine label="Checklist step, after you pay" width="80%" /></span>
-              <span className="flex-shrink-0 rounded-full px-2.5 py-1" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, background: done ? "#EAF6EE" : tokens.sky, color: done ? tokens.green : tokens.navy }}>{done ? "Done" : "To do"}</span>
-            </button>
-            {open && (
-              <div className="px-3 pb-3">
-                <div className="rounded-xl p-3 mb-2" style={{ background: tokens.paper }}>
-                  <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, letterSpacing: "0.06em", color: tokens.muted }}>WHAT TO DO</div>
-                  <div className="mt-2"><MaskedLine label="Step instructions, after you pay" width="92%" /></div>
-                </div>
-                <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mb-2">
-                  If the pet’s Vault has a weight and carrier size, and the pass has a published limit, the pass says whether they fit. That comparison is hidden here.
-                </p>
-                <button type="button" onClick={() => setDone((v) => !v)} className="w-full rounded-full py-3.5 min-h-[48px]" style={{ background: done ? "#fff" : tokens.navy, color: done ? tokens.navy : "#fff", border: done ? `2px solid ${tokens.navy}` : "none", fontFamily: font.body, fontWeight: 700, fontSize: 16, cursor: "pointer" }}>
-                  {done ? "Mark not done" : "Mark done"}
+        <SoftCard title="Checklist">
+          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mb-3">These rows are a sample of the layout. They are not airline rules, and marking one does not save. After you pay, steps split into Do these first and General prep, with due dates and a progress count.</p>
+          <ul className="space-y-2">
+            {DEMO_STEPS.map((step, i) => (
+              <li key={step}>
+                <button type="button" onClick={() => toggle(i)} className="w-full flex items-center gap-3 rounded-xl px-3 py-3 text-left" style={{ background: tokens.paper, border: "none", cursor: "pointer", minHeight: 52 }}>
+                  <CheckMark on={done[i]} />
+                  <span className="flex-1" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{step}</span>
+                  <span style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: done[i] ? tokens.green : tokens.navy }}>{done[i] ? "Done" : "To do"}</span>
                 </button>
-              </div>
-            )}
-          </article>
-        </Shell>
+              </li>
+            ))}
+          </ul>
+        </SoftCard>
       )}
 
       {section === "reminders" && (
-        <Shell>
-          <Title>Reminders</Title>
-          {["Before the trip", "Flight day"].map((label) => (
-            <div key={label} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3 mb-2" style={{ background: tokens.paper }}>
-              <span style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{label}</span>
-              <MaskedLine label="Reminder date, after you pay" width="96px" />
-            </div>
-          ))}
-          <Note>Reminders are timed from the travel date on the pass. Dates are not shown on this preview.</Note>
-        </Shell>
+        <SoftCard title="Reminders">
+          <ul className="space-y-3">
+            {DEMO_REMINDERS.map((r) => (
+              <li key={r.title} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
+                <span className="flex items-center gap-3">
+                  <Icon name={r.icon} size={20} />
+                  <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{r.title}</span>
+                </span>
+                <span style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>{r.when}</span>
+              </li>
+            ))}
+          </ul>
+        </SoftCard>
+      )}
+
+      {section === "documents" && (
+        <SoftCard title="Documents">
+          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mb-3">Your Pet ID opens from the paid pass. This preview is not a real ID, and nothing here is verified.</p>
+          <ul className="space-y-2">
+            {["Pet ID", "Vaccination records", "DOT service animal form, when the trip is a service dog", "Travel Pass summary"].map((label) => (
+              <li key={label} className="rounded-xl px-4 py-3" style={{ background: tokens.paper, fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{label}</li>
+            ))}
+          </ul>
+        </SoftCard>
+      )}
+
+      {section === "destination" && (
+        <SoftCard title="Destination">
+          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>Vets and pet stores near where you land, and near where you leave, from public map data. Place names are not shown until the trip is paid.</p>
+          <div className="flex gap-4 mt-4">
+            {[["stethoscope", "Vets"], ["bag", "Pet stores"]].map(([icon, label]) => (
+              <div key={label} className="flex flex-col items-center gap-2">
+                <span className="flex items-center justify-center rounded-full" style={{ width: 64, height: 64, background: tokens.sky, color: tokens.navy }}><Icon name={icon} size={28} /></span>
+                <span style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </SoftCard>
       )}
     </div>
   );

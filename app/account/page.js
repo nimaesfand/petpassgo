@@ -4,8 +4,8 @@ import Icon from "../../components/Icon";
 import { telHref } from "../../lib/linkify";
 import { VAULT_NAME, VAULT_SUB, MEMBERSHIP_TERMS } from "../../lib/travelPassOffer";
 import GuaranteeLine from "../../components/GuaranteeLine";
+import TrustBadges from "../../components/TrustBadges";
 import React, { useEffect, useState } from "react";
-import { LiveFlightCard } from "../../components/FlightLookup";
 import { supabase } from "../../lib/supabaseClient";
 import { usePetAccess } from "../../lib/access";
 import WinBack from "../../components/WinBack";
@@ -18,7 +18,8 @@ import { trackBeginCheckout, trackPurchaseOnce, getAttribution } from "../../lib
 import { requirementAirline } from "../../lib/airlines";
 import { tripTypeForRoute } from "../../lib/airports";
 import SiteHeader from "../../components/SiteHeader";
-import { useTripPet, isTravelDay, TripCountdown, DayOfMode, PetReliefCard, TripExtras } from "../../components/TripLive";
+import { useTripPet, TripCountdown } from "../../components/TripLive";
+import TravelPassDashboard from "../../components/TravelPassDashboard";
 import { maskChip, ChipVault, HealthPassport, ShareCard, WalletCard, ActivationChecklist } from "../../components/PetIdV2";
 import { WhatsNeededNext, TravelStamps, FindAVet } from "../../components/PetExtras";
 import VetImport from "../../components/VetImport";
@@ -28,15 +29,13 @@ import FeedbackPrompt from "../../components/FeedbackPrompt";
 import MobileBottomNav from "../../components/MobileBottomNav";
 import LostPanel from "../../components/LostPanel";
 import PetIdCard, { PetIllustration } from "../../components/PetIdCard";
-import TripTimeline from "../../components/TripTimeline";
-import DocCheck from "../../components/DocCheck";
-import PassChecklist from "../../components/PassChecklist";
-import RoundTripAddon from "../../components/RoundTripAddon";
-import { buildPassCards, groupCards, isServiceRole, matchesDestination, passProgress } from "../../lib/passCards";
+import PetProfileExperience from "../../components/PetProfileExperience";
+import MarketingOptIn from "../../components/MarketingOptIn";
+import MarketingSettings from "../../components/MarketingSettings";
+import { buildPassCards, groupCards, matchesDestination, passProgress } from "../../lib/passCards";
 import { pickTripPet } from "../../lib/tripPet";
 import { reminderSchedule, classifyReminder, todayPT } from "../../lib/travelDates";
 import { fmtTripDate } from "../../lib/tripAccess";
-import VetGuidance from "../../components/VetGuidance";
 import { BUCKET, SignedImg, getSignedUrl, toStoragePath } from "../../lib/storage";
 import { tokens, font } from "../../lib/theme";
 
@@ -319,157 +318,17 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
   const photoEl = pet.photo_url ? <SignedImg value={pet.photo_url} alt={pet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : null;
 
   return (
-    <div id={`pet-top-${pet.id}`} data-pet-passport className="rounded-2xl p-4 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-      <div className="flex items-center gap-3">
-        <div className="relative flex-shrink-0">
-          <div className="rounded-2xl overflow-hidden flex items-center justify-center" style={{ width: 60, height: 60, background: tokens.sky, border: `2px solid ${isService(pet.role) ? tokens.primary : tokens.gold}` }}>
-            {photoEl || <PetIllustration type={pet.animal_type} size={56} />}
-          </div>
-          <label aria-label="Change photo" className="absolute flex items-center justify-center" style={{ bottom: -4, right: -4, width: 24, height: 24, background: tokens.navy, borderRadius: "50%", cursor: "pointer", border: "2px solid #fff" }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: "none" }} />
-          </label>
-        </div>
-        <div className="flex-1 min-w-0">
-          <div style={{ fontFamily: font.display, fontSize: 21, fontWeight: 700, color: tokens.navy, lineHeight: 1.15 }}>{pet.name}</div>
-          <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>
-            {[pet.breed || pet.animal_type, pet.sex, calculateAge(pet.date_of_birth), pet.weight_lb ? `${pet.weight_lb} lb` : null, isService(pet.role) ? "Service dog" : null].filter(Boolean).join(" · ")}
-          </div>
-          {pet.passport_no && <div style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 700, color: tokens.navy, letterSpacing: "0.04em" }}>No. {pet.passport_no}</div>}
-        </div>
-        <button onClick={() => setShowEditForm((v) => !v)} className="rounded-full px-3.5 py-1.5" style={{ fontFamily: font.body, fontSize: 14, color: tokens.navy, fontWeight: 700, background: tokens.sky, border: "none", cursor: "pointer" }}>
-          {showEditForm ? "Close" : "Edit"}
-        </button>
-      </div>
-      {uploadingPhoto && <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mt-2">Uploading photo…</div>}
-
-      {showEditForm && (
-        <form data-pet-edit onSubmit={handleSaveEdit} className="rounded-xl p-3 mt-3 grid gap-2" style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}>
-          <input required placeholder="Name" value={editForm.name} onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))} style={field} className={fieldCls} />
-          <div className="grid grid-cols-2 gap-2">
-            <select value={editForm.animal_type} onChange={(e) => setEditForm((f) => ({ ...f, animal_type: e.target.value }))} style={field} className={fieldCls}><option>Dog</option><option>Cat</option><option>Other</option></select>
-            <select value={editForm.role} onChange={(e) => setEditForm((f) => ({ ...f, role: e.target.value }))} style={field} className={fieldCls}><option>Pet</option><option>Service animal</option></select>
-          </div>
-          <input placeholder="Breed" value={editForm.breed} onChange={(e) => setEditForm((f) => ({ ...f, breed: e.target.value }))} style={field} className={fieldCls} />
-          <div className="grid grid-cols-2 gap-2">
-            <input type="number" step="0.1" min="0.1" placeholder="Weight (lb)" aria-label="Weight in pounds" value={editForm.weight_lb} onChange={(e) => setEditForm((f) => ({ ...f, weight_lb: e.target.value }))} style={field} className={fieldCls} />
-            <input type="number" step="0.1" min="0.1" placeholder="Carrier length (in)" aria-label="Carrier length in inches" value={editForm.carrier_length_in} onChange={(e) => setEditForm((f) => ({ ...f, carrier_length_in: e.target.value }))} style={field} className={fieldCls} />
-            <input type="number" step="0.1" min="0.1" placeholder="Carrier width (in)" aria-label="Carrier width in inches" value={editForm.carrier_width_in} onChange={(e) => setEditForm((f) => ({ ...f, carrier_width_in: e.target.value }))} style={field} className={fieldCls} />
-            <input type="number" step="0.1" min="0.1" placeholder="Carrier height (in)" aria-label="Carrier height in inches" value={editForm.carrier_height_in} onChange={(e) => setEditForm((f) => ({ ...f, carrier_height_in: e.target.value }))} style={field} className={fieldCls} />
-          </div>
-          <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Weight and carrier size are used to check a limit only when the airline published one.</p>
-          <div className="grid grid-cols-2 gap-2">
-            <select value={editForm.sex} onChange={(e) => setEditForm((f) => ({ ...f, sex: e.target.value }))} style={field} className={fieldCls}><option value="">Sex</option><option>Male</option><option>Female</option></select>
-            <input type="date" aria-label="Date of birth" value={editForm.date_of_birth} onChange={(e) => setEditForm((f) => ({ ...f, date_of_birth: e.target.value }))} style={field} className={fieldCls} />
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <input placeholder={editForm.role === "Service animal" ? "Handler name" : "Owner name"} value={editForm.handler_name} onChange={(e) => setEditForm((f) => ({ ...f, handler_name: e.target.value }))} style={field} className={fieldCls} maxLength={80} />
-            <select aria-label="Trained" value={editForm.trained} onChange={(e) => setEditForm((f) => ({ ...f, trained: e.target.value }))} style={field} className={fieldCls}><option value="">Trained?</option><option value="yes">Trained: yes</option><option value="no">Trained: no</option></select>
-          </div>
-          {sub("Vet & emergency contact")}
-          <div className="grid grid-cols-2 gap-2">
-            <input placeholder="Vet name" value={editForm.vet_name} onChange={(e) => setEditForm((f) => ({ ...f, vet_name: e.target.value }))} style={field} className={fieldCls} />
-            <input placeholder="Vet phone" type="tel" value={editForm.vet_phone} onChange={(e) => setEditForm((f) => ({ ...f, vet_phone: e.target.value }))} style={field} className={fieldCls} />
-            <input placeholder="Emergency contact" value={editForm.emergency_contact_name} onChange={(e) => setEditForm((f) => ({ ...f, emergency_contact_name: e.target.value }))} style={field} className={fieldCls} />
-            <input placeholder="Their phone" type="tel" value={editForm.emergency_contact_phone} onChange={(e) => setEditForm((f) => ({ ...f, emergency_contact_phone: e.target.value }))} style={field} className={fieldCls} />
-          </div>
-          <div className="flex items-center gap-3 mt-1">
-            <button type="submit" disabled={savingEdit} className="rounded-full px-5 py-2.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 15, border: "none" }}>{savingEdit ? "Saving…" : "Save"}</button>
-            <button type="button" onClick={handleShare} style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 600, color: tokens.navy }}>{justCopied ? "Copied" : "Share info"}</button>
-            <button type="button" onClick={handleDeletePet} disabled={deleting} className="ml-auto" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.primary }}>{deleting ? "Removing…" : "Remove pet"}</button>
-          </div>
-        </form>
-      )}
-
-      {/* Pet ID: one tap to the polished card; lost report is a single button until used */}
-      <button data-preview-pet-id onClick={() => setShowId(true)} className="w-full mt-3 rounded-2xl px-4 py-3 flex items-center gap-3 text-left" style={{ background: `linear-gradient(135deg, ${tokens.navyDeep}, ${tokens.navy})`, border: "none", cursor: "pointer" }}>
-        <span className="rounded-lg p-1 flex-shrink-0" style={{ background: "#fff" }}><PetQr petId={pet.id} size={40} color={tokens.navy} /></span>
-        <span className="flex-1 min-w-0">
-          <span style={{ display: "block", fontFamily: font.body, fontWeight: 800, fontSize: 16, color: "#fff" }}>Preview Pet ID</span>
-          <span style={{ display: "block", fontFamily: font.body, fontSize: 15, color: tokens.sky }}>What a finder sees when they scan</span>
-        </span>
-        <span style={{ color: tokens.gold, fontSize: 22, fontWeight: 700 }} aria-hidden="true">›</span>
-      </button>
-      <PetIdSheet open={showId} onClose={() => setShowId(false)} card={card} photo={photoEl}>
-        <label className="flex items-start gap-3 rounded-2xl p-4" style={{ background: "#fff", cursor: "pointer" }}>
-          <input type="checkbox" className="mt-0.5 w-5 h-5 flex-shrink-0" style={{ accentColor: tokens.primary }} checked={!!pet.show_contact_on_public_id} disabled={savingContactToggle} onChange={(e) => togglePublicContact(e.target.checked)} />
-          <span style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, color: tokens.ink }}>Show {isService(pet.role) ? "handler" : "owner"} name and emergency contact to finders
-            <span style={{ display: "block", fontWeight: 400, fontSize: 14, color: tokens.muted }}>{pet.show_contact_on_public_id ? "On. Shown on the public page." : "Off. Finders message you privately."}</span>
-          </span>
-        </label>
-        <div className="flex gap-2 mt-3">
-          <a href={`/id/${pet.id}`} target="_blank" rel="noopener noreferrer" className="flex-1 text-center rounded-full px-4 py-3" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>Open public page</a>
-          <button onClick={() => { setShowId(false); setShowEditForm(true); setTimeout(() => document.getElementById(`pet-top-${pet.id}`)?.scrollIntoView({ behavior: "smooth" }), 50); }} className="flex-1 rounded-full px-4 py-3" style={{ background: "rgba(255,255,255,0.14)", color: "#fff", fontFamily: font.body, fontWeight: 700, border: "none", cursor: "pointer" }}>Edit details</button>
-        </div>
-      </PetIdSheet>
+    <div id={`pet-top-${pet.id}`} data-pet-passport className="mb-6 grid gap-4">
+      <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} />
       <LostPanel pet={pet} userId={userId} onChanged={onPhotoUpdated} />
 
       <ActivationChecklist pet={pet} userId={userId} refreshKey={healthKey} />
       <WhatsNeededNext pet={pet} />
 
-      <div className="grid grid-cols-3 gap-2 mt-3">
-        {[["pet-id", "Pet ID"], ["docs", "Documents"], ["reminders", "Reminders"]].map(([id, label]) => (
-          <a key={id} href={`#${id}-${pet.id}`} className="rounded-xl px-2 py-3 text-center" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontWeight: 700, fontSize: 15, textDecoration: "none", minHeight: 48 }}>{label}</a>
-        ))}
-      </div>
 
       <div className="mt-3 rounded-2xl overflow-hidden" style={{ border: `1px solid ${tokens.line}` }}>
-        <VaultSection id={`pet-id-${pet.id}`} title="Pet ID card" hint="QR code">
-          <WalletCard pet={pet} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
-          <div className="mt-4"><ShareCard pet={pet} userId={userId} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} /></div>
-        </VaultSection>
-        <VaultSection id={`docs-${pet.id}`} title="Documents" hint={loadingDocs ? "" : documents.length ? `${documents.length} file${documents.length === 1 ? "" : "s"}` : "None yet"}>
-          <div id={`documents-${pet.id}`}>
-          {!loadingDocs && documents.map((doc) => (
-            <div key={doc.id} className="flex items-center justify-between gap-2 py-2" style={{ borderTop: `1px solid ${tokens.line}` }}>
-              <a href="#" onClick={async (e) => { e.preventDefault(); const win = window.open("", "_blank"); const url = await getSignedUrl(doc.file_url); if (url && win) win.location.href = url; else if (win) win.close(); }} style={{ fontFamily: font.body, fontSize: 15, color: tokens.navy, textDecoration: "underline" }}>{doc.document_type}</a>
-              {doc.expires_on && <span style={{ fontFamily: font.body, fontSize: 13, color: doc.expires_on < new Date().toISOString().slice(0, 10) ? tokens.stamp : tokens.muted }} className="ml-auto">{doc.expires_on < new Date().toISOString().slice(0, 10) ? "Expired" : "Expires"} {new Date(doc.expires_on + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>}
-              <button onClick={() => handleDeleteDocument(doc)} style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.stamp }}>Remove</button>
-            </div>
-          ))}
-          {!showUploadForm ? (
-            <button onClick={() => setShowUploadForm(true)} className="mt-2 rounded-full px-4 py-2" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.navy, fontWeight: 700, background: tokens.sky, border: "none" }}>Upload a document</button>
-          ) : (
-            <form onSubmit={handleUpload} className="mt-3 grid gap-2">
-              <select value={docType} onChange={(e) => setDocType(e.target.value)} style={field} className={fieldCls}>
-                <option>Vaccination record</option><option>Health certificate</option><option>Training documentation</option><option>Microchip registration</option><option>Insurance policy</option><option>Other</option>
-              </select>
-              <input type="file" accept="image/*,application/pdf" onChange={(e) => setSelectedFile(e.target.files[0])} style={{ fontFamily: font.body, fontSize: 14.5 }} />
-              <label style={{ fontFamily: font.body, fontSize: 14, color: tokens.navy }} className="flex items-center gap-2">Expires (optional)
-                <input type="date" value={expiresOn} onChange={(e) => setExpiresOn(e.target.value)} style={field} className="rounded-lg px-3 py-1.5 outline-none" />
-              </label>
-              <div className="flex gap-3">
-                <button type="submit" disabled={uploading || !selectedFile} className="rounded-full px-5 py-2" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 14.5, border: "none" }}>{uploading ? "Uploading…" : "Upload"}</button>
-                <button type="button" onClick={() => setShowUploadForm(false)} style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>Cancel</button>
-              </div>
-            </form>
-          )}
-          </div>
-        </VaultSection>
-        <VaultSection id={`reminders-${pet.id}`} title="Reminders" hint={reminders.length ? `${reminders.length} dated` : "None yet"}>
-          {reminders.length === 0 ? (
-            <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>No expiry dates yet. Add one on a document or a health record and it shows up here.</p>
-          ) : (
-            <ul className="grid gap-2">
-              {reminders.map((item) => (
-                <li key={item.id} className="flex items-center justify-between gap-3 rounded-xl px-3 py-3" style={{ background: tokens.paper }}>
-                  <span style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{item.label}</span>
-                  <span style={{ fontFamily: font.body, fontSize: 15, color: item.date < new Date().toISOString().slice(0, 10) ? tokens.stamp : tokens.ink }}>{item.date < new Date().toISOString().slice(0, 10) ? "Expired" : "Expires"} {new Date(item.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </VaultSection>
-        <VaultSection id={`health-${pet.id}`} anchor="health-passport" title="Health records" hint={rab.tone === "good" ? "Rabies current" : healthRows.length ? `${healthRows.length} record${healthRows.length === 1 ? "" : "s"}` : "None yet"} hintTone={rab.tone === "bad" ? "bad" : null}>
-          <HealthPassport pet={pet} userId={userId} refreshKey={healthKey} bare onRows={(rows) => setHealthRows(rows)} />
-          <VetImport pet={pet} userId={userId} onSaved={() => { setHealthKey((v) => v + 1); onPhotoUpdated(); }} />
-        </VaultSection>
-        <VaultSection id={`vet-${pet.id}`} title="Vet & emergency contact" hint={pet.vet_name || pet.emergency_contact_name ? "Saved" : "Not added"}>
-          <div className="grid gap-1.5" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>
-            <div><span style={{ color: tokens.muted }}>Vet: </span>{pet.vet_name || "Not added"}{pet.vet_phone ? <> · <a href={`tel:${pet.vet_phone.replace(/[^0-9+]/g, "")}`} style={{ color: tokens.primary, fontWeight: 700 }}>{pet.vet_phone}</a></> : null}</div>
-            <div><span style={{ color: tokens.muted }}>Emergency: </span>{pet.emergency_contact_name || "Not added"}{pet.emergency_contact_phone ? <> · <a href={`tel:${pet.emergency_contact_phone.replace(/[^0-9+]/g, "")}`} style={{ color: tokens.primary, fontWeight: 700 }}>{pet.emergency_contact_phone}</a></> : null}</div>
-            <button onClick={() => { setShowEditForm(true); document.getElementById(`pet-top-${pet.id}`)?.scrollIntoView({ behavior: "smooth" }); }} className="justify-self-start mt-1" style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 700, color: tokens.navy, textDecoration: "underline" }}>Edit</button>
-          </div>
+        <VaultSection id={`pet-id-${pet.id}`} title="Care card" hint="Sitter or emergency">
+          <ShareCard pet={pet} userId={userId} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
         </VaultSection>
         <VaultSection id={`weight-${pet.id}`} title="Weight" hint={loadingLog ? "" : current ? `${current.value} ${current.unit || "lbs"}` : "Not logged"}>
           {measurements.length > 0 && (
@@ -538,6 +397,7 @@ function MemberUpsell() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [consent, setConsent] = useState(false);
+  const [tips, setTips] = useState(false);
   return (
     <div className="rounded-xl p-5 mt-3" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
       <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }} className="mb-1">Traveling with more than one animal?</div>
@@ -545,7 +405,8 @@ function MemberUpsell() {
         Your plan includes one pet. Membership ({usd(P.member)}/mo) adds unlimited pets, {usd(P.memberPass)} Travel Passes and reminders before your documents expire. {MEMBERSHIP_TERMS}
       </p>
       <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
-      <button disabled={busy} onClick={async () => { if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; } trackBeginCheckout("membership"); setBusy(true); const e = await startStripe("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true }); if (e) { setErr(e); setBusy(false); } }} className="rounded-full px-5 py-2.5 hover:opacity-90" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontSize: 16, fontWeight: 600 }}>{JOIN_CTA}</button>
+      <MarketingOptIn checked={tips} onChange={setTips} />
+      <button disabled={busy} onClick={async () => { if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; } trackBeginCheckout("membership"); setBusy(true); const e = await startStripe("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true, marketing_opt_in: tips }); if (e) { setErr(e); setBusy(false); } }} className="rounded-full px-5 py-2.5 hover:opacity-90" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontSize: 16, fontWeight: 600 }}>{JOIN_CTA}</button>
     </div>
   );
 }
@@ -791,13 +652,14 @@ function UnlockTripCard({ trip }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [consent, setConsent] = useState(false);
+  const [tips, setTips] = useState(false);
   async function unlock() {
     if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; }
     setBusy(true); setErr("");
     const { data: m } = await supabase.rpc("my_membership");
     const { data: s } = await supabase.auth.getSession();
     trackBeginCheckout(m ? "member_pass" : "pass");
-    const r = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ plan: m ? "member_pass" : "pass", trip_id: trip.id, attribution: getAttribution(), immediate_access_consent: true }) });
+    const r = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ plan: m ? "member_pass" : "pass", trip_id: trip.id, attribution: getAttribution(), immediate_access_consent: true, marketing_opt_in: tips }) });
     const j = await r.json().catch(() => ({}));
     if (r.ok && j.url) window.location.href = j.url; else { setErr(j.error || "Checkout isn't available right now. Please try again."); setBusy(false); }
   }
@@ -805,9 +667,11 @@ function UnlockTripCard({ trip }) {
     <div className="rounded-xl p-6 text-center" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
       <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-1"><Icon name="lock" size={18} /> This trip isn't unlocked yet</div>
       <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, opacity: 0.8 }} className="mb-4">Your full checklist, deadlines and reminders are ready the moment you finish checkout.</p>
+      <MarketingOptIn checked={tips} onChange={setTips} />
       <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
       <button disabled={busy} onClick={unlock} className="rounded-full px-6 py-3" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}>Unlock this trip</button>
       <GuaranteeLine align="center" />
+      <TrustBadges className="mt-4 text-left" />
     </div>
   );
 }
@@ -941,9 +805,6 @@ function CurrentFlightTab({ userId }) {
   const [statusMap, setStatusMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [isMember, setIsMember] = useState(false);
-  const [showFull, setShowFull] = useState(false);
-  const [section, setSection] = useState("overview");
-  const [showAllActions, setShowAllActions] = useState(false);
   const [petChoices, setPetChoices] = useState([]);
   const petForTrip = useTripPet(trip);
   useEffect(() => {
@@ -1050,129 +911,34 @@ function CurrentFlightTab({ userId }) {
     );
   }
 
-  const tripPet = petForTrip;
-  const passCards = buildPassCards(results, { ...trip, pet: tripPet });
-  const passGroups = groupCards(passCards, statusMap);
-  const actionItems = [...passGroups.first, ...passGroups.general];
-  const progress = passProgress(passGroups);
-  const trackedTotal = progress.total;
-  const trackedDone = progress.done;
-  const progressPct = progress.pct;
-  const serviceDogMismatch = trip.paid && isServiceRole(trip.role) && trip.animal_type && !/dog/i.test(trip.animal_type);
-
-  if (trip.paid && isTravelDay(trip) && !showFull) {
-    return <DayOfMode trip={trip} pet={tripPet} actionItems={passGroups.first.map((c) => ({ title: c.shortTitle }))} onShowFull={() => setShowFull(true)} />;
-  }
+  if (!trip.paid) return <UnlockTripCard trip={trip} />;
 
   return (
-    <div>
-      {trip.paid && <TripCountdown trip={trip} pet={tripPet} done={trackedDone} total={trackedTotal} />}
-      <div className="rounded-xl p-5 mb-4" style={{ background: tokens.navy }}>
-        <div className="flex items-center gap-3 mb-3">
-          <div className="rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" style={{ width: 52, height: 52, background: tokens.gold, border: "2px solid #fff" }}>
-            {tripPet?.photo_url ? <SignedImg value={tripPet.photo_url} alt={tripPet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : <span style={{ color: tokens.navy }}><Icon name="paw" size={26} stroke={1.5} /></span>}
-          </div>
-          <div className="min-w-0">
-            <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold, letterSpacing: "0.1em" }}>YOUR TRAVEL PASS</div>
-            <div style={{ fontFamily: font.display, fontSize: 20, color: "#fff", lineHeight: 1.2 }}>{tripPet?.name ? `${tripPet.name}’s trip` : "Your trip"}</div>
-          </div>
-        </div>
-        <div style={{ fontFamily: font.display, fontSize: 18, color: "#fff" }} className="mb-1">
-          {trip.origin} → {trip.destination}
-        </div>
-        <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, opacity: 0.9 }} className="mb-3">
-          {trip.airline} · {trip.travel_date ? fmtTripDate(trip.travel_date) : "date not set"}{trip.return_date ? ` · back ${fmtTripDate(trip.return_date)}` : ""} · {tripPet?.name || trip.animal_type || "Pet not linked"}{isServiceRole(trip.role) ? (serviceDogMismatch ? "" : trip.service_kind === "psd" ? " · PSD" : " · Service dog") : ""}{tripTypeForRoute(trip.origin, trip.destination) === "international" ? " · International" : ""}
-        </div>
-        {!trip.pet_id && petChoices.length > 1 && (
-          <label className="block mb-3" style={{ fontFamily: font.body, fontSize: 16, color: "#fff" }}>
-            Which pet is flying?
-            <select className="mt-1 w-full rounded-xl px-3 py-3" style={{ fontFamily: font.body, fontSize: 16, color: tokens.navy }} defaultValue="" onChange={async (e) => {
-              const id = e.target.value;
-              if (!id) return;
-              const { error } = await supabase.from("trips").update({ pet_id: id }).eq("id", trip.id);
-              if (!error) setTrip((t) => ({ ...t, pet_id: id }));
-            }}>
-              <option value="">Choose a pet</option>
-              {petChoices.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </select>
-          </label>
-        )}
-        {trackedTotal > 0 && <>
-          <div className="flex items-center justify-between mb-1.5">
-            <span style={{ fontFamily: font.mono, fontSize: 12, color: tokens.sky, opacity: 0.7, letterSpacing: "0.08em" }}>TRIP READINESS</span>
-            <span style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold }}>{trackedDone}/{trackedTotal} DONE</span>
-          </div>
-          <div className="w-full h-[6px] rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.15)" }}>
-            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${progressPct}%`, background: progressPct >= 100 ? "#7DCEA0" : tokens.stamp }} />
-          </div>
-          {progress.complete && <div style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.gold }} className="mt-2">Travel Pass complete</div>}
-        </>}
-      </div>
-
-      {trip.paid && (
-        <div role="tablist" aria-label="Trip sections" className="inline-flex flex-wrap gap-1 mb-5 p-1 rounded-full" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-          {[["overview", "Overview"], ["flight", "Flight & weather"], ["checklist", "Checklist"], ["reminders", "Reminders"]].map(([k, l]) => (
-            <button key={k} role="tab" aria-selected={section === k} onClick={() => setSection(k)} className="rounded-full px-4 py-2" style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 600, background: section === k ? tokens.navy : "transparent", color: section === k ? "#fff" : tokens.ink, border: "none", cursor: "pointer" }}>{l}</button>
-          ))}
-        </div>
-      )}
-
-      {trip.paid && section === "overview" && (<>
-        <LiveFlightCard trip={trip} />
-        {actionItems.length > 0 && (
-          <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-            <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-1">Needs action</div>
-            <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mb-3">Start here — the full list is under Checklist.</p>
-            <ul className="space-y-2">{actionItems.slice(0, showAllActions ? undefined : 3).map((r) => (
-              <li key={r.id} className="rounded-xl px-4 py-3" style={{ background: tokens.paper, fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{r.shortTitle}</li>
-            ))}</ul>
-            {actionItems.length > 3 && <button onClick={() => setShowAllActions((s) => !s)} style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy, background: "none", border: "none", padding: "8px 0 0", cursor: "pointer", textDecoration: "underline" }}>{showAllActions ? "Show less" : "Show more"}</button>}
-            <div className="mt-3"><button onClick={() => setSection("checklist")} className="rounded-full px-5 py-2.5" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600, border: "none", cursor: "pointer" }}>Open the checklist →</button></div>
-          </div>
-        )}
-        {!isMember && <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-4">Pet Vault keeps this pet’s records for the next trip.</p>}
-      </>)}
-      {trip.paid && section === "flight" && (<>
-        <LiveFlightCard trip={trip} />
-        <TripExtras trip={trip} pet={tripPet} />
-        <div id="pet-relief">
-          <PetReliefCard airportLabel={trip.origin} />
-          <PetReliefCard airportLabel={trip.destination} title="When you land: pet relief" />
-        </div>
-        <DocCheck trip={trip} />
-      </>)}
-      {trip.paid && section === "reminders" && <TripTimeline trip={trip} requirements={results} statusMap={statusMap} />}
-      {trip.paid && section === "checklist" && <VetGuidance trip={trip} requirements={[...results, ...passCards.filter((c) => String(c.id).startsWith("syn:"))]} paid={!!trip.paid} />}
-
-      {!trip.paid ? (
-        <UnlockTripCard trip={trip} />
-      ) : section !== "checklist" ? null : (
-        <>
-          {serviceDogMismatch && (
-            <div className="rounded-2xl p-4 mb-4" style={{ background: "#FFF7F2", border: `1px solid ${tokens.primary}` }}>
-              <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-1">U.S. service animals are dogs</div>
-              <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }} className="mb-3">A psychiatric service dog (PSD) is a service dog. Cats and other animals, and emotional support animals, fly as pets: carrier plus the airline’s pet fee. Since 2021, airlines don’t treat an ESA as a service animal. <a href="/blog/service-dog-vs-esa-vs-psd-flying" style={{ color: tokens.navy, fontWeight: 600 }}>How this works.</a></p>
-              <button type="button" onClick={async () => { await supabase.from("trips").update({ role: "Pet", service_kind: null }).eq("id", trip.id); setTrip((t) => ({ ...t, role: "Pet", service_kind: null })); }} className="rounded-full px-5 py-3" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, border: "none", cursor: "pointer" }}>Switch this trip to the pet path</button>
-            </div>
-          )}
-          <RoundTripAddon trip={trip} onSave={saveReturn} />
-          {passCards.length === 0 ? (
-            <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 15, opacity: 0.7 }}>
-              No requirements found for this exact combination yet.
-            </div>
-          ) : (
-            <PassChecklist trip={trip} requirements={results} statusMap={statusMap} onSetDone={handleSetDone} onOpenRelief={() => { setSection("flight"); setTimeout(() => document.getElementById("pet-relief")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }} />
-          )}
-        </>
-      )}
-    </div>
+    <TravelPassDashboard
+      trip={trip}
+      pet={petForTrip}
+      petChoices={petChoices}
+      onPickPet={async (id) => {
+        const { error } = await supabase.from("trips").update({ pet_id: id }).eq("id", trip.id);
+        if (!error) setTrip((t) => ({ ...t, pet_id: id }));
+      }}
+      onSetRolePet={async () => {
+        await supabase.from("trips").update({ role: "Pet", service_kind: null }).eq("id", trip.id);
+        setTrip((t) => ({ ...t, role: "Pet", service_kind: null }));
+      }}
+      results={results}
+      statusMap={statusMap}
+      onSetDone={handleSetDone}
+      onSaveReturn={saveReturn}
+      isMember={isMember}
+    />
   );
 }
 
 function BillingTab({ userId }) {
   const [memberRow, setMemberRow] = useState(null); const [isMember, setIsMember] = useState(null);
   const [purchases, setPurchases] = useState([]); const [legacyTrips, setLegacyTrips] = useState([]);
-  const [busy, setBusy] = useState(false); const [err, setErr] = useState(""); const [consent, setConsent] = useState(false);
+  const [busy, setBusy] = useState(false); const [err, setErr] = useState(""); const [consent, setConsent] = useState(false); const [tips, setTips] = useState(false);
   useEffect(() => { if (!userId) return; (async () => {
     const [{ data: m }, { data: buys }, { data: trips }] = await Promise.all([
       supabase.from("memberships").select("status,current_period_end").eq("user_id", userId).maybeSingle(),
@@ -1211,10 +977,12 @@ function BillingTab({ userId }) {
           {err && <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp }} className="mt-3">{err}</p>}
         </> : <>
           <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}<b>{VAULT_NAME}</b> · {usd(P.member)}{P.memberUnit}. {VAULT_SUB} Plus {usd(P.memberPass)} Travel Passes. {MEMBERSHIP_TERMS}</p>
+          <MarketingOptIn checked={tips} onChange={setTips} />
           <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
-          <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => { if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; } trackBeginCheckout("membership"); go("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true }); }} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">{JOIN_CTA}</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts and cards</button></div>
+          <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => { if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; } trackBeginCheckout("membership"); go("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true, marketing_opt_in: tips }); }} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">{JOIN_CTA}</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts and cards</button></div>
         </>}
       </div>
+      <MarketingSettings />
     </div>
   );
 }
@@ -1240,7 +1008,7 @@ function CheckoutBanner() {
     else if (q === "canceled") setMsg("Checkout canceled. You haven't been charged.");
   }, []);
   if (!msg) return null;
-  return <><div className="rounded-xl p-4 mb-6" style={{ background: "#fff", border: `1px solid ${tokens.green}`, fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>{msg === "paid" ? <>Payment received. Thank you. {WITHDRAWAL_CONFIRMED} We also email that confirmation. Your trip unlocks in a few seconds. Refresh if it still looks locked. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Flight-Ready Guarantee. Conditions apply.</a></> : msg}</div>
+  return <><div className="rounded-xl p-4 mb-6" style={{ background: "#fff", border: `1px solid ${tokens.green}`, fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>{msg === "paid" ? <>Payment received. Thank you. {WITHDRAWAL_CONFIRMED} We also email that confirmation. Your trip unlocks in a few seconds. Refresh if it still looks locked. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Flight-Ready Guarantee. Terms.</a></> : msg}</div>
   {sessionId && <FeedbackPrompt kind="purchase" refKey={sessionId} title="How did that feel?" blurb="A quick rating helps us make PetPassGo better." />}</>;
 }
 
