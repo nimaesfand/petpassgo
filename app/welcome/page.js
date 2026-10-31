@@ -6,6 +6,7 @@ import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
 import GuaranteeLine from "../../components/GuaranteeLine";
 import { WITHDRAWAL_CONFIRMED, clearWithdrawalConsent } from "../../lib/withdrawal";
+import MarketingOptIn from "../../components/MarketingOptIn";
 
 const card = { background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.06)" };
 const h = { fontFamily: font.display, fontSize: 26, fontWeight: 700, color: tokens.navy };
@@ -21,6 +22,7 @@ export default function WelcomePage() {
   const [sessionId, setSessionId] = useState("");
   const [info, setInfo] = useState(null); // { state, email, first_name, plan }
   const [password, setPassword] = useState("");
+  const [tips, setTips] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
 
@@ -36,7 +38,7 @@ export default function WelcomePage() {
   async function finish(e) {
     e.preventDefault();
     setBusy(true); setErr("");
-    const r = await fetch("/api/welcome/claim", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId, password }) });
+    const r = await fetch("/api/welcome/claim", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId, password, marketing_opt_in: tips }) });
     const j = await r.json().catch(() => ({}));
     if (j.state === "exists" || j.state === "claimed") { clearSaved(); setInfo((i) => ({ ...i, state: j.state })); setBusy(false); return; }
     if (!r.ok) { setErr(j.error || "Something went wrong. Please try again."); setBusy(false); return; }
@@ -62,6 +64,7 @@ export default function WelcomePage() {
               <form onSubmit={finish} className="flex flex-col gap-3">
                 <input type="email" value={info.email || ""} readOnly aria-label="Email" style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, background: "#F5F7FA", color: tokens.navy }} className="rounded-xl px-4 py-3 outline-none" />
                 <input type="password" required minLength={6} autoFocus autoComplete="new-password" placeholder="Password (6+ characters)" value={password} onChange={(e) => setPassword(e.target.value)} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-4 py-3 outline-none" />
+                <MarketingOptIn checked={tips} onChange={setTips} />
                 {err && <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.stamp }}>{err}</div>}
                 <button type="submit" disabled={busy} style={btn} className="btn-primary rounded-full py-3.5 text-[16px] mt-1">{busy ? "Finishing…" : "Finish"}</button>
               </form>

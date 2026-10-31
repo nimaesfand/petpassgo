@@ -10,6 +10,7 @@ import { supabase } from "../../../lib/supabaseClient";
 import { BOARDS, boardBySlug, textProblem, friendly, formatPostWhen, POST_TYPES, LOST_POST_TYPES, postTypeLabel } from "../../../lib/community";
 import { US_STATES, stateName, titleCase, visitorArea } from "../../../lib/places";
 import { tokens, font } from "../../../lib/theme";
+import CommunityPetChip from "../../../components/CommunityPetChip";
 
 const input = { fontFamily: font.body, fontSize: 15.5, border: `2px solid ${tokens.line}`, background: "#fff" };
 
@@ -34,7 +35,7 @@ function DisplayNameSetup({ onDone }) {
 }
 
 
-function Composer({ board, parentId, lostPets, defaultPet, onPosted, compact, area }) {
+function Composer({ board, parentId, lostPets, myPets, profilePet, setProfilePet, defaultPet, onPosted, compact, area }) {
   const lostBoard = board === "lost-and-found";
   const [title, setTitle] = useState(""); const [body, setBody] = useState(""); const [petId, setPetId] = useState(defaultPet || "");
   const [postType, setPostType] = useState(lostBoard ? "found" : "tip");
@@ -56,6 +57,7 @@ function Composer({ board, parentId, lostPets, defaultPet, onPosted, compact, ar
       parent_id: parentId || null,
       pet_id: petId || null,
       post_type: parentId ? null : postType,
+      profile_pet_id: profilePet || null,
     });
     setBusy(false);
     if (error) return setErr(friendly(error));
@@ -97,6 +99,14 @@ function Composer({ board, parentId, lostPets, defaultPet, onPosted, compact, ar
         </div>
       )}
       <textarea value={body} onChange={(e) => setBody(e.target.value)} maxLength={2000} rows={compact ? 2 : 4} placeholder={parentId ? "Write a reply…" : "Share the details. No links, emails or phone numbers."} className="w-full rounded-lg px-3 py-2" style={input} aria-label={parentId ? "Reply" : "Post"} />
+      {myPets?.length > 0 && (
+        <label className="flex items-center gap-2 mt-2 flex-wrap" style={{ fontFamily: font.body, fontSize: 15, color: tokens.navy }}>
+          Show this pet on the post
+          <select value={profilePet || ""} onChange={(e) => setProfilePet(e.target.value)} className="rounded-lg px-2 py-1" style={input} aria-label="Pet shown on the post">
+            {myPets.map((p) => <option key={p.id} value={p.id}>{p.name}{p.breed ? ` · ${p.breed}` : ""}</option>)}
+          </select>
+        </label>
+      )}
       {board === "lost-and-found" && !parentId && lostPets.length > 0 && (
         <label className="flex items-center gap-2 mt-2" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.navy }}>
           Link my lost pet's poster:
@@ -155,6 +165,9 @@ export default function BoardPage() {
   const [stillLost, setStillLost] = useState(new Set());
   const [isMod, setIsMod] = useState(false);
   const [lostPets, setLostPets] = useState([]);
+  const [myPets, setMyPets] = useState([]);
+  const [profilePet, setProfilePet] = useState("");
+  const [petChips, setPetChips] = useState({});
   const [openReply, setOpenReply] = useState(null);
   const [loading, setLoading] = useState(true);
   const [canRead, setCanRead] = useState(null);
@@ -185,6 +198,11 @@ export default function BoardPage() {
     const rows = data || []; setPosts(rows); setLoading(false);
     const ids = rows.map((r) => r.id);
     if (ids.length) supabase.rpc("my_community_post_ids", { ids }).then(({ data: m }) => setMine(new Set((m || []).map((x) => (typeof x === "string" ? x : Object.values(x)[0])))));
+    if (ids.length) supabase.rpc("community_post_pets", { ids }).then(({ data: chips }) => {
+      const map = {};
+      (chips || []).forEach((c) => { map[c.post_id] = c; });
+      setPetChips(map);
+    });
     const petIds = [...new Set(rows.map((r) => r.pet_id).filter(Boolean))];
     if (petIds.length) supabase.rpc("community_pets_still_lost", { ids: petIds }).then(({ data: l }) => setStillLost(new Set((l || []).map((x) => (typeof x === "string" ? x : Object.values(x)[0])))));
   }
@@ -201,6 +219,11 @@ export default function BoardPage() {
       load();
       if (postOk) {
         supabase.from("community_profiles").select("display_name").maybeSingle().then(({ data: p }) => setDisplayName(p?.display_name || ""));
+        supabase.from("pets").select("id,name,breed,animal_type").order("created_at", { ascending: true }).then(({ data: minePets }) => {
+          const list = minePets || [];
+          setMyPets(list);
+          setProfilePet((cur) => cur || list[0]?.id || "");
+        });
         supabase.rpc("is_community_moderator").then(({ data: m }) => setIsMod(!!m));
         if (slug === "lost-and-found") {
           const { data: reps } = await supabase.from("pet_lost_reports").select("pet_id").eq("status", "lost");
@@ -230,7 +253,8 @@ export default function BoardPage() {
 
   const Post = ({ p, reply }) => (
     <div style={{ opacity: p.is_hidden ? 0.5 : 1 }}>
-      <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mb-1 flex flex-wrap items-center gap-2">
+      <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-2 flex flex-wrap items-center gap-2">
+        {petChips[p.id] ? <CommunityPetChip pet={petChips[p.id]} /> : null}
         <strong style={{ color: tokens.navy }}>{p.author_name}</strong>
         {!reply && isLost && (p.lost_city || p.lost_state) && <span style={{ fontWeight: 700, color: tokens.navy }}>{[p.lost_city, p.lost_state].filter(Boolean).join(", ")}</span>}
         {!reply && p.post_type && (
@@ -316,7 +340,7 @@ export default function BoardPage() {
             </label>
           </div>
         )}
-        {canPost && displayName && <Composer key={`${area.state}-${area.city}`} board={slug} area={area} lostPets={lostPets} defaultPet={search.get("pet") || ""} onPosted={load} />}
+        {canPost && displayName && <Composer key={`${area.state}-${area.city}`} board={slug} area={area} lostPets={lostPets} myPets={myPets} profilePet={profilePet} setProfilePet={setProfilePet} defaultPet={search.get("pet") || ""} onPosted={load} />}
 
         {canRead && (
           <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
@@ -343,7 +367,7 @@ export default function BoardPage() {
                   </div>
                 )}
                 {canPost && displayName && (openReply === t.id
-                  ? <Composer board={slug} parentId={t.id} lostPets={[]} onPosted={() => { setOpenReply(null); load(); }} compact />
+                  ? <Composer board={slug} parentId={t.id} lostPets={[]} myPets={myPets} profilePet={profilePet} setProfilePet={setProfilePet} onPosted={() => { setOpenReply(null); load(); }} compact />
                   : <button onClick={() => setOpenReply(t.id)} className="mt-3" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy, background: "none", border: "none", cursor: "pointer", padding: 0 }}>Reply</button>)}
               </article>
             ))}

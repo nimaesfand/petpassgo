@@ -80,7 +80,7 @@ export default function PetIdPreviewCard({ card, photo }) {
           <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 16, color: "#fff" }}>PetPassGo</span>
           <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.18em", color: tokens.gold }}>{c.service ? "SERVICE ANIMAL ID" : "PET ID"}</span>
         </div>
-        {c.passportNo && <div className="relative mt-1" style={{ fontFamily: font.body, fontSize: 12, letterSpacing: "0.08em", color: "rgba(255,255,255,0.7)" }}>No. {c.passportNo}</div>}
+        {c.passportNo && <div className="relative mt-1" style={{ fontFamily: font.body, fontSize: 15, letterSpacing: "0.04em", color: "rgba(255,255,255,0.85)" }}>PetPassGo ID {c.passportNo}</div>}
       </div>
       <div className="px-5 -mt-11 relative">
         <div className="flex items-end gap-4">

@@ -25,7 +25,7 @@ export async function POST(req) {
     const body = await req.json().catch(() => ({}));
     const petId = String(body.pet_id || "");
     if (!/^[0-9a-f-]{36}$/i.test(petId)) return NextResponse.json({ error: "Missing pet." }, { status: 400 });
-    const { data: pet } = await sb.from("pets").select("id,name,breed,animal_type").eq("id", petId).eq("user_id", user.id).maybeSingle();
+    const { data: pet } = await sb.from("pets").select("id,name,breed,animal_type,passport_no").eq("id", petId).eq("user_id", user.id).maybeSingle();
     if (!pet) return NextResponse.json({ error: "Pet not found." }, { status: 404 });
 
     const bytes = await buildPetPass(pet);
