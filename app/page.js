@@ -4,7 +4,6 @@ import SiteHeader from "../components/SiteHeader";
 import Logo from "../components/Logo";
 import Icon from "../components/Icon";
 import TrustBadges from "../components/TrustBadges";
-import GuaranteeLine from "../components/GuaranteeLine";
 import TripHero from "../components/TripHero";
 import PassPhone from "../components/home/PassPhone";
 import VaultCluster from "../components/home/VaultCluster";
@@ -107,7 +106,7 @@ const FOOTER_LINKS = [
   { href: "/blog", label: "Blog" },
   { href: "#pricing", label: "Pricing" },
   { href: "/faq", label: "FAQ" },
-  { href: "mailto:support@petpassgo.com", label: "Contact" },
+  { href: "/contact", label: "Contact" },
   { href: "/lost-flyer", label: "Free lost pet flyer" },
   { href: "/guarantee", label: "Flight-Ready Guarantee" },
   { href: "/terms", label: "Terms" },
@@ -181,7 +180,6 @@ export default function PetPassGoLanding() {
           </div>
           <div className="order-4 lg:col-start-1">
             <a href="/join" className="home-navy-btn inline-flex items-center justify-center rounded-full px-8 py-3.5 min-h-[52px] w-full sm:w-auto" style={{ background: tokens.navy, color: "#fff", fontFamily: B, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>Create your Pet Vault</a>
-            <p style={{ fontFamily: B, fontSize: 16, lineHeight: 1.45, color: tokens.ink }} className="mt-3">{P.member}/mo. Members add a Travel Pass for {P.memberPass} per trip.</p>
           </div>
         </div>
       </section>
@@ -210,7 +208,7 @@ export default function PetPassGoLanding() {
           <Eyebrow>AIRLINES</Eyebrow>
           <H2>Wherever you're flying, we've got you covered.</H2>
           <p style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }} className="max-w-[40rem]">
-            These are the airlines in Plan my trip. The checklist for your airline and route is in the Travel Pass after you pay.
+            These are the airlines in Plan my trip.
           </p>
           <div className="mt-8 space-y-8">
             {HOME_AIRLINE_GROUPS.map((group) => (
@@ -237,9 +235,6 @@ export default function PetPassGoLanding() {
           <H2 light>Pick your plan.</H2>
           <div className="mt-8">
             <HomePricing />
-          </div>
-          <div className="mt-6 max-w-[40rem]" data-testid="guarantee-link">
-            <GuaranteeLine tone="light" />
           </div>
           <TrustBadges className="mt-6" />
         </div>
@@ -297,11 +292,8 @@ export default function PetPassGoLanding() {
               <a key={l.href} href={l.href} style={{ fontFamily: B, fontSize: 16, color: "#E7EDF6", textDecoration: "underline", textUnderlineOffset: 3 }}>{l.label}</a>
             ))}
           </nav>
-          <p style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: "#C9D3E3" }} className="mt-6 max-w-[46rem]">
-            PetPassGo is a preparation tool, not a certifying authority. Requirements are set by airlines and government agencies.
-          </p>
-          <p style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5 }} className="mt-3">
-            <a href="mailto:support@petpassgo.com" style={{ color: "#fff" }}>support@petpassgo.com</a>
+          <p style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5 }} className="mt-6">
+            <a href="/contact" style={{ color: "#fff" }}>support@petpassgo.com</a>
           </p>
         </div>
       </footer>

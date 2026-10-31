@@ -1,13 +1,27 @@
 import "./globals.css";
-import { Bricolage_Grotesque, Inter } from "next/font/google";
+import localFont from "next/font/local";
 import { SITE_URL, SITE_NAME } from "../lib/site";
 import ChatWidget from "../components/ChatWidget";
 import Analytics from "../components/Analytics";
 import AuthResume from "../components/AuthResume";
 import JsonLd from "../components/JsonLd";
 
-const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["500", "600", "700", "800"], variable: "--font-display", display: "swap" });
-const body = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-body", display: "swap" });
+// Self-hosted latin subsets. next/font/google fetches these during the build, and that
+// fetch fails on Vercel when the font URL has no extension the loader can match.
+const display = localFont({
+  src: "./fonts/BricolageGrotesque-latin.woff2",
+  weight: "500 800",
+  style: "normal",
+  display: "swap",
+  variable: "--font-display",
+});
+const body = localFont({
+  src: "./fonts/Inter-latin.woff2",
+  weight: "400 700",
+  style: "normal",
+  display: "swap",
+  variable: "--font-body",
+});
 
 const description =
   "PetPassGo helps travelers prepare for flights with pets and service animals — answer a few trip questions, then get a personalized, airline-specific Travel Pass with every requirement organized and tracked.";
@@ -31,7 +45,7 @@ export default function RootLayout({ children }) {
           name: SITE_NAME,
           url: SITE_URL,
           email: "support@petpassgo.com",
-          contactPoint: { "@type": "ContactPoint", contactType: "customer support", email: "support@petpassgo.com" },
+          contactPoint: { "@type": "ContactPoint", contactType: "customer support", email: "support@petpassgo.com", url: `${SITE_URL}/contact` },
         }} />
         {children}
         <Analytics />

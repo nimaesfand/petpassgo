@@ -23,14 +23,10 @@ export default function VaultPreview() {
   return (
     <div>
       <style>{`summary::-webkit-details-marker { display: none; }`}</style>
-      <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.muted }} className="mb-4">
-        This is the Pet Vault layout. It is not a pet. Your name, photo, and QR code appear after you add a pet.
-      </p>
-
       <div className="rounded-2xl overflow-hidden mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.10)" }}>
         <div style={{ background: tokens.navy }} className="px-5 py-3.5 flex items-center justify-between gap-3">
           <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 17, color: "#fff" }}>PetPassGo</span>
-          <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, letterSpacing: "0.08em", color: tokens.gold }}>DIGITAL PET ID</span>
+          <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, letterSpacing: "0.08em", color: tokens.gold }}>SAMPLE</span>
         </div>
         <div className="p-5 flex flex-col sm:flex-row gap-5 items-center sm:items-start">
           <div className="rounded-2xl overflow-hidden flex-shrink-0" style={{ border: `4px solid ${tokens.gold}` }}>
@@ -61,7 +57,7 @@ export default function VaultPreview() {
         Report lost
       </div>
       <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mb-4">
-        In your vault, Report lost opens the lost-pet flyer. You confirm it, then you can print it and share it. This preview does not publish a report.
+        In your vault, Report lost opens the lost-pet flyer. You confirm it, then you can print it and share it.
       </p>
 
       <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${tokens.line}` }}>

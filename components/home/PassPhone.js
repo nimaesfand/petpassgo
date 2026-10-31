@@ -13,7 +13,7 @@ const ROWS = [
 
 export default function PassPhone() {
   return (
-    <figure className="mx-auto w-full" style={{ maxWidth: 320 }}>
+    <div className="mx-auto w-full" style={{ maxWidth: 320 }}>
       <div className="rounded-[36px] p-2.5" style={{ background: tokens.navy, boxShadow: "0 24px 50px rgba(20,33,61,0.18)" }}>
         <div className="rounded-[28px] overflow-hidden" style={{ background: "#fff" }}>
           <div className="px-4 pt-4 pb-3 flex items-center justify-between" style={{ background: tokens.navy }}>
@@ -29,7 +29,7 @@ export default function PassPhone() {
               </div>
               <div>
                 <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 18, color: tokens.navy, lineHeight: 1.2 }}>Sample pet</div>
-                <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>Dog · not a real pet</div>
+                <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>Dog</div>
               </div>
             </div>
           </div>
@@ -45,12 +45,9 @@ export default function PassPhone() {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={tokens.muted} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
                   </span>
                   {row.progress ? (
-                    <>
-                      <span className="block mt-2 h-1.5 rounded-full overflow-hidden" style={{ background: tokens.line }}>
-                        <span className="block h-full rounded-full" style={{ width: "60%", background: tokens.primary }} />
-                      </span>
-                      <span className="block mt-1.5" style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.4, color: tokens.muted }}>Example. The bar fills as you check steps off.</span>
-                    </>
+                    <span className="block mt-2 h-1.5 rounded-full overflow-hidden" style={{ background: tokens.line }}>
+                      <span className="block h-full rounded-full" style={{ width: "60%", background: tokens.primary }} />
+                    </span>
                   ) : null}
                 </span>
               </li>
@@ -58,9 +55,6 @@ export default function PassPhone() {
           </ul>
         </div>
       </div>
-      <figcaption style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.45, color: tokens.muted }} className="mt-3 text-center">
-        Example layout. Airline rules stay hidden until you pay.
-      </figcaption>
-    </figure>
+    </div>
   );
 }

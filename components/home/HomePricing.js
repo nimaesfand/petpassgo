@@ -10,7 +10,7 @@ const PASS_INCLUDED = [
   "Live weather at both airports, plus cargo heat and cold warnings",
   "Vets and pet stores near you",
   "Flight status, documents, and Digital Pet ID",
-  "Email support at support@petpassgo.com",
+  "Questions answered within 24 hours",
 ];
 
 const VAULT_INCLUDED = [

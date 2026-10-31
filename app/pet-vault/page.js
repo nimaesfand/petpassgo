@@ -24,7 +24,6 @@ export default function PetVaultPage() {
             Members can add a Travel Pass for {usd(P.memberPass)} per trip. {MEMBERSHIP_TERMS}
           </p>
           <a href="/join" className="btn-primary inline-flex items-center justify-center rounded-full px-8 py-3.5 min-h-[52px]" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>{JOIN_CTA}</a>
-          <p style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.45, color: tokens.sky }} className="mt-3">Next: secure checkout, then set your password.</p>
         </div>
       </main>
     </div>
