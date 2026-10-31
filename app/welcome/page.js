@@ -50,7 +50,7 @@ export default function WelcomePage() {
 
   const s = info?.state;
   return (
-    <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full">
+    <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full ppg-fab-clear">
       <SiteHeader />
       <div className="w-full flex justify-center px-4 py-10 md:py-16">
         <div className="w-full max-w-[460px] rounded-2xl p-7" style={card}>

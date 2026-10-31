@@ -27,6 +27,70 @@ a:focus-visible, button:focus-visible, input:focus-visible, .ppg-choice:focus-wi
 }
 .home-navy-btn:hover { background: #23345C !important; }
 .ppg-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.ppg-contact-fab {
+  position: fixed;
+  z-index: 45;
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 999px;
+  background: #14213D;
+  color: #F2B84B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(20, 33, 61, 0.28);
+  cursor: pointer;
+  padding: 0;
+}
+.ppg-contact-fab:hover { background: #23345C; }
+.ppg-contact-fab.is-account { bottom: calc(74px + env(safe-area-inset-bottom, 0px)); }
+.ppg-contact-fab.with-chat { bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+.ppg-contact-fab.is-account.with-chat { bottom: calc(146px + env(safe-area-inset-bottom, 0px)); }
+@media (min-width: 768px) {
+  .ppg-contact-fab.is-account { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+  .ppg-contact-fab.with-chat,
+  .ppg-contact-fab.is-account.with-chat { bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+}
+.ppg-fab-clear { padding-bottom: calc(6.75rem + env(safe-area-inset-bottom, 0px)); }
+.ppg-account-clear { padding-bottom: calc(11rem + env(safe-area-inset-bottom, 0px)); }
+@media (min-width: 768px) {
+  .ppg-account-clear { padding-bottom: 3rem; }
+}
+.ppg-contact-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(20, 33, 61, 0.45);
+}
+.ppg-contact-panel {
+  position: fixed;
+  z-index: 81;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: min(92dvh, 720px);
+  overflow: auto;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -12px 40px rgba(20, 33, 61, 0.18);
+}
+@media (min-width: 768px) {
+  .ppg-contact-layer { background: transparent; }
+  .ppg-contact-panel {
+    left: auto;
+    width: 380px;
+    right: calc(16px + env(safe-area-inset-right, 0px));
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    border-radius: 20px;
+    padding: 16px;
+    border: 1px solid #DCE3EC;
+    box-shadow: 0 16px 40px rgba(20, 33, 61, 0.16);
+  }
+}
 .ppg-hscroll { display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .ppg-hscroll::-webkit-scrollbar { display: none; }
 .btn-secondary { transition: background .15s ease; }

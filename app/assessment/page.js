@@ -281,7 +281,7 @@ export default function PetPassGoQuiz() {
   }, [autoBuy, answers]);
 
   return (
-    <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full">
+    <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full ppg-fab-clear">
       <SiteHeader />
       <div className="w-full flex justify-center px-4 py-10 md:py-14">
       <style>{`

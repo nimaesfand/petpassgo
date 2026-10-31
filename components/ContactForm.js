@@ -1,15 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { tokens, font } from "../lib/theme";
 
-export default function ContactForm() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+export default function ContactForm({ initialName = "", initialEmail = "", compact = false }) {
+  const [name, setName] = useState(initialName);
+  const [email, setEmail] = useState(initialEmail);
   const [message, setMessage] = useState("");
   const [company, setCompany] = useState("");
   const [state, setState] = useState("idle");
   const [error, setError] = useState("");
+  useEffect(() => {
+    if (initialName) setName((value) => value || initialName);
+    if (initialEmail) setEmail((value) => value || initialEmail);
+  }, [initialName, initialEmail]);
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -68,7 +72,7 @@ export default function ContactForm() {
       </label>
       <label style={label}>
         Message
-        <textarea required minLength={2} maxLength={4000} rows={6} value={message} onChange={(e) => setMessage(e.target.value)} style={{ ...field, minHeight: 160, resize: "vertical" }} />
+        <textarea required minLength={2} maxLength={4000} rows={compact ? 4 : 6} value={message} onChange={(e) => setMessage(e.target.value)} style={{ ...field, minHeight: compact ? 112 : 160, resize: "vertical" }} />
       </label>
       <div className="ppg-hp" aria-hidden="true">
         <label>
@@ -77,7 +81,7 @@ export default function ContactForm() {
         </label>
       </div>
       {error ? <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp, margin: 0 }}>{error}</p> : null}
-      <button type="submit" disabled={state === "sending"} className="btn-primary rounded-full px-8 py-3.5 min-h-[52px] w-full sm:w-auto" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: state === "sending" ? "wait" : "pointer" }}>
+      <button type="submit" disabled={state === "sending"} className={`btn-primary rounded-full px-8 py-3.5 min-h-[52px] w-full ${compact ? "" : "sm:w-auto"}`} style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: state === "sending" ? "wait" : "pointer" }}>
         {state === "sending" ? "Sending…" : "Send"}
       </button>
     </form>

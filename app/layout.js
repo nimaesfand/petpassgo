@@ -2,6 +2,7 @@ import "./globals.css";
 import localFont from "next/font/local";
 import { SITE_URL, SITE_NAME } from "../lib/site";
 import ChatWidget from "../components/ChatWidget";
+import ContactBubble from "../components/ContactBubble";
 import Analytics from "../components/Analytics";
 import AuthResume from "../components/AuthResume";
 import JsonLd from "../components/JsonLd";
@@ -51,6 +52,7 @@ export default function RootLayout({ children }) {
         <Analytics />
         <AuthResume />
         <ChatWidget />
+        <ContactBubble />
       </body>
     </html>
   );
