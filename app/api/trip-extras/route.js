@@ -28,11 +28,27 @@ async function weather(code, date) {
   const offH = Math.round(c[1] / 15);
   const rows = ts.filter((t) => new Date(new Date(t.time).getTime() + offH * 3600e3).toISOString().slice(0, 10) === date);
   if (rows.length < 3) return { status: "later" };
-  const temps = rows.map((t) => t.data.instant.details.air_temperature);
+  const temps = rows.map((t) => t.data?.instant?.details?.air_temperature).filter((n) => typeof n === "number");
+  if (!temps.length) return { status: "unavailable" };
+  const winds = rows.map((t) => t.data?.instant?.details?.wind_speed).filter((n) => typeof n === "number");
+  const hourPrecip = rows.map((t) => t.data?.next_1_hours?.details?.precipitation_amount).filter((n) => typeof n === "number");
+  const sixPrecip = rows.map((t) => t.data?.next_6_hours?.details?.precipitation_amount).filter((n) => typeof n === "number");
   const sym = rows.map((t) => t.data.next_6_hours?.summary?.symbol_code || t.data.next_1_hours?.summary?.symbol_code).filter(Boolean);
   const midday = sym[Math.floor(sym.length / 2)] || sym[0] || "";
+  const midC = rows[Math.floor(rows.length / 2)]?.data?.instant?.details?.air_temperature;
   const f = (x) => Math.round(x * 9 / 5 + 32);
-  return { status: "ok", highF: f(Math.max(...temps)), lowF: f(Math.min(...temps)), symbol: midday.replace(/_(day|night|polartwilight)$/, "") };
+  const precipMm = hourPrecip.length
+    ? Math.round(hourPrecip.reduce((a, b) => a + b, 0) * 10) / 10
+    : (sixPrecip.length ? Math.round(Math.max(...sixPrecip) * 10) / 10 : null);
+  return {
+    status: "ok",
+    highF: f(Math.max(...temps)),
+    lowF: f(Math.min(...temps)),
+    tempF: typeof midC === "number" ? f(midC) : null,
+    symbol: midday.replace(/_(day|night|polartwilight)$/, ""),
+    windMph: winds.length ? Math.round((winds.reduce((a, b) => a + b, 0) / winds.length) * 2.23694) : null,
+    precipMm,
+  };
 }
 
 // OpenStreetMap via Overpass (ODbL). Names/types only, nothing invented.
@@ -74,7 +90,16 @@ export async function GET(req) {
   if (!trip?.paid) return NextResponse.json({ error: "Paid trips only" }, { status: 403 });
   const o = findAirport(trip.origin), d = findAirport(trip.destination);
   if (new URL(req.url).searchParams.get("part") === "spots") {
-    return NextResponse.json({ destination: d && { code: d.code, city: d.city }, spots: d ? await spots(d.code).catch(() => null) : null });
+    const [destSpots, originSpots] = await Promise.all([
+      d ? spots(d.code).catch(() => null) : null,
+      o && o.code !== d?.code ? spots(o.code).catch(() => null) : null,
+    ]);
+    return NextResponse.json({
+      destination: d && { code: d.code, city: d.city },
+      origin: o && { code: o.code, city: o.city },
+      spots: destSpots,
+      originSpots,
+    });
   }
   const policyAirline = trip.airline === "Hawaiian Airlines" ? "Alaska Airlines" : trip.airline;
   const { data: cargoPolicy } = await sb.from("airline_cargo_temp_policies").select("airline,service_type,min_f,max_f,summary,source_url,verified_at").eq("airline", policyAirline).maybeSingle();

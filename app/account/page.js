@@ -4,8 +4,8 @@ import Icon from "../../components/Icon";
 import { telHref } from "../../lib/linkify";
 import { VAULT_NAME, VAULT_SUB, MEMBERSHIP_TERMS } from "../../lib/travelPassOffer";
 import GuaranteeLine from "../../components/GuaranteeLine";
+import TrustBadges from "../../components/TrustBadges";
 import React, { useEffect, useState } from "react";
-import { LiveFlightCard } from "../../components/FlightLookup";
 import { supabase } from "../../lib/supabaseClient";
 import { usePetAccess } from "../../lib/access";
 import WinBack from "../../components/WinBack";
@@ -18,7 +18,8 @@ import { trackBeginCheckout, trackPurchaseOnce, getAttribution } from "../../lib
 import { requirementAirline } from "../../lib/airlines";
 import { tripTypeForRoute } from "../../lib/airports";
 import SiteHeader from "../../components/SiteHeader";
-import { useTripPet, isTravelDay, TripCountdown, DayOfMode, PetReliefCard, TripExtras } from "../../components/TripLive";
+import { useTripPet, TripCountdown } from "../../components/TripLive";
+import TravelPassDashboard from "../../components/TravelPassDashboard";
 import { maskChip, ChipVault, HealthPassport, ShareCard, WalletCard, ActivationChecklist } from "../../components/PetIdV2";
 import { WhatsNeededNext, TravelStamps, FindAVet } from "../../components/PetExtras";
 import VetImport from "../../components/VetImport";
@@ -28,15 +29,10 @@ import FeedbackPrompt from "../../components/FeedbackPrompt";
 import MobileBottomNav from "../../components/MobileBottomNav";
 import LostPanel from "../../components/LostPanel";
 import PetIdCard, { PetIllustration } from "../../components/PetIdCard";
-import TripTimeline from "../../components/TripTimeline";
-import DocCheck from "../../components/DocCheck";
-import PassChecklist from "../../components/PassChecklist";
-import RoundTripAddon from "../../components/RoundTripAddon";
-import { buildPassCards, groupCards, isServiceRole, matchesDestination, passProgress } from "../../lib/passCards";
+import { buildPassCards, groupCards, matchesDestination, passProgress } from "../../lib/passCards";
 import { pickTripPet } from "../../lib/tripPet";
 import { reminderSchedule, classifyReminder, todayPT } from "../../lib/travelDates";
 import { fmtTripDate } from "../../lib/tripAccess";
-import VetGuidance from "../../components/VetGuidance";
 import { BUCKET, SignedImg, getSignedUrl, toStoragePath } from "../../lib/storage";
 import { tokens, font } from "../../lib/theme";
 
@@ -808,6 +804,7 @@ function UnlockTripCard({ trip }) {
       <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
       <button disabled={busy} onClick={unlock} className="rounded-full px-6 py-3" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}>Unlock this trip</button>
       <GuaranteeLine align="center" />
+      <TrustBadges className="mt-4 text-left" />
     </div>
   );
 }
@@ -941,9 +938,6 @@ function CurrentFlightTab({ userId }) {
   const [statusMap, setStatusMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [isMember, setIsMember] = useState(false);
-  const [showFull, setShowFull] = useState(false);
-  const [section, setSection] = useState("overview");
-  const [showAllActions, setShowAllActions] = useState(false);
   const [petChoices, setPetChoices] = useState([]);
   const petForTrip = useTripPet(trip);
   useEffect(() => {
@@ -1050,122 +1044,27 @@ function CurrentFlightTab({ userId }) {
     );
   }
 
-  const tripPet = petForTrip;
-  const passCards = buildPassCards(results, { ...trip, pet: tripPet });
-  const passGroups = groupCards(passCards, statusMap);
-  const actionItems = [...passGroups.first, ...passGroups.general];
-  const progress = passProgress(passGroups);
-  const trackedTotal = progress.total;
-  const trackedDone = progress.done;
-  const progressPct = progress.pct;
-  const serviceDogMismatch = trip.paid && isServiceRole(trip.role) && trip.animal_type && !/dog/i.test(trip.animal_type);
-
-  if (trip.paid && isTravelDay(trip) && !showFull) {
-    return <DayOfMode trip={trip} pet={tripPet} actionItems={passGroups.first.map((c) => ({ title: c.shortTitle }))} onShowFull={() => setShowFull(true)} />;
-  }
+  if (!trip.paid) return <UnlockTripCard trip={trip} />;
 
   return (
-    <div>
-      {trip.paid && <TripCountdown trip={trip} pet={tripPet} done={trackedDone} total={trackedTotal} />}
-      <div className="rounded-xl p-5 mb-4" style={{ background: tokens.navy }}>
-        <div className="flex items-center gap-3 mb-3">
-          <div className="rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" style={{ width: 52, height: 52, background: tokens.gold, border: "2px solid #fff" }}>
-            {tripPet?.photo_url ? <SignedImg value={tripPet.photo_url} alt={tripPet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : <span style={{ color: tokens.navy }}><Icon name="paw" size={26} stroke={1.5} /></span>}
-          </div>
-          <div className="min-w-0">
-            <div style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold, letterSpacing: "0.1em" }}>YOUR TRAVEL PASS</div>
-            <div style={{ fontFamily: font.display, fontSize: 20, color: "#fff", lineHeight: 1.2 }}>{tripPet?.name ? `${tripPet.name}’s trip` : "Your trip"}</div>
-          </div>
-        </div>
-        <div style={{ fontFamily: font.display, fontSize: 18, color: "#fff" }} className="mb-1">
-          {trip.origin} → {trip.destination}
-        </div>
-        <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky, opacity: 0.9 }} className="mb-3">
-          {trip.airline} · {trip.travel_date ? fmtTripDate(trip.travel_date) : "date not set"}{trip.return_date ? ` · back ${fmtTripDate(trip.return_date)}` : ""} · {tripPet?.name || trip.animal_type || "Pet not linked"}{isServiceRole(trip.role) ? (serviceDogMismatch ? "" : trip.service_kind === "psd" ? " · PSD" : " · Service dog") : ""}{tripTypeForRoute(trip.origin, trip.destination) === "international" ? " · International" : ""}
-        </div>
-        {!trip.pet_id && petChoices.length > 1 && (
-          <label className="block mb-3" style={{ fontFamily: font.body, fontSize: 16, color: "#fff" }}>
-            Which pet is flying?
-            <select className="mt-1 w-full rounded-xl px-3 py-3" style={{ fontFamily: font.body, fontSize: 16, color: tokens.navy }} defaultValue="" onChange={async (e) => {
-              const id = e.target.value;
-              if (!id) return;
-              const { error } = await supabase.from("trips").update({ pet_id: id }).eq("id", trip.id);
-              if (!error) setTrip((t) => ({ ...t, pet_id: id }));
-            }}>
-              <option value="">Choose a pet</option>
-              {petChoices.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </select>
-          </label>
-        )}
-        {trackedTotal > 0 && <>
-          <div className="flex items-center justify-between mb-1.5">
-            <span style={{ fontFamily: font.mono, fontSize: 12, color: tokens.sky, opacity: 0.7, letterSpacing: "0.08em" }}>TRIP READINESS</span>
-            <span style={{ fontFamily: font.mono, fontSize: 12, color: tokens.gold }}>{trackedDone}/{trackedTotal} DONE</span>
-          </div>
-          <div className="w-full h-[6px] rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.15)" }}>
-            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${progressPct}%`, background: progressPct >= 100 ? "#7DCEA0" : tokens.stamp }} />
-          </div>
-          {progress.complete && <div style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.gold }} className="mt-2">Travel Pass complete</div>}
-        </>}
-      </div>
-
-      {trip.paid && (
-        <div role="tablist" aria-label="Trip sections" className="inline-flex flex-wrap gap-1 mb-5 p-1 rounded-full" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-          {[["overview", "Overview"], ["flight", "Flight & weather"], ["checklist", "Checklist"], ["reminders", "Reminders"]].map(([k, l]) => (
-            <button key={k} role="tab" aria-selected={section === k} onClick={() => setSection(k)} className="rounded-full px-4 py-2" style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 600, background: section === k ? tokens.navy : "transparent", color: section === k ? "#fff" : tokens.ink, border: "none", cursor: "pointer" }}>{l}</button>
-          ))}
-        </div>
-      )}
-
-      {trip.paid && section === "overview" && (<>
-        <LiveFlightCard trip={trip} />
-        {actionItems.length > 0 && (
-          <div className="rounded-xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-            <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-1">Needs action</div>
-            <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mb-3">Start here — the full list is under Checklist.</p>
-            <ul className="space-y-2">{actionItems.slice(0, showAllActions ? undefined : 3).map((r) => (
-              <li key={r.id} className="rounded-xl px-4 py-3" style={{ background: tokens.paper, fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{r.shortTitle}</li>
-            ))}</ul>
-            {actionItems.length > 3 && <button onClick={() => setShowAllActions((s) => !s)} style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy, background: "none", border: "none", padding: "8px 0 0", cursor: "pointer", textDecoration: "underline" }}>{showAllActions ? "Show less" : "Show more"}</button>}
-            <div className="mt-3"><button onClick={() => setSection("checklist")} className="rounded-full px-5 py-2.5" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600, border: "none", cursor: "pointer" }}>Open the checklist →</button></div>
-          </div>
-        )}
-        {!isMember && <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-4">Pet Vault keeps this pet’s records for the next trip.</p>}
-      </>)}
-      {trip.paid && section === "flight" && (<>
-        <LiveFlightCard trip={trip} />
-        <TripExtras trip={trip} pet={tripPet} />
-        <div id="pet-relief">
-          <PetReliefCard airportLabel={trip.origin} />
-          <PetReliefCard airportLabel={trip.destination} title="When you land: pet relief" />
-        </div>
-        <DocCheck trip={trip} />
-      </>)}
-      {trip.paid && section === "reminders" && <TripTimeline trip={trip} requirements={results} statusMap={statusMap} />}
-      {trip.paid && section === "checklist" && <VetGuidance trip={trip} requirements={[...results, ...passCards.filter((c) => String(c.id).startsWith("syn:"))]} paid={!!trip.paid} />}
-
-      {!trip.paid ? (
-        <UnlockTripCard trip={trip} />
-      ) : section !== "checklist" ? null : (
-        <>
-          {serviceDogMismatch && (
-            <div className="rounded-2xl p-4 mb-4" style={{ background: "#FFF7F2", border: `1px solid ${tokens.primary}` }}>
-              <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-1">U.S. service animals are dogs</div>
-              <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }} className="mb-3">A psychiatric service dog (PSD) is a service dog. Cats and other animals, and emotional support animals, fly as pets: carrier plus the airline’s pet fee. Since 2021, airlines don’t treat an ESA as a service animal. <a href="/blog/service-dog-vs-esa-vs-psd-flying" style={{ color: tokens.navy, fontWeight: 600 }}>How this works.</a></p>
-              <button type="button" onClick={async () => { await supabase.from("trips").update({ role: "Pet", service_kind: null }).eq("id", trip.id); setTrip((t) => ({ ...t, role: "Pet", service_kind: null })); }} className="rounded-full px-5 py-3" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, border: "none", cursor: "pointer" }}>Switch this trip to the pet path</button>
-            </div>
-          )}
-          <RoundTripAddon trip={trip} onSave={saveReturn} />
-          {passCards.length === 0 ? (
-            <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 15, opacity: 0.7 }}>
-              No requirements found for this exact combination yet.
-            </div>
-          ) : (
-            <PassChecklist trip={trip} requirements={results} statusMap={statusMap} onSetDone={handleSetDone} onOpenRelief={() => { setSection("flight"); setTimeout(() => document.getElementById("pet-relief")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }} />
-          )}
-        </>
-      )}
-    </div>
+    <TravelPassDashboard
+      trip={trip}
+      pet={petForTrip}
+      petChoices={petChoices}
+      onPickPet={async (id) => {
+        const { error } = await supabase.from("trips").update({ pet_id: id }).eq("id", trip.id);
+        if (!error) setTrip((t) => ({ ...t, pet_id: id }));
+      }}
+      onSetRolePet={async () => {
+        await supabase.from("trips").update({ role: "Pet", service_kind: null }).eq("id", trip.id);
+        setTrip((t) => ({ ...t, role: "Pet", service_kind: null }));
+      }}
+      results={results}
+      statusMap={statusMap}
+      onSetDone={handleSetDone}
+      onSaveReturn={saveReturn}
+      isMember={isMember}
+    />
   );
 }
 
@@ -1240,7 +1139,7 @@ function CheckoutBanner() {
     else if (q === "canceled") setMsg("Checkout canceled. You haven't been charged.");
   }, []);
   if (!msg) return null;
-  return <><div className="rounded-xl p-4 mb-6" style={{ background: "#fff", border: `1px solid ${tokens.green}`, fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>{msg === "paid" ? <>Payment received. Thank you. {WITHDRAWAL_CONFIRMED} We also email that confirmation. Your trip unlocks in a few seconds. Refresh if it still looks locked. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Flight-Ready Guarantee. Conditions apply.</a></> : msg}</div>
+  return <><div className="rounded-xl p-4 mb-6" style={{ background: "#fff", border: `1px solid ${tokens.green}`, fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>{msg === "paid" ? <>Payment received. Thank you. {WITHDRAWAL_CONFIRMED} We also email that confirmation. Your trip unlocks in a few seconds. Refresh if it still looks locked. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Flight-Ready Guarantee. Terms.</a></> : msg}</div>
   {sessionId && <FeedbackPrompt kind="purchase" refKey={sessionId} title="How did that feel?" blurb="A quick rating helps us make PetPassGo better." />}</>;
 }
 
