@@ -152,9 +152,8 @@ export default function PetPassGoLanding() {
       {/* 5. PRICING */}
       <section id="pricing" className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14 py-10 lg:py-14">
         <Eyebrow>PRICING</Eyebrow>
-        <H2>Travel Pass or Pet Vault.</H2>
-        <p style={{ fontFamily: B, fontSize: 16, lineHeight: 1.45, color: tokens.muted }} className="mb-2">Prices are in US dollars (USD).</p>
-        <div className="mt-10"><PlanCards /></div>
+        <H2>Pick your plan.</H2>
+        <div className="mt-8"><PlanCards /></div>
       </section>
 
       {/* 6. FAQ TEASER */}
