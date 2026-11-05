@@ -120,11 +120,11 @@ export function LiveFlightCard({ trip }) {
       </div>
       {data ? <FlightSummary f={data} /> : (
         <div>
-          <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mb-3">Add your flight number to see live status, times, terminal and gate here.</p>
-          <div className="flex flex-wrap gap-2">
-            <input value={flightNo} onChange={(e) => setFlightNo(e.target.value)} placeholder="Flight # e.g. UA1234" aria-label="Flight number" style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }} className="rounded-xl px-3 py-2 outline-none flex-1 min-w-[150px]" />
-            <button type="button" disabled={busy || !flightNo.trim()} onClick={() => load()} className="rounded-full px-5 py-2 disabled:opacity-50" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600 }}>{busy ? "Looking up…" : "Add flight"}</button>
-          </div>
+          <label style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy, display: "grid", gap: 6 }} className="mb-3">
+            Flight number
+            <input value={flightNo} onChange={(e) => setFlightNo(e.target.value)} placeholder="UA1234" aria-label="Flight number" style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, background: "#fff" }} className="rounded-xl px-3 py-3 outline-none w-full" />
+          </label>
+          <button type="button" disabled={busy || !flightNo.trim()} onClick={() => load()} className="ppg-btn ppg-btn-primary">{busy ? "Looking up…" : "Add flight"}</button>
         </div>
       )}
       {!data && trip?.flight_number && <AutoLoad onLoad={() => load(trip.flight_number)} />}

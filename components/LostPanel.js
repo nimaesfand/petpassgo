@@ -121,7 +121,7 @@ export default function LostPanel({ pet, userId, onChanged }) {
 
   if (!report && !form) {
     return (
-      <button data-report-lost onClick={openForm} className="w-full rounded-full px-5 py-3 mt-3" style={{ border: `2px solid ${tokens.primary}`, color: tokens.primary, fontFamily: font.body, fontWeight: 700, fontSize: 16, background: "#fff", cursor: "pointer" }}>
+      <button data-report-lost onClick={openForm} className="ppg-btn ppg-btn-primary w-full mt-3">
         Report {pet.name} lost
       </button>
     );
@@ -191,8 +191,8 @@ export default function LostPanel({ pet, userId, onChanged }) {
         )}
         {err && <div role="alert" style={{ fontFamily: font.body, color: "#B42318", fontSize: 14 }}>{err}</div>}
         <div className="flex gap-2 items-center">
-          <button disabled={busy} className="rounded-full px-6 py-3 flex-1" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>{busy ? "Publishing…" : "Publish lost poster"}</button>
-          <button type="button" onClick={() => setForm(null)} className="rounded-full px-4 py-3" style={{ fontFamily: font.body, fontWeight: 600, color: tokens.navy, background: "none", border: "none", cursor: "pointer" }}>Cancel</button>
+          <button disabled={busy} className="ppg-btn ppg-btn-primary flex-1">{busy ? "Publishing…" : "Publish lost poster"}</button>
+          <button type="button" onClick={() => setForm(null)} className="ppg-btn ppg-btn-secondary">Cancel</button>
         </div>
       </form>
     );
@@ -248,10 +248,10 @@ export default function LostPanel({ pet, userId, onChanged }) {
         </details>
 
         {err && <div role="alert" style={{ color: "#B42318", fontSize: 14 }}>{err}</div>}
-        <button disabled={busy} onClick={reunited} className="rounded-full px-6 py-3" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>
+        <button disabled={busy} onClick={reunited} className="ppg-btn ppg-btn-primary">
           {pet.name} is home: mark reunited
         </button>
-        <button data-turn-off disabled={busy} onClick={turnOff} className="rounded-full px-6 py-2.5" style={{ background: "#fff", color: tokens.navy, border: `2px solid ${tokens.line}`, fontFamily: font.body, fontWeight: 700, fontSize: 15, cursor: "pointer" }}>
+        <button data-turn-off disabled={busy} onClick={turnOff} className="ppg-btn ppg-btn-secondary">
           Turn off report (made by mistake)
         </button>
       </div>

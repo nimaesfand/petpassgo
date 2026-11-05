@@ -31,8 +31,8 @@ function ConfirmDialog({ title, confirmLabel, onCancel, onConfirm }) {
     <div role="dialog" aria-modal="true" aria-label={title} className="rounded-2xl p-4" style={{ background: "#fff", border: `2px solid ${tokens.navy}` }}>
       <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-3">{title}</div>
       <div className="flex flex-wrap gap-2">
-        <button type="button" onClick={onConfirm} style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, background: tokens.primary, color: "#fff", border: "none", borderRadius: 999, minHeight: 44, padding: "8px 14px", cursor: "pointer" }}>{confirmLabel}</button>
-        <button type="button" onClick={onCancel} style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, borderRadius: 999, minHeight: 44, padding: "8px 14px", cursor: "pointer" }}>Cancel</button>
+        <button type="button" onClick={onConfirm} className="ppg-btn ppg-btn-primary">{confirmLabel}</button>
+        <button type="button" onClick={onCancel} className="ppg-btn ppg-btn-secondary">Cancel</button>
       </div>
     </div>
   );
@@ -126,19 +126,10 @@ export default function PetDocumentsCard({ pet, userId }) {
     <section id={`documents-${pet.id}`} data-pet-documents className="rounded-3xl p-4 sm:p-6 min-w-0 max-w-full overflow-x-clip" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
       <h3 style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }} className="mb-4">Documents</h3>
       {docs.length === 0 ? <p className="mb-4" style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>No documents yet</p> : null}
-      {ask ? (
-        <div className="mb-3">
-          <ConfirmDialog
-            title={ask.kind === "delete" ? "Delete this document?" : "Replace this file?"}
-            confirmLabel={ask.kind === "delete" ? "Delete" : "Replace"}
-            onCancel={() => setAsk(null)}
-            onConfirm={() => (ask.kind === "delete" ? remove(ask.doc) : replace(ask.doc, ask.file))}
-          />
-        </div>
-      ) : null}
       <div className="grid gap-3 min-w-0">
         {docs.map((doc) => {
           const status = documentStatus(doc.expires_on, today);
+          const pending = ask?.doc?.id === doc.id;
           return (
             <article key={doc.id} className="rounded-2xl p-4" style={{ background: tokens.paper }}>
               <div className="flex items-start justify-between gap-3">
@@ -149,14 +140,25 @@ export default function PetDocumentsCard({ pet, userId }) {
                 {[doc.issued_on ? `Issued ${fmtDob(doc.issued_on)}` : "", doc.expires_on ? `Expires ${fmtDob(doc.expires_on)}` : ""].filter(Boolean).join(" · ")}
               </div>
               {doc.note ? <div className="mt-1" style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>{doc.note}</div> : null}
-              <div className="flex flex-wrap gap-2 mt-3">
-                <button type="button" onClick={() => view(doc)} style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, background: tokens.navy, color: "#fff", border: "none", borderRadius: 999, minHeight: 44, padding: "8px 14px", cursor: "pointer" }}>View</button>
-                <label style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, borderRadius: 999, minHeight: 44, padding: "8px 14px", cursor: "pointer" }}>
-                  Replace
-                  <input type="file" accept={DOC_ACCEPT} className="ppg-hp" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) queueReplace(doc, f); }} />
-                </label>
-                <button type="button" onClick={() => setAsk({ kind: "delete", doc })} style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, background: "#fff", color: tokens.primary, border: `2px solid ${tokens.primary}`, borderRadius: 999, minHeight: 44, padding: "8px 14px", cursor: "pointer" }}>Delete</button>
-              </div>
+              {pending ? (
+                <div className="mt-3">
+                  <ConfirmDialog
+                    title={ask.kind === "delete" ? "Delete this document?" : "Replace this file?"}
+                    confirmLabel={ask.kind === "delete" ? "Delete" : "Replace"}
+                    onCancel={() => setAsk(null)}
+                    onConfirm={() => (ask.kind === "delete" ? remove(ask.doc) : replace(ask.doc, ask.file))}
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <button type="button" onClick={() => view(doc)} className="ppg-btn ppg-btn-secondary">View</button>
+                  <label className="ppg-btn ppg-btn-secondary">
+                    Replace
+                    <input type="file" accept={DOC_ACCEPT} className="ppg-hp" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) queueReplace(doc, f); }} />
+                  </label>
+                  <button type="button" onClick={() => setAsk({ kind: "delete", doc })} className="ppg-btn ppg-btn-secondary">Delete</button>
+                </div>
+              )}
             </article>
           );
         })}
@@ -180,7 +182,7 @@ export default function PetDocumentsCard({ pet, userId }) {
           <label style={label}>Expiry date<input type="date" aria-label="Expiry date" value={form.expiresOn} onChange={(e) => setForm({ ...form, expiresOn: e.target.value })} style={input} /></label>
         </div>
         <label style={label}>Note<input aria-label="Document note" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} maxLength={500} style={input} /></label>
-        <button type="submit" disabled={busy} style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, background: tokens.primary, color: "#fff", border: "none", borderRadius: 999, minHeight: 48, padding: "12px 18px", cursor: "pointer", justifySelf: "start" }}>{busy ? "Uploading…" : "Upload"}</button>
+        <button type="submit" disabled={busy} className="ppg-btn ppg-btn-primary" style={{ justifySelf: "start" }}>{busy ? "Uploading…" : "Upload"}</button>
       </form>
     </section>
   );

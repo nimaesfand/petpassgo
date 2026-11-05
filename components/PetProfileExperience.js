@@ -85,12 +85,12 @@ export function DigitalIdCard({ pet, photo }) {
       <div className="px-4 py-3 sm:px-5 flex items-center justify-between gap-3" style={{ background: tokens.navy }}>
         <div className="flex items-center gap-2 min-w-0">
           <Logo size={36} />
-          <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 20, color: "#fff" }}>PetPassGo</span>
+          <span className="ppg-id-brand" style={{ fontFamily: font.display, fontWeight: 700, fontSize: 18, color: "#fff" }}>PetPassGo</span>
         </div>
-        <div className="flex items-center gap-2 text-right">
-          <div>
-            <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 13, letterSpacing: "0.12em", color: tokens.gold }}>DIGITAL PET ID</div>
-            <div style={{ fontFamily: font.body, fontSize: 15, color: "#fff" }}>Scan QR for pet info</div>
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <div className="text-right">
+            <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 11, letterSpacing: "0.08em", color: tokens.gold, whiteSpace: "nowrap" }}>DIGITAL PET ID</div>
+            <div className="ppg-id-scan" style={{ fontFamily: font.body, color: "#fff" }}>Scan QR for pet info</div>
           </div>
           <Contactless />
         </div>
@@ -122,7 +122,6 @@ export function DigitalIdCard({ pet, photo }) {
         <div className="rounded-2xl p-3 flex flex-col items-center flex-shrink-0" style={{ border: `2px solid ${tokens.gold}` }}>
           <PetQr petId={pet.id} publicKey={pet.public_slug || pet.id} size={148} color={tokens.navy} />
           <div className="mt-2 text-center" style={{ fontFamily: font.body, fontWeight: 800, fontSize: 14, letterSpacing: "0.06em", color: tokens.navy }}>SCAN FOR FULL PROFILE</div>
-          <div className="text-center" style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted, maxWidth: 180 }}>Travel info, documents, emergency contact</div>
         </div>
       </div>
       <div aria-hidden="true" style={{ position: "absolute", right: 18, bottom: 12, opacity: 0.07 }}><PawMark size={72} color={tokens.navy} /></div>
@@ -323,7 +322,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
               {photoBusy ? <div style={{ ...text, color: tokens.muted }}>Uploading photo…</div> : null}
             </div>
             {showDocsButton ? (
-              <button type="button" onClick={() => document.getElementById(`documents-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" })} className="self-center" style={{ ...btn, background: tokens.navy, color: "#fff" }}>View Documents</button>
+              <button type="button" onClick={() => document.getElementById(`documents-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" })} className="ppg-btn ppg-btn-primary self-center">View Documents</button>
             ) : null}
           </div>
           {chips.length > 0 ? <div className="flex flex-wrap gap-2 mt-4 justify-center sm:justify-start">{chips.map((c) => <Chip key={c}>{c}</Chip>)}</div> : null}
@@ -342,7 +341,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
                 {trips.length === 0 && owner ? (
                   <div className="rounded-2xl p-4" style={{ background: tokens.paper }}>
                     <p style={text}>No trips yet. When you plan one, the date shows up here. Airline details stay hidden until the Travel Pass is paid.</p>
-                    <a href="/assessment" className="inline-flex items-center mt-2" style={{ ...btn, background: tokens.navy, color: "#fff", textDecoration: "none" }}>Plan my trip</a>
+                    <a href="/assessment" className="ppg-btn ppg-btn-primary mt-2">Plan my trip</a>
                   </div>
                 ) : null}
                 {trips.map((t) => {
@@ -381,7 +380,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
                     </label>
                   ) : <p style={{ ...text, whiteSpace: "pre-wrap" }}>{pet.housing_notes}</p>
                 ) : null}
-                {owner ? <button type="button" disabled={saving} onClick={() => save({ housing_notes: form.housing_notes.trim() || null })} style={{ ...btn, background: tokens.navy, color: "#fff", justifySelf: "start" }}>{saving ? "Saving…" : "Save housing notes"}</button> : null}
+                {owner ? <button type="button" disabled={saving} onClick={() => save({ housing_notes: form.housing_notes.trim() || null })} className="ppg-btn ppg-btn-primary" style={{ justifySelf: "start" }}>{saving ? "Saving…" : "Save housing notes"}</button> : null}
                 {housingDocs.map((d) => (
                   <div key={d.id} className="flex items-center justify-between gap-3">
                     <button type="button" onClick={(e) => openDoc(d, e)} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left" }}><CheckRow title={d.document_type} /></button>
@@ -395,7 +394,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
                       <span className="truncate" style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{housingFile ? housingFile.name : "Choose a file"}</span>
                       <input aria-label="Housing document file" type="file" accept=".pdf,.jpg,.jpeg,.png,.heic,.heif,application/pdf,image/jpeg,image/png,image/heic" className="ppg-hp" onChange={(e) => setHousingFile(e.target.files?.[0] || null)} />
                     </label>
-                    <button type="submit" disabled={uploading || !housingFile} style={{ ...btn, background: tokens.primary, color: "#fff", justifySelf: "start", opacity: housingFile ? 1 : 0.6 }}>{uploading ? "Uploading…" : "Attach paperwork"}</button>
+                    <button type="submit" disabled={uploading || !housingFile} className="ppg-btn ppg-btn-primary" style={{ justifySelf: "start" }}>{uploading ? "Uploading…" : "Attach paperwork"}</button>
                   </form>
                 ) : null}
               </div>
@@ -424,7 +423,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
                       vet_phone: form.vet_phone.trim() || null,
                       emergency_contact_name: form.emergency_contact_name.trim() || null,
                       emergency_contact_phone: form.emergency_contact_phone.trim() || null,
-                    })} style={{ ...btn, background: tokens.navy, color: "#fff", justifySelf: "start" }}>{saving ? "Saving…" : "Save medical info"}</button>
+                    })} className="ppg-btn ppg-btn-primary" style={{ justifySelf: "start" }}>{saving ? "Saving…" : "Save medical info"}</button>
                     <HealthPassport pet={pet} userId={userId} bare refreshKey={healthKey} />
                     <VetImport pet={pet} userId={userId} onSaved={() => { setHealthKey((n) => n + 1); onChanged?.(); }} />
                   </>
@@ -447,7 +446,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
                   <>
                     {!filled(pet.about_bio) ? <p style={text}>Add a few words about {pet.name}: personality, what they like, anything a sitter should know.</p> : null}
                     <textarea aria-label={`About ${pet.name}`} value={form.about_bio} onChange={(e) => setForm({ ...form, about_bio: e.target.value })} rows={5} maxLength={1000} style={input} placeholder={`What is ${pet.name || "your pet"} like?`} />
-                    <button type="button" disabled={saving} onClick={() => save({ about_bio: form.about_bio.trim() || null })} style={{ ...btn, background: tokens.navy, color: "#fff", justifySelf: "start" }}>{saving ? "Saving…" : "Save about"}</button>
+                    <button type="button" disabled={saving} onClick={() => save({ about_bio: form.about_bio.trim() || null })} className="ppg-btn ppg-btn-primary" style={{ justifySelf: "start" }}>{saving ? "Saving…" : "Save about"}</button>
                   </>
                 ) : <p style={{ ...text, whiteSpace: "pre-wrap" }}>{pet.about_bio}</p>}
               </div>
@@ -486,7 +485,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
                 <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 700, color: tokens.navy }}>Profile URL</div>
                 <div className="flex flex-col sm:flex-row gap-2 mt-2">
                   <input readOnly value={profileLabel(pet)} aria-label="Profile URL" style={input} onFocus={(e) => e.target.select()} />
-                  <button type="button" onClick={async () => { try { await navigator.clipboard.writeText(profileUrl(pet)); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {} }} style={{ ...btn, background: tokens.navy, color: "#fff" }}>{copied ? "Copied" : "Copy"}</button>
+                  <button type="button" onClick={async () => { try { await navigator.clipboard.writeText(profileUrl(pet)); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {} }} className="ppg-btn ppg-btn-secondary">{copied ? "Copied" : "Copy"}</button>
                 </div>
               </div>
               <div className="grid gap-2">

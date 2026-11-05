@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
+import { pingSaved } from "./SavedToast";
 
 const input = { fontFamily: font.body, fontSize: 16, border: `2px solid ${tokens.line}`, borderRadius: 12, padding: "12px 14px", width: "100%", background: "#fff", color: tokens.ink };
 const label = { fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy, display: "grid", gap: 6 };
-const btn = { fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", borderRadius: 999, minHeight: 48, padding: "12px 18px", cursor: "pointer" };
-
 function numOrNull(v) {
   if (v === "" || v == null) return null;
   const n = Number(v);
@@ -29,7 +28,6 @@ export default function PetCareCard({ pet, userId, onChanged }) {
   const [meds, setMeds] = useState([]);
   const [med, setMed] = useState({ name: "", dose: "", timing: "" });
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   async function loadMeds() {
@@ -68,7 +66,7 @@ export default function PetCareCard({ pet, userId, onChanged }) {
       return;
     }
     setSaving(false);
-    if (!error) { setSaved(true); setTimeout(() => setSaved(false), 2000); onChanged?.(); }
+    if (!error) { pingSaved(); onChanged?.(); }
     else alert("Couldn't save Care. Please try again.");
   }
 
@@ -109,10 +107,7 @@ export default function PetCareCard({ pet, userId, onChanged }) {
           <label className="min-w-0" style={label}>W (in)<input type="number" step="0.1" min="0.1" aria-label="Carrier width in inches" placeholder="W" value={form.carrier_width_in} onChange={set("carrier_width_in")} style={input} /></label>
           <label className="min-w-0" style={label}>H (in)<input type="number" step="0.1" min="0.1" aria-label="Carrier height in inches" placeholder="H" value={form.carrier_height_in} onChange={set("carrier_height_in")} style={input} /></label>
         </div>
-        <div className="flex items-center gap-3">
-          <button type="submit" disabled={saving} style={{ ...btn, background: tokens.primary, color: "#fff" }}>{saving ? "Saving…" : "Save care"}</button>
-          {saved ? <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.green }}>Saved</span> : null}
-        </div>
+        <button type="submit" disabled={saving} className="ppg-btn ppg-btn-primary" style={{ justifySelf: "start" }}>{saving ? "Saving…" : "Save care"}</button>
       </form>
 
       <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${tokens.line}` }}>
@@ -124,17 +119,17 @@ export default function PetCareCard({ pet, userId, onChanged }) {
                 <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{row.name}</div>
                 <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>{[row.dose, row.timing, !row.dose && !row.timing ? row.notes : ""].filter(Boolean).join(" · ")}</div>
               </div>
-              <button type="button" onClick={() => removeMed(row.id)} style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, color: tokens.primary, background: "none", border: "none", cursor: "pointer", minHeight: 44 }}>Remove</button>
+              <button type="button" onClick={() => removeMed(row.id)} className="ppg-btn ppg-btn-secondary">Remove</button>
             </div>
           ))}
         </div>
         <form onSubmit={addMed} className="grid gap-2">
-          <input required aria-label="Medication name" placeholder="Medication" value={med.name} onChange={(e) => setMed({ ...med, name: e.target.value })} style={input} />
+          <label style={label}>Medication<input required aria-label="Medication name" value={med.name} onChange={(e) => setMed({ ...med, name: e.target.value })} style={input} /></label>
           <div className="grid sm:grid-cols-2 gap-2">
-            <input aria-label="Dose" placeholder="Dose" value={med.dose} onChange={(e) => setMed({ ...med, dose: e.target.value })} style={input} />
-            <input aria-label="Timing" placeholder="Timing" value={med.timing} onChange={(e) => setMed({ ...med, timing: e.target.value })} style={input} />
+            <label style={label}>Dose<input aria-label="Dose" value={med.dose} onChange={(e) => setMed({ ...med, dose: e.target.value })} style={input} /></label>
+            <label style={label}>Timing<input aria-label="Timing" value={med.timing} onChange={(e) => setMed({ ...med, timing: e.target.value })} style={input} /></label>
           </div>
-          <button type="submit" style={{ ...btn, background: tokens.navy, color: "#fff", justifySelf: "start" }}>Add medication</button>
+          <button type="submit" className="ppg-btn ppg-btn-secondary" style={{ justifySelf: "start" }}>Add medication</button>
         </form>
       </div>
     </section>
