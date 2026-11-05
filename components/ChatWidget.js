@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import useClearFab from "./useClearFab";
 
 const navy = "#14213D";
 const ENABLED = process.env.NEXT_PUBLIC_CHAT_ENABLED === "true";
@@ -17,6 +18,8 @@ export default function ChatWidget() {
   const account = path === "/account" || path.startsWith("/account/");
   const onPetPage = path === "/id" || path.startsWith("/id/");
   const [fieldFocus, setFieldFocus] = useState(false);
+  const rootRef = useRef(null);
+  const clear = useClearFab(rootRef, account && !onPetPage && !fieldFocus && !open, { side: "left", bottom: 146 });
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)");
     let timer;
@@ -67,7 +70,7 @@ export default function ChatWidget() {
 
   const box = { fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 14 };
   return (
-    <div data-ppg-chat className="ppg-no-print" style={{ position: "fixed", right: account ? "auto" : 16, left: account ? 16 : "auto", bottom: account ? "calc(146px + env(safe-area-inset-bottom, 0px))" : "calc(88px + env(safe-area-inset-bottom, 0px))", zIndex: 50, maxWidth: "calc(100vw - 32px)", ...box }}>
+    <div ref={rootRef} data-ppg-chat className="ppg-no-print" style={{ position: "fixed", right: clear ? "auto" : (account ? "auto" : 16), left: clear ? clear.left : (account ? 16 : "auto"), top: clear ? clear.top : "auto", bottom: clear ? "auto" : (account ? "calc(146px + env(safe-area-inset-bottom, 0px))" : "calc(88px + env(safe-area-inset-bottom, 0px))"), zIndex: 50, maxWidth: "calc(100vw - 32px)", ...box }}>
       {open && (
         <div className="rounded-2xl shadow-xl flex flex-col" style={{ width: 320, height: 440, background: "#fff", border: "1px solid #DCE3EC", marginBottom: 10 }}>
           <div className="px-4 py-3 flex justify-between items-center rounded-t-2xl" style={{ background: navy, color: "#F3F5F9" }}>

@@ -928,8 +928,8 @@ function CurrentFlightTab({ userId }) {
               <button key={row.id} type="button" onClick={() => openTrip(row)} className="w-full rounded-2xl px-4 py-3 text-left" style={{ background: "#fff", border: `2px solid ${open ? tokens.navy : tokens.line}`, cursor: "pointer" }}>
                 <span className="flex flex-wrap items-center gap-2 min-w-0">
                   <span className="min-w-0" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{row.origin} → {row.destination}</span>
-                  <span className="rounded-full px-2.5 py-1" style={{ background: row.paid ? tokens.sky : "#FDE8E2", color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>{row.paid ? "Paid" : "Unpaid"}</span>
-                  {tripIsPast(row) ? <span className="rounded-full px-2.5 py-1" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>Past</span> : null}
+                  <span data-keep-clear className="rounded-full px-2.5 py-1 whitespace-nowrap" style={{ background: row.paid ? tokens.sky : "#FDE8E2", color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>{row.paid ? "Paid" : "Unpaid"}</span>
+                  {tripIsPast(row) ? <span data-keep-clear className="rounded-full px-2.5 py-1 whitespace-nowrap" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>Past</span> : null}
                 </span>
                 <span className="block mt-1" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{row.travel_date ? fmtTripDate(row.travel_date) : "Date not set"}{row.airline ? ` · ${row.airline}` : ""}</span>
                 <span className="block mt-0.5" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{petName(row)}</span>
@@ -1025,10 +1025,10 @@ function BillingTab({ userId, email }) {
         {purchases.length === 0 && legacyTrips.length === 0 && <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }}>No purchases yet. Stripe also emails a receipt for every payment.</p>}
         <div className="space-y-2">{purchases.map((x) => <div key={x.id} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
           <div className="min-w-0"><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>{kindLabel[x.kind] || "Purchase"}</div><div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>{new Date(x.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}{x.amount_cents != null ? ` · ${money(x.amount_cents, x.currency)}` : ""}</div></div>
-          {x.receipt_url ? <a href={x.receipt_url} target="_blank" rel="noopener noreferrer" className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Receipt</a> : <button onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Receipts</button>}
+          {x.receipt_url ? <a href={x.receipt_url} data-keep-clear target="_blank" rel="noopener noreferrer" className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Receipt</a> : <button data-keep-clear onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Receipts</button>}
         </div>)}{legacyTrips.map((t) => <div key={t.id} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
           <div className="min-w-0"><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>Travel Pass</div><div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>{t.origin} → {t.destination}{t.paid_at ? ` · ${new Date(t.paid_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` : ""}</div></div>
-          <button onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Receipts</button>
+          <button data-keep-clear onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Receipts</button>
         </div>)}</div>
         <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mt-3">Receipts open in Stripe.</p>
       </div>

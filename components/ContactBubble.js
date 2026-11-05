@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Icon from "./Icon";
+import useClearFab from "./useClearFab";
 
 const CHAT = process.env.NEXT_PUBLIC_CHAT_ENABLED === "true";
 
@@ -11,8 +12,10 @@ export default function ContactBubble() {
   const [open, setOpen] = useState(false);
   const [Panel, setPanel] = useState(null);
   const [loading, setLoading] = useState(false);
+  const buttonRef = useRef(null);
   const account = path === "/account" || path.startsWith("/account/");
   const onPetPage = path === "/id" || path.startsWith("/id/");
+  const clear = useClearFab(buttonRef, account && !onPetPage && !open, { side: "right", bottom: account ? (CHAT ? 146 : 74) : 16 });
   if (onPetPage) return null;
 
   async function toggle() {
@@ -38,7 +41,9 @@ export default function ContactBubble() {
     <>
       <button
         type="button"
+        ref={buttonRef}
         className={classes}
+        style={clear ? { left: clear.left, top: clear.top, right: "auto", bottom: "auto" } : undefined}
         aria-label="Contact us"
         aria-expanded={open}
         aria-controls={open ? "contact-panel" : undefined}
