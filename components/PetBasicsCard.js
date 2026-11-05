@@ -21,6 +21,7 @@ function Field({ k, v }) {
 export default function PetBasicsCard({ pet, userId, onChanged }) {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [form, setForm] = useState(() => ({
     name: pet.name || "",
     animal_type: pet.animal_type || "Dog",
@@ -50,7 +51,7 @@ export default function PetBasicsCard({ pet, userId, onChanged }) {
     };
     const { error } = await supabase.from("pets").update(patch).eq("id", pet.id).eq("user_id", userId);
     setSaving(false);
-    if (!error) { setOpen(false); onChanged?.(); }
+    if (!error) { setSaved(true); setTimeout(() => setSaved(false), 2000); setOpen(false); onChanged?.(); }
     else alert("Couldn't save the profile. Please try again.");
   }
 
@@ -65,10 +66,13 @@ export default function PetBasicsCard({ pet, userId, onChanged }) {
   ];
 
   return (
-    <section data-pet-basics className="rounded-3xl p-4 sm:p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+    <section data-pet-basics className="rounded-3xl p-4 sm:p-6 min-w-0 max-w-full" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
       <div className="flex items-center justify-between gap-3 mb-3">
         <h3 style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }}>Basics</h3>
-        <button type="button" onClick={() => setOpen((v) => !v)} style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy, background: "#fff", border: `2px solid ${tokens.navy}`, borderRadius: 999, minHeight: 44, padding: "8px 16px", cursor: "pointer" }}>{open ? "Close" : "Edit"}</button>
+        <span className="flex items-center gap-2">
+          {saved && !open ? <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.green }}>Saved</span> : null}
+          <button type="button" onClick={() => setOpen((v) => !v)} style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy, background: "#fff", border: `2px solid ${tokens.navy}`, borderRadius: 999, minHeight: 44, padding: "8px 16px", cursor: "pointer" }}>{open ? "Close" : "Edit"}</button>
+        </span>
       </div>
       {pet.passport_no ? <div className="mb-3" style={{ fontFamily: font.body, fontSize: 17, color: tokens.ink }}><b style={{ color: tokens.navy }}>PetPassGo ID </b>{pet.passport_no}</div> : null}
       {!open ? (
@@ -92,7 +96,10 @@ export default function PetBasicsCard({ pet, userId, onChanged }) {
               <option>Emotional support animal</option>
             </select>
           </label>
-          <button type="submit" disabled={saving} style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, background: tokens.primary, color: "#fff", border: "none", borderRadius: 999, minHeight: 48, padding: "12px 18px", cursor: "pointer", justifySelf: "start" }}>{saving ? "Saving…" : "Save basics"}</button>
+          <div className="flex items-center gap-3">
+            <button type="submit" disabled={saving} style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, background: tokens.primary, color: "#fff", border: "none", borderRadius: 999, minHeight: 48, padding: "12px 18px", cursor: "pointer" }}>{saving ? "Saving…" : "Save basics"}</button>
+            {saved ? <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.green }}>Saved</span> : null}
+          </div>
         </form>
       )}
     </section>

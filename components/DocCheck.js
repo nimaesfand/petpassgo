@@ -30,7 +30,7 @@ export default function DocCheck({ trip }) {
     <div className="rounded-xl p-4 mb-4" style={{ background: "#fff", border: "1px solid #E5E0D5" }}>
       <div style={{ fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 12, letterSpacing: "0.1em", color: tokens.muted }} className="mb-1">DOCUMENT PRE-CHECK (BETA)</div>
       <div style={{ fontSize: 14, opacity: 0.7 }} className="mb-2">Upload a photo of your vet certificate. We'll read the key details to help you prep. This is not a certification or approval. Your airline and vet have the final say.</div>
-      <input type="file" accept="image/*" onChange={onFile} disabled={busy} />
+      <label className="inline-flex items-center min-h-[44px] rounded-full px-4 cursor-pointer" style={{ background: tokens.navy, color: "#fff", fontWeight: 700, fontSize: 15 }}>{busy ? "Reading…" : "Choose a photo"}<input type="file" accept="image/*" onChange={onFile} disabled={busy} className="ppg-hp" /></label>
       {busy && <div style={{ fontSize: 14.5 }} className="mt-2">Reading your document…</div>}
       {err && <div style={{ fontSize: 14.5, color: "#B42318" }} className="mt-2">{err}</div>}
       {res && (

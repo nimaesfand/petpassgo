@@ -29,6 +29,7 @@ export default function PetCareCard({ pet, userId, onChanged }) {
   const [meds, setMeds] = useState([]);
   const [med, setMed] = useState({ name: "", dose: "", timing: "" });
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   async function loadMeds() {
@@ -67,7 +68,7 @@ export default function PetCareCard({ pet, userId, onChanged }) {
       return;
     }
     setSaving(false);
-    if (!error) onChanged?.();
+    if (!error) { setSaved(true); setTimeout(() => setSaved(false), 2000); onChanged?.(); }
     else alert("Couldn't save Care. Please try again.");
   }
 
@@ -92,7 +93,7 @@ export default function PetCareCard({ pet, userId, onChanged }) {
   }
 
   return (
-    <section data-pet-care className="rounded-3xl p-4 sm:p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+    <section data-pet-care className="rounded-3xl p-4 sm:p-6 min-w-0 max-w-full" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
       <h3 style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }} className="mb-4">Care</h3>
       <form onSubmit={save} className="grid gap-3">
         <label style={label}>Food<textarea aria-label="Food" rows={2} value={form.food} onChange={set("food")} style={input} /></label>
@@ -103,15 +104,15 @@ export default function PetCareCard({ pet, userId, onChanged }) {
           <label style={label}>Vet phone<input aria-label="Vet phone" value={form.vet_phone} onChange={set("vet_phone")} style={input} inputMode="tel" /></label>
         </div>
         <label style={label}>Temperament and behavior<textarea aria-label="Temperament" rows={3} value={form.temperament} onChange={set("temperament")} style={input} /></label>
-        <div>
-          <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }} className="mb-2">Crate or carrier size (inches)</div>
-          <div className="grid grid-cols-3 gap-2">
-            <input type="number" step="0.1" min="0.1" aria-label="Carrier length in inches" placeholder="Length" value={form.carrier_length_in} onChange={set("carrier_length_in")} style={input} />
-            <input type="number" step="0.1" min="0.1" aria-label="Carrier width in inches" placeholder="Width" value={form.carrier_width_in} onChange={set("carrier_width_in")} style={input} />
-            <input type="number" step="0.1" min="0.1" aria-label="Carrier height in inches" placeholder="Height" value={form.carrier_height_in} onChange={set("carrier_height_in")} style={input} />
-          </div>
+        <div className="grid grid-cols-3 gap-2 min-w-0">
+          <label className="min-w-0" style={label}>L (in)<input type="number" step="0.1" min="0.1" aria-label="Carrier length in inches" placeholder="L" value={form.carrier_length_in} onChange={set("carrier_length_in")} style={input} /></label>
+          <label className="min-w-0" style={label}>W (in)<input type="number" step="0.1" min="0.1" aria-label="Carrier width in inches" placeholder="W" value={form.carrier_width_in} onChange={set("carrier_width_in")} style={input} /></label>
+          <label className="min-w-0" style={label}>H (in)<input type="number" step="0.1" min="0.1" aria-label="Carrier height in inches" placeholder="H" value={form.carrier_height_in} onChange={set("carrier_height_in")} style={input} /></label>
         </div>
-        <button type="submit" disabled={saving} style={{ ...btn, background: tokens.primary, color: "#fff", justifySelf: "start" }}>{saving ? "Saving…" : "Save care"}</button>
+        <div className="flex items-center gap-3">
+          <button type="submit" disabled={saving} style={{ ...btn, background: tokens.primary, color: "#fff" }}>{saving ? "Saving…" : "Save care"}</button>
+          {saved ? <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.green }}>Saved</span> : null}
+        </div>
       </form>
 
       <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${tokens.line}` }}>

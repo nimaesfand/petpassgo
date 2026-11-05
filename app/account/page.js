@@ -488,7 +488,14 @@ function PetProfileTab({ userId }) {
   // Lapsed (only when launched, or with ?preview=lapsed pre-launch): lost-pet tools stay
   // free; vault and full Pet ID show a win-back message. Nothing is deleted.
   if (!access.loading && !access.allowed) return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0">
+      {pets.length === 0 && !loading ? (
+        <div className="rounded-3xl p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+          <h3 style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-2">Pet Vault</h3>
+          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mb-4">Pet Vault is {usd(P.member)} a month. It holds your pet's records, ID, and documents.</p>
+          <a href="/join" className="btn-primary inline-flex items-center justify-center rounded-full px-6 py-3 min-h-[48px]" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>{JOIN_CTA}</a>
+        </div>
+      ) : null}
       {loading ? <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading your pets…</div> : pets.map((pet) => (
         <div key={pet.id} className="rounded-2xl p-5 space-y-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           <div className="flex items-center gap-3">
@@ -616,12 +623,11 @@ function PetProfileTab({ userId }) {
               <option>Female</option>
             </select>
             <input type="number" step="0.1" min="0.1" placeholder="Weight in pounds (optional)" aria-label="Weight in pounds" value={form.weight_lb} onChange={(e) => setForm((f) => ({ ...f, weight_lb: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-4 py-3 outline-none" />
-            <div className="grid grid-cols-3 gap-2">
-              <input type="number" step="0.1" min="0.1" placeholder="Length (in)" aria-label="Carrier length in inches" value={form.carrier_length_in} onChange={(e) => setForm((f) => ({ ...f, carrier_length_in: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-3 py-3 outline-none" />
-              <input type="number" step="0.1" min="0.1" placeholder="Width (in)" aria-label="Carrier width in inches" value={form.carrier_width_in} onChange={(e) => setForm((f) => ({ ...f, carrier_width_in: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-3 py-3 outline-none" />
-              <input type="number" step="0.1" min="0.1" placeholder="Height (in)" aria-label="Carrier height in inches" value={form.carrier_height_in} onChange={(e) => setForm((f) => ({ ...f, carrier_height_in: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-3 py-3 outline-none" />
+            <div className="grid grid-cols-3 gap-2 min-w-0">
+              <label className="min-w-0" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>L (in)<input type="number" step="0.1" min="0.1" placeholder="L" aria-label="Carrier length in inches" value={form.carrier_length_in} onChange={(e) => setForm((f) => ({ ...f, carrier_length_in: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, width: "100%", minWidth: 0 }} className="rounded-xl px-3 py-3 outline-none mt-1" /></label>
+              <label className="min-w-0" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>W (in)<input type="number" step="0.1" min="0.1" placeholder="W" aria-label="Carrier width in inches" value={form.carrier_width_in} onChange={(e) => setForm((f) => ({ ...f, carrier_width_in: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, width: "100%", minWidth: 0 }} className="rounded-xl px-3 py-3 outline-none mt-1" /></label>
+              <label className="min-w-0" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>H (in)<input type="number" step="0.1" min="0.1" placeholder="H" aria-label="Carrier height in inches" value={form.carrier_height_in} onChange={(e) => setForm((f) => ({ ...f, carrier_height_in: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, width: "100%", minWidth: 0 }} className="rounded-xl px-3 py-3 outline-none mt-1" /></label>
             </div>
-            <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Carrier size is length, width, and height. We use it only when the airline published a limit.</p>
           </div>
           <div className="flex gap-3 mt-4">
             <button
@@ -916,9 +922,9 @@ function CurrentFlightTab({ userId }) {
             const open = trip?.id === row.id;
             return (
               <button key={row.id} type="button" onClick={() => openTrip(row)} className="w-full rounded-2xl px-4 py-3 text-left" style={{ background: "#fff", border: `2px solid ${open ? tokens.navy : tokens.line}`, cursor: "pointer" }}>
-                <span className="flex items-start justify-between gap-3">
-                  <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{row.origin} → {row.destination}</span>
-                  <span className="rounded-full px-2.5 py-1 flex-shrink-0" style={{ background: row.paid ? tokens.sky : "#FDE8E2", color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>{row.paid ? "Paid" : "Unpaid"}</span>
+                <span className="flex flex-wrap items-center gap-2 min-w-0">
+                  <span className="min-w-0" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{row.origin} → {row.destination}</span>
+                  <span className="rounded-full px-2.5 py-1" style={{ background: row.paid ? tokens.sky : "#FDE8E2", color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>{row.paid ? "Paid" : "Unpaid"}</span>
                 </span>
                 <span className="block mt-1" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{row.travel_date ? fmtTripDate(row.travel_date) : "Date not set"}{row.airline ? ` · ${row.airline}` : ""}</span>
                 <span className="block mt-0.5" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{petName(row)}</span>
@@ -1032,12 +1038,11 @@ function BillingTab({ userId }) {
           {err && <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp }} className="mt-3">{err}</p>}
         </> : <>
           <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}<b>{VAULT_NAME}</b> · {usd(P.member)}{P.memberUnit}. {VAULT_SUB} Plus {usd(P.memberPass)} Travel Passes. {MEMBERSHIP_TERMS}</p>
-          <MarketingOptIn checked={tips} onChange={setTips} />
           <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
           <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => { if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; } trackBeginCheckout("membership"); go("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true, marketing_opt_in: tips }); }} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">{JOIN_CTA}</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts and cards</button></div>
         </>}
       </div>
-      <MarketingSettings />
+      <MarketingSettings onMarketingChange={setTips} />
     </div>
   );
 }
@@ -1071,7 +1076,7 @@ function PostTripFeedback() {
   const [trip, setTrip] = useState(null);
   useEffect(() => { const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" }); supabase.from("trips").select("id,origin,destination,travel_date,return_date").eq("paid", true).lt("travel_date", today).order("travel_date", { ascending: false }).limit(1).then(async ({ data, error }) => { let row = data?.[0]; if (error) { const again = await supabase.from("trips").select("id,origin,destination,travel_date").eq("paid", true).lt("travel_date", today).order("travel_date", { ascending: false }).limit(1); row = again.data?.[0]; } if (row && (!row.return_date || row.return_date < today)) setTrip(row); }); }, []);
   if (!trip) return null;
-  return <FeedbackPrompt kind="post_trip" tripId={trip.id} refKey={trip.id} title="How was the trip?" blurb={`Tell us how ${trip.origin} → ${trip.destination} went. Private to PetPassGo.`} />;
+  return <FeedbackPrompt kind="post_trip" tripId={trip.id} refKey={trip.id} title="How was the trip?" blurb={`Tell us how ${trip.origin} → ${trip.destination} went.`} />;
 }
 
 function revealAnchor(sel) {
@@ -1144,7 +1149,7 @@ export default function AccountPage() {
       {loading ? (
         <div className="flex items-center justify-center py-24" style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div>
       ) : (
-      <main className="w-full max-w-[1100px] mx-auto px-4 md:px-8 pt-8 md:pt-12 ppg-account-clear">
+      <main className="w-full max-w-[1100px] mx-auto px-4 md:px-8 pt-8 md:pt-12 ppg-account-clear min-w-0 overflow-x-clip">
         <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
           <div>
             <h1 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 34, color: tokens.navy, lineHeight: 1.1 }}>Your dashboard</h1>

@@ -43,7 +43,6 @@ export default function FinderMessageForm({ petId, petName }) {
       <button disabled={state === "sending"} className="btn-primary rounded-full px-6 py-3 mt-3 w-full" style={{ background: tokens.primary, color: "#fff", fontWeight: 700, fontSize: 16 }}>
         {state === "sending" ? "Sending…" : "Send message"}
       </button>
-      <div style={{ fontSize: 12.5, color: tokens.muted }} className="mt-2">Don't share your home address. PetPassGo never asks finders or owners for money.</div>
     </form>
   );
 }

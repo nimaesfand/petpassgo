@@ -64,7 +64,7 @@ export default function LostFlyer() {
           <h1 style={{ fontFamily: font.display, fontSize: 40, fontWeight: 700, color: tokens.navy, lineHeight: 1.1 }} className="mb-2">Make a lost pet flyer</h1>
           <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.muted }} className="mb-6">Free, no account. Nothing you enter leaves your device.</p>
           <div className="grid gap-3">
-            <label style={{ fontFamily: font.body, fontWeight: 600, color: tokens.navy }}>Photo<input type="file" accept="image/*" onChange={(e) => { const x = e.target.files?.[0]; if (x) setPhoto(URL.createObjectURL(x)); }} className="block mt-1" /></label>
+            <label className="inline-flex items-center min-h-[44px] rounded-full px-4 cursor-pointer" style={{ fontFamily: font.body, fontWeight: 700, color: "#fff", background: tokens.navy }}>Choose a photo<input type="file" accept="image/*" className="ppg-hp" onChange={(e) => { const x = e.target.files?.[0]; if (x) setPhoto(URL.createObjectURL(x)); }} /></label>
             <input placeholder="Pet's name" value={f.name} onChange={set("name")} maxLength={30} className="rounded-lg px-3 py-2.5" style={input} aria-label="Pet's name" />
             <input placeholder="Description (breed, color, collar)" value={f.desc} onChange={set("desc")} maxLength={120} className="rounded-lg px-3 py-2.5" style={input} aria-label="Description" />
             <input placeholder="Last seen (area)" value={f.area} onChange={set("area")} maxLength={50} className="rounded-lg px-3 py-2.5" style={input} aria-label="Last seen area" />

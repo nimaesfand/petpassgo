@@ -110,7 +110,7 @@ export default function PublicPetId({ params }) {
   }, [status, lost, pet?.id]);
 
   return (
-    <main className="min-h-screen flex flex-col items-center px-4 py-8 sm:py-14" style={{ background: `linear-gradient(180deg, ${tokens.navy} 0, ${tokens.navy} 220px, ${tokens.sky} 220px)` }}>
+    <main className="min-h-screen flex flex-col items-center px-4 py-8 sm:py-14 ppg-fab-clear min-w-0 overflow-x-clip" style={{ background: `linear-gradient(180deg, ${tokens.navy} 0, ${tokens.navy} 220px, ${tokens.sky} 220px)` }}>
       <a href="/" className="mb-6" style={{ fontFamily: font.display, fontWeight: 700, fontSize: 22, color: "#fff", textDecoration: "none" }}>PetPassGo</a>
       <div className="w-full max-w-3xl">
         {status === "loading" && <div className="rounded-2xl p-8 text-center" style={{ background: "#fff", fontFamily: font.body, color: tokens.muted }}>Loading…</div>}

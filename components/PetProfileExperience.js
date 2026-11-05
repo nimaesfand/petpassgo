@@ -11,6 +11,7 @@ import PetBasicsCard from "./PetBasicsCard";
 import PetCareCard from "./PetCareCard";
 import PetDocumentsCard from "./PetDocumentsCard";
 import { documentFileError } from "../lib/petDocuments";
+import { todayPT } from "../lib/travelDates";
 import { SignedImg, BUCKET, getSignedUrl } from "../lib/storage";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
@@ -286,7 +287,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
   const showDocsButton = owner || otherDocs.length + housingDocs.length > 0;
 
   return (
-    <div data-pet-profile className="grid gap-4">
+    <div data-pet-profile className="grid gap-4 min-w-0 max-w-full">
       <section className="rounded-3xl overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.08)" }}>
         <div className="px-4 py-2.5 flex items-center gap-3" style={{ background: tokens.navy }}>
           <span className="flex gap-1.5 flex-shrink-0" aria-hidden="true">
@@ -346,19 +347,23 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
                 ) : null}
                 {trips.map((t) => {
                   const paid = owner ? !!t.paid : true;
+                  const today = todayPT();
+                  const past = !!t.travel_date && t.travel_date < today && (!t.return_date || t.return_date < today);
                   const when = [fmtDob(t.travel_date), t.return_date ? `back ${fmtDob(t.return_date)}` : ""].filter(Boolean).join(" · ");
                   const route = [t.origin, t.destination].filter(Boolean).join(" → ");
                   return (
-                    <div key={t.id} className="rounded-2xl p-4" style={{ background: tokens.paper }}>
-                      <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 18, color: tokens.navy }}>{paid ? (t.airline || "Travel Pass") : "Trip planned"}</div>
+                    <div key={t.id} className="rounded-2xl p-4 min-w-0" style={{ background: tokens.paper }}>
+                      <div className="flex flex-wrap items-center gap-2 min-w-0">
+                        <div className="min-w-0" style={{ fontFamily: font.body, fontWeight: 800, fontSize: 18, color: tokens.navy }}>{paid ? (t.airline || "Travel Pass") : "Trip planned"}</div>
+                        {past ? <span className="rounded-full px-2.5 py-1" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>Past</span> : null}
+                      </div>
                       {route ? <div style={text}>{route}</div> : null}
                       {when ? <div style={text}>{when}</div> : null}
-                      {paid ? (
+                      {paid && !past ? (
                         <div style={text}>{steps[t.id] ? `${steps[t.id]} checklist steps marked done.` : "Checklist is in the Travel Pass."}</div>
-                      ) : (
-                        <div style={text}>Airline details open after you pay.</div>
-                      )}
-                      {owner ? <a href="/account?tab=trips" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{paid ? "Open checklist" : "Continue checkout"}</a> : null}
+                      ) : null}
+                      {!paid ? <div style={text}>Airline details open after you pay.</div> : null}
+                      {owner && !past ? <a href="/account?tab=trips" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{paid ? "Open checklist" : "Continue checkout"}</a> : null}
                     </div>
                   );
                 })}
@@ -386,7 +391,10 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
                 {owner ? (
                   <form className="grid gap-2" onSubmit={(e) => { e.preventDefault(); uploadDoc(housingFile, housingType); }}>
                     <select aria-label="Housing document type" value={housingType} onChange={(e) => setHousingType(e.target.value)} style={input}>{HOUSING_DOC_TYPES.map((t) => <option key={t}>{t}</option>)}</select>
-                    <input aria-label="Housing document file" type="file" accept=".pdf,.jpg,.jpeg,.png,.heic,.heif,application/pdf,image/jpeg,image/png,image/heic" onChange={(e) => setHousingFile(e.target.files?.[0] || null)} style={{ fontFamily: font.body, fontSize: 16 }} />
+                    <label className="flex items-center min-h-[52px] rounded-2xl px-4 cursor-pointer min-w-0" style={{ border: `2px dashed ${tokens.navy}`, background: "#fff" }}>
+                      <span className="truncate" style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{housingFile ? housingFile.name : "Choose a file"}</span>
+                      <input aria-label="Housing document file" type="file" accept=".pdf,.jpg,.jpeg,.png,.heic,.heif,application/pdf,image/jpeg,image/png,image/heic" className="ppg-hp" onChange={(e) => setHousingFile(e.target.files?.[0] || null)} />
+                    </label>
                     <button type="submit" disabled={uploading || !housingFile} style={{ ...btn, background: tokens.primary, color: "#fff", justifySelf: "start", opacity: housingFile ? 1 : 0.6 }}>{uploading ? "Uploading…" : "Attach paperwork"}</button>
                   </form>
                 ) : null}
