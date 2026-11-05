@@ -28,8 +28,10 @@ export default function PetPassport({
   owner = false,
   chipValue = "",
   onPhoto,
+  onRemovePhoto,
   photoBusy = false,
   onDocuments,
+  sheet = false,
 }) {
   const [copied, setCopied] = useState(false);
   const url = profileUrl(pet);
@@ -85,6 +87,7 @@ export default function PetPassport({
               </label>
             ) : null}
             {photoBusy ? <div className="mt-1 text-center" style={{ fontFamily: font.body, fontSize: 13, fontWeight: 700, color: tokens.navy }}>Uploading photo…</div> : null}
+            {owner && onRemovePhoto && photo ? <button type="button" onClick={onRemovePhoto} className="ppg-btn ppg-btn-secondary ppg-btn-compact ppg-no-print mt-2">Remove photo</button> : null}
           </div>
           <div className="flex-1 min-w-0">
             <h2 style={{ fontFamily: font.display, fontWeight: 800, fontSize: 36, lineHeight: 1.05, color: tokens.navy, overflowWrap: "anywhere" }}>{pet.name}</h2>
@@ -117,7 +120,7 @@ export default function PetPassport({
         ) : null}
 
         <div className="ppg-no-print flex flex-wrap gap-2 mt-5">
-          <button type="button" onClick={() => window.print()} className="ppg-btn ppg-btn-primary">Print</button>
+          <button type="button" onClick={() => { if (sheet || !(owner && pet?.id)) window.print(); else window.open(`/account/passport/print?pet=${pet.id}`, "_blank"); }} className="ppg-btn ppg-btn-primary">Print</button>
           <button type="button" onClick={share} className="ppg-btn ppg-btn-secondary">{copied ? "Link copied" : "Share"}</button>
           {owner && onDocuments ? <button type="button" onClick={onDocuments} className="ppg-btn ppg-btn-secondary">View documents</button> : null}
         </div>

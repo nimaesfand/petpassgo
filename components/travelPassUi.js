@@ -51,7 +51,7 @@ export function SoftCard({ title, action, children }) {
 
 export function TextButton({ children, onClick }) {
   return (
-    <button type="button" onClick={onClick} className="rounded-full px-4 py-2.5" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer", minHeight: 44 }}>{children}</button>
+    <button type="button" onClick={onClick} className="ppg-btn ppg-btn-secondary">{children}</button>
   );
 }
 

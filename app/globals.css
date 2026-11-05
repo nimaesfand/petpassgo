@@ -120,6 +120,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, .ppg-choice:focus-wi
 .ppg-btn-primary:hover { background: #9A3412; }
 .ppg-btn-secondary { background: #fff; color: #14213D; border: 2px solid #14213D; }
 .ppg-btn-secondary:hover { background: #EEF2F7; }
+.ppg-btn-compact { min-height: 40px; padding: 6px 10px; font-size: 14px; }
 select,
 input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="button"]):not([type="submit"]),
 textarea {
@@ -137,8 +138,21 @@ textarea {
 @media print {
   header, nav, .ppg-no-print, .ppg-contact-fab, .ppg-contact-layer, .ppg-contact-panel { display: none !important; }
   body { background: #fff !important; }
-  .ppg-passport { box-shadow: none !important; break-inside: avoid; }
-  @page { size: letter; margin: 0.45in; }
+  .ppg-passport { box-shadow: none !important; }
+  .ppg-print-sheet {
+    width: 8.5in !important;
+    height: 10.9in !important;
+    max-height: 10.9in !important;
+    overflow: hidden !important;
+    margin: 0 auto !important;
+    break-after: avoid;
+    page-break-after: avoid;
+    break-inside: avoid;
+  }
+  @page { size: letter; margin: 0; }
+}
+@media (max-width: 767px) {
+  .ppg-account-clear { padding-bottom: calc(18rem + env(safe-area-inset-bottom, 0px)); }
 }
 .blog-body p { margin: 0 0 1em; }
 .blog-body h2 { font-size: 26px; color: #14213D; margin: 1.5em 0 0.45em; }

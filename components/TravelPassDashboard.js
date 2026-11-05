@@ -192,7 +192,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
           </div>
         </div>
         {pet?.id ? (
-          <a href={`/id/${pet.id}`} className="mt-4 inline-flex items-center justify-center rounded-full px-5 py-3 w-full sm:w-auto" style={{ background: "#fff", color: tokens.navy, fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none", minHeight: 48 }}>View your Pet ID</a>
+          <a href={`/id/${pet.id}`} className="ppg-btn ppg-btn-secondary mt-4 w-full sm:w-auto">View your Pet ID</a>
         ) : (
           <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.sky }} className="mt-3">Link a pet and the Pet ID opens from here.</p>
         )}
@@ -274,7 +274,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
                     <span className="flex items-center justify-center rounded-xl flex-shrink-0" style={{ width: 40, height: 40, background: tokens.sky, color: tokens.navy }}><Icon name={r.icon} size={20} /></span>
                     <span>
                       <span className="block" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{r.title}</span>
-                      <span className="block" style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Expires {fmt(r.date)}</span>
+                      <span className="inline-flex rounded-full px-2.5 py-1 mt-1" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 13, fontWeight: 700 }}>Expires {fmt(r.date)}</span>
                     </span>
                   </li>
                 ))}
@@ -312,7 +312,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
             <div className="rounded-2xl p-4 mb-4" style={{ background: "#FFF7F2", border: `1px solid ${tokens.primary}` }}>
               <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-1">U.S. service animals are dogs</div>
               <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink, lineHeight: 1.45 }} className="mb-3">A psychiatric service dog is a service dog. Cats, other animals, and emotional support animals fly as pets. PetPassGo does not decide service-animal status. That is what you tell us, and what the airline accepts.</p>
-              <button type="button" onClick={onSetRolePet} className="rounded-full px-5 py-3" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, border: "none", cursor: "pointer", minHeight: 48 }}>Switch this trip to the pet path</button>
+              <button type="button" onClick={onSetRolePet} className="ppg-btn ppg-btn-primary">Switch this trip to the pet path</button>
             </div>
           )}
           <RoundTripAddon trip={trip} onSave={onSaveReturn} />
@@ -348,7 +348,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
           <SoftCard title="Pet ID">
             <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>The Pet ID page is the one a finder or gate agent can open. PetPassGo does not verify service-animal status.</p>
             {pet?.passport_no && <p style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }} className="mt-2">PetPassGo ID {pet.passport_no}</p>}
-            {pet?.id && <div className="mt-3"><a href={`/id/${pet.id}`} className="inline-flex items-center justify-center rounded-full px-5 py-3" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none", minHeight: 48 }}>View your Pet ID</a></div>}
+            {pet?.id && <div className="mt-3"><a href={`/id/${pet.id}`} className="ppg-btn ppg-btn-primary">View your Pet ID</a></div>}
           </SoftCard>
           <SoftCard title="Vaccination records">
             {(health || []).length === 0 && (docs || []).filter((d) => /vaccin|rabies|health/i.test(d.document_type || "")).length === 0 && (
@@ -358,7 +358,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
               {(health || []).map((h) => (
                 <li key={h.id} className="flex items-center justify-between gap-3 rounded-xl px-3 py-3" style={{ background: tokens.paper }}>
                   <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{h.name}</span>
-                  <span style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>{h.expires_on ? `Expires ${fmt(h.expires_on)}` : h.kind}</span>
+                  <span className="inline-flex rounded-full px-2.5 py-1" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 13, fontWeight: 700 }}>{h.expires_on ? `Expires ${fmt(h.expires_on)}` : h.kind}</span>
                 </li>
               ))}
               {(docs || []).filter((d) => /vaccin|rabies|health/i.test(d.document_type || "")).map((d) => (

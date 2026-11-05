@@ -67,7 +67,7 @@ export default function ChatWidget() {
 
   const box = { fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 14 };
   return (
-    <div data-ppg-chat className="ppg-no-print" style={{ position: "fixed", right: 16, bottom: account ? "calc(146px + env(safe-area-inset-bottom, 0px))" : "calc(88px + env(safe-area-inset-bottom, 0px))", zIndex: 50, maxWidth: "calc(100vw - 32px)", ...box }}>
+    <div data-ppg-chat className="ppg-no-print" style={{ position: "fixed", right: account ? "auto" : 16, left: account ? 16 : "auto", bottom: account ? "calc(146px + env(safe-area-inset-bottom, 0px))" : "calc(88px + env(safe-area-inset-bottom, 0px))", zIndex: 50, maxWidth: "calc(100vw - 32px)", ...box }}>
       {open && (
         <div className="rounded-2xl shadow-xl flex flex-col" style={{ width: 320, height: 440, background: "#fff", border: "1px solid #DCE3EC", marginBottom: 10 }}>
           <div className="px-4 py-3 flex justify-between items-center rounded-t-2xl" style={{ background: navy, color: "#F3F5F9" }}>
