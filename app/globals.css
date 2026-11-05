@@ -11,7 +11,10 @@ body {
   margin: 0;
 }
 
-body { font-family: var(--font-body), system-ui, sans-serif; color: #1A2333; background: #F3F5F9; font-size: 16px; -webkit-font-smoothing: antialiased; }
+html { overflow-x: clip; }
+body { font-family: var(--font-body), system-ui, sans-serif; color: #1A2333; background: #F3F5F9; font-size: 16px; -webkit-font-smoothing: antialiased; overflow-x: clip; }
+input, select, textarea, button { max-width: 100%; }
+img, svg, video { max-width: 100%; }
 h1, h2, h3, h4 { font-family: var(--font-display), system-ui, sans-serif; letter-spacing: -0.015em; }
 .btn-primary { transition: background .15s ease, transform .15s ease; }
 .btn-primary:hover { background: #9A3412 !important; }
@@ -54,8 +57,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, .ppg-choice:focus-wi
   .ppg-contact-fab.with-chat,
   .ppg-contact-fab.is-account.with-chat { bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
 }
-.ppg-fab-clear { padding-bottom: calc(6.75rem + env(safe-area-inset-bottom, 0px)); }
-.ppg-account-clear { padding-bottom: calc(11rem + env(safe-area-inset-bottom, 0px)); }
+.ppg-fab-clear { padding-bottom: calc(9.5rem + env(safe-area-inset-bottom, 0px)); }
+.ppg-account-clear { padding-bottom: calc(15rem + env(safe-area-inset-bottom, 0px)); }
 @media (min-width: 768px) {
   .ppg-account-clear { padding-bottom: 3rem; }
 }
