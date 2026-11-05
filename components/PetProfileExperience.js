@@ -7,11 +7,15 @@ import PetQr from "../lib/PetQr";
 import { PetIllustration } from "./PetIdCard";
 import { WalletCard, HealthPassport } from "./PetIdV2";
 import VetImport from "./VetImport";
+import PetBasicsCard from "./PetBasicsCard";
+import PetCareCard from "./PetCareCard";
+import PetDocumentsCard from "./PetDocumentsCard";
+import { documentFileError } from "../lib/petDocuments";
 import { SignedImg, BUCKET, getSignedUrl } from "../lib/storage";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
 import {
-  DOC_TYPES, HOUSING_DOC_TYPES, chipMask, filled, fmtDob, isHousingDoc, isTravelDoc,
+  HOUSING_DOC_TYPES, chipMask, filled, fmtDob, isHousingDoc, isTravelDoc,
   profileLabel, profileUrl, roleLabel, weightLabel,
 } from "../lib/petProfile";
 
@@ -151,12 +155,6 @@ function fromPet(pet) {
   };
 }
 
-function numOrNull(v) {
-  if (v === "" || v == null) return null;
-  const n = Number(v);
-  return Number.isFinite(n) ? n : null;
-}
-
 export default function PetProfileExperience({ pet, userId, mode = "owner", onChanged }) {
   const owner = mode === "owner";
   const [tab, setTab] = useState("travel");
@@ -165,13 +163,10 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
   const [steps, setSteps] = useState({});
   const [health, setHealth] = useState([]);
   const [healthKey, setHealthKey] = useState(0);
-  const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(() => fromPet(pet));
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [docType, setDocType] = useState("Vaccination record");
   const [housingType, setHousingType] = useState(HOUSING_DOC_TYPES[0]);
-  const [file, setFile] = useState(null);
   const [housingFile, setHousingFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
@@ -234,34 +229,6 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
     return !error;
   }
 
-  async function saveProfile(e) {
-    e?.preventDefault();
-    const ok = await save({
-      name: form.name.trim() || pet.name,
-      animal_type: form.animal_type,
-      role: form.role,
-      breed: form.breed.trim() || null,
-      sex: form.sex || null,
-      color: form.color.trim() || null,
-      weight_lb: numOrNull(form.weight_lb),
-      date_of_birth: form.date_of_birth || null,
-      carrier_length_in: numOrNull(form.carrier_length_in),
-      carrier_width_in: numOrNull(form.carrier_width_in),
-      carrier_height_in: numOrNull(form.carrier_height_in),
-      handler_name: form.handler_name.trim() || null,
-      trained: form.trained === "" ? null : form.trained === "yes",
-      allergies: form.allergies.trim() || null,
-      medications: form.medications.trim() || null,
-      vet_name: form.vet_name.trim() || null,
-      vet_phone: form.vet_phone.trim() || null,
-      emergency_contact_name: form.emergency_contact_name.trim() || null,
-      emergency_contact_phone: form.emergency_contact_phone.trim() || null,
-      about_bio: form.about_bio.trim() || null,
-      housing_notes: form.housing_notes.trim() || null,
-    });
-    if (ok) setEditing(false);
-  }
-
   async function toggle(key, value) {
     await save({ [key]: value });
   }
@@ -279,12 +246,14 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
 
   async function uploadDoc(chosen, type) {
     if (!chosen || !owner) return;
+    const problem = documentFileError(chosen);
+    if (problem) { alert(problem); return; }
     setUploading(true);
     const path = `${userId}/${pet.id}/${Date.now()}-${chosen.name}`;
     const { error } = await supabase.storage.from(BUCKET).upload(path, chosen);
     if (!error) {
       await supabase.from("documents").insert({ user_id: userId, pet_id: pet.id, document_type: type, file_url: path });
-      setFile(null); setHousingFile(null);
+      setHousingFile(null);
       const { data } = await supabase.from("documents").select("*").eq("pet_id", pet.id).order("uploaded_at", { ascending: false });
       setDocs(data || []);
     }
@@ -356,35 +325,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
               <button type="button" onClick={() => document.getElementById(`documents-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" })} className="self-center" style={{ ...btn, background: tokens.navy, color: "#fff" }}>View Documents</button>
             ) : null}
           </div>
-          {chips.length > 0 ? <div className="flex flex-wrap gap-2 mt-4 justify-center sm:justify-start">{chips.map((c) => <Chip key={c}>{c}</Chip>)}</div> : (owner ? <p className="mt-3" style={{ ...text, color: tokens.muted }}>Add a breed, birthday, or weight and they’ll show up as chips here.</p> : null)}
-          {owner ? (
-            <button type="button" className="mt-3" onClick={() => setEditing((v) => !v)} style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>{editing ? "Close editor" : "Edit profile"}</button>
-          ) : null}
-          {owner && editing ? (
-            <form onSubmit={saveProfile} className="grid gap-2 mt-3">
-              <input required aria-label="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} style={input} />
-              <div className="grid sm:grid-cols-2 gap-2">
-                <select aria-label="Animal type" value={form.animal_type} onChange={(e) => setForm({ ...form, animal_type: e.target.value })} style={input}><option>Dog</option><option>Cat</option><option>Other</option></select>
-                <select aria-label="Role" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} style={input}><option>Pet</option><option>Service animal</option><option>Emotional support animal</option></select>
-              </div>
-              <p style={{ ...text, color: tokens.muted, margin: 0 }}>Role is whatever you declare. PetPassGo does not verify it.</p>
-              <div className="grid sm:grid-cols-2 gap-2">
-                <input aria-label="Breed" placeholder="Breed" value={form.breed} onChange={(e) => setForm({ ...form, breed: e.target.value })} style={input} />
-                <input aria-label="Color" placeholder="Color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} style={input} />
-                <select aria-label="Sex" value={form.sex} onChange={(e) => setForm({ ...form, sex: e.target.value })} style={input}><option value="">Sex</option><option>Male</option><option>Female</option></select>
-                <input type="date" aria-label="Date of birth" value={form.date_of_birth} onChange={(e) => setForm({ ...form, date_of_birth: e.target.value })} style={input} />
-                <input type="number" step="0.1" min="0.1" aria-label="Weight in pounds" placeholder="Weight (lb)" value={form.weight_lb} onChange={(e) => setForm({ ...form, weight_lb: e.target.value })} style={input} />
-                <input aria-label="Owner name" placeholder="Owner name" value={form.handler_name} onChange={(e) => setForm({ ...form, handler_name: e.target.value })} style={input} maxLength={80} />
-                <select aria-label="Trained" value={form.trained} onChange={(e) => setForm({ ...form, trained: e.target.value })} style={input}><option value="">Trained?</option><option value="yes">Trained: yes, per owner</option><option value="no">Trained: no</option></select>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                <input type="number" step="0.1" min="0.1" aria-label="Carrier length in inches" placeholder="Length (in)" value={form.carrier_length_in} onChange={(e) => setForm({ ...form, carrier_length_in: e.target.value })} style={input} />
-                <input type="number" step="0.1" min="0.1" aria-label="Carrier width in inches" placeholder="Width (in)" value={form.carrier_width_in} onChange={(e) => setForm({ ...form, carrier_width_in: e.target.value })} style={input} />
-                <input type="number" step="0.1" min="0.1" aria-label="Carrier height in inches" placeholder="Height (in)" value={form.carrier_height_in} onChange={(e) => setForm({ ...form, carrier_height_in: e.target.value })} style={input} />
-              </div>
-              <button type="submit" disabled={saving} style={{ ...btn, background: tokens.primary, color: "#fff", justifySelf: "start" }}>{saving ? "Saving…" : "Save profile"}</button>
-            </form>
-          ) : null}
+          {chips.length > 0 ? <div className="flex flex-wrap gap-2 mt-4 justify-center sm:justify-start">{chips.map((c) => <Chip key={c}>{c}</Chip>)}</div> : null}
 
           {publicTabs.length > 0 ? (
             <div className="flex flex-wrap gap-2 mt-5" role="tablist">
@@ -445,7 +386,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
                 {owner ? (
                   <form className="grid gap-2" onSubmit={(e) => { e.preventDefault(); uploadDoc(housingFile, housingType); }}>
                     <select aria-label="Housing document type" value={housingType} onChange={(e) => setHousingType(e.target.value)} style={input}>{HOUSING_DOC_TYPES.map((t) => <option key={t}>{t}</option>)}</select>
-                    <input aria-label="Housing document file" type="file" accept="image/*,application/pdf" onChange={(e) => setHousingFile(e.target.files?.[0] || null)} style={{ fontFamily: font.body, fontSize: 16 }} />
+                    <input aria-label="Housing document file" type="file" accept=".pdf,.jpg,.jpeg,.png,.heic,.heif,application/pdf,image/jpeg,image/png,image/heic" onChange={(e) => setHousingFile(e.target.files?.[0] || null)} style={{ fontFamily: font.body, fontSize: 16 }} />
                     <button type="submit" disabled={uploading || !housingFile} style={{ ...btn, background: tokens.primary, color: "#fff", justifySelf: "start", opacity: housingFile ? 1 : 0.6 }}>{uploading ? "Uploading…" : "Attach paperwork"}</button>
                   </form>
                 ) : null}
@@ -487,7 +428,6 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
                     {(filled(pet.emergency_contact_name) || filled(pet.emergency_contact_phone)) ? <IdField label="Emergency contact" value={[pet.emergency_contact_name, pet.emergency_contact_phone].filter(Boolean).join(" · ")} /> : null}
                     {filled(pet.handler_name) ? <IdField label="Owner" value={pet.handler_name} /> : null}
                     {health.map((h, i) => <div key={`${h.name}-${i}`} style={text}><b>{h.name}</b>{h.expires_on ? ` · expires ${fmtDob(h.expires_on)}` : ""}</div>)}
-                    <p style={{ ...text, color: tokens.muted }}>The owner typed this. PetPassGo did not check it.</p>
                   </div>
                 )}
               </div>
@@ -508,22 +448,13 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
         </div>
       </section>
 
-      {(owner || docs.length > 0) && <section id={`documents-${pet.id}`} className="rounded-3xl p-4 sm:p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+      {owner ? <><PetBasicsCard pet={pet} userId={userId} onChanged={onChanged} /><PetCareCard pet={pet} userId={userId} onChanged={onChanged} /><PetDocumentsCard pet={pet} userId={userId} /></> : null}
+
+      {!owner && docs.length > 0 && <section id={`documents-${pet.id}`} className="rounded-3xl p-4 sm:p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
         <h3 style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }}>Documents</h3>
-        {(owner ? otherDocs : docs).length === 0 && owner ? <p className="mt-2" style={text}>No documents yet. Upload vet records or vaccination records when you have them.</p> : null}
-        {(owner ? otherDocs : docs).map((d) => (
-          <div key={d.id} className="flex items-center justify-between gap-3">
-            <button type="button" onClick={(e) => openDoc(d, e)} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left" }}><CheckRow title={d.document_type} detail={d.expires_on ? `Expires ${fmtDob(d.expires_on)}` : ""} /></button>
-            {owner ? <button type="button" onClick={() => removeDoc(d)} style={{ fontFamily: font.body, fontSize: 15, color: tokens.primary, background: "none", border: "none", cursor: "pointer" }}>Remove</button> : null}
-          </div>
+        {docs.map((d) => (
+          <button key={d.id} type="button" onClick={(e) => openDoc(d, e)} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left" }}><CheckRow title={d.document_type} detail={d.expires_on ? `Expires ${fmtDob(d.expires_on)}` : ""} /></button>
         ))}
-        {owner ? (
-          <form className="grid gap-2 mt-3" onSubmit={(e) => { e.preventDefault(); uploadDoc(file, docType); }}>
-            <select aria-label="Document type" value={docType} onChange={(e) => setDocType(e.target.value)} style={input}>{DOC_TYPES.map((t) => <option key={t}>{t}</option>)}</select>
-            <input aria-label="Document file" type="file" accept="image/*,application/pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} style={{ fontFamily: font.body, fontSize: 16 }} />
-            <button type="submit" disabled={uploading || !file} style={{ ...btn, background: tokens.primary, color: "#fff", justifySelf: "start", opacity: file ? 1 : 0.6 }}>{uploading ? "Uploading…" : "Upload a document"}</button>
-          </form>
-        ) : null}
       </section>}
 
       {owner ? (

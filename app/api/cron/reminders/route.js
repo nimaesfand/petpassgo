@@ -44,15 +44,20 @@ export async function GET(req) {
       else await sb.from("trip_reminders").delete().eq("trip_id", trip.id).eq("kind", it.kind);
     }
   }
-  // Members only: reminders 30 and 7 days before a document's expiry date.
+  // Document expiry: one email 30 days before, and one 7 days before. Transactional.
+  // Marketing opt-in does not gate these. A document_reminders = false row does.
   let docSent = 0;
   const addDays = (d, n) => { const x = new Date(d + "T12:00:00Z"); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
   const targets = { "30d": addDays(today, 30), "7d": addDays(today, 7) };
   const { data: docs } = await sb.from("documents").select("id,user_id,pet_id,document_type,expires_on").in("expires_on", Object.values(targets));
-  const { data: members } = await sb.from("memberships").select("user_id,status,current_period_end").eq("status", "active");
-  const memberIds = new Set((members || []).filter((m) => !m.current_period_end || new Date(m.current_period_end) > new Date()).map((m) => m.user_id));
+  const userIds = [...new Set((docs || []).map((d) => d.user_id).filter(Boolean))];
+  let optedOut = new Set();
+  if (userIds.length) {
+    const prefs = await sb.from("user_marketing").select("user_id,document_reminders").in("user_id", userIds);
+    if (!prefs.error) optedOut = new Set((prefs.data || []).filter((r) => r.document_reminders === false).map((r) => r.user_id));
+  }
   for (const doc of docs || []) {
-    if (!memberIds.has(doc.user_id)) continue;
+    if (optedOut.has(doc.user_id)) continue;
     const kind = doc.expires_on === targets["7d"] ? "7d" : "30d";
     const { error: insErr } = await sb.from("document_reminders").insert({ document_id: doc.id, user_id: doc.user_id, kind });
     if (insErr) continue; // already sent
