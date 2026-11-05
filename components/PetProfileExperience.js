@@ -7,6 +7,7 @@ import PetQr from "../lib/PetQr";
 import { PetIllustration } from "./PetIdCard";
 import { WalletCard, HealthPassport } from "./PetIdV2";
 import VetImport from "./VetImport";
+import PetPassport from "./PetPassport";
 import PetBasicsCard from "./PetBasicsCard";
 import PetCareCard from "./PetCareCard";
 import PetDocumentsCard from "./PetDocumentsCard";
@@ -284,9 +285,23 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
     : (pet.photo_path ? <img src={`/api/pet-photo/${pet.id}`} alt={pet.name || ""} className="object-cover" style={{ width: "100%", height: "100%" }} /> : null);
 
   const showDocsButton = owner || otherDocs.length + housingDocs.length > 0;
+  const stampRows = (trips || []).filter((t) => (owner ? t.paid : true) && (t.origin || t.destination));
+  const chipValue = owner
+    ? (filled(pet.microchip_number) ? pet.microchip_number : "")
+    : (pet.microchipped ? "On file" : "");
 
   return (
     <div data-pet-profile className="grid gap-4 min-w-0 max-w-full">
+      <PetPassport
+        pet={pet}
+        photo={photo}
+        stamps={stampRows}
+        owner={owner}
+        chipValue={chipValue}
+        onPhoto={owner ? uploadPhoto : null}
+        photoBusy={photoBusy}
+        onDocuments={showDocsButton ? () => document.getElementById(`documents-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }) : null}
+      />
       <section className="rounded-3xl overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.08)" }}>
         <div className="px-4 py-2.5 flex items-center gap-3" style={{ background: tokens.navy }}>
           <span className="flex gap-1.5 flex-shrink-0" aria-hidden="true">
@@ -297,35 +312,8 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
           <div className="flex-1 min-w-0 rounded-full px-3 py-1 text-center truncate" style={{ background: "rgba(255,255,255,0.12)", color: "#fff", fontFamily: font.body, fontSize: 15 }}>{profileLabel(pet)}</div>
         </div>
         <div className="p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
-            <div className="relative self-center sm:self-auto">
-              <div className="rounded-full overflow-hidden" style={{ width: 112, height: 112, border: `3px solid ${tokens.gold}`, background: "#E8EEF7" }}>
-                {photo || <PetIllustration type={pet.animal_type} size={112} />}
-              </div>
-              {owner ? (
-                <label className="absolute flex items-center justify-center" style={{ right: 0, bottom: 0, width: 36, height: 36, borderRadius: "50%", background: tokens.navy, color: "#fff", border: "2px solid #fff", cursor: "pointer" }}>
-                  <span className="sr-only">Change photo</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
-                  <input type="file" accept="image/*" onChange={uploadPhoto} style={{ display: "none" }} />
-                </label>
-              ) : null}
-            </div>
-            <div className="flex-1 min-w-0 text-center sm:text-left">
-              <div className="flex items-center justify-center sm:justify-start gap-2">
-                <Logo size={28} />
-                <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 16, color: tokens.navy }}>PetPassGo</span>
-              </div>
-              <h2 className="mt-1" style={{ fontFamily: font.display, fontWeight: 800, fontSize: 34, lineHeight: 1.05, color: tokens.navy, overflowWrap: "anywhere" }}>{pet.name}</h2>
-              {pet.animal_type ? <div style={{ fontFamily: font.body, fontSize: 18, color: tokens.ink }}>{pet.animal_type}</div> : null}
-              {pet.passport_no ? <div className="mt-1" style={{ fontFamily: font.body, fontSize: 16, color: tokens.navy }}><span style={{ color: tokens.muted }}>PetPassGo ID </span><b>{pet.passport_no}</b></div> : null}
-              {declared ? <div className="mt-1" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.ink }}>{declared}, as declared by the owner</div> : null}
-              {photoBusy ? <div style={{ ...text, color: tokens.muted }}>Uploading photo…</div> : null}
-            </div>
-            {showDocsButton ? (
-              <button type="button" onClick={() => document.getElementById(`documents-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" })} className="ppg-btn ppg-btn-primary self-center">View Documents</button>
-            ) : null}
-          </div>
-          {chips.length > 0 ? <div className="flex flex-wrap gap-2 mt-4 justify-center sm:justify-start">{chips.map((c) => <Chip key={c}>{c}</Chip>)}</div> : null}
+          {declared ? <div className="mb-3" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.ink }}>{declared}, as declared by the owner</div> : null}
+          {chips.length > 0 ? <div className="flex flex-wrap gap-2 mb-4">{chips.map((c) => <Chip key={c}>{c}</Chip>)}</div> : null}
 
           {publicTabs.length > 0 ? (
             <div className="flex flex-wrap gap-2 mt-5" role="tablist">
@@ -466,7 +454,6 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
 
       {owner ? (
         <>
-          <DigitalIdCard pet={pet} photo={photo} />
           <section data-pet-details className="rounded-3xl overflow-hidden flex flex-col lg:flex-row" style={{ border: `1px solid ${tokens.line}` }}>
             <aside className="p-5 lg:w-72 flex-shrink-0" style={{ background: tokens.navy }}>
               <div className="flex items-center gap-2 mb-4"><Logo size={32} /><span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 18, color: "#fff" }}>PetPassGo</span></div>

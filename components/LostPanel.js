@@ -24,6 +24,7 @@ export default function LostPanel({ pet, userId, onChanged }) {
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photo, setPhoto] = useState(pet.photo_url || null);
   const [err, setErr] = useState("");
+  const [ask, setAsk] = useState(null);
 
   async function load() {
     const [r, m, s] = await Promise.all([
@@ -43,7 +44,7 @@ export default function LostPanel({ pet, userId, onChanged }) {
 
   async function openForm() {
     setErr("");
-    setForm({ area: "", city: "", state: "", date: todayPT(), note: "", useTrip: false, flight: "", showContact: !!pet.show_contact_on_public_id, toBoard: true, cityTouched: false });
+    setForm({ area: "", city: "", state: "", date: todayPT(), note: "", reward: "", useTrip: false, flight: "", showContact: !!pet.show_contact_on_public_id, toBoard: false, cityTouched: false });
     const g = await visitorArea();
     setForm((f) => f && ({ ...f, state: f.state || g?.state || "", city: f.city || g?.city || "" }));
   }
@@ -69,12 +70,12 @@ export default function LostPanel({ pet, userId, onChanged }) {
       setErr("Please use a neighborhood, park or cross-streets, not a street address.");
       return;
     }
-    if (!form.city.trim() || !form.state) { setErr("Add the city and state so the right local board sees it."); return; }
+    if (COMMUNITY_ON && form.toBoard && (!form.city.trim() || !form.state)) { setErr("Add the city and state so the right local board sees it."); return; }
     setBusy(true); setErr("");
     if (form.showContact !== !!pet.show_contact_on_public_id) {
       await supabase.from("pets").update({ show_contact_on_public_id: form.showContact }).eq("id", pet.id).eq("user_id", userId);
     }
-    const { error } = await supabase.rpc("publish_lost_report", {
+    const payload = {
       p_pet_id: pet.id,
       p_area: form.area.trim(),
       p_date: form.date || null,
@@ -85,27 +86,31 @@ export default function LostPanel({ pet, userId, onChanged }) {
       p_trip_destination: form.useTrip && trip ? trip.destination : null,
       p_trip_flight: form.useTrip ? form.flight.trim() || null : null,
       p_post_board: COMMUNITY_ON && form.toBoard,
-    });
+    };
+    let { error } = await supabase.rpc("publish_lost_with_reward", { ...payload, p_reward: form.reward.trim() || null });
+    if (error && /publish_lost_with_reward|schema cache|PGRST202|reward_text|Could not find the function/i.test(error.message || "")) {
+      ({ error } = await supabase.rpc("publish_lost_report", payload));
+    }
     setBusy(false);
-    if (error) return setErr(error.message && !/^\d/.test(error.message) && error.message.length < 120 ? error.message : "Couldn't publish. Please try again.");
+    if (error) return setErr(error.message && !/^\d/.test(error.message) && error.message.length < 160 ? error.message : "Couldn't publish. Please try again.");
     setForm(null);
     onChanged?.();
     load();
   }
 
   async function reunited() {
-    if (!confirm(`Mark ${pet.name} as home safe? The poster comes down right away and scan locations are deleted.`)) return;
     setBusy(true);
     const { error } = await supabase.rpc("mark_pet_reunited", { pet_id: pet.id });
     setBusy(false);
+    setAsk(null);
     if (error) return setErr("Couldn't update. Please try again.");
     load();
   }
   async function turnOff() {
-    if (!confirm(`Turn off ${pet.name}'s lost report? The poster and board post come down. Use this if it was made by mistake.`)) return;
     setBusy(true);
     const { error } = await supabase.rpc("cancel_lost_report", { p_pet_id: pet.id });
     setBusy(false);
+    setAsk(null);
     if (error) return setErr("Couldn't turn it off. Please try again.");
     load();
   }
@@ -148,10 +153,10 @@ export default function LostPanel({ pet, userId, onChanged }) {
         </label>
         <div className="grid gap-2" style={{ gridTemplateColumns: "1fr 110px" }}>
           <label style={label}>City
-            <input required maxLength={80} style={input} value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value, cityTouched: true })} placeholder="City" />
+            <input maxLength={80} style={input} value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value, cityTouched: true })} placeholder="City" />
           </label>
           <label style={label}>State
-            <select required style={input} value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value, stateTouched: true })}>
+            <select style={input} value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value, stateTouched: true })}>
               <option value="">State</option>
               {US_STATES.map(([c]) => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -162,6 +167,9 @@ export default function LostPanel({ pet, userId, onChanged }) {
         </label>
         <label style={label}>Note for finders (optional, public)
           <textarea maxLength={500} rows={2} style={input} value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} placeholder="Red collar. Friendly but shy, don't chase." />
+        </label>
+        <label style={label}>Reward (optional, public)
+          <input maxLength={160} style={input} value={form.reward} onChange={(e) => setForm({ ...form, reward: e.target.value })} />
         </label>
         <fieldset className="grid gap-2" style={{ border: "none", padding: 0, margin: 0 }}>
           <legend style={{ ...label, marginBottom: 4 }}>How finders reach you</legend>
@@ -233,7 +241,7 @@ export default function LostPanel({ pet, userId, onChanged }) {
               </div>
             </div>
           ))}
-          {messages.length > 0 && <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mt-1">Meet in a public place, and never pay anyone before {pet.name} is back.</div>}
+          {messages.length > 0 && <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.ink }} className="mt-1">Meet in a public place, and never pay anyone before {pet.name} is back.</div>}
         </div>
 
         <details>
@@ -248,12 +256,21 @@ export default function LostPanel({ pet, userId, onChanged }) {
         </details>
 
         {err && <div role="alert" style={{ color: "#B42318", fontSize: 14 }}>{err}</div>}
-        <button disabled={busy} onClick={reunited} className="ppg-btn ppg-btn-primary">
-          {pet.name} is home: mark reunited
-        </button>
-        <button data-turn-off disabled={busy} onClick={turnOff} className="ppg-btn ppg-btn-secondary">
-          Turn off report (made by mistake)
-        </button>
+        <a href={`/id/${pet.public_slug || pet.id}/flyer`} className="ppg-btn ppg-btn-secondary">Print letter flyer</a>
+        {ask ? (
+          <div role="dialog" aria-label={ask === "found" ? "Mark found" : "Turn off report"} className="rounded-2xl p-4" style={{ border: `2px solid ${tokens.navy}` }}>
+            <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-3">{ask === "found" ? `Mark ${pet.name} found? The lost page comes down.` : `Turn off ${pet.name}'s lost report? The poster and board post come down.`}</div>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" disabled={busy} onClick={ask === "found" ? reunited : turnOff} className="ppg-btn ppg-btn-primary">{ask === "found" ? "Found" : "Turn off"}</button>
+              <button type="button" onClick={() => setAsk(null)} className="ppg-btn ppg-btn-secondary">Cancel</button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <button disabled={busy} onClick={() => setAsk("found")} className="ppg-btn ppg-btn-primary">Found</button>
+            <button data-turn-off disabled={busy} onClick={() => setAsk("off")} className="ppg-btn ppg-btn-secondary">Turn off report</button>
+          </>
+        )}
       </div>
     </div>
   );

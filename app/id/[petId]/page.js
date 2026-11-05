@@ -20,13 +20,8 @@ function PublicHealth({ petId, petName }) {
   return <div className="mt-4 rounded-2xl p-5" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body }}>
     <div style={{ fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Health notes {petName ? `for ${petName}` : ""}</div>
     <div className="space-y-1">{rows.map((r, i) => <div key={i} style={{ fontSize: 14.5, color: tokens.ink }}>{icon[r.kind] || "•"} <b>{r.name}</b>{r.expires_on ? ` · expires ${fmtDate(r.expires_on)}` : ""}</div>)}</div>
-    <div style={{ fontSize: 15, color: tokens.muted }} className="mt-2">The owner typed this. PetPassGo did not check it.</div>
+    <div style={{ fontSize: 15, color: tokens.ink }} className="mt-2">The owner typed this. PetPassGo did not check it.</div>
   </div>;
-}
-
-function ChipLine({ pet }) {
-  if (!pet.microchipped) return null;
-  return <div className="mt-4 rounded-2xl p-4 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>🔖 <b>Microchipped.</b> Any vet or shelter can scan the chip for free, and the registry contacts the owner.</div>;
 }
 
 function ContactBox({ pet }) {
@@ -37,7 +32,7 @@ function ContactBox({ pet }) {
       <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 12, letterSpacing: "0.14em", color: tokens.primary }} className="mb-2">FOUND THIS PET? PLEASE CONTACT</div>
       {pet.emergency_contact_name && <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 22, color: tokens.navy }}>{pet.emergency_contact_name}</div>}
       {phone && (
-        <a href={`tel:${phone.replace(/[^0-9+]/g, "")}`} className="btn-primary rounded-full px-6 py-3.5 mt-4 block" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 18, textDecoration: "none" }}>
+        <a href={`tel:${phone.replace(/[^0-9+]/g, "")}`} className="ppg-btn ppg-btn-primary mt-4 w-full">
           Call {phone}
         </a>
       )}
@@ -54,42 +49,38 @@ function Photo({ pet, size }) {
   );
 }
 
-function LostPoster({ pet, lost }) {
-  const what = [pet.breed, pet.animal_type].filter(Boolean).join(" · ");
+function LostBanner({ pet, lost, reward }) {
   const trip = [lost.trip_airline, lost.trip_flight && `flight ${lost.trip_flight}`, lost.trip_destination && `to ${lost.trip_destination}`].filter(Boolean).join(" ");
   return (
-    <>
-      <div className="rounded-2xl overflow-hidden" style={{ background: "#fff", border: `3px solid ${tokens.primary}`, boxShadow: "0 10px 30px rgba(20,33,61,0.12)" }}>
-        <div className="text-center py-3" style={{ background: tokens.primary }}>
-          <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 40, letterSpacing: "0.08em", color: "#fff", lineHeight: 1 }}>LOST {(pet.animal_type || "PET").toUpperCase()}</div>
-        </div>
-        <div style={{ aspectRatio: "4 / 3", background: "#E8EEF7" }}><Photo pet={pet} size={200} /></div>
-        <div className="p-6 text-center">
-          <h1 style={{ fontFamily: font.display, fontWeight: 800, fontSize: 40, color: tokens.navy, lineHeight: 1.05 }}>{pet.name}</h1>
-          {what && <div style={{ fontFamily: font.body, fontWeight: 600, fontSize: 18, color: tokens.ink }} className="mt-1">{what}</div>}
-          <div className="mt-4 rounded-xl p-4" style={{ background: tokens.sky, fontFamily: font.body, fontSize: 16, color: tokens.ink }}>
-            <div style={{ fontWeight: 700, fontSize: 12, letterSpacing: "0.14em", color: tokens.muted }}>LAST SEEN</div>
-            <div style={{ fontWeight: 700, fontSize: 19, color: tokens.navy }}>{lost.last_seen_area || "Area not given"}</div>
-            {lost.last_seen_date && <div>{fmtDate(lost.last_seen_date)}</div>}
-            {trip && <div className="mt-1" style={{ color: tokens.muted }}>While traveling: {trip}</div>}
+    <section className="rounded-3xl overflow-hidden mb-4 min-w-0" style={{ background: "#fff", border: `3px solid ${tokens.primary}` }}>
+      <div className="px-4 py-3 text-center" style={{ background: tokens.primary }}>
+        <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 28, letterSpacing: "0.12em", color: "#fff", lineHeight: 1 }}>LOST</div>
+      </div>
+      <div className="p-4 sm:p-5 grid gap-3 min-w-0">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="rounded-2xl overflow-hidden flex-shrink-0" style={{ width: 72, height: 72, background: "#E8EEF7" }}><Photo pet={pet} size={72} /></div>
+          <div className="min-w-0">
+            <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 28, color: tokens.navy, overflowWrap: "anywhere", lineHeight: 1.05 }}>{pet.name}</div>
+            <div style={{ fontFamily: font.body, fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", color: tokens.navy }} className="mt-1">LAST SEEN</div>
+            <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.ink, overflowWrap: "anywhere" }}>{lost.last_seen_area || "Area not given"}{lost.last_seen_date ? ` · ${fmtDate(lost.last_seen_date)}` : ""}</div>
           </div>
-          {lost.note && <p className="mt-4 text-left" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.55, color: tokens.ink, whiteSpace: "pre-wrap" }}>{lost.note}</p>}
         </div>
+        {trip ? <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>While traveling: {trip}</div> : null}
+        {lost.note ? <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink, whiteSpace: "pre-wrap", margin: 0 }}>{lost.note}</p> : null}
+        {reward ? (
+          <div>
+            <div style={{ fontFamily: font.body, fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", color: tokens.navy }}>REWARD</div>
+            <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.ink, overflowWrap: "anywhere" }}>{reward}</div>
+          </div>
+        ) : null}
       </div>
-      <div className="mt-4"><ContactBox pet={pet} /></div>
-      <div className="mt-4"><ChipLine pet={pet} /></div>
-      <PublicHealth petId={pet.id} petName={pet.name} />
-      <div className="mt-4"><FinderMessageForm petId={pet.id} petName={pet.name} /></div>
-      <div className="mt-4 rounded-2xl p-5" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-        <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, color: tokens.navy }} className="mb-3">Help {pet.name} get home: share this page</div>
-        <ShareButtons pet={pet} lost={lost} />
-      </div>
-    </>
+    </section>
   );
 }
 
 export default function PublicPetId({ params }) {
   const { status, pet, lost } = usePublicPet(params.petId);
+  const [reward, setReward] = useState("");
   // Owner's membership/trip lapsed (enforced only after launch; ?preview=lapsed pre-launch):
   // show a basic page with name, photo and the message relay instead of the full ID.
   const [basic, setBasic] = useState(false);
@@ -99,6 +90,15 @@ export default function PublicPetId({ params }) {
     if (!SITE_LAUNCHED) return;
     supabase.rpc("pet_owner_has_access", { pet_id: pet.id }).then(({ data }) => setBasic(data === false));
   }, [status, pet?.id]);
+
+  useEffect(() => {
+    if (status !== "ok" || !lost || !pet?.id) return;
+    supabase.rpc("get_public_lost_reward", { pet_id: pet.id }).then(({ data, error }) => {
+      if (error) return;
+      const value = Array.isArray(data) ? data[0] : data;
+      if (typeof value === "string") setReward(value);
+    });
+  }, [status, lost, pet?.id]);
 
   // Log a coarse scan only while the pet is lost (server checks again).
   useEffect(() => {
@@ -119,13 +119,21 @@ export default function PublicPetId({ params }) {
             This Pet ID wasn’t found. Please check the link or QR code.
           </div>
         )}
-        {status === "ok" && lost && <LostPoster pet={pet} lost={lost} />}
+        {status === "ok" && lost && (
+          <>
+            <LostBanner pet={pet} lost={lost} reward={reward} />
+            <div className="mb-4"><ContactBox pet={pet} /></div>
+            <FinderMessageForm petId={pet.id} petName={pet.name} />
+            <div className="mt-4"><ShareButtons pet={pet} lost={lost} /></div>
+            {!basic && <div className="mt-4"><PetProfileExperience pet={pet} mode="public" /></div>}
+            {!basic && <PublicHealth petId={pet.id} petName={pet.name} />}
+          </>
+        )}
         {status === "ok" && !lost && basic && (
           <div className="rounded-2xl p-7 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-            <div className="flex justify-center mb-3">{pet.photo_path ? <Photo pet={pet} size={128} /> : <PetIllustration type={pet.animal_type} size={128} />}</div>
+            <div className="flex justify-center mb-3">{pet.photo_path ? <div className="rounded-full overflow-hidden" style={{ width: 128, height: 128 }}><Photo pet={pet} size={128} /></div> : <PetIllustration type={pet.animal_type} size={128} />}</div>
             <div style={{ fontFamily: font.display, fontSize: 34, fontWeight: 700, color: tokens.navy }} className="mb-1">{pet.name}</div>
-            {pet.passport_no && <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.navy }} className="mb-1">PetPassGo ID {pet.passport_no}</div>}
-            <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-5">Found this pet, or need to reach the owner? Send a message. Your note goes straight to them.</p>
+            {pet.passport_no && <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.navy }} className="mb-4">PetPassGo ID {pet.passport_no}</div>}
             <div className="text-left"><FinderMessageForm petId={pet.id} petName={pet.name} /></div>
           </div>
         )}
@@ -135,7 +143,7 @@ export default function PublicPetId({ params }) {
             <div className="mt-4"><FinderMessageForm petId={pet.id} petName={pet.name} /></div>
           </>
         )}
-        {status === "ok" && <p className="text-center mt-6" style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>Digital Pet ID by <a href="/" style={{ color: tokens.navy, fontWeight: 600 }}>PetPassGo</a></p>}
+        {status === "ok" && <p className="text-center mt-6" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>Digital Pet ID by <a href="/" style={{ color: tokens.navy }}>PetPassGo</a></p>}
       </div>
     </main>
   );

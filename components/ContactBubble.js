@@ -32,7 +32,7 @@ export default function ContactBubble() {
     setOpen(true);
   }
 
-  const classes = ["ppg-contact-fab", account ? "is-account" : "", CHAT ? "with-chat" : ""].filter(Boolean).join(" ");
+  const classes = ["ppg-contact-fab", "ppg-no-print", account ? "is-account" : "", CHAT ? "with-chat" : ""].filter(Boolean).join(" ");
 
   return (
     <>

@@ -25,6 +25,7 @@ export default function SavedToast() {
   if (!on) return null;
   return (
     <div
+      className="ppg-no-print"
       role="status"
       aria-live="polite"
       style={{

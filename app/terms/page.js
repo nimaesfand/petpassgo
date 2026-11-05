@@ -27,7 +27,7 @@ export default function TermsPage() {
 
       <H>4. Public Pet ID pages and lost-pet tools</H>
       <UL>
-        <li>Each pet can have a public Pet ID page that anyone with the link or QR code can view. You control what appears on it.</li>
+        <li>Each pet can have a public Pet ID page that anyone with the link or QR code can view. You control what appears on it. The Pet Passport and the PetPassGo ID are not government documents and do not grant legal rights.</li>
         <li>A lost notice goes live only when you tap Report lost. Finder messages then come to you through our relay form. Your email address is not shown to the finder. If you also post to the Lost &amp; Found board, people browsing the state and city you enter can see that post. We do not use GPS, and we do not see or verify microchip scans.</li>
         <li>We do not guarantee that a lost pet will be found or that messages from finders are genuine. Use caution when meeting anyone in person.</li>
         <li>You must not use the finder message form to harass, spam or deceive anyone.</li>
