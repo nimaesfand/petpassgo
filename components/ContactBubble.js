@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import Icon from "./Icon";
 
@@ -11,8 +12,18 @@ export default function ContactBubble() {
   const [open, setOpen] = useState(false);
   const [Panel, setPanel] = useState(null);
   const [loading, setLoading] = useState(false);
-  const account = path === "/account" || path.startsWith("/account/");
+  const [slot, setSlot] = useState(null);
+  const account = (path === "/account" || path.startsWith("/account/")) && !path.startsWith("/account/passport");
   const onPetPage = path === "/id" || path.startsWith("/id/");
+
+  useEffect(() => {
+    if (!account) { setSlot(null); return; }
+    const sync = () => setSlot(document.getElementById("ppg-contact-slot"));
+    sync();
+    const id = requestAnimationFrame(sync);
+    return () => cancelAnimationFrame(id);
+  }, [account]);
+
   if (onPetPage) return null;
 
   async function toggle() {
@@ -32,22 +43,25 @@ export default function ContactBubble() {
     setOpen(true);
   }
 
-  const classes = ["ppg-contact-fab", "ppg-no-print", account ? "is-account" : "", CHAT ? "with-chat" : ""].filter(Boolean).join(" ");
+  const classes = ["ppg-contact-fab", "ppg-no-print", slot ? "is-docked" : "", !slot && account ? "is-account" : "", !slot && CHAT ? "with-chat" : ""].filter(Boolean).join(" ");
+  const button = (
+    <button
+      type="button"
+      className={classes}
+      aria-label="Contact us"
+      aria-expanded={open}
+      aria-controls={open ? "contact-panel" : undefined}
+      aria-haspopup="dialog"
+      aria-busy={loading || undefined}
+      onClick={toggle}
+    >
+      <Icon name={open ? "x" : "message"} size={26} />
+    </button>
+  );
 
   return (
     <>
-      <button
-        type="button"
-        className={classes}
-        aria-label="Contact us"
-        aria-expanded={open}
-        aria-controls={open ? "contact-panel" : undefined}
-        aria-haspopup="dialog"
-        aria-busy={loading || undefined}
-        onClick={toggle}
-      >
-        <Icon name={open ? "x" : "message"} size={26} />
-      </button>
+      {slot ? createPortal(button, slot) : button}
       {open && Panel ? <Panel onClose={() => setOpen(false)} /> : null}
     </>
   );

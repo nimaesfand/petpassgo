@@ -23,7 +23,7 @@ function todayPT() {
 
 function StatusChip({ status }) {
   const tone = CHIP[status] || CHIP["No expiry"];
-  return <span className="inline-flex items-center rounded-full px-3 py-1" style={{ ...tone, fontFamily: font.body, fontSize: 13, fontWeight: 700 }}>{status}</span>;
+  return <span className="inline-flex items-center rounded-full px-3 py-1 flex-shrink-0 whitespace-nowrap" style={{ ...tone, fontFamily: font.body, fontSize: 14, fontWeight: 700 }}>{status}</span>;
 }
 
 function ConfirmDialog({ title, confirmLabel, onCancel, onConfirm }) {
@@ -132,8 +132,8 @@ export default function PetDocumentsCard({ pet, userId }) {
           const pending = ask?.doc?.id === doc.id;
           return (
             <article key={doc.id} className="rounded-2xl p-4" style={{ background: tokens.paper }}>
-              <div className="flex items-start justify-between gap-3">
-                <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 17, color: tokens.navy }}>{doc.document_type}</div>
+              <div className="flex items-center justify-between gap-3 min-w-0">
+                <div className="min-w-0" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 17, color: tokens.navy, overflowWrap: "anywhere" }}>{doc.document_type}</div>
                 <StatusChip status={status} />
               </div>
               <div className="mt-1" style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>

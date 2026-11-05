@@ -29,6 +29,13 @@ const body = localFont({
 const description =
   "PetPassGo helps travelers prepare for flights with pets and service animals — answer a few trip questions, then get a personalized, airline-specific Travel Pass with every requirement organized and tracked.";
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  interactiveWidget: "resizes-content",
+};
+
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: "PetPassGo — Travel with confidence", template: "%s | PetPassGo" },
