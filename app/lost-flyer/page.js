@@ -82,7 +82,9 @@ export default function LostFlyer() {
             <a href="/join" className="btn-primary inline-block rounded-full px-6 py-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>{JOIN_CTA}</a>
           </div>
         </div>
-        <canvas ref={canvas} width={W} height={H} className="w-full rounded-xl" style={{ boxShadow: "0 10px 30px rgba(20,33,61,.15)", background: "#fff" }} aria-label="Flyer preview" role="img" />
+        <div className="min-w-0 max-w-full">
+          <canvas ref={canvas} width={W} height={H} className="block w-full max-w-full min-w-0 rounded-xl" style={{ width: "100%", maxWidth: "100%", height: "auto", boxShadow: "0 10px 30px rgba(20,33,61,.15)", background: "#fff" }} aria-label="Flyer preview" role="img" />
+        </div>
       </main>
     </div>
   );

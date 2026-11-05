@@ -176,7 +176,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
         {!trip.pet_id && petChoices.length > 1 && (
           <label className="block mt-4" style={{ fontFamily: font.body, fontSize: 16, color: "#fff" }}>
             Which pet is flying?
-            <select className="mt-1 w-full rounded-xl px-3 py-3" style={{ fontFamily: font.body, fontSize: 16, color: tokens.navy }} defaultValue="" onChange={(e) => e.target.value && onPickPet?.(e.target.value)}>
+            <select className="mt-1 w-full rounded-xl px-3 py-3" style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink, background: "#fff", border: `2px solid ${tokens.line}` }} defaultValue="" onChange={(e) => e.target.value && onPickPet?.(e.target.value)}>
               <option value="">Choose a pet</option>
               {petChoices.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
             </select>
@@ -205,7 +205,6 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
           <SoftCard title="Flight status" action={flightStatus ? <StatusChip tone={flightStatus.tone}>{flightStatus.label}</StatusChip> : null}>
             <RouteLine from={from} to={to} />
             <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mt-3">{[when, nonstop, duration].filter(Boolean).join(" · ")}</p>
-            {!snapshot && <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-1">Add a flight number to see live status, terminal, and gate.</p>}
             <div className="mt-3"><TextButton onClick={() => setSection("flight")}>View full flight details</TextButton></div>
           </SoftCard>
 
@@ -240,8 +239,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
                 </button>
               ))}
             </div>
-            <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-3">Near arrival{pack.originSpots ? " and departure" : ""}, from public map data.</p>
-            <div className="mt-3"><TextButton onClick={() => setSection("destination")}>View map & locations</TextButton></div>
+            <div className="mt-3"><TextButton onClick={() => setSection("destination")}>View map and locations</TextButton></div>
           </SoftCard>
 
           <SoftCard title="Travel checklist">
@@ -292,7 +290,6 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
               <DocTile label="DOT form" on={dotOn} hint={service ? "PDF you sign" : "Service-dog trips"} onClick={() => setSection("documents")} />
               <DocTile label="Travel Pass summary" on onClick={() => setSection("documents")} />
             </div>
-            {!isMember && <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-3">Pet Vault keeps this pet’s records for the next trip.</p>}
           </SoftCard>
         </div>
       )}

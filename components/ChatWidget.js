@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 const navy = "#14213D";
@@ -15,7 +15,30 @@ export default function ChatWidget() {
   const [handoffState, setHandoffState] = useState("");
   const path = usePathname() || "";
   const account = path === "/account" || path.startsWith("/account/");
-  if (!ENABLED) return null;
+  const onPetPage = path === "/id" || path.startsWith("/id/");
+  const [fieldFocus, setFieldFocus] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    let timer;
+    const typing = (el) => {
+      if (!el || el.closest?.("[data-ppg-chat]")) return false;
+      if (el.tagName === "TEXTAREA" || el.tagName === "SELECT") return true;
+      if (el.tagName !== "INPUT") return false;
+      return !["checkbox", "radio", "file", "button", "submit", "hidden", "range"].includes(el.type || "");
+    };
+    const sync = () => setFieldFocus(mq.matches && typing(document.activeElement));
+    const later = () => { clearTimeout(timer); timer = setTimeout(sync, 0); };
+    document.addEventListener("focusin", later);
+    document.addEventListener("focusout", later);
+    mq.addEventListener?.("change", later);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("focusin", later);
+      document.removeEventListener("focusout", later);
+      mq.removeEventListener?.("change", later);
+    };
+  }, []);
+  if (!ENABLED || onPetPage || fieldFocus) return null;
 
   async function send(e) {
     e.preventDefault();
@@ -44,7 +67,7 @@ export default function ChatWidget() {
 
   const box = { fontFamily: "var(--font-body), system-ui, sans-serif", fontSize: 14 };
   return (
-    <div style={{ position: "fixed", right: 16, bottom: account ? "calc(146px + env(safe-area-inset-bottom, 0px))" : "calc(88px + env(safe-area-inset-bottom, 0px))", zIndex: 50, maxWidth: "calc(100vw - 32px)", ...box }}>
+    <div data-ppg-chat style={{ position: "fixed", right: 16, bottom: account ? "calc(146px + env(safe-area-inset-bottom, 0px))" : "calc(88px + env(safe-area-inset-bottom, 0px))", zIndex: 50, maxWidth: "calc(100vw - 32px)", ...box }}>
       {open && (
         <div className="rounded-2xl shadow-xl flex flex-col" style={{ width: 320, height: 440, background: "#fff", border: "1px solid #DCE3EC", marginBottom: 10 }}>
           <div className="px-4 py-3 flex justify-between items-center rounded-t-2xl" style={{ background: navy, color: "#F3F5F9" }}>

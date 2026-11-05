@@ -12,6 +12,8 @@ export default function ContactBubble() {
   const [Panel, setPanel] = useState(null);
   const [loading, setLoading] = useState(false);
   const account = path === "/account" || path.startsWith("/account/");
+  const onPetPage = path === "/id" || path.startsWith("/id/");
+  if (onPetPage) return null;
 
   async function toggle() {
     if (open) {

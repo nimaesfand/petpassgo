@@ -13,7 +13,6 @@ const input = { fontFamily: font.body, fontSize: 15.5, border: `2px solid ${toke
 const label = { fontFamily: font.body, fontSize: 13, fontWeight: 700, color: tokens.navy, letterSpacing: "0.02em" };
 const section = { borderTop: `1px solid ${tokens.line}`, paddingTop: 16, marginTop: 16 };
 const h3 = { fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy };
-const btn = { fontFamily: font.body, fontWeight: 700, fontSize: 14.5, borderRadius: 999, padding: "9px 16px" };
 
 export const maskChip = (v) => {
   const s = String(v || "").replace(/[^0-9A-Za-z]/g, "");
@@ -87,9 +86,9 @@ export function ChipVault({ pet, userId, onChanged, bare = false }) {
       </div>
       {form.microchip_number && !chipLooksValid(form.microchip_number) && <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.stamp }} className="mt-2">That doesn't look like a standard 9-, 10- or 15-digit chip number. Please double-check it — we saved nothing yet.</div>}
       <div className="flex gap-2 flex-wrap mt-3">
-        <button onClick={() => save()} disabled={saving} style={{ ...btn, background: tokens.navy, color: "#fff" }}>{saving ? "Saving…" : "Save microchip"}</button>
-        <button onClick={() => { const n = { ...form, chip_verified_at: todayISO() }; setForm(n); save(n); }} disabled={!form.microchip_number || saving} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, opacity: form.microchip_number ? 1 : 0.5 }}>I checked it today</button>
-        <button onClick={() => setChecker((v) => !v)} style={{ ...btn, background: tokens.sky, color: tokens.navy }}>Is my chip registered?</button>
+        <button onClick={() => save()} disabled={saving} className="ppg-btn ppg-btn-primary">{saving ? "Saving…" : "Save microchip"}</button>
+        <button onClick={() => { const n = { ...form, chip_verified_at: todayISO() }; setForm(n); save(n); }} disabled={!form.microchip_number || saving} className="ppg-btn ppg-btn-secondary" style={{ opacity: form.microchip_number ? 1 : 0.5 }}>I checked it today</button>
+        <button onClick={() => setChecker((v) => !v)} className="ppg-btn ppg-btn-secondary">Is my chip registered?</button>
         {saved && <span style={{ fontFamily: font.body, fontSize: 14, color: tokens.green, alignSelf: "center" }}>Saved</span>}
       </div>
       {checker && (
@@ -117,7 +116,7 @@ export function HealthPassport({ pet, userId, refreshKey = 0, bare = false, onRo
   async function toggle(row) { await supabase.from("pet_health_records").update({ show_to_finder: !row.show_to_finder }).eq("id", row.id); load(); }
   return (
     <section id="health-passport" style={bare ? {} : section} aria-label="Health records">
-      <div className="flex items-start justify-between gap-3 flex-wrap"><div>{!bare && <div style={h3}>Health records</div>}<div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>Vaccines, meds and allergies you enter.</div></div><button onClick={() => setShow((v) => !v)} style={{ ...btn, background: tokens.navy, color: "#fff" }}>+ Add record</button></div>
+      <div className="flex items-start justify-between gap-3 flex-wrap"><div>{!bare && <div style={h3}>Health records</div>}<div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>Vaccines, meds and allergies you enter.</div></div><button onClick={() => setShow((v) => !v)} className="ppg-btn ppg-btn-secondary">{show ? "Cancel" : "Add record"}</button></div>
       {show && <form onSubmit={add} className="grid sm:grid-cols-2 gap-2 mt-3 rounded-xl p-3" style={{ background: tokens.paper }}>
         <label style={label}>Type<select style={input} value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })}>{KIND.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
         <label style={label}>Name<input required style={input} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Rabies, medication, allergy…" /></label>
@@ -126,7 +125,7 @@ export function HealthPassport({ pet, userId, refreshKey = 0, bare = false, onRo
         <label style={label}>Clinic / vet<input style={input} value={f.clinic} onChange={(e) => setF({ ...f, clinic: e.target.value })} placeholder="Optional" /></label>
         <label style={label}>Notes<input style={input} value={f.notes} onChange={(e) => setF({ ...f, notes: e.target.value })} placeholder="Dose, reaction, instructions…" /></label>
         <label className="flex gap-2 items-center sm:col-span-2" style={{ fontFamily: font.body, fontSize: 14 }}><input type="checkbox" checked={f.show_to_finder} onChange={(e) => setF({ ...f, show_to_finder: e.target.checked })} /> Show this on the public Pet ID / share card</label>
-        <button style={{ ...btn, background: tokens.stamp, color: "#fff" }}>Save record</button>
+        <button className="ppg-btn ppg-btn-primary">Save record</button>
       </form>}
       {loading ? <div style={{ fontFamily: font.body, color: tokens.muted }} className="mt-2">Loading…</div> : rows.length === 0 ? <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-2">No vaccines, medicines or allergies recorded yet.</p> : <div className="mt-3 space-y-2">{rows.map((r) => { const ex = expiryState(r.expires_on); return <div key={r.id} className="rounded-xl p-3 flex gap-3 items-start justify-between" style={{ background: tokens.paper }}>
         <div className="min-w-0"><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>{KIND.find(([k]) => k === r.kind)?.[1]} · {r.name}</div><div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>{[r.date_given ? `Given ${fmtDate(r.date_given)}` : "", r.clinic || "", r.notes || ""].filter(Boolean).join(" · ")}</div><div className="flex gap-2 mt-1 flex-wrap">{ex && <DueBadge tone={ex.tone}>{ex.text}</DueBadge>}<DueBadge tone={r.show_to_finder ? "good" : "muted"}>{r.show_to_finder ? "Shown publicly" : "Private"}</DueBadge></div></div>
@@ -193,8 +192,8 @@ export function WalletCard({ pet, onDone, bare = false }) {
       <div style={h3}>Pet ID card</div>
       <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }} className="mt-1">The QR code opens {pet.name ? `${pet.name}'s` : "this pet's"} public page. Save the image to your phone.</p>
       <div className="flex flex-wrap gap-2 mt-3">
-        <button type="button" disabled={!!busy} onClick={downloadPng} style={{ ...btn, fontSize: 16, background: tokens.navy, color: "#fff", minHeight: 48 }}>{busy === "png" ? "Saving…" : "Save to phone"}</button>
-        {wallet && <button type="button" disabled={!!busy} onClick={downloadPass} style={{ ...btn, fontSize: 16, background: tokens.primary, color: "#fff", minHeight: 48 }}>{busy === "wallet" ? "Preparing…" : "Add to Apple Wallet"}</button>}
+        <button type="button" disabled={!!busy} onClick={downloadPng} className="ppg-btn ppg-btn-primary">{busy === "png" ? "Saving…" : "Save to phone"}</button>
+        {wallet && <button type="button" disabled={!!busy} onClick={downloadPass} className="ppg-btn ppg-btn-secondary">{busy === "wallet" ? "Preparing…" : "Add to Apple Wallet"}</button>}
       </div>
       {err && <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.primary }} className="mt-2">{err}</p>}
     </section>
@@ -210,9 +209,9 @@ export function ShareCard({ pet, userId, onDone, bare = false }) {
   const active = links.filter((l) => !l.revoked_at && new Date(l.expires_at) > new Date());
   return <section id="share-card" style={bare ? {} : section}>{!bare && <div style={h3}>{pet.name}'s Care Card</div>}<p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-1">{preset === "emergency" ? "Meds, allergies, vet and who to call — first. For an emergency vet." : "Feeding, walks, meds, quirks, and who to call. Made for sitters and vets."} A private, expiring link; it never shows the full chip number.</p>
     <div className="flex gap-2 mt-3" role="tablist" aria-label="Care Card type">{[["sitter", "Sitter"], ["emergency", "Emergency"]].map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={preset === k} onClick={() => setPreset(k)} className="rounded-full px-4 py-2" style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 700, background: preset === k ? tokens.navy : tokens.sky, color: preset === k ? "#fff" : tokens.navy, border: "none", cursor: "pointer" }}>{l}</button>)}</div>
-    <div className="flex gap-2 items-center flex-wrap mt-3"><label style={label}>Expires in <select value={days} onChange={(e) => setDays(Number(e.target.value))} style={{ ...input, width: "auto", display: "inline-block", marginLeft: 6 }}><option value={1}>1 day</option><option value={7}>7 days</option><option value={30}>30 days</option></select></label><button disabled={busy} onClick={create} style={{ ...btn, background: tokens.stamp, color: "#fff" }}>{busy ? "Creating…" : "Create share link"}</button></div>
+    <div className="flex gap-2 items-center flex-wrap mt-3"><label style={label}>Expires in <select value={days} onChange={(e) => setDays(Number(e.target.value))} style={{ ...input, width: "auto", display: "inline-block", marginLeft: 6, background: "#fff" }}><option value={1}>1 day</option><option value={7}>7 days</option><option value={30}>30 days</option></select></label><button disabled={busy} onClick={create} className="ppg-btn ppg-btn-primary">{busy ? "Creating…" : "Create share link"}</button></div>
     {err && <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.stamp }} className="mt-2">{err}</div>}
-    {url && <div className="rounded-xl p-3 mt-3 flex gap-2 flex-wrap items-center" style={{ background: tokens.paper }}><input readOnly value={url} style={{ ...input, flex: 1, minWidth: 220 }} onFocus={(e) => e.target.select()} /><button onClick={() => navigator.clipboard?.writeText(url)} style={{ ...btn, background: tokens.navy, color: "#fff" }}>Copy</button><a href={url} target="_blank" rel="noopener noreferrer" style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, textDecoration: "none" }}>Open / PDF</a></div>}
+    {url && <div className="rounded-xl p-3 mt-3 flex gap-2 flex-wrap items-center" style={{ background: tokens.paper }}><input readOnly value={url} style={{ ...input, flex: 1, minWidth: 0 }} onFocus={(e) => e.target.select()} /><button onClick={() => navigator.clipboard?.writeText(url)} className="ppg-btn ppg-btn-secondary">Copy</button><a href={url} target="_blank" rel="noopener noreferrer" className="ppg-btn ppg-btn-secondary">Open / PDF</a></div>}
     {active.length > 0 && <div className="mt-3 space-y-1">{active.map((l) => <div key={l.id} className="flex justify-between gap-2" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}><span>{l.preset === "emergency" ? "Emergency" : "Sitter"} · active until {fmtDate(String(l.expires_at).slice(0, 10))} · viewed {l.view_count || 0}×</span><button onClick={() => revoke(l.id)} style={{ color: tokens.stamp, fontWeight: 700 }}>Turn off</button></div>)}</div>}
   </section>;
 }

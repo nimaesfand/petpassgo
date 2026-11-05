@@ -34,13 +34,18 @@ export default function FinderMessageForm({ petId, petName }) {
     );
   return (
     <form onSubmit={submit} className="rounded-2xl p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body }}>
-      <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 20, color: tokens.navy }} className="mb-1">Message the owner</div>
-      <div style={{ fontSize: 14, color: tokens.muted }} className="mb-3">Your message goes to {petName}'s owner through PetPassGo. Their email and phone stay private.</div>
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 20, color: tokens.navy }}>Message the owner</div>
+        <span className="rounded-full px-2.5 py-1" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>Private</span>
+      </div>
       <textarea required minLength={2} maxLength={1000} rows={4} style={input} placeholder={`Where and when did you see ${petName}?`} value={message} onChange={(e) => setMessage(e.target.value)} />
-      <input style={{ ...input, marginTop: 10 }} maxLength={200} placeholder="Your phone or email (optional, so the owner can reply)" value={contact} onChange={(e) => setContact(e.target.value)} />
+      <label style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy, display: "grid", gap: 6, marginTop: 10 }}>
+        Phone or email (optional)
+        <input style={input} maxLength={200} aria-label="Phone or email (optional)" value={contact} onChange={(e) => setContact(e.target.value)} />
+      </label>
       <input tabIndex={-1} autoComplete="off" aria-hidden="true" value={website} onChange={(e) => setWebsite(e.target.value)} name="website" style={{ position: "absolute", left: -9999, width: 1, height: 1, opacity: 0 }} />
       {err && <div style={{ color: "#B42318", fontSize: 14 }} className="mt-2">{err}</div>}
-      <button disabled={state === "sending"} className="btn-primary rounded-full px-6 py-3 mt-3 w-full" style={{ background: tokens.primary, color: "#fff", fontWeight: 700, fontSize: 16 }}>
+      <button disabled={state === "sending"} className="ppg-btn ppg-btn-primary mt-3 w-full">
         {state === "sending" ? "Sending…" : "Send message"}
       </button>
     </form>

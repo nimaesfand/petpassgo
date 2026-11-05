@@ -37,6 +37,7 @@ import { reminderSchedule, classifyReminder, todayPT } from "../../lib/travelDat
 import { fmtTripDate } from "../../lib/tripAccess";
 import { BUCKET, SignedImg, getSignedUrl, toStoragePath } from "../../lib/storage";
 import { tokens, font } from "../../lib/theme";
+import SavedToast from "../../components/SavedToast";
 
 
 
@@ -346,7 +347,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
           <form onSubmit={handleAddWeight} className="mt-2 flex gap-2 items-center">
             <input required type="number" step="0.1" placeholder="lbs" value={newValue} onChange={(e) => setNewValue(e.target.value)} style={{ ...field, width: 90 }} className="rounded-lg px-3 py-2 outline-none" />
             <input type="date" value={newDate} onChange={(e) => setNewDate(e.target.value)} style={field} className="rounded-lg px-3 py-2 outline-none flex-1 min-w-0" />
-            <button type="submit" disabled={saving} className="rounded-full px-4 py-2" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 14.5, border: "none" }}>{saving ? "…" : "Log"}</button>
+            <button type="submit" disabled={saving} className="ppg-btn ppg-btn-primary">{saving ? "Saving…" : "Log"}</button>
           </form>
         </VaultSection>
         <VaultSection id={`chip-${pet.id}`} title="Microchip" hint={pet.microchip_number ? `•••• ${String(pet.microchip_number).replace(/[^0-9A-Za-z]/g, "").slice(-4)}` : "Not added"}>
@@ -405,7 +406,7 @@ function MemberUpsell() {
       </p>
       <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
       <MarketingOptIn checked={tips} onChange={setTips} />
-      <button disabled={busy} onClick={async () => { if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; } trackBeginCheckout("membership"); setBusy(true); const e = await startStripe("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true, marketing_opt_in: tips }); if (e) { setErr(e); setBusy(false); } }} className="rounded-full px-5 py-2.5 hover:opacity-90" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontSize: 16, fontWeight: 600 }}>{JOIN_CTA}</button>
+      <button disabled={busy} onClick={async () => { if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; } trackBeginCheckout("membership"); setBusy(true); const e = await startStripe("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true, marketing_opt_in: tips }); if (e) { setErr(e); setBusy(false); } }} className="ppg-btn ppg-btn-primary">{JOIN_CTA}</button>
     </div>
   );
 }
@@ -424,14 +425,17 @@ function PetProfileTab({ userId }) {
 
   const [loadError, setLoadError] = useState(false);
   const loadSeq = React.useRef(0);
+  const loadedOnce = React.useRef(false);
 
   // Race-safe loader: only the latest request may update state, the spinner always
   // clears (try/finally), and a stalled request times out into a Retry state instead
   // of leaving "Loading your pets…" up forever.
   async function loadPets() {
     const seq = ++loadSeq.current;
-    setLoading(true);
-    setLoadError(false);
+    if (!loadedOnce.current) {
+      setLoading(true);
+      setLoadError(false);
+    }
     try {
       const query = supabase.from("pets").select("*").order("created_at", { ascending: false });
       const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 12000));
@@ -439,8 +443,10 @@ function PetProfileTab({ userId }) {
       if (seq !== loadSeq.current) return;
       if (error) throw error;
       setPets(data || []);
+      loadedOnce.current = true;
+      setLoadError(false);
     } catch {
-      if (seq === loadSeq.current) setLoadError(true);
+      if (seq === loadSeq.current && !loadedOnce.current) setLoadError(true);
     } finally {
       if (seq === loadSeq.current) setLoading(false);
     }
@@ -491,9 +497,9 @@ function PetProfileTab({ userId }) {
     <div className="space-y-6 min-w-0">
       {pets.length === 0 && !loading ? (
         <div className="rounded-3xl p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-          <h3 style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-2">Pet Vault</h3>
+          <h3 style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-2">Keep every record in one place</h3>
           <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mb-4">Pet Vault is {usd(P.member)} a month. It holds your pet's records, ID, and documents.</p>
-          <a href="/join" className="btn-primary inline-flex items-center justify-center rounded-full px-6 py-3 min-h-[48px]" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>{JOIN_CTA}</a>
+          <a href="/join" className="ppg-btn ppg-btn-primary w-full">{JOIN_CTA}</a>
         </div>
       ) : null}
       {loading ? <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading your pets…</div> : pets.map((pet) => (
@@ -508,7 +514,7 @@ function PetProfileTab({ userId }) {
         </div>
       ))}
       {pets.length > 1 && <WinBack area="pets" compact />}
-      <a href="/lost-flyer" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, color: tokens.navy }}>Make a printable lost pet flyer →</a>
+      <a href="/lost-flyer" className="inline-block" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, color: tokens.navy, marginTop: 16 }}>Make a printable lost pet flyer →</a>
     </div>
   );
   return (
@@ -518,7 +524,7 @@ function PetProfileTab({ userId }) {
       ) : loadError ? (
         <div className="rounded-xl p-6 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body, fontSize: 16 }}>
           We couldn't load your pets.{" "}
-          <button onClick={loadPets} className="btn-primary rounded-full px-5 py-2 ml-2" style={{ background: tokens.primary, color: "#fff", fontWeight: 600 }}>Retry</button>
+          <button onClick={loadPets} className="ppg-btn ppg-btn-primary ml-2">Retry</button>
         </div>
       ) : pets.length === 0 && !showForm ? (
         <div
@@ -533,10 +539,9 @@ function PetProfileTab({ userId }) {
           </div>
           <button
             onClick={() => setShowForm(true)}
-            style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}
-            className="rounded-full px-6 py-2.5 text-[14px] hover:opacity-90 transition"
+            className="ppg-btn ppg-btn-primary"
           >
-            + Add your pet
+            Add your pet
           </button>
         </div>
       ) : (
@@ -588,9 +593,9 @@ function PetProfileTab({ userId }) {
               <select
                 value={form.animal_type}
                 onChange={(e) => setForm((f) => ({ ...f, animal_type: e.target.value }))}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
-                className="rounded-xl px-4 py-3 outline-none flex-1"
-              >
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, background: "#fff" }}
+              className="rounded-xl px-4 py-3 outline-none flex-1"
+            >
                 <option>Dog</option>
                 <option>Cat</option>
                 <option>Other</option>
@@ -598,7 +603,7 @@ function PetProfileTab({ userId }) {
               <select
                 value={form.role}
                 onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
+                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, background: "#fff" }}
                 className="rounded-xl px-4 py-3 outline-none flex-1"
               >
                 <option>Pet</option>
@@ -615,7 +620,7 @@ function PetProfileTab({ userId }) {
             <select
               value={form.sex}
               onChange={(e) => setForm((f) => ({ ...f, sex: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
+              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, background: "#fff" }}
               className="rounded-xl px-4 py-3 outline-none"
             >
               <option value="">Sex (optional)</option>
@@ -633,15 +638,14 @@ function PetProfileTab({ userId }) {
             <button
               type="submit"
               disabled={saving}
-              style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}
-              className="rounded-full px-6 py-2.5 text-[14px] hover:opacity-90 transition"
+              className="ppg-btn ppg-btn-primary"
             >
               {saving ? "Saving…" : "Save pet"}
             </button>
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }}
+              className="ppg-btn ppg-btn-secondary"
             >
               Cancel
             </button>
@@ -674,7 +678,7 @@ function UnlockTripCard({ trip }) {
       <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, opacity: 0.8 }} className="mb-4">Your full checklist, deadlines and reminders are ready the moment you finish checkout.</p>
       <MarketingOptIn checked={tips} onChange={setTips} />
       <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
-      <button disabled={busy} onClick={unlock} className="rounded-full px-6 py-3" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600 }}>Unlock this trip</button>
+      <button disabled={busy} onClick={unlock} className="ppg-btn ppg-btn-primary">Unlock this trip</button>
       <TrustBadges className="mt-4 text-left" />
     </div>
   );
@@ -785,7 +789,7 @@ export function DashboardTab({ userId, onOpenTrips }) {
       ) : trip?.paid ? <TripCountdown trip={trip} pet={pet} done={doneCount} total={stepTotal} /> : (
         <div className="rounded-2xl p-7 mb-6 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }} className="mb-5">Where are you and your pets flying to?</div>
-          <a href="/assessment" className="rounded-full px-6 py-3 inline-block" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}>{PLAN_CTA}</a>
+          <a href="/assessment" className="ppg-btn ppg-btn-primary">{PLAN_CTA}</a>
         </div>
       )}
       {trip?.paid && !tripIsPast(trip) && (
@@ -799,7 +803,7 @@ export function DashboardTab({ userId, onOpenTrips }) {
               </li>))}
             </ul>
             {actions.length > 4 && <button onClick={() => setShowAll((s) => !s)} style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy, background: "none", border: "none", padding: "8px 0 0", cursor: "pointer", textDecoration: "underline" }}>{showAll ? "Show less" : `Show ${actions.length - 4} more`}</button>}
-            <div className="mt-4"><button onClick={onOpenTrips} className="rounded-full px-5 py-2.5" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600, border: "none", cursor: "pointer" }}>Open in My Trips →</button></div>
+            <div className="mt-4"><button onClick={onOpenTrips} className="ppg-btn ppg-btn-primary">Open in My Trips</button></div>
           </>}
         </div>
       )}
@@ -925,6 +929,7 @@ function CurrentFlightTab({ userId }) {
                 <span className="flex flex-wrap items-center gap-2 min-w-0">
                   <span className="min-w-0" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{row.origin} → {row.destination}</span>
                   <span className="rounded-full px-2.5 py-1" style={{ background: row.paid ? tokens.sky : "#FDE8E2", color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>{row.paid ? "Paid" : "Unpaid"}</span>
+                  {tripIsPast(row) ? <span className="rounded-full px-2.5 py-1" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>Past</span> : null}
                 </span>
                 <span className="block mt-1" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{row.travel_date ? fmtTripDate(row.travel_date) : "Date not set"}{row.airline ? ` · ${row.airline}` : ""}</span>
                 <span className="block mt-0.5" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{petName(row)}</span>
@@ -932,7 +937,7 @@ function CurrentFlightTab({ userId }) {
             );
           })}
         </div>
-        {total > rows.length && <button type="button" onClick={onMore} className="mt-2 rounded-full px-4 py-2" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, border: "none", cursor: "pointer" }}>Show more</button>}
+        {total > rows.length && <button type="button" onClick={onMore} className="ppg-btn ppg-btn-secondary mt-2">Show more</button>}
       </section>
     );
   }
@@ -946,8 +951,7 @@ function CurrentFlightTab({ userId }) {
         </div>
         <a
           href="/assessment"
-          style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, textDecoration: "none" }}
-          className="rounded-full px-6 py-2.5 text-[14px] hover:opacity-90 transition inline-block"
+          className="ppg-btn ppg-btn-primary"
         >
           {PLAN_CTA}
         </a>
@@ -987,7 +991,7 @@ function CurrentFlightTab({ userId }) {
     <div>
       <div className="flex items-center justify-between gap-3 mb-4">
         <h2 style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: tokens.navy }}>My Trips</h2>
-        <a href="/assessment" className="rounded-full px-4 py-2.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>{PLAN_CTA}</a>
+        <a href="/assessment" className="ppg-btn ppg-btn-primary">{PLAN_CTA}</a>
       </div>
       <TripList title="Upcoming" rows={roster.upcoming} total={roster.upTotal} onMore={() => setLimits((n) => ({ ...n, up: n.up + TRIP_PAGE }))} />
       <TripList title="Past" rows={roster.past} total={roster.pastTotal} onMore={() => setLimits((n) => ({ ...n, past: n.past + TRIP_PAGE }))} />
@@ -996,7 +1000,7 @@ function CurrentFlightTab({ userId }) {
   );
 }
 
-function BillingTab({ userId }) {
+function BillingTab({ userId, email }) {
   const [memberRow, setMemberRow] = useState(null); const [isMember, setIsMember] = useState(null);
   const [purchases, setPurchases] = useState([]); const [legacyTrips, setLegacyTrips] = useState([]);
   const [busy, setBusy] = useState(false); const [err, setErr] = useState(""); const [consent, setConsent] = useState(false); const [tips, setTips] = useState(false);
@@ -1010,12 +1014,12 @@ function BillingTab({ userId }) {
     setPurchases(buys || []); if (!buys?.length) setLegacyTrips(trips || []);
   })(); }, [userId]);
   async function go(path, body) { setBusy(true); setErr(""); const { data: s } = await supabase.auth.getSession(); const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify(body || {}) }); const j = await r.json().catch(() => ({})); if (r.ok && j.url) window.location.href = j.url; else { setErr(j.error || "Something went wrong. Please try again."); setBusy(false); } }
-  const btn = { background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 600 };
   const money = (c, cur) => c == null ? "" : `$${(c / 100).toFixed(2)} ${(cur || "usd").toUpperCase()}`;
   const kindLabel = { pass: "Travel Pass", member_pass: "Travel Pass · member price", join: "Membership + Travel Pass", membership: "Membership", membership_renewal: "Membership renewal" };
   return (
     <div className="rounded-xl p-6 sm:p-8" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-      <div style={{ fontFamily: font.display, fontSize: 22, color: tokens.navy }} className="mb-2">Billing</div>
+      <div style={{ fontFamily: font.display, fontSize: 22, color: tokens.navy }} className="mb-2">Account</div>
+      {email ? <p className="mb-6" style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink, overflowWrap: "anywhere" }}>{email}</p> : null}
       <div className="mb-6">
         <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-2">Purchase history</div>
         {purchases.length === 0 && legacyTrips.length === 0 && <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }}>No purchases yet. Stripe also emails a receipt for every payment.</p>}
@@ -1032,14 +1036,14 @@ function BillingTab({ userId }) {
       {isMember === null ? <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div> : isMember ? <>
           <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-1">You're a PetPassGo member ({usd(P.member)}{P.memberUnit}).</p>
           {memberRow?.current_period_end && <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-3">Current period ends {new Date(memberRow.current_period_end).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.</p>}
-          <button disabled={busy} onClick={() => go("/api/stripe/portal")} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">Cancel membership</button>
+          <button disabled={busy} onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary">Cancel membership</button>
           <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }} className="mt-3">Cancel online here. No phone call. You keep access through the period you've paid, and you won't be charged again.</p>
-          <button disabled={busy} onClick={() => go("/api/stripe/portal")} className="rounded-full px-6 py-3 mt-3" style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }}>Receipts and payment method</button>
+          <button disabled={busy} onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary mt-3">Receipts and payment method</button>
           {err && <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp }} className="mt-3">{err}</p>}
         </> : <>
           <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}<b>{VAULT_NAME}</b> · {usd(P.member)}{P.memberUnit}. {VAULT_SUB} Plus {usd(P.memberPass)} Travel Passes. {MEMBERSHIP_TERMS}</p>
           <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
-          <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => { if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; } trackBeginCheckout("membership"); go("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true, marketing_opt_in: tips }); }} style={btn} className="rounded-full px-6 py-3 hover:opacity-90">{JOIN_CTA}</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ ...btn, background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}` }} className="rounded-full px-6 py-3">Receipts and cards</button></div>
+          <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => { if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; } trackBeginCheckout("membership"); go("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true, marketing_opt_in: tips }); }} className="ppg-btn ppg-btn-primary">{JOIN_CTA}</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary">Receipts and cards</button></div>
         </>}
       </div>
       <MarketingSettings onMarketingChange={setTips} />
@@ -1153,7 +1157,6 @@ export default function AccountPage() {
         <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
           <div>
             <h1 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 34, color: tokens.navy, lineHeight: 1.1 }}>Your dashboard</h1>
-            <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mt-1">{user?.email}</div>
           </div>
         </div>
 
@@ -1193,10 +1196,11 @@ export default function AccountPage() {
 
         {activeTab === "trips" && <CurrentFlightTab userId={user?.id} />}
 
-        {activeTab === "billing" && <BillingTab userId={user?.id} />}
+        {activeTab === "billing" && <BillingTab userId={user?.id} email={user?.email} />}
       </main>
       )}
       {!loading && user && <MobileBottomNav active={bottomActive} onNavigate={handleBottomNav} />}
+      <SavedToast />
     </div>
   );
 }

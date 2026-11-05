@@ -30,10 +30,10 @@ export default function SiteHeader({ onLogout }) {
   }
   return (
     <header style={{ background: "#fff", borderBottom: `1px solid ${tokens.line}` }}>
-      <nav className="max-w-[1280px] mx-auto flex items-center justify-between px-4 sm:px-5 md:px-10 py-3 md:py-4 gap-2 min-w-0">
-        <a href="/" className="flex items-center gap-2 min-w-0" style={{ textDecoration: "none" }}>
-          <Logo size={34} />
-          <span className="truncate" style={{ fontFamily: font.display, fontWeight: 700, fontSize: 21, color: tokens.navy, letterSpacing: "-0.02em" }}>PetPassGo</span>
+      <nav className="max-w-[1280px] mx-auto flex items-center justify-between px-3 sm:px-5 md:px-10 py-3 md:py-4 gap-2 min-w-0">
+        <a href="/" className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0" style={{ textDecoration: "none" }} aria-label="PetPassGo">
+          <Logo size={30} />
+          <span className="ppg-wordmark" style={{ fontFamily: font.display, fontWeight: 700, fontSize: 18, color: tokens.navy, letterSpacing: "-0.02em" }}>PetPassGo</span>
         </a>
         <div className="flex items-center gap-2 sm:gap-4 md:gap-6 flex-nowrap flex-shrink-0">
           {NAV_LINKS.map((l) => <a key={l.href} href={l.href} style={link} className="hidden md:inline">{l.label}</a>)}
@@ -49,7 +49,7 @@ export default function SiteHeader({ onLogout }) {
               <a href="/login" style={link}>{LOGIN_CTA}</a>
             </>
           )}
-          <a href="/assessment" onClick={(e) => { const href = readHomeIntentHref(); if (href !== "/assessment") { e.preventDefault(); window.location.href = href; } }} className="btn-primary rounded-full px-3.5 sm:px-5 py-2.5" style={{ ...link, background: tokens.primary, color: "#fff", fontWeight: 600 }}>{PLAN_CTA}</a>
+          <a href="/assessment" onClick={(e) => { const href = readHomeIntentHref(); if (href !== "/assessment") { e.preventDefault(); window.location.href = href; } }} className="btn-primary rounded-full px-3 sm:px-5 py-2" style={{ ...link, background: tokens.primary, color: "#fff", fontWeight: 700, fontSize: 15 }}>{PLAN_CTA}</a>
         </div>
       </nav>
     </header>
