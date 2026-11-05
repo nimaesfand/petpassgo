@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Icon from "./Icon";
+import SampleChip from "./SampleChip";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
 import { todayPT } from "../lib/travelDates";
@@ -27,17 +28,15 @@ export function SampleDogPreview({ petId, compact = false }) {
   return (
     <div className="rounded-xl p-3 mt-3" style={{ background: "#FFF9EC", border: `1.5px dashed ${tokens.gold}`, fontFamily: font.body }} aria-label="Sample preview">
       <div className="flex items-start justify-between gap-2">
-        <div style={{ fontWeight: 800, fontSize: 13, letterSpacing: "0.08em", color: tokens.primary }}>SAMPLE · {SAMPLE_DOG.name} · Sample dog</div>
+        <span className="flex items-center gap-2"><SampleChip /><span style={{ fontWeight: 700, fontSize: 15, color: tokens.navy }}>{SAMPLE_DOG.name}</span></span>
         <button type="button" aria-label="Dismiss sample" onClick={() => { setGone(true); try { localStorage.setItem(key, "1"); } catch {} }} style={{ background: "none", border: "none", color: tokens.muted, fontSize: 16, cursor: "pointer", lineHeight: 1 }}><Icon name="x" size={16} /></button>
       </div>
-      <div style={{ fontSize: 14.5, color: tokens.ink }} className="mt-1">This is what it looks like once your records are in — {SAMPLE_DOG.breed}:</div>
       {!compact && <div className="mt-2 space-y-1">{SAMPLE_DOG.rows.map((r) => (
         <div key={r.name} className="flex items-center justify-between rounded-lg px-3 py-2" style={{ background: "#fff" }}>
           <span style={{ fontWeight: 700, fontSize: 14, color: tokens.navy }}>{r.name}</span>
           <span style={{ fontSize: 12, fontWeight: 800, color: r.tone === "bad" ? tokens.stamp : r.tone === "warn" ? "#8A5A00" : tokens.green }}>{r.status}</span>
         </div>))}
       </div>}
-      <div style={{ fontSize: 13.5, color: tokens.muted }} className="mt-2">{SAMPLE_DOG.name}'s Care Card would show feeding, walks, meds, quirks, and who to call. Add a real record and this sample goes away.</div>
     </div>
   );
 }

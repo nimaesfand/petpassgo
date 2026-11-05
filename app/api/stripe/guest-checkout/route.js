@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { stripe, priceId, siteUrl, serviceClient, isMember } from "@/lib/stripeServer";
 import { cleanTrip, userIdByEmail } from "@/lib/guestCheckout";
+import { routeAllowed } from "@/lib/airports";
 import { consentAccepted, WITHDRAWAL_BLOCKED } from "@/lib/withdrawal";
 import { attachConsentSession, consentMetadata, recordWithdrawalConsent } from "@/lib/withdrawalRecord";
 
@@ -30,6 +31,7 @@ async function handle(req) {
   if (!consentAccepted(body)) return NextResponse.json({ error: WITHDRAWAL_BLOCKED }, { status: 400 });
   const trip = plan === "membership" ? null : cleanTrip(body?.trip);
   if (plan !== "membership" && !trip) return NextResponse.json({ error: "Please finish your trip details first." }, { status: 400 });
+  if (trip && !routeAllowed(trip.origin, trip.destination)) return NextResponse.json({ error: "Trips are in the United States, Canada, and Mexico." }, { status: 400 });
   const attribution = {};
   for (const k of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "fbclid"]) {
     const v = body?.attribution?.[k];

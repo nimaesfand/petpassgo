@@ -6,6 +6,7 @@ import Icon from "../../components/Icon";
 import { PRICES as P } from "../../lib/pricing";
 import { PLAN_CTA } from "../../lib/cta";
 import { tokens, font } from "../../lib/theme";
+import SampleChip from "../../components/SampleChip";
 
 const CHIPS = [
   { icon: "plane", title: "Airline requirements" },
@@ -43,9 +44,9 @@ export default function TravelPassPage() {
             style={{ objectPosition: "70% center" }}
           />
           <div className="relative sm:absolute sm:left-5 sm:bottom-5 mt-3 sm:mt-0 w-full sm:w-auto sm:max-w-[300px] rounded-2xl p-4" style={{ background: "#fff", boxShadow: "0 16px 40px rgba(20,33,61,0.18)" }}>
-            <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, letterSpacing: "0.08em", color: tokens.muted }}>SAMPLE ROUTE</div>
-            <div style={{ fontFamily: font.display, fontSize: 28, fontWeight: 700, color: tokens.navy, lineHeight: 1.1 }} className="mt-1">LAX to JFK</div>
-            <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mt-1">Apr 18 · sample date</div>
+            <SampleChip />
+            <div style={{ fontFamily: font.display, fontSize: 28, fontWeight: 700, color: tokens.navy, lineHeight: 1.1 }} className="mt-2">LAX to JFK</div>
+            <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mt-1">Apr 18</div>
             <span className="inline-flex mt-3 rounded-full px-3 py-1.5" style={{ background: "#EAF6EE", color: tokens.green, fontFamily: font.body, fontWeight: 700, fontSize: 15 }}>Ready for travel</span>
           </div>
         </div>

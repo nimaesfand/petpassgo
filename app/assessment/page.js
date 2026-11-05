@@ -3,8 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import { PRICES as P, usd } from "../../lib/pricing";
 import { supabase } from "../../lib/supabaseClient";
-import { US_AIRLINES, INTERNATIONAL_AIRLINES, OTHER_AIRLINE } from "../../lib/airlines";
+import { OTHER_AIRLINE, airlineGroupsForRegion } from "../../lib/airlines";
 import { pickTripPet } from "../../lib/tripPet";
+import { routeAllowed } from "../../lib/airports";
+import { saveCheckoutTrip } from "../../lib/tripCheckout";
 import AirportField from "../../components/AirportField";
 import { readTripIntent } from "../../lib/tripIntent";
 import { fmtTripDate } from "../../lib/tripAccess";
@@ -103,22 +105,12 @@ function AirlineGroup({ title, names, selected, onSelect, columns }) {
   );
 }
 
-const CANADA_MEXICO = ["Air Canada", "Aeroméxico", "Volaris", "Viva Aerobus"];
-
 function AirlineChoices({ query, selected, onSelect, region }) {
   const q = query.trim().toLowerCase();
   const match = (name) => !q || name.toLowerCase().includes(q);
-  const us = US_AIRLINES.filter(match);
-  const international = INTERNATIONAL_AIRLINES.filter(match);
-  const near = CANADA_MEXICO.filter((name) => international.includes(name));
-  const farther = international.filter((name) => !CANADA_MEXICO.includes(name));
+  const groups = airlineGroupsForRegion(region).map(([title, names, columns]) => [title, names.filter(match), columns]);
   const showOther = match(OTHER_AIRLINE);
-  const groups = region === "domestic"
-    ? [["U.S.", us, 2], ["Canada and Mexico", near, 1], ["Other international", farther, 1]]
-    : region === "international"
-      ? [["International", international, 1], ["U.S.", us, 2]]
-      : [["U.S.", us, 2], ["International", international, 1]];
-  const any = us.length || international.length || showOther;
+  const any = groups.some(([, names]) => names.length) || showOther;
   return (
     <>
       {groups.map(([title, names, columns]) => (
@@ -136,6 +128,7 @@ export default function PetPassGoQuiz() {
   const [step, setStep] = useState(0);
   const [isMember, setIsMember] = useState(false);
   const [guestPlan, setGuestPlan] = useState(""); // signed-out buyer: email sheet open for "pass" | "join"
+  const [buying, setBuying] = useState(false);
   const [consent, setConsent] = useState(false);
   const [tips, setTips] = useState(false);
   const [consentErr, setConsentErr] = useState("");
@@ -212,18 +205,24 @@ export default function PetPassGoQuiz() {
   }
 
   async function handlePurchase(plan = "pass", consentOverride = false) {
+    if (buying) return;
     const { data } = await supabase.auth.getUser();
     if (!consentOverride && !consent) { setConsentErr(WITHDRAWAL_BLOCKED); return; }
+    if (!routeAllowed(answers.origin, answers.destination)) {
+      alert("PetPassGo trips are in the United States, Canada, and Mexico.");
+      return;
+    }
     if (!data.user) {
       // Pay first: ask for the email (existing accounts log in instead), then Stripe.
       // Answers stay in this browser so "Back" from Stripe returns to these results.
-      const guestPlan = plan === "member" ? "join" : "pass";
-      trackBeginCheckout(guestPlan);
+      const nextGuest = plan === "member" ? "join" : "pass";
+      trackBeginCheckout(nextGuest);
       localStorage.setItem("petpassgo_pending_trip", JSON.stringify(answers));
-      setGuestPlan(guestPlan);
+      setGuestPlan(nextGuest);
       return;
     }
 
+    setBuying(true);
     const baseTrip = {
       user_id: data.user.id,
       origin: answers.origin,
@@ -239,8 +238,6 @@ export default function PetPassGoQuiz() {
     const { data: pets } = await supabase.from("pets").select("id,animal_type").eq("user_id", data.user.id);
     const linked = pickTripPet(pets, { animal_type: answers.animal });
     if (linked) baseTrip.pet_id = linked.id;
-    // New columns are optional. One-way trips omit them so a trip still saves
-    // if the return-date migration has not been applied yet.
     const extras = {};
     if (answers.round_trip && answers.return_date) {
       extras.return_date = answers.return_date;
@@ -248,12 +245,11 @@ export default function PetPassGoQuiz() {
       extras.return_flight_snapshot = answers.return_flight_snapshot || null;
     }
     if (answers.role === "Service animal" && answers.psd) extras.service_kind = "psd";
-    let { data: trip, error } = await supabase.from("trips").insert({ ...baseTrip, ...extras }).select("id").single();
-    if (error && Object.keys(extras).length) {
-      ({ data: trip, error } = await supabase.from("trips").insert(baseTrip).select("id").single());
-      if (!error) alert("Your trip was saved as a one-way trip. The return date can be added from your pass once the account update is in place.");
-    }
-    if (error || !trip) { alert("Sorry, something went wrong saving your trip. Please try again."); return; }
+    const saved = await saveCheckoutTrip(supabase, { userId: data.user.id, baseTrip, extras, answers });
+    if (saved.paid) { setBuying(false); alert("This trip is already unlocked. Open My Trips to see it."); return; }
+    if (saved.droppedReturn) alert("Your trip was saved as a one-way trip. The return date can be added from your pass once the account update is in place.");
+    const trip = saved.trip;
+    if (saved.error || !trip) { setBuying(false); alert("Sorry, something went wrong saving your trip. Please try again."); return; }
 
     // Payment happens on Stripe; only the Stripe webhook can mark the trip paid.
     const stripePlan = plan === "member" ? "join" : isMember ? "member_pass" : "pass";
@@ -265,7 +261,7 @@ export default function PetPassGoQuiz() {
       body: JSON.stringify({ plan: stripePlan, trip_id: trip.id, attribution: getAttribution(), immediate_access_consent: true, marketing_opt_in: tips }),
     });
     const j = await r.json().catch(() => ({}));
-    if (!r.ok || !j.url) { alert(j.error || "Checkout isn't available right now. Please try again."); return; }
+    if (!r.ok || !j.url) { setBuying(false); alert(j.error || "Checkout isn't available right now. Please try again."); return; }
     localStorage.setItem("petpassgo_open_flight_tab", "1");
     window.location.href = j.url;
   }
@@ -443,12 +439,12 @@ export default function PetPassGoQuiz() {
               <MarketingOptIn checked={tips} onChange={setTips} />
               <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setConsentErr(""); }} error={consentErr} />
               {isMember ? (
-                <button onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16 }}>Travel Pass · {usd(P.memberPass)}</button>
+                <button disabled={buying} onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : `Travel Pass · ${usd(P.memberPass)}`}</button>
               ) : (
                 <>
-                  <button onClick={() => handlePurchase("member")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16 }}>Join + Pass · {usd(P.joinToday)}</button>
+                  <button disabled={buying} onClick={() => handlePurchase("member")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : `Join + Pass · ${usd(P.joinToday)}`}</button>
                   <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mt-2 text-center">{usd(P.joinToday)} today is {usd(P.member)} for Pet Vault plus a {usd(P.memberPass)} pass. Then {usd(P.member)}/mo. Cancel anytime.</p>
-                  <button type="button" onClick={() => handlePurchase("pass")} className="w-full mt-4 py-2" style={{ background: "none", border: "none", fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy, cursor: "pointer", textDecoration: "underline" }}>Travel Pass only · {usd(P.pass)}</button>
+                  <button type="button" disabled={buying} onClick={() => handlePurchase("pass")} className="w-full mt-4 py-2" style={{ background: "none", border: "none", fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy, cursor: "pointer", textDecoration: "underline" }}>Travel Pass only · {usd(P.pass)}</button>
                 </>
               )}
               <TrustBadges className="mt-4 text-left" />

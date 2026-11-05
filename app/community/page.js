@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import SiteHeader from "../../components/SiteHeader";
 import CommunityPaywall from "../../components/CommunityPaywall";
-import { VAULT_SUB } from "../../lib/travelPassOffer";
+import CommunityNotice from "../../components/CommunityNotice";
 import { supabase } from "../../lib/supabaseClient";
 import { BOARDS, formatBoardLatest } from "../../lib/community";
 import { tokens, font } from "../../lib/theme";
@@ -43,9 +43,10 @@ export default function CommunityHome() {
       <SiteHeader />
       <main className="max-w-[1100px] mx-auto px-6 py-12">
         <h1 style={{ fontFamily: font.display, fontSize: 40, fontWeight: 700, color: tokens.navy }} className="mb-2">Community</h1>
-        <p style={{ fontFamily: font.body, fontSize: 18, color: tokens.muted }} className="mb-4">
-          {VAULT_SUB} Boards are for Pet Vault members.
+        <p style={{ fontFamily: font.body, fontSize: 18, lineHeight: 1.45, color: tokens.ink }} className="mb-3">
+          Airline tips and a Lost & found board. Members post.
         </p>
+        <div className="mb-5"><CommunityNotice /></div>
         {member !== true && (
           <div className="mb-6"><CommunityPaywall /></div>
         )}

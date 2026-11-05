@@ -42,6 +42,13 @@ export async function POST(req) {
   }
   const sb = serviceClient();
   const o = event.data.object;
+  let recorded = false;
+  const logged = await sb.from("stripe_events").insert({ id: event.id, event_type: event.type });
+  if (logged.error?.code === "23505") return NextResponse.json({ received: true });
+  if (!logged.error) recorded = true;
+  else if (!/stripe_events|schema cache|PGRST205|relation/i.test(logged.error.message || "")) {
+    console.error("stripe event log", logged.error.message);
+  }
   try {
     switch (event.type) {
       case "checkout.session.completed":
@@ -74,6 +81,7 @@ export async function POST(req) {
         break;
       case "invoice.paid":
         await recordRenewal(sb, o);
+        break;
       case "invoice.payment_failed": {
         const subId = o.subscription || o.parent?.subscription_details?.subscription;
         if (subId) await syncSubscription(sb, await stripe().subscriptions.retrieve(subId));
@@ -81,6 +89,7 @@ export async function POST(req) {
       }
     }
   } catch (e) {
+    if (recorded) await sb.from("stripe_events").delete().eq("id", event.id);
     console.error("stripe webhook", event.type, e?.message);
     return NextResponse.json({ error: "Handler failed" }, { status: 500 });
   }

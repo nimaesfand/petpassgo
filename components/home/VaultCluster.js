@@ -1,6 +1,7 @@
 import { tokens, font } from "../../lib/theme";
 import Icon from "../Icon";
 import { PetIllustration } from "../PetIdCard";
+import SampleChip from "../SampleChip";
 
 const TILES = [
   { icon: "health", label: "Vaccination records", tint: "#EAF6EE", ink: tokens.green },
@@ -24,7 +25,7 @@ export default function VaultCluster() {
       </div>
       <div className="grid grid-cols-[minmax(0,1fr)_108px] gap-3 mt-3 items-stretch">
         <div className="rounded-2xl p-4" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 12px 28px rgba(20,33,61,0.08)" }}>
-          <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, letterSpacing: "0.08em", color: tokens.muted }}>EXAMPLE PROFILE</div>
+          <SampleChip />
           <div className="flex items-center gap-3 mt-3">
             <div className="rounded-xl overflow-hidden flex-shrink-0" style={{ border: `3px solid ${tokens.gold}` }}>
               <PetIllustration size={64} />

@@ -1,6 +1,7 @@
 import { tokens, font } from "../../lib/theme";
 import Icon from "../Icon";
 import { PetIllustration } from "../PetIdCard";
+import SampleChip from "../SampleChip";
 
 const ROWS = [
   { icon: "home", label: "Overview" },
@@ -18,7 +19,7 @@ export default function PassPhone() {
         <div className="rounded-[28px] overflow-hidden" style={{ background: "#fff" }}>
           <div className="px-4 pt-4 pb-3 flex items-center justify-between" style={{ background: tokens.navy }}>
             <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 16, color: "#fff" }}>PetPassGo</span>
-            <span style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, letterSpacing: "0.06em", color: tokens.gold }}>EXAMPLE</span>
+            <SampleChip />
           </div>
           <div className="px-4 py-4">
             <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, letterSpacing: "0.08em", color: tokens.muted }}>YOUR TRAVEL PASS</div>

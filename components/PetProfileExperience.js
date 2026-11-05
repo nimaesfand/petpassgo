@@ -500,7 +500,6 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
                     {!filled(pet.about_bio) ? <p style={text}>Add a few words about {pet.name}: personality, what they like, anything a sitter should know.</p> : null}
                     <textarea aria-label={`About ${pet.name}`} value={form.about_bio} onChange={(e) => setForm({ ...form, about_bio: e.target.value })} rows={5} maxLength={1000} style={input} placeholder={`What is ${pet.name || "your pet"} like?`} />
                     <button type="button" disabled={saving} onClick={() => save({ about_bio: form.about_bio.trim() || null })} style={{ ...btn, background: tokens.navy, color: "#fff", justifySelf: "start" }}>{saving ? "Saving…" : "Save about"}</button>
-                    <p style={{ ...text, color: tokens.muted }}>This is shown on the public profile when you save it.</p>
                   </>
                 ) : <p style={{ ...text, whiteSpace: "pre-wrap" }}>{pet.about_bio}</p>}
               </div>
@@ -550,12 +549,15 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
                   <input readOnly value={profileLabel(pet)} aria-label="Profile URL" style={input} onFocus={(e) => e.target.select()} />
                   <button type="button" onClick={async () => { try { await navigator.clipboard.writeText(profileUrl(pet)); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {} }} style={{ ...btn, background: tokens.navy, color: "#fff" }}>{copied ? "Copied" : "Copy"}</button>
                 </div>
-                <p className="mt-2" style={{ ...text, color: tokens.muted }}>PetPassGo ID is included with Pet Vault. It is not a registration number.</p>
               </div>
               <div className="grid gap-2">
                 <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 16, color: tokens.navy }}>What the public page can show</div>
-                <p style={{ ...text, color: tokens.muted }}>Off until you turn them on. Finder messages stay private either way.</p>
                 {[
+                  ["show_dob_on_public", "Show date of birth on the public page", pet.show_dob_on_public],
+                  ["show_weight_on_public", "Show weight on the public page", pet.show_weight_on_public],
+                  ["show_sex_on_public", "Show sex on the public page", pet.show_sex_on_public],
+                  ["show_color_on_public", "Show color on the public page", pet.show_color_on_public],
+                  ["show_about_on_public", "Show the About text on the public page", pet.show_about_on_public],
                   ["show_medical_on_public", "Show medical info on the public page", pet.show_medical_on_public],
                   ["show_contact_on_public_id", "Show emergency contact on the public page", pet.show_contact_on_public_id],
                   ["show_documents_on_public", "Show documents on the public page", pet.show_documents_on_public],
@@ -574,7 +576,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
           </section>
         </>
       ) : (
-        <p style={{ ...text, color: tokens.muted, textAlign: "center" }}>This is a digital pet ID. It is not a government ID and does not grant special legal rights.</p>
+        null
       )}
     </div>
   );
