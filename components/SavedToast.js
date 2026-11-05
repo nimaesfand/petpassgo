@@ -25,13 +25,12 @@ export default function SavedToast() {
   if (!on) return null;
   return (
     <div
-      className="ppg-no-print"
+      className="ppg-saved-toast ppg-no-print"
       role="status"
       aria-live="polite"
       style={{
         position: "fixed",
         left: "50%",
-        bottom: "calc(84px + env(safe-area-inset-bottom, 0px))",
         transform: "translateX(-50%)",
         zIndex: 70,
         background: "#fff",

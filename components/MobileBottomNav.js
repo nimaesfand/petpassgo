@@ -12,9 +12,9 @@ const ITEMS = [
   { key: "more", icon: "more", label: "More" },
 ];
 
-export default function MobileBottomNav({ active, onNavigate }) {
+export default function MobileBottomNav({ active, onNavigate, docked = false }) {
   return (
-    <nav aria-label="Account" className="md:hidden ppg-no-print" style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 60, background: "#fff", borderTop: `1px solid ${tokens.line}`, paddingBottom: "env(safe-area-inset-bottom)", boxShadow: "0 -6px 24px rgba(20,33,61,0.06)" }}>
+    <nav aria-label="Account" className="md:hidden ppg-no-print" style={docked ? { position: "relative", zIndex: 60, background: "#fff", borderTop: `1px solid ${tokens.line}`, paddingBottom: "env(safe-area-inset-bottom)" } : { position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 60, background: "#fff", borderTop: `1px solid ${tokens.line}`, paddingBottom: "env(safe-area-inset-bottom)", boxShadow: "0 -6px 24px rgba(20,33,61,0.06)" }}>
       <div className="flex">
         {ITEMS.map((it) => {
           const on = active === it.key;

@@ -928,8 +928,8 @@ function CurrentFlightTab({ userId }) {
               <button key={row.id} type="button" onClick={() => openTrip(row)} className="w-full rounded-2xl px-4 py-3 text-left" style={{ background: "#fff", border: `2px solid ${open ? tokens.navy : tokens.line}`, cursor: "pointer" }}>
                 <span className="flex flex-wrap items-center gap-2 min-w-0">
                   <span className="min-w-0" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{row.origin} → {row.destination}</span>
-                  <span data-keep-clear className="rounded-full px-2.5 py-1 whitespace-nowrap" style={{ background: row.paid ? tokens.sky : "#FDE8E2", color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>{row.paid ? "Paid" : "Unpaid"}</span>
-                  {tripIsPast(row) ? <span data-keep-clear className="rounded-full px-2.5 py-1 whitespace-nowrap" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>Past</span> : null}
+                  <span className="rounded-full px-2.5 py-1 whitespace-nowrap" style={{ background: row.paid ? tokens.sky : "#FDE8E2", color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>{row.paid ? "Paid" : "Unpaid"}</span>
+                  {tripIsPast(row) ? <span className="rounded-full px-2.5 py-1 whitespace-nowrap" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>Past</span> : null}
                 </span>
                 <span className="block mt-1" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{row.travel_date ? fmtTripDate(row.travel_date) : "Date not set"}{row.airline ? ` · ${row.airline}` : ""}</span>
                 <span className="block mt-0.5" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{petName(row)}</span>
@@ -1025,10 +1025,10 @@ function BillingTab({ userId, email }) {
         {purchases.length === 0 && legacyTrips.length === 0 && <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }}>No purchases yet. Stripe also emails a receipt for every payment.</p>}
         <div className="space-y-2">{purchases.map((x) => <div key={x.id} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
           <div className="min-w-0"><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>{kindLabel[x.kind] || "Purchase"}</div><div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>{new Date(x.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}{x.amount_cents != null ? ` · ${money(x.amount_cents, x.currency)}` : ""}</div></div>
-          {x.receipt_url ? <a href={x.receipt_url} data-keep-clear target="_blank" rel="noopener noreferrer" className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Receipt</a> : <button data-keep-clear onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Receipts</button>}
+          {x.receipt_url ? <a href={x.receipt_url} target="_blank" rel="noopener noreferrer" className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Receipt</a> : <button onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Receipts</button>}
         </div>)}{legacyTrips.map((t) => <div key={t.id} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
           <div className="min-w-0"><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>Travel Pass</div><div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>{t.origin} → {t.destination}{t.paid_at ? ` · ${new Date(t.paid_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` : ""}</div></div>
-          <button data-keep-clear onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Receipts</button>
+          <button onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Receipts</button>
         </div>)}</div>
         <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mt-3">Receipts open in Stripe.</p>
       </div>
@@ -1144,16 +1144,28 @@ export default function AccountPage() {
     else if (key === "passport") openVaultAnchor("[data-pet-passport]");
     else if (key === "health") openVaultAnchor("#health-passport");
     else setActiveTab("billing");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const scroller = document.querySelector(".ppg-account-scroll");
+    if (scroller) scroller.scrollTo({ top: 0, behavior: "smooth" });
+    else window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  useEffect(() => {
+    const dock = document.querySelector(".ppg-account-dock");
+    if (!dock) return;
+    const sync = () => document.documentElement.style.setProperty("--ppg-dock-h", `${dock.offsetHeight}px`);
+    sync();
+    const obs = new ResizeObserver(sync);
+    obs.observe(dock);
+    return () => { obs.disconnect(); document.documentElement.style.removeProperty("--ppg-dock-h"); };
+  }, [loading, user]);
+
   return (
-    <div style={{ background: tokens.sky, minHeight: "100vh" }} className="w-full">
+    <div style={{ background: tokens.sky }} className="ppg-account-app w-full">
       <SiteHeader onLogout={handleLogout} />
       {loading ? (
-        <div className="flex items-center justify-center py-24" style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div>
+        <main className="ppg-account-scroll flex items-center justify-center py-24" style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</main>
       ) : (
-      <main className="w-full max-w-[1100px] mx-auto px-4 md:px-8 pt-8 md:pt-12 ppg-account-clear min-w-0 overflow-x-clip">
+      <main className="ppg-account-scroll w-full max-w-[1100px] mx-auto px-4 md:px-8 pt-8 md:pt-12 ppg-account-clear min-w-0 overflow-x-clip">
         <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
           <div>
             <h1 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 34, color: tokens.navy, lineHeight: 1.1 }}>Your dashboard</h1>
@@ -1186,7 +1198,7 @@ export default function AccountPage() {
 
         {activeTab === "dashboard" && (<>
           <DashboardTab userId={user?.id} onOpenTrips={() => setActiveTab("trips")} />
-          <VaultCard userId={user?.id} onOpenVault={(anchor) => { setActiveTab("vault"); if (anchor) setTimeout(() => revealAnchor(anchor), 350); window.scrollTo({ top: 0 }); }} />
+          <VaultCard userId={user?.id} onOpenVault={(anchor) => { setActiveTab("vault"); if (anchor) setTimeout(() => revealAnchor(anchor), 350); const scroller = document.querySelector(".ppg-account-scroll"); if (scroller) scroller.scrollTo({ top: 0 }); else window.scrollTo({ top: 0 }); }} />
         </>)}
 
         {activeTab === "vault" && (<>
@@ -1199,7 +1211,13 @@ export default function AccountPage() {
         {activeTab === "billing" && <BillingTab userId={user?.id} email={user?.email} />}
       </main>
       )}
-      {!loading && user && <MobileBottomNav active={bottomActive} onNavigate={handleBottomNav} />}
+      <div className="ppg-account-dock">
+        <div id="ppg-support-dock" className="ppg-support-dock">
+          <div id="ppg-chat-slot" />
+          <div id="ppg-contact-slot" />
+        </div>
+        {!loading && user ? <MobileBottomNav docked active={bottomActive} onNavigate={handleBottomNav} /> : null}
+      </div>
       <SavedToast />
     </div>
   );
