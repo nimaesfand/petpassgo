@@ -795,7 +795,7 @@ export function DashboardTab({ userId, onOpenTrips }) {
       {trip?.paid && !tripIsPast(trip) && (
         <div className="rounded-2xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
           <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 700, color: tokens.navy }} className="mb-3">Needs action</div>
-          {actions.length === 0 ? <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Nothing needs action right now.</p> : <>
+          {actions.length === 0 ? <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>Nothing needs action right now.</p> : <>
             <ul className="space-y-2">{visible.map((a) => (
               <li key={a.key} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
                 <span style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{a.label}</span>
@@ -1024,11 +1024,11 @@ function BillingTab({ userId, email }) {
         <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-2">Purchase history</div>
         {purchases.length === 0 && legacyTrips.length === 0 && <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }}>No purchases yet. Stripe also emails a receipt for every payment.</p>}
         <div className="space-y-2">{purchases.map((x) => <div key={x.id} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
-          <div><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>{kindLabel[x.kind] || "Purchase"}</div><div style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>{new Date(x.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}{x.amount_cents != null ? ` · ${money(x.amount_cents, x.currency)}` : ""}</div></div>
-          {x.receipt_url ? <a href={x.receipt_url} target="_blank" rel="noopener noreferrer" className="rounded-full px-3.5 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 15, fontWeight: 700, textDecoration: "none" }}>Receipt</a> : <button onClick={() => go("/api/stripe/portal")} className="rounded-full px-3.5 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 15, fontWeight: 700 }}>Receipts</button>}
+          <div className="min-w-0"><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>{kindLabel[x.kind] || "Purchase"}</div><div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>{new Date(x.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}{x.amount_cents != null ? ` · ${money(x.amount_cents, x.currency)}` : ""}</div></div>
+          {x.receipt_url ? <a href={x.receipt_url} target="_blank" rel="noopener noreferrer" className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Receipt</a> : <button onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Receipts</button>}
         </div>)}{legacyTrips.map((t) => <div key={t.id} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
-          <div><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>Travel Pass</div><div style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>{t.origin} → {t.destination}{t.paid_at ? ` · ${new Date(t.paid_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` : ""}</div></div>
-          <button onClick={() => go("/api/stripe/portal")} className="rounded-full px-3.5 py-1.5 flex-shrink-0" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 15, fontWeight: 700 }}>Receipts</button>
+          <div className="min-w-0"><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>Travel Pass</div><div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>{t.origin} → {t.destination}{t.paid_at ? ` · ${new Date(t.paid_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` : ""}</div></div>
+          <button onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Receipts</button>
         </div>)}</div>
         <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mt-3">Receipts open in Stripe.</p>
       </div>

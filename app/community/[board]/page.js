@@ -215,7 +215,6 @@ export default function BoardPage() {
       const postOk = !!ok && !lapsedPreview();
       setCanRead(postOk);
       setCanPost(postOk);
-      if (!postOk) { setLoading(false); return; }
       load();
       if (postOk) {
         supabase.from("community_profiles").select("display_name").maybeSingle().then(({ data: p }) => setDisplayName(p?.display_name || ""));
@@ -238,11 +237,11 @@ export default function BoardPage() {
 
   const threads = useMemo(() => {
     const cutoff = recentOnly ? Date.now() - 90 * 86400000 : 0;
-    const inArea = (p) => !isLost || area.state === "all" || !area.state || (p.lost_state === area.state && (area.city === "all" || p.lost_city === area.city));
+    const inArea = (p) => !canRead || !isLost || area.state === "all" || !area.state || (p.lost_state === area.state && (area.city === "all" || p.lost_city === area.city));
     const top = posts.filter((p) => !p.parent_id && inArea(p) && (!recentOnly || new Date(p.created_at).getTime() >= cutoff));
     const replies = posts.filter((p) => p.parent_id).sort((a, b) => a.created_at.localeCompare(b.created_at));
     return top.map((t) => ({ ...t, replies: replies.filter((r) => r.parent_id === t.id) }));
-  }, [posts, recentOnly, area, isLost]);
+  }, [posts, recentOnly, area, isLost, canRead]);
   const citiesInState = useMemo(() => {
     const set = new Set(posts.filter((p) => !p.parent_id && p.lost_state === area.state && p.lost_city).map((p) => p.lost_city));
     if (area.city && area.city !== "all") set.add(area.city);
@@ -352,7 +351,7 @@ export default function BoardPage() {
           </div>
         )}
 
-        {canRead && (loading ? <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div> : threads.length === 0 ? (
+        {(canRead || posts.length > 0) && (loading ? <div style={{ fontFamily: font.body, color: tokens.ink }}>Loading…</div> : threads.length === 0 ? (
           <div className="rounded-xl p-8 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, color: tokens.muted }}>
             {isLost && area.state && area.state !== "all" ? `No lost or found pets posted in ${area.city !== "all" ? area.city : stateName(area.state)}${recentOnly ? " in the last 90 days" : ""}.` : recentOnly ? "No posts in the last 90 days." : "No posts yet. Start the first thread."}
           </div>

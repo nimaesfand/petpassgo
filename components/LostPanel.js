@@ -225,7 +225,7 @@ export default function LostPanel({ pet, userId, onChanged }) {
             <span style={{ color: tokens.navy, fontWeight: 700 }}>›</span>
           </a>
         )}
-        <ShareButtons pet={pet} lost={report} />
+        <ShareButtons pet={pet} lost={report} flyer={false} />
 
         <div>
           <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 17, color: tokens.navy }} className="mb-2">Messages from finders ({messages.length})</div>
@@ -256,7 +256,7 @@ export default function LostPanel({ pet, userId, onChanged }) {
         </details>
 
         {err && <div role="alert" style={{ color: "#B42318", fontSize: 14 }}>{err}</div>}
-        <a href={`/id/${pet.public_slug || pet.id}/flyer`} className="ppg-btn ppg-btn-secondary">Print letter flyer</a>
+        <a href={`/id/${pet.public_slug || pet.id}/flyer`} className="ppg-btn ppg-btn-secondary">Print flyer</a>
         {ask ? (
           <div role="dialog" aria-label={ask === "found" ? "Mark found" : "Turn off report"} className="rounded-2xl p-4" style={{ border: `2px solid ${tokens.navy}` }}>
             <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-3">{ask === "found" ? `Mark ${pet.name} found? The lost page comes down.` : `Turn off ${pet.name}'s lost report? The poster and board post come down.`}</div>

@@ -13,7 +13,7 @@ import PetCareCard from "./PetCareCard";
 import PetDocumentsCard from "./PetDocumentsCard";
 import { documentFileError } from "../lib/petDocuments";
 import { todayPT } from "../lib/travelDates";
-import { SignedImg, BUCKET, getSignedUrl } from "../lib/storage";
+import { SignedImg, BUCKET, getSignedUrl, toStoragePath } from "../lib/storage";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
 import {
@@ -171,6 +171,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
   const [housingFile, setHousingFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
+  const [askRemove, setAskRemove] = useState(false);
 
   useEffect(() => { setForm(fromPet(pet)); }, [pet.id, pet.updated_at, pet.name, pet.breed, pet.about_bio, pet.housing_notes, pet.allergies, pet.color, pet.weight_lb]);
 
@@ -240,9 +241,32 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
     setPhotoBusy(true);
     const path = `${userId}/${pet.id}/profile-photo-${Date.now()}-${f.name}`;
     const { error } = await supabase.storage.from(BUCKET).upload(path, f);
-    if (!error) await supabase.from("pets").update({ photo_url: path }).eq("id", pet.id).eq("user_id", userId);
+    if (!error) {
+      const previous = toStoragePath(pet.photo_url);
+      await supabase.from("pets").update({ photo_url: path }).eq("id", pet.id).eq("user_id", userId);
+      if (previous && previous !== path) await supabase.storage.from(BUCKET).remove([previous]);
+    }
     setPhotoBusy(false);
     if (!error) onChanged?.();
+  }
+
+  async function removePhoto() {
+    const previous = toStoragePath(pet.photo_url);
+    if (previous) await supabase.storage.from(BUCKET).remove([previous]);
+    await supabase.from("pets").update({ photo_url: null }).eq("id", pet.id).eq("user_id", userId);
+    onChanged?.();
+  }
+
+  async function removePet() {
+    const { data: docs } = await supabase.from("documents").select("file_url").eq("pet_id", pet.id).eq("user_id", userId);
+    const paths = (docs || []).map((d) => toStoragePath(d.file_url)).filter(Boolean);
+    const photoPath = toStoragePath(pet.photo_url);
+    if (photoPath) paths.push(photoPath);
+    if (paths.length) await supabase.storage.from(BUCKET).remove(paths);
+    await supabase.from("documents").delete().eq("pet_id", pet.id).eq("user_id", userId);
+    await supabase.from("pets").delete().eq("id", pet.id).eq("user_id", userId);
+    setAskRemove(false);
+    onChanged?.();
   }
 
   async function uploadDoc(chosen, type) {
@@ -299,6 +323,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
         owner={owner}
         chipValue={chipValue}
         onPhoto={owner ? uploadPhoto : null}
+        onRemovePhoto={owner && pet.photo_url ? removePhoto : null}
         photoBusy={photoBusy}
         onDocuments={showDocsButton ? () => document.getElementById(`documents-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }) : null}
       />
@@ -496,7 +521,17 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
                 ))}
               </div>
               <div id="wallet-card"><WalletCard pet={pet} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} /></div>
-              <button type="button" onClick={async () => { if (!window.confirm(`Remove ${pet.name}'s profile? This can't be undone.`)) return; await supabase.from("pets").delete().eq("id", pet.id).eq("user_id", userId); onChanged?.(); }} style={{ fontFamily: font.body, fontSize: 15, color: tokens.primary, background: "none", border: "none", cursor: "pointer", justifySelf: "start" }}>Remove pet</button>
+              {askRemove ? (
+                <div role="dialog" aria-label="Remove pet" className="rounded-2xl p-4" style={{ border: `2px solid ${tokens.navy}` }}>
+                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-3">Remove {pet.name}'s profile? This can't be undone.</div>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={removePet} className="ppg-btn ppg-btn-primary">Remove pet</button>
+                    <button type="button" onClick={() => setAskRemove(false)} className="ppg-btn ppg-btn-secondary">Cancel</button>
+                  </div>
+                </div>
+              ) : (
+                <button type="button" onClick={() => setAskRemove(true)} className="ppg-btn ppg-btn-secondary" style={{ justifySelf: "start" }}>Remove pet</button>
+              )}
             </div>
           </section>
         </>

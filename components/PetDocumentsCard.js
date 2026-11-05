@@ -150,13 +150,13 @@ export default function PetDocumentsCard({ pet, userId }) {
                   />
                 </div>
               ) : (
-                <div className="flex flex-wrap gap-2 mt-3">
-                  <button type="button" onClick={() => view(doc)} className="ppg-btn ppg-btn-secondary">View</button>
-                  <label className="ppg-btn ppg-btn-secondary">
+                <div className="flex flex-nowrap gap-2 mt-3 min-w-0">
+                  <button type="button" onClick={() => view(doc)} className="ppg-btn ppg-btn-secondary ppg-btn-compact">View</button>
+                  <label className="ppg-btn ppg-btn-secondary ppg-btn-compact">
                     Replace
                     <input type="file" accept={DOC_ACCEPT} className="ppg-hp" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) queueReplace(doc, f); }} />
                   </label>
-                  <button type="button" onClick={() => setAsk({ kind: "delete", doc })} className="ppg-btn ppg-btn-secondary">Delete</button>
+                  <button type="button" onClick={() => setAsk({ kind: "delete", doc })} className="ppg-btn ppg-btn-secondary ppg-btn-compact">Delete</button>
                 </div>
               )}
             </article>

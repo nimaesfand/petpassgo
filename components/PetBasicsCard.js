@@ -31,6 +31,7 @@ export default function PetBasicsCard({ pet, userId, onChanged }) {
     weight_lb: pet.weight_lb ?? "",
     date_of_birth: pet.date_of_birth ? String(pet.date_of_birth).slice(0, 10) : "",
     microchip_number: pet.microchip_number || "",
+    handler_name: pet.handler_name || "",
     role: pet.role || "Pet",
   }));
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -48,6 +49,7 @@ export default function PetBasicsCard({ pet, userId, onChanged }) {
       weight_lb: form.weight_lb === "" ? null : Number(form.weight_lb),
       date_of_birth: form.date_of_birth || null,
       microchip_number: form.microchip_number.trim() || null,
+      handler_name: form.handler_name.trim() || null,
     };
     const { error } = await supabase.from("pets").update(patch).eq("id", pet.id).eq("user_id", userId);
     setSaving(false);
@@ -63,6 +65,7 @@ export default function PetBasicsCard({ pet, userId, onChanged }) {
     ["Sex", pet.sex],
     ["Color", pet.color],
     ["Microchip", pet.microchip_number],
+    ["Owner", pet.handler_name],
   ];
 
   return (
@@ -86,6 +89,7 @@ export default function PetBasicsCard({ pet, userId, onChanged }) {
             <label style={label}>Color<input aria-label="Color" value={form.color} onChange={set("color")} style={input} /></label>
           </div>
           <label style={label}>Microchip number<input aria-label="Microchip number" value={form.microchip_number} onChange={set("microchip_number")} autoComplete="off" style={input} /></label>
+          <label style={label}>Owner name<input aria-label="Owner name" maxLength={80} value={form.handler_name} onChange={set("handler_name")} style={input} /></label>
           <label style={label}>Role, as you declare it
             <select aria-label="Role" value={form.role} onChange={set("role")} style={input}>
               <option>Pet</option>
