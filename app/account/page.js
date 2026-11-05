@@ -733,7 +733,12 @@ export function DashboardTab({ userId, onOpenTrips }) {
   const [stepTotal, setStepTotal] = useState(0);
   const pet = useTripPet(trip);
   useEffect(() => { (async () => {
-    const { data: trips } = await supabase.from("trips").select("*").order("created_at", { ascending: false }).limit(1);
+    const today = todayPT();
+    let { data: trips, error: tripErr } = await supabase.from("trips").select("*").or(`travel_date.gte.${today},return_date.gte.${today}`).order("travel_date", { ascending: true }).limit(1);
+    if (tripErr || !trips?.length) {
+      const again = await supabase.from("trips").select("*").order("travel_date", { ascending: false }).limit(1);
+      trips = again.data;
+    }
     const current = trips?.[0] || null; setTrip(current);
     const list = []; let doneN = 0;
     if (current?.paid && !tripIsPast(current)) {
@@ -796,8 +801,29 @@ export function DashboardTab({ userId, onOpenTrips }) {
   );
 }
 
+const TRIP_PAGE = 20;
+
+async function loadTripRoster(upLimit, pastLimit) {
+  const today = todayPT();
+  const [up, past, pets] = await Promise.all([
+    supabase.from("trips").select("*", { count: "exact" }).or(`travel_date.is.null,travel_date.gte.${today},return_date.gte.${today}`).order("travel_date", { ascending: true, nullsFirst: true }).range(0, upLimit - 1),
+    supabase.from("trips").select("*", { count: "exact" }).lt("travel_date", today).or(`return_date.is.null,return_date.lt.${today}`).order("travel_date", { ascending: false }).range(0, pastLimit - 1),
+    supabase.from("pets").select("id,name,animal_type"),
+  ]);
+  if (up.error || past.error) {
+    const all = await supabase.from("trips").select("*").order("travel_date", { ascending: true }).limit(upLimit + pastLimit);
+    const rows = all.data || [];
+    const upcoming = rows.filter((trip) => !tripIsPast(trip));
+    const pastRows = rows.filter(tripIsPast).sort((a, b) => String(b.travel_date || "").localeCompare(String(a.travel_date || "")));
+    return { upcoming: upcoming.slice(0, upLimit), past: pastRows.slice(0, pastLimit), upTotal: upcoming.length, pastTotal: pastRows.length, pets: pets.data || [] };
+  }
+  return { upcoming: up.data || [], past: past.data || [], upTotal: up.count || 0, pastTotal: past.count || 0, pets: pets.data || [] };
+}
+
 function CurrentFlightTab({ userId }) {
   const [trip, setTrip] = useState(null);
+  const [roster, setRoster] = useState({ upcoming: [], past: [], upTotal: 0, pastTotal: 0, pets: [] });
+  const [limits, setLimits] = useState({ up: TRIP_PAGE, past: TRIP_PAGE });
   const [results, setResults] = useState([]);
   const [statusMap, setStatusMap] = useState({});
   const [loading, setLoading] = useState(true);
@@ -818,50 +844,40 @@ function CurrentFlightTab({ userId }) {
   useEffect(() => { supabase.rpc("my_membership").then(({ data }) => setIsMember(!!data)); }, []);
 
   useEffect(() => {
-    load();
-  }, []);
+    let cancel = false;
+    (async () => {
+      const next = await loadTripRoster(limits.up, limits.past);
+      if (cancel) return;
+      setRoster(next);
+      const all = [...next.upcoming, ...next.past];
+      setTrip((current) => all.find((row) => row.id === current?.id) || next.upcoming[0] || next.past[0] || null);
+      setLoading(false);
+    })();
+    return () => { cancel = true; };
+  }, [limits.up, limits.past]);
 
-  async function load() {
-    setLoading(true);
-    const { data: trips } = await supabase
-      .from("trips")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(1);
-
-    const currentTrip = trips && trips[0];
-    setTrip(currentTrip || null);
-
-    if (currentTrip) {
-      // Facts only after payment: unpaid trips get nothing; paid owners read via a server function.
-      const { data: reqs } = currentTrip.paid
+  useEffect(() => {
+    if (!trip?.id) { setResults([]); setStatusMap({}); return; }
+    let cancel = false;
+    (async () => {
+      const { data: reqs } = trip.paid
         ? await supabase.rpc("get_trip_requirements", {
-            p_trip_id: currentTrip.id,
-            p_trip_types: tripTypeForRoute(currentTrip.origin, currentTrip.destination) === "international" ? ["international", "domestic"] : ["domestic"],
+            p_trip_id: trip.id,
+            p_trip_types: tripTypeForRoute(trip.origin, trip.destination) === "international" ? ["international", "domestic"] : ["domestic"],
           })
         : { data: [] };
-
-      const filtered = (reqs || []).filter((row) => matchesDestination(row, currentTrip));
-      // Official source citations are a paid feature: strip them unless this trip is paid.
-      const finalResults = filtered
-        .filter((r) => r.category !== "ELIGIBILITY NOTE")
-        .map((r) => (currentTrip.paid ? r : { ...r, source_url: null, verified_at: null }));
-      setResults(finalResults);
-      if (currentTrip.paid && !currentTrip.details_first_viewed_at) supabase.rpc("mark_trip_details_viewed", { p_trip_id: currentTrip.id });
-
-      const { data: statusRows } = await supabase
-        .from("trip_requirement_status")
-        .select("*")
-        .eq("trip_id", currentTrip.id);
-
+      if (cancel) return;
+      const filtered = (reqs || []).filter((row) => matchesDestination(row, trip));
+      setResults(filtered.filter((r) => r.category !== "ELIGIBILITY NOTE").map((r) => (trip.paid ? r : { ...r, source_url: null, verified_at: null })));
+      if (trip.paid && !trip.details_first_viewed_at) supabase.rpc("mark_trip_details_viewed", { p_trip_id: trip.id });
+      const { data: statusRows } = await supabase.from("trip_requirement_status").select("*").eq("trip_id", trip.id);
+      if (cancel) return;
       const map = {};
-      (statusRows || []).forEach((s) => {
-        map[s.requirement_id] = s.completed;
-      });
+      (statusRows || []).forEach((s) => { map[s.requirement_id] = s.completed; });
       setStatusMap(map);
-    }
-    setLoading(false);
-  }
+    })();
+    return () => { cancel = true; };
+  }, [trip?.id, trip?.paid]);
 
   async function handleSetDone(requirementIds, completed) {
     const ids = (requirementIds || []).filter((id) => /^[0-9a-f-]{36}$/i.test(String(id || "")));
@@ -888,7 +904,35 @@ function CurrentFlightTab({ userId }) {
     return <div style={{ fontFamily: font.body, opacity: 0.6, fontSize: 15.5 }}>Loading your trip…</div>;
   }
 
-  if (!trip) {
+  const petName = (row) => roster.pets.find((pet) => pet.id === row.pet_id)?.name || "No pet linked yet";
+  const openTrip = (row) => setTrip(row);
+  function TripList({ title, rows, total, onMore }) {
+    if (!rows.length && total === 0) return null;
+    return (
+      <section className="mb-4">
+        <h3 style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-2">{title}</h3>
+        <div className="grid gap-2">
+          {rows.map((row) => {
+            const open = trip?.id === row.id;
+            return (
+              <button key={row.id} type="button" onClick={() => openTrip(row)} className="w-full rounded-2xl px-4 py-3 text-left" style={{ background: "#fff", border: `2px solid ${open ? tokens.navy : tokens.line}`, cursor: "pointer" }}>
+                <span className="flex items-start justify-between gap-3">
+                  <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{row.origin} → {row.destination}</span>
+                  <span className="rounded-full px-2.5 py-1 flex-shrink-0" style={{ background: row.paid ? tokens.sky : "#FDE8E2", color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>{row.paid ? "Paid" : "Unpaid"}</span>
+                </span>
+                <span className="block mt-1" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{row.travel_date ? fmtTripDate(row.travel_date) : "Date not set"}{row.airline ? ` · ${row.airline}` : ""}</span>
+                <span className="block mt-0.5" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{petName(row)}</span>
+              </button>
+            );
+          })}
+        </div>
+        {total > rows.length && <button type="button" onClick={onMore} className="mt-2 rounded-full px-4 py-2" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, border: "none", cursor: "pointer" }}>Show more</button>}
+      </section>
+    );
+  }
+  const anyTrip = roster.upTotal + roster.pastTotal > 0;
+
+  if (!anyTrip) {
     return (
       <div className="rounded-xl p-8 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}` }}>
         <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-4">
@@ -905,16 +949,21 @@ function CurrentFlightTab({ userId }) {
     );
   }
 
-  if (!trip.paid) return <UnlockTripCard trip={trip} />;
-
-  return (
+  const detail = !trip ? null : !trip.paid ? <UnlockTripCard trip={trip} /> : (
     <TravelPassDashboard
       trip={trip}
       pet={petForTrip}
       petChoices={petChoices}
       onPickPet={async (id) => {
         const { error } = await supabase.from("trips").update({ pet_id: id }).eq("id", trip.id);
-        if (!error) setTrip((t) => ({ ...t, pet_id: id }));
+        if (!error) {
+          setTrip((t) => ({ ...t, pet_id: id }));
+          setRoster((r) => ({
+            ...r,
+            upcoming: r.upcoming.map((row) => row.id === trip.id ? { ...row, pet_id: id } : row),
+            past: r.past.map((row) => row.id === trip.id ? { ...row, pet_id: id } : row),
+          }));
+        }
       }}
       onSetRolePet={async () => {
         await supabase.from("trips").update({ role: "Pet", service_kind: null }).eq("id", trip.id);
@@ -926,6 +975,18 @@ function CurrentFlightTab({ userId }) {
       onSaveReturn={saveReturn}
       isMember={isMember}
     />
+  );
+
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <h2 style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: tokens.navy }}>My Trips</h2>
+        <a href="/assessment" className="rounded-full px-4 py-2.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none" }}>{PLAN_CTA}</a>
+      </div>
+      <TripList title="Upcoming" rows={roster.upcoming} total={roster.upTotal} onMore={() => setLimits((n) => ({ ...n, up: n.up + TRIP_PAGE }))} />
+      <TripList title="Past" rows={roster.past} total={roster.pastTotal} onMore={() => setLimits((n) => ({ ...n, past: n.past + TRIP_PAGE }))} />
+      {detail}
+    </div>
   );
 }
 
@@ -1083,7 +1144,7 @@ export default function AccountPage() {
       {loading ? (
         <div className="flex items-center justify-center py-24" style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div>
       ) : (
-      <div className="w-full max-w-[1100px] mx-auto px-4 md:px-8 pt-8 md:pt-12 ppg-account-clear">
+      <main className="w-full max-w-[1100px] mx-auto px-4 md:px-8 pt-8 md:pt-12 ppg-account-clear">
         <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
           <div>
             <h1 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 34, color: tokens.navy, lineHeight: 1.1 }}>Your dashboard</h1>
@@ -1121,15 +1182,14 @@ export default function AccountPage() {
         </>)}
 
         {activeTab === "vault" && (<>
-          <div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: tokens.navy }}>Pet Vault</div>
-          <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-4">{VAULT_SUB}</p>
+          <div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: tokens.navy }} className="mb-4">Pet Vault</div>
           <PetProfileTab userId={user?.id} />
         </>)}
 
         {activeTab === "trips" && <CurrentFlightTab userId={user?.id} />}
 
         {activeTab === "billing" && <BillingTab userId={user?.id} />}
-      </div>
+      </main>
       )}
       {!loading && user && <MobileBottomNav active={bottomActive} onNavigate={handleBottomNav} />}
     </div>

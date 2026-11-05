@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { AIRPORTS, formatAirport, foldAscii, countryLabel } from "../lib/airports";
+import { selectableAirports, formatAirport, foldAscii, countryLabel } from "../lib/airports";
 import { tokens, font } from "../lib/theme";
 
 export default function AirportField({ label, value, onSelect }) {
@@ -8,7 +8,7 @@ export default function AirportField({ label, value, onSelect }) {
   const [open, setOpen] = useState(false);
   const q = foldAscii(query.trim());
   const matches = q.length > 0
-    ? AIRPORTS.filter((a) => foldAscii(a.city).includes(q) || foldAscii(a.code).includes(q) || foldAscii(a.name).includes(q) || foldAscii(countryLabel(a.country)).includes(q))
+    ? selectableAirports().filter((a) => foldAscii(a.city).includes(q) || foldAscii(a.code).includes(q) || foldAscii(a.name).includes(q) || foldAscii(countryLabel(a.country)).includes(q))
         .sort((a, b) => (a.rank || 999) - (b.rank || 999))
         .slice(0, 12)
     : [];

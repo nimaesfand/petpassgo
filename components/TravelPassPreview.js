@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Icon from "./Icon";
 import { tokens, font } from "../lib/theme";
+import SampleChip from "./SampleChip";
 import { PASS_TAB_LIST, PassTabs, RouteLine, SoftCard, StatusChip, TextButton } from "./travelPassUi";
 
 const DEMO_STEPS = [
@@ -46,7 +47,7 @@ export default function TravelPassPreview() {
               <Icon name="paw" size={30} />
             </div>
             <div className="min-w-0">
-              <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, letterSpacing: "0.08em", color: tokens.gold }}>YOUR TRIP · SAMPLE</div>
+              <SampleChip />
               <div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: "#fff", lineHeight: 1.15 }}>Maple</div>
               <div className="flex flex-wrap items-center gap-2 mt-1">
                 <span style={{ fontFamily: font.body, fontSize: 16, color: tokens.sky }}>Golden retriever · 64 lb</span>
@@ -55,7 +56,7 @@ export default function TravelPassPreview() {
             </div>
           </div>
           <div className="sm:text-right">
-            <div style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: "#fff" }}>Apr 18 · sample</div>
+            <div style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: "#fff" }}>Apr 18</div>
             <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.sky }}>LAX to JFK · Nonstop · 5h 15m</div>
           </div>
         </div>

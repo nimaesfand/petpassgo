@@ -1,16 +1,15 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendResendEmail, serviceClient } from "../../../lib/serverEmail";
+import { SITE_URL } from "../../../lib/site";
 
 export const dynamic = "force-dynamic";
-const OWNER_EMAIL = "nimaesfand@gmail.com";
-
 async function gate(req) {
   const token = req.headers.get("x-sb-token") || "";
   if (!token) return null;
   const anon = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, { auth: { persistSession: false } });
   const { data: u } = await anon.auth.getUser(token);
-  if (!u?.user || (u.user.email || "").toLowerCase() !== OWNER_EMAIL) return null;
+  if (!u?.user) return null;
   const admin = serviceClient();
   const { data } = await admin.from("admins").select("user_id").eq("user_id", u.user.id).maybeSingle();
   return data ? { user: u.user, admin } : null;
@@ -72,7 +71,7 @@ export async function POST(req) {
     }
     if (b.action === "help_links") {
       const c = await customer(ctx.admin, target); if (!c) return NextResponse.json({ error: "Customer not found" }, { status: 404 });
-      const links = ["https://petpassgo.com/login", "https://petpassgo.com/assessment", "https://petpassgo.com/account", "https://petpassgo.com/contact"];
+      const links = [`${SITE_URL}/login`, `${SITE_URL}/assessment`, `${SITE_URL}/account`, `${SITE_URL}/contact`];
       let sent = false;
       if (process.env.RESEND_API_KEY && process.env.REMINDER_FROM_EMAIL && c.email) {
         const r = await sendResendEmail({ to: c.email, kind: "help_links", subject: "PetPassGo help links", text: `Hi from PetPassGo support,\n\nHere are the links you asked for:\n${links.join("\n")}\n\nIf you still need help, reply to this email.\n\n— PetPassGo` });

@@ -3,6 +3,7 @@
 import { tokens, font } from "../lib/theme";
 import { PetIllustration } from "./PetIdCard";
 import MaskedLine from "./MaskedLine";
+import SampleChip from "./SampleChip";
 
 function Section({ title, hint, children, open = false }) {
   return (
@@ -26,7 +27,7 @@ export default function VaultPreview() {
       <div className="rounded-2xl overflow-hidden mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.10)" }}>
         <div style={{ background: tokens.navy }} className="px-5 py-3.5 flex items-center justify-between gap-3">
           <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 17, color: "#fff" }}>PetPassGo</span>
-          <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, letterSpacing: "0.08em", color: tokens.gold }}>SAMPLE</span>
+          <SampleChip />
         </div>
         <div className="p-5 flex flex-col sm:flex-row gap-5 items-center sm:items-start">
           <div className="rounded-2xl overflow-hidden flex-shrink-0" style={{ border: `4px solid ${tokens.gold}` }}>

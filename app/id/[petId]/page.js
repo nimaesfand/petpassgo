@@ -29,12 +29,6 @@ function ChipLine({ pet }) {
   return <div className="mt-4 rounded-2xl p-4 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}`, fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>🔖 <b>Microchipped.</b> Any vet or shelter can scan the chip for free, and the registry contacts the owner.</div>;
 }
 
-function ScanHonesty({ lostMode }) {
-  return <div className="mt-4 rounded-2xl p-4" style={{ background: "#FFF9EC", border: `1px solid ${tokens.line}`, fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>
-    {lostMode ? <>Found this pet? Send a message below. If the owner marked them lost, opening this page can alert the owner. A chip has no GPS, and PetPassGo cannot see a vet’s chip scan.</> : <>Send a message if you found this pet. A chip has no GPS, and PetPassGo cannot see a vet’s chip scan.</>}
-  </div>;
-}
-
 function ContactBox({ pet }) {
   const phone = pet.emergency_contact_phone;
   if (!pet.emergency_contact_name && !phone) return null;
@@ -83,7 +77,6 @@ function LostPoster({ pet, lost }) {
         </div>
       </div>
       <div className="mt-4"><ContactBox pet={pet} /></div>
-      <div className="mt-4"><ScanHonesty lostMode /></div>
       <div className="mt-4"><ChipLine pet={pet} /></div>
       <PublicHealth petId={pet.id} petName={pet.name} />
       <div className="mt-4"><FinderMessageForm petId={pet.id} petName={pet.name} /></div>
@@ -133,13 +126,12 @@ export default function PublicPetId({ params }) {
             <div style={{ fontFamily: font.display, fontSize: 34, fontWeight: 700, color: tokens.navy }} className="mb-1">{pet.name}</div>
             {pet.passport_no && <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.navy }} className="mb-1">PetPassGo ID {pet.passport_no}</div>}
             <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-5">Found this pet, or need to reach the owner? Send a message. Your note goes straight to them.</p>
-            <div className="text-left"><ScanHonesty lostMode={false} /><div className="mt-4"><FinderMessageForm petId={pet.id} petName={pet.name} /></div></div>
+            <div className="text-left"><FinderMessageForm petId={pet.id} petName={pet.name} /></div>
           </div>
         )}
         {status === "ok" && !lost && !basic && (
           <>
             <PetProfileExperience pet={pet} mode="public" />
-            <div className="mt-4"><ScanHonesty lostMode={false} /></div>
             <div className="mt-4"><FinderMessageForm petId={pet.id} petName={pet.name} /></div>
           </>
         )}

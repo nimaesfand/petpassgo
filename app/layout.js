@@ -1,9 +1,11 @@
 import "./globals.css";
 import localFont from "next/font/local";
 import { SITE_URL, SITE_NAME } from "../lib/site";
-import ChatWidget from "../components/ChatWidget";
+import dynamic from "next/dynamic";
 import ContactBubble from "../components/ContactBubble";
-import Analytics from "../components/Analytics";
+
+const ChatWidget = dynamic(() => import("../components/ChatWidget"), { ssr: false });
+const Analytics = dynamic(() => import("../components/Analytics"), { ssr: false });
 import AuthResume from "../components/AuthResume";
 import JsonLd from "../components/JsonLd";
 
@@ -32,8 +34,20 @@ export const metadata = {
   title: { default: "PetPassGo — Travel with confidence", template: "%s | PetPassGo" },
   description,
   alternates: { canonical: "/" },
-  openGraph: { type: "website", siteName: SITE_NAME, url: "/", title: "PetPassGo — Travel with confidence", description },
-  twitter: { card: "summary_large_image", title: "PetPassGo — Travel with confidence", description },
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    url: "/",
+    title: "PetPassGo — Travel with confidence",
+    description,
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "A golden retriever in a travel harness lies beside an airport window." }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PetPassGo — Travel with confidence",
+    description,
+    images: ["/og.jpg"],
+  },
 };
 
 export default function RootLayout({ children }) {

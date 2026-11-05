@@ -7,7 +7,7 @@ const BADGES = [
   { icon: "lock", title: "Secure checkout with Stripe", line: "Card payments go through Stripe. We don’t store your full card number." },
   { icon: "link", title: "Rules checked on official airline sites", line: "Each rule in a Travel Pass shows its source and the Last checked date." },
   { icon: "shield", title: "Your info stays private", line: "Finder messages never show your phone number." },
-  { icon: "message", title: "Real support", line: "Questions answered within 24 hours.", href: "/contact" },
+  { icon: "message", title: "Help within 24 hours", line: "Questions answered within 24 hours.", href: "/contact" },
   { icon: "checkCircle", title: "Flight-Ready Guarantee", line: "If a requirement we showed was wrong and your pet was refused boarding, we refund that Travel Pass.", link: { href: "/guarantee", label: "See terms", testId: "guarantee-link" } },
 ];
 

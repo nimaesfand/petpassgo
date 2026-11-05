@@ -9,7 +9,7 @@ import PassPhone from "../components/home/PassPhone";
 import VaultCluster from "../components/home/VaultCluster";
 import HomePricing from "../components/home/HomePricing";
 import PlanTripButton from "../components/home/PlanTripButton";
-import { US_AIRLINES, INTERNATIONAL_AIRLINES } from "../lib/airlines";
+import { homeAirlineGroups } from "../lib/airlines";
 import { FAQ } from "../lib/faq";
 import { PRICES as P } from "../lib/pricing";
 
@@ -17,7 +17,7 @@ const D = font.display;
 const B = font.body;
 
 export const metadata = {
-  title: "Travel with your pet",
+  title: { absolute: "Travel with your pet | PetPassGo" },
   description: "Get the exact steps for your trip, your airline, and your pet. A Travel Pass is $49.99 for one trip. Pet Vault is $6.99 a month.",
 };
 
@@ -50,10 +50,7 @@ const STEPS = [
   { n: "3", title: "Check it off and fly", body: "Follow the steps and keep your pet's ID and documents ready in your Pet Vault.", icon: "M5 13l4 4L19 7" },
 ];
 
-const HOME_AIRLINE_GROUPS = [
-  { title: "U.S.", names: US_AIRLINES },
-  { title: "International", names: INTERNATIONAL_AIRLINES },
-];
+const HOME_AIRLINE_GROUPS = homeAirlineGroups();
 
 const HOME_FAQ = [
   {
@@ -128,6 +125,7 @@ export default function PetPassGoLanding() {
 
       <SiteHeader />
 
+      <main>
       <section className={`${WRAP} pt-7 sm:pt-10 lg:pt-14 pb-8 lg:pb-12`}>
         <TripHero />
       </section>
@@ -280,6 +278,7 @@ export default function PetPassGoLanding() {
           </div>
         </div>
       </section>
+      </main>
 
       <footer className="px-4 sm:px-6 md:px-14 pt-10 pb-28 md:pb-10" style={{ background: tokens.navyDeep, color: "#D5DEEB" }}>
         <div className="max-w-[1240px] mx-auto">

@@ -1,11 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { tokens, font } from "../lib/theme";
 import { PLAN_CTA } from "../lib/cta";
 import { PET_CHOICES, REGION_CHOICES, planTripHref, writeHomeIntent } from "../lib/tripIntent";
-import FlightPathMap from "./FlightPathMap";
+
+const FlightPathMap = dynamic(() => import("./FlightPathMap"), {
+  ssr: false,
+  loading: () => <div className="rounded-3xl" style={{ minHeight: 220, background: "#fff" }} aria-hidden="true" />,
+});
 
 const D = font.display;
 const B = font.body;
@@ -41,8 +46,7 @@ export default function TripHero() {
       <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(300px,0.95fr)] lg:gap-x-12 lg:gap-y-0 lg:items-stretch">
         <div className="order-1 lg:col-start-1 lg:row-start-1">
           <h1 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05, textWrap: "balance" }} className="text-[32px] sm:text-[48px] lg:text-[56px] font-bold">
-            <span className="block">Travel with your pet.</span>
-            <span className="block" style={{ color: tokens.primary }}>Without the stress.</span>
+            Travel with your pet.
           </h1>
           <p style={{ fontFamily: B, color: tokens.ink, fontSize: 18, lineHeight: 1.5 }} className="mt-4 max-w-[36rem]">
             Get the exact steps for your trip, your airline, and your pet.
@@ -86,19 +90,11 @@ export default function TripHero() {
             <a href={href} data-testid="hero-plan" className="btn-primary inline-flex items-center justify-center rounded-full px-8 py-3.5 min-h-[52px] w-full max-sm:w-[calc(100%-4.75rem)] sm:w-auto" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>
               {PLAN_CTA}
             </a>
-            {(region || pet) ? (
-              <p style={{ fontFamily: B, fontSize: 15, lineHeight: 1.45, color: tokens.muted }} className="mt-3">Your choices are filled in on the next page. You can change any answer.</p>
-            ) : null}
           </div>
         </div>
       </div>
 
-      <div>
-        <FlightPathMap route={region} />
-        <p style={{ fontFamily: B, fontSize: 15, lineHeight: 1.45, color: tokens.muted }} className="mt-3">
-          Example routes. Not a live flight.
-        </p>
-      </div>
+      <FlightPathMap route={region} />
     </div>
   );
 }

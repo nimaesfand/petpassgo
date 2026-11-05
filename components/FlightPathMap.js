@@ -8,8 +8,8 @@ import {
 } from "../lib/flightMap";
 import PassportPuppy from "./PassportPuppy";
 
-// Illustrative map. The puppy follows example arcs; choosing Domestic or
-// International only changes which examples play. Nothing here is tracked.
+// Illustrative map. The puppy follows sample arcs for the United States,
+// Canada, and Mexico. Nothing here is a live flight.
 function Pin({ fill, dot }) {
   return (
     <g>
