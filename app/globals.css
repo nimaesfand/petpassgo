@@ -134,6 +134,12 @@ textarea {
 @media (max-width: 420px) {
   .ppg-id-brand { display: none; }
 }
+@media print {
+  header, nav, .ppg-no-print, .ppg-contact-fab, .ppg-contact-layer, .ppg-contact-panel { display: none !important; }
+  body { background: #fff !important; }
+  .ppg-passport { box-shadow: none !important; break-inside: avoid; }
+  @page { size: letter; margin: 0.45in; }
+}
 .blog-body p { margin: 0 0 1em; }
 .blog-body h2 { font-size: 26px; color: #14213D; margin: 1.5em 0 0.45em; }
 .blog-body ul { margin: 0 0 1em; padding-left: 1.25em; }
