@@ -142,7 +142,7 @@ export default function PetHub() {
           body="Vets, sitters, hotels, cafés and parks that welcome pets, in the cities you fly to."
           bullets={["Details confirmed by the business, checked by PetPassGo", "Shown in your Travel Pass for your destination"]}
           cta={DISCOVER_LIVE ? "Explore pet-friendly places" : "Own a pet-friendly business? Get listed"}
-          href={DISCOVER_LIVE ? "/discover" : "/contact?topic=business"}
+          href={DISCOVER_LIVE ? "/discover" : "/business"}
         />
       </div>
     </div>

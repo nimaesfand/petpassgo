@@ -109,6 +109,7 @@ const FOOTER_LINKS = [
   { href: "/contact", label: "Contact" },
   { href: "/lost-flyer", label: "Free lost pet flyer" },
   { href: "/guarantee", label: "Flight-Ready Guarantee" },
+  { href: "/business", label: "For Businesses — Advertise with PetPassGo" },
   { href: "/terms", label: "Terms" },
   { href: "/privacy", label: "Privacy" },
 ];
