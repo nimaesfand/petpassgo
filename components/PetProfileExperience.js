@@ -8,6 +8,7 @@ import { PetIllustration } from "./PetIdCard";
 import { WalletCard, HealthPassport } from "./PetIdV2";
 import VetImport from "./VetImport";
 import PetPassport from "./PetPassport";
+import PassportReveal from "./PassportReveal";
 import PetBasicsCard from "./PetBasicsCard";
 import PetCareCard from "./PetCareCard";
 import PetDocumentsCard from "./PetDocumentsCard";
@@ -18,7 +19,7 @@ import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
 import {
   HOUSING_DOC_TYPES, chipMask, filled, fmtDob, isHousingDoc, isTravelDoc,
-  profileLabel, profileUrl, roleLabel, weightLabel,
+  profileLabel, profileUrl, roleLabel, weightLabel, passportMissing, PASSPORT_FIELDS,
 } from "../lib/petProfile";
 
 const text = { fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink };
@@ -171,6 +172,23 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
   const [uploading, setUploading] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [askRemove, setAskRemove] = useState(false);
+  const [reveal, setReveal] = useState(null); // ISO time the passport is being issued
+
+  const missing = owner ? passportMissing(pet) : [];
+  const readyToIssue = owner && pet?.id && !pet.passport_issued_at && missing.length === 0;
+  useEffect(() => {
+    if (!readyToIssue) return;
+    try { if (sessionStorage.getItem(`ppg-issued-${pet.id}`)) return; } catch {}
+    setReveal(new Date().toISOString());
+  }, [readyToIssue, pet.id]);
+
+  async function finishReveal() {
+    const at = reveal;
+    setReveal(null);
+    try { sessionStorage.setItem(`ppg-issued-${pet.id}`, "1"); } catch {}
+    await supabase.from("pets").update({ passport_issued_at: at }).eq("id", pet.id).eq("user_id", userId);
+    onChanged?.();
+  }
 
   useEffect(() => { setForm(fromPet(pet)); }, [pet.id, pet.updated_at, pet.name, pet.breed, pet.about_bio, pet.housing_notes, pet.allergies, pet.color, pet.weight_lb]);
 
@@ -315,6 +333,16 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
 
   return (
     <div data-pet-profile className="grid gap-4 min-w-0 max-w-full">
+      {reveal ? <PassportReveal pet={pet} photo={photo} issuedAt={reveal} onClose={finishReveal} /> : null}
+      {owner && !pet.passport_issued_at && missing.length > 0 ? (
+        <div className="rounded-2xl px-4 py-3 flex items-center gap-4" style={{ background: "#FFF9EC", border: `1.5px solid ${tokens.gold}` }}>
+          <div className="flex-shrink-0 rounded-full flex items-center justify-center" style={{ width: 44, height: 44, border: `2.5px dashed ${tokens.primary}`, color: tokens.primary, fontFamily: font.display, fontWeight: 800, fontSize: 15 }}>{PASSPORT_FIELDS.length - missing.length}/{PASSPORT_FIELDS.length}</div>
+          <div className="min-w-0">
+            <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{missing.length === 1 ? "One more detail" : `${missing.length} more details`} to issue {pet.name || "your pet"}'s passport</div>
+            <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>Still needed: {missing.join(", ")}.</div>
+          </div>
+        </div>
+      ) : null}
       <PetPassport
         pet={pet}
         photo={photo}
