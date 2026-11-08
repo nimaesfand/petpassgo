@@ -24,7 +24,7 @@ const GUEST_MAIN = [
   { href: "/pet-vault", label: "Pet Vault", icon: "shield", sub: "Records, reminders, lost-pet help" },
   { href: "/pet-vault#pet-id", label: "Pet ID", icon: "tag", sub: "A QR tag that helps them get home" },
   ...(DISCOVER ? [{ href: "/discover", label: "Discover", icon: "pin", sub: "Pet-friendly places" }] : []),
-  { href: "/airlines", label: "Airlines", icon: "seat", sub: "Pet rules by airline" },
+  { href: "/airlines", label: "Airlines", icon: "file", sub: "Pet rules by airline" },
 ];
 const GUEST_MORE = [
   { href: "/airlines", label: "Airline pet rules" },
@@ -131,7 +131,7 @@ function MobileMenu({ open, onClose, main, more, signedIn, onLogout, here }) {
             );
           })}
           <div className="px-4 pt-4 pb-1" style={{ fontFamily: font.body, fontSize: 11, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>MORE</div>
-          {more.map((it) => (
+          {more.filter((it) => !main.some((m) => m.href === it.href)).map((it) => (
             <a key={it.href} href={it.href} onClick={onClose} className="block rounded-xl px-4 py-2.5" style={{ ...link, fontSize: 16, fontWeight: 600 }}>{it.label}</a>
           ))}
           {signedIn ? (
