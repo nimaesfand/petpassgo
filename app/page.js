@@ -10,6 +10,8 @@ import VaultCluster from "../components/home/VaultCluster";
 import HomePricing from "../components/home/HomePricing";
 import PlanTripButton from "../components/home/PlanTripButton";
 import ScrollReveal from "../components/ScrollReveal";
+import WelcomeBack from "../components/home/WelcomeBack";
+import PetHub from "../components/home/PetHub";
 import { homeAirlineGroups } from "../lib/airlines";
 import { FAQ } from "../lib/faq";
 import { PRICES as P } from "../lib/pricing";
@@ -129,6 +131,7 @@ export default function PetPassGoLanding() {
 
       <main>
       <section className={`${WRAP} pt-7 sm:pt-10 lg:pt-14 pb-8 lg:pb-12`}>
+        <WelcomeBack />
         <TripHero />
       </section>
 
@@ -182,6 +185,10 @@ export default function PetPassGoLanding() {
             <a href="/join" className="home-navy-btn inline-flex items-center justify-center rounded-full px-8 py-3.5 min-h-[52px] w-full sm:w-auto" style={{ background: tokens.navy, color: "#fff", fontFamily: B, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>Create your Pet Vault</a>
           </div>
         </div>
+      </section>
+
+      <section data-reveal className={`${WRAP} py-12 lg:py-16`}>
+        <PetHub />
       </section>
 
       <section data-reveal className={`${WRAP} py-12 lg:py-16`}>

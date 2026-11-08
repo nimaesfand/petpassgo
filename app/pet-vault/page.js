@@ -16,7 +16,7 @@ export default function PetVaultPage() {
         <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mt-3 mb-6">
           Digital Pet ID, lost pet help with a printable flyer and private finder messages, vaccination records, health records and vet records, and reminders. {usd(P.member)} a month.
         </p>
-        <VaultPreview />
+        <div id="pet-id" style={{ scrollMarginTop: 16 }}><VaultPreview /></div>
         <div className="rounded-3xl p-6 sm:p-8 mt-8 text-center" style={{ background: tokens.navy }}>
           <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, letterSpacing: "0.08em", color: tokens.gold }}>{VAULT_NAME.toUpperCase()}</div>
           <div style={{ fontFamily: font.display, fontSize: 36, fontWeight: 700, color: "#fff" }} className="mt-2">{usd(P.member)}<span style={{ fontSize: 16, fontWeight: 600 }}>/mo</span></div>

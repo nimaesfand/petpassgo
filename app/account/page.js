@@ -1113,6 +1113,12 @@ export default function AccountPage() {
 
     const want = new URLSearchParams(window.location.search).get("tab");
     if (want) setActiveTab({ vault: "vault", profile: "vault", trips: "trips", flight: "trips", history: "trips", billing: "billing", dashboard: "dashboard" }[want] || "dashboard");
+    // ?focus=id (header "Pet ID" link): open Pet Vault and scroll to the pet's ID card once it has loaded.
+    if (new URLSearchParams(window.location.search).get("focus") === "id") {
+      setActiveTab("vault");
+      let tries = 0;
+      const t = setInterval(() => { tries += 1; if (revealAnchor("[data-pet-passport]") || tries > 20) clearInterval(t); }, 400);
+    }
     else if (localStorage.getItem("petpassgo_open_flight_tab")) {
       setActiveTab("trips");
       localStorage.removeItem("petpassgo_open_flight_tab");

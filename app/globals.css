@@ -240,3 +240,13 @@ textarea {
   .ppg-pp-cover { transition: none; }
   .ppg-pp-bit { display: none; }
 }
+
+/* Homepage hub cards: gentle lift on hover */
+.ppg-lift { transition: transform .2s ease, box-shadow .2s ease; }
+.ppg-lift:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(20,33,61,.10); }
+@media (prefers-reduced-motion: reduce) { .ppg-lift, .ppg-lift:hover { transition: none; transform: none; } }
+
+/* Mobile menu sheet */
+.ppg-menu-sheet { animation: ppgMenuIn .18s ease-out; }
+@keyframes ppgMenuIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ppg-menu-sheet { animation: none; } }
