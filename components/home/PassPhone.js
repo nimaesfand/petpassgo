@@ -5,6 +5,7 @@ import { tokens, font } from "../../lib/theme";
 import Icon from "../Icon";
 import { PetIllustration } from "../PetIdCard";
 import SampleChip from "../SampleChip";
+import { Wordmark } from "../Logo";
 
 // A sample Travel Pass that "works" on its own: steps tick off, progress fills,
 // and the trip card shows weather and boarding info. Starts when scrolled into
@@ -47,7 +48,7 @@ export default function PassPhone() {
         <div className="rounded-[28px] overflow-hidden" style={{ background: "#fff" }}>
           <div className="px-4 pt-4 pb-3" style={{ background: tokens.navy }}>
             <div className="flex items-center justify-between">
-              <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 16, color: "#fff" }}>PetPassGo</span>
+              <Wordmark size={18} onDark />
               <SampleChip />
             </div>
             <div className="flex items-center gap-3 mt-3">

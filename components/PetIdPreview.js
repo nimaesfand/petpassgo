@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import PetQr from "../lib/PetQr";
 import { PetIllustration } from "./PetIdCard";
 import { tokens, font } from "../lib/theme";
+import { Wordmark } from "./Logo";
 
 const todayISO = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
 const fmt = (v) => (v ? new Date(`${String(v).slice(0, 10)}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "");
@@ -77,7 +78,7 @@ export default function PetIdPreviewCard({ card, photo }) {
       <div className="relative px-5 pt-4 pb-14" style={{ background: `linear-gradient(135deg, ${tokens.navyDeep} 0%, ${tokens.navy} 60%, #23345C 100%)` }}>
         <svg aria-hidden="true" width="180" height="180" viewBox="0 0 24 24" fill="#fff" style={{ position: "absolute", right: -30, top: -30, opacity: 0.05 }}><circle cx="6" cy="9" r="2.2"/><circle cx="10" cy="5.5" r="2.2"/><circle cx="14" cy="5.5" r="2.2"/><circle cx="18" cy="9" r="2.2"/><path d="M12 10c-3.3 0-6 3.6-6 6.2 0 2 1.6 2.8 3.3 2.8 1.2 0 1.8-.6 2.7-.6s1.5.6 2.7.6c1.7 0 3.3-.8 3.3-2.8 0-2.6-2.7-6.2-6-6.2z"/></svg>
         <div className="flex items-center justify-between relative">
-          <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 16, color: "#fff" }}>PetPassGo</span>
+          <Wordmark size={18} onDark />
           <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.18em", color: tokens.gold }}>{c.service ? "SERVICE ANIMAL ID" : "PET ID"}</span>
         </div>
         {c.passportNo && <div className="relative mt-1" style={{ fontFamily: font.body, fontSize: 15, letterSpacing: "0.04em", color: "rgba(255,255,255,0.85)" }}>PetPassGo ID {c.passportNo}</div>}

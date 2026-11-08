@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Logo from "./Logo";
+import { Wordmark } from "./Logo";
 import PetQr from "../lib/PetQr";
 import { PetIllustration } from "./PetIdCard";
 import { tokens, font } from "../lib/theme";
@@ -62,8 +62,8 @@ export default function PetPassport({
     <article data-pet-passport className="ppg-passport rounded-3xl overflow-hidden min-w-0 max-w-full" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 16px 40px rgba(20,33,61,0.12)" }}>
       <div className="px-4 py-3 flex items-center justify-between gap-3 min-w-0" style={{ background: tokens.navy }}>
         <div className="flex items-center gap-2 min-w-0">
-          <Logo size={32} />
-          <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", color: tokens.gold, whiteSpace: "nowrap" }}>PET PASSPORT</div>
+          <Wordmark size={19} onDark />
+          <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", color: tokens.gold, whiteSpace: "nowrap", borderLeft: "1px solid rgba(242,184,75,0.4)", paddingLeft: 8 }}>PET PASSPORT</div>
         </div>
         {pet.passport_no ? (
           <div className="text-right flex-shrink-0">

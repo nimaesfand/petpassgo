@@ -6,6 +6,7 @@ import { tokens, font } from "../lib/theme";
 import { PetIllustration } from "./PetIdCard";
 import SampleChip from "./SampleChip";
 import Icon from "./Icon";
+import { Wordmark } from "./Logo";
 
 // A filled-in sample vault so visitors see what theirs will look like.
 // Everything here is clearly labeled Sample; no real pet data is shown.
@@ -47,7 +48,7 @@ export default function VaultPreview() {
     <div>
       <div className="rounded-2xl overflow-hidden mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.10)" }}>
         <div style={{ background: tokens.navy }} className="px-5 py-3.5 flex items-center justify-between gap-3">
-          <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 17, color: "#fff" }}>PetPassGo · Pet ID</span>
+          <Wordmark size={19} onDark />
           <SampleChip />
         </div>
         <div className="p-5 flex flex-col sm:flex-row gap-5 items-center sm:items-start">

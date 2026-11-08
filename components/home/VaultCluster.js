@@ -2,6 +2,7 @@ import { tokens, font } from "../../lib/theme";
 import Icon from "../Icon";
 import { PetIllustration } from "../PetIdCard";
 import SampleChip from "../SampleChip";
+import { Wordmark } from "../Logo";
 
 const TILES = [
   { icon: "health", label: "Vaccination records", tint: "#EAF6EE", ink: tokens.green },
@@ -44,7 +45,7 @@ export default function VaultCluster() {
             <Icon name="passport" size={22} />
           </span>
           <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, letterSpacing: "0.12em", color: tokens.gold }} className="mt-3">PET ID</span>
-          <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 15, color: "#fff", lineHeight: 1.2 }} className="mt-1">PetPassGo</span>
+          <span className="mt-1"><Wordmark size={16} onDark /></span>
         </div>
       </div>
     </div>

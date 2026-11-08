@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
-import Logo from "./Logo";
+import Logo, { Wordmark } from "./Logo";
 import { LOGIN_CTA, PLAN_CTA } from "../lib/cta";
 import { readHomeIntentHref } from "../lib/tripIntent";
 
@@ -32,8 +32,8 @@ export default function SiteHeader({ onLogout }) {
     <header style={{ background: "#fff", borderBottom: `1px solid ${tokens.line}` }}>
       <nav className="max-w-[1280px] mx-auto flex items-center justify-between px-3 sm:px-5 md:px-10 py-3 md:py-4 gap-2 min-w-0">
         <a href="/" className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0" style={{ textDecoration: "none" }} aria-label="PetPassGo">
-          <Logo size={30} />
-          <span className="ppg-wordmark" style={{ fontFamily: font.display, fontWeight: 700, fontSize: 18, color: tokens.navy, letterSpacing: "-0.02em" }}>PetPassGo</span>
+          <span className="ppg-logo-icon"><Logo size={30} /></span>
+          <Wordmark size={23} className="ppg-wordmark" />
         </a>
         <div className="flex items-center gap-2 sm:gap-4 md:gap-6 flex-nowrap flex-shrink-0">
           {NAV_LINKS.map((l) => <a key={l.href} href={l.href} style={link} className="hidden md:inline">{l.label}</a>)}

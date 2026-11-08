@@ -128,8 +128,10 @@ textarea {
   background-color: #fff;
 }
 .ppg-wordmark { white-space: nowrap; }
+.ppg-logo-icon { display: none; }
 @media (max-width: 380px) {
   .ppg-wordmark { display: none; }
+  .ppg-logo-icon { display: inline-flex; }
 }
 .ppg-id-scan { white-space: nowrap; font-size: 13px; }
 .ppg-id-brand { white-space: nowrap; }

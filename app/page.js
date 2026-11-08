@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { tokens, font } from "../lib/theme";
 import SiteHeader from "../components/SiteHeader";
-import Logo from "../components/Logo";
+import { Wordmark } from "../components/Logo";
 import Icon from "../components/Icon";
 import TrustBadges from "../components/TrustBadges";
 import TripHero from "../components/TripHero";
@@ -285,8 +285,7 @@ export default function PetPassGoLanding() {
       <footer className="px-4 sm:px-6 md:px-14 pt-10 pb-28 md:pb-10" style={{ background: tokens.navyDeep, color: "#D5DEEB" }}>
         <div className="max-w-[1240px] mx-auto">
           <div className="flex items-center gap-2 mb-5">
-            <Logo size={34} />
-            <span style={{ fontFamily: D, fontWeight: 700, fontSize: 20, color: "#fff" }}>PetPassGo</span>
+            <Wordmark size={28} onDark />
           </div>
           <nav className="flex flex-wrap gap-x-4 gap-y-2" aria-label="Footer">
             {FOOTER_LINKS.map((l) => (

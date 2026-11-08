@@ -1,6 +1,7 @@
 "use client";
 import PetQr from "../lib/PetQr";
 import { tokens, font } from "../lib/theme";
+import { Wordmark } from "./Logo";
 
 export function PetIllustration({ type, size = 96 }) {
   const cat = type === "Cat";
@@ -41,7 +42,7 @@ export default function PetIdCard({ pet, photo, showQr = true, children }) {
       <div style={{ background: tokens.navy }} className="px-5 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <svg width="18" height="18" viewBox="0 0 24 24" fill={tokens.gold} aria-hidden="true"><circle cx="6" cy="9" r="2.2"/><circle cx="10" cy="5.5" r="2.2"/><circle cx="14" cy="5.5" r="2.2"/><circle cx="18" cy="9" r="2.2"/><path d="M12 10c-3.3 0-6 3.6-6 6.2 0 2 1.6 2.8 3.3 2.8 1.2 0 1.8-.6 2.7-.6s1.5.6 2.7.6c1.7 0 3.3-.8 3.3-2.8 0-2.6-2.7-6.2-6-6.2z"/></svg>
-          <span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 17, color: "#fff" }}>PetPassGo</span>
+          <Wordmark size={19} onDark />
         </div>
         <span style={{ textAlign: "right" }}><span style={{ display: "block", fontFamily: font.body, fontWeight: 700, fontSize: 11.5, letterSpacing: "0.14em", color: tokens.gold }}>DIGITAL PET ID</span><span style={{ display: "block", fontFamily: font.body, fontSize: 11, color: "#fff", opacity: 0.75 }}>Show this if found</span></span>
       </div>

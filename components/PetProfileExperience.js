@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Logo from "./Logo";
+import { Wordmark } from "./Logo";
 import PawMark from "./PawMark";
 import PetQr from "../lib/PetQr";
 import { PetIllustration } from "./PetIdCard";
@@ -85,8 +85,7 @@ export function DigitalIdCard({ pet, photo }) {
     <article data-pet-id-card className="rounded-3xl overflow-hidden w-full relative" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 16px 40px rgba(20,33,61,0.12)" }}>
       <div className="px-4 py-3 sm:px-5 flex items-center justify-between gap-3" style={{ background: tokens.navy }}>
         <div className="flex items-center gap-2 min-w-0">
-          <Logo size={36} />
-          <span className="ppg-id-brand" style={{ fontFamily: font.display, fontWeight: 700, fontSize: 18, color: "#fff" }}>PetPassGo</span>
+          <Wordmark size={21} onDark className="ppg-id-brand" />
         </div>
         <div className="flex items-center gap-1.5 flex-shrink-0">
           <div className="text-right">
@@ -481,7 +480,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
         <>
           <section data-pet-details className="rounded-3xl overflow-hidden flex flex-col lg:flex-row" style={{ border: `1px solid ${tokens.line}` }}>
             <aside className="p-5 lg:w-72 flex-shrink-0" style={{ background: tokens.navy }}>
-              <div className="flex items-center gap-2 mb-4"><Logo size={32} /><span style={{ fontFamily: font.display, fontWeight: 700, fontSize: 18, color: "#fff" }}>PetPassGo</span></div>
+              <div className="flex items-center gap-2 mb-4"><Wordmark size={21} onDark /></div>
               <ul className="grid gap-3" style={{ listStyle: "none", margin: 0, padding: 0 }}>
                 {SIDEBAR.map(([label, path]) => (
                   <li key={label} className="flex items-center gap-3" style={{ color: "#fff", fontFamily: font.body, fontSize: 16, fontWeight: 700 }}>
