@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabaseClient";
 import { tripTypeForRoute, destinationKeywordHit, findAirport } from "../lib/airports";
 import { tokens, font } from "../lib/theme";
 import Icon from "./Icon";
+import TripFitCard from "./TripFitCard";
 
 // Shown on the last question before payment. Reads the real rule rows for this
 // airline, pet and route (titles stay hidden until the pass is bought) so the
@@ -34,7 +35,7 @@ export default function RequirementsPreview({ answers }) {
     let alive = true;
     const types = tripTypeForRoute(answers.origin, answers.destination) === "international" ? ["international", "domestic"] : ["domestic"];
     supabase
-      .rpc("requirements_preview", { p_airline: answers.airline, p_animal: answers.animal, p_role: answers.role, p_trip_types: types })
+      .rpc("requirements_preview", { p_airline: answers.airline, p_animal: answers.animal, p_role: answers.role, p_trip_types: types, p_second_airline: (answers.connecting && answers.second_airline) || null })
       .then(({ data, error }) => {
         if (!alive) return;
         if (error || !Array.isArray(data)) { setRows([]); return; }
@@ -45,7 +46,7 @@ export default function RequirementsPreview({ answers }) {
         setRows(fits);
       });
     return () => { alive = false; };
-  }, [answers.airline, answers.animal, answers.role, answers.origin, answers.destination]);
+  }, [answers.airline, answers.second_airline, answers.connecting, answers.animal, answers.role, answers.origin, answers.destination]);
 
   // Reveal rows one by one so the plan visibly "builds" for this trip.
   useEffect(() => {
@@ -56,15 +57,18 @@ export default function RequirementsPreview({ answers }) {
 
   const days = daysUntil(answers.date);
   const pet = answers.animal === "Other" ? "pet" : String(answers.animal || "pet").toLowerCase();
-  const airline = answers.airline && !/not sure/i.test(answers.airline) ? answers.airline : "your airline";
+  const first = answers.airline && !/not sure/i.test(answers.airline) ? answers.airline : "your airline";
+  const airline = answers.connecting && answers.second_airline ? `${first} + ${answers.second_airline}` : first;
 
-  if (rows && rows.length === 0) return null;
+  if (rows && rows.length === 0) return <TripFitCard answers={answers} />;
 
   const action = rows ? rows.filter((r) => r.status === "attention").length : 0;
   const notes = rows ? rows.filter((r) => r.title) : [];
   const locked = rows ? rows.filter((r) => !r.title) : [];
 
   return (
+    <>
+    <TripFitCard answers={answers} />
     <div className="rounded-2xl mb-6 overflow-hidden" style={{ border: `1px solid ${tokens.line}`, background: "#fff" }}>
       <div className="px-5 py-4 flex items-center justify-between gap-3 flex-wrap" style={{ background: tokens.navy, color: "#fff" }}>
         <div>
@@ -118,5 +122,6 @@ export default function RequirementsPreview({ answers }) {
         )}
       </div>
     </div>
+    </>
   );
 }

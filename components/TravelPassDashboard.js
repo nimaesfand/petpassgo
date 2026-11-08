@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import TripFitCard from "./TripFitCard";
 import Icon from "./Icon";
 import { tokens, font } from "../lib/theme";
 import { findAirport, tripTypeForRoute } from "../lib/airports";
@@ -316,6 +317,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
             </div>
           )}
           <RoundTripAddon trip={trip} onSave={onSaveReturn} />
+          <TripFitCard answers={trip} className="mb-5" />
           <VetGuidance trip={trip} requirements={[...results, ...cards.filter((c) => String(c.id).startsWith("syn:"))]} paid />
           {cards.length === 0 ? (
             <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 16, color: tokens.ink }}>No requirements found for this exact combination yet.</div>

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { PRICES as P, usd } from "../../lib/pricing";
 import { supabase } from "../../lib/supabaseClient";
 import { OTHER_AIRLINE, airlineGroupsForRegion } from "../../lib/airlines";
+import { TRAVEL_METHODS } from "../../lib/tripFit";
 import { pickTripPet } from "../../lib/tripPet";
 import { routeAllowed, tripTypeForRoute } from "../../lib/airports";
 import RequirementsPreview from "../../components/RequirementsPreview";
@@ -26,7 +27,7 @@ import { WITHDRAWAL_BLOCKED, takeWithdrawalConsent } from "../../lib/withdrawal"
 
 
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 7;
 
 function ProgressStub({ step }) {
   const shown = Math.min(step + 1, TOTAL_STEPS);
@@ -163,6 +164,9 @@ export default function PetPassGoQuiz() {
     return_flight_snapshot: null,
     psd: false,
     esa: false,
+    connecting: null,
+    second_airline: "",
+    pet_travel: "",
   });
   const set = (k, v) => setAnswers((a) => ({ ...a, [k]: v }));
   const back = () => setStep((s) => Math.max(s - 1, 0));
@@ -176,7 +180,7 @@ export default function PetPassGoQuiz() {
         try {
           const savedAnswers = JSON.parse(pending);
           setAnswers(savedAnswers);
-          setStep(5);
+          setStep(6);
           const intent = localStorage.getItem("petpassgo_purchase_intent");
           if (intent === "join" || intent === "pass") setAutoBuy(intent);
           localStorage.removeItem("petpassgo_purchase_intent");
@@ -246,6 +250,9 @@ export default function PetPassGoQuiz() {
       extras.return_flight_snapshot = answers.return_flight_snapshot || null;
     }
     if (answers.role === "Service animal" && answers.psd) extras.service_kind = "psd";
+    if (answers.connecting) extras.connecting = true;
+    if (answers.connecting && answers.second_airline) extras.second_airline = answers.second_airline;
+    if (answers.pet_travel) extras.pet_travel = answers.pet_travel;
     const saved = await saveCheckoutTrip(supabase, { userId: data.user.id, baseTrip, extras, answers });
     if (saved.paid) { setBuying(false); alert("This trip is already unlocked. Open My Trips to see it."); return; }
     if (saved.droppedReturn) alert("Your trip was saved as a one-way trip. The return date can be added from your pass once the account update is in place.");
@@ -439,6 +446,44 @@ export default function PetPassGoQuiz() {
           )}
 
           {step === 5 && (
+            <>
+              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
+                How does the trip fly?
+              </h2>
+              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-5">
+                Connections and a second airline can change the rules.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <OptionCard label="Nonstop" sub="One flight" selected={answers.connecting === false} onClick={() => setAnswers((a) => ({ ...a, connecting: false, second_airline: "" }))} />
+                <OptionCard label="Connecting" sub="Two or more flights" selected={answers.connecting === true} onClick={() => setAnswers((a) => ({ ...a, connecting: true }))} />
+              </div>
+              {answers.connecting === true && (
+                <div className="mt-5">
+                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Are all flights on {answers.airline && !/not sure/i.test(answers.airline) ? answers.airline : "the same airline"}?</div>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={() => set("second_airline", "")} className="rounded-full px-4 py-2.5" style={{ fontFamily: font.body, fontWeight: 700, background: !answers.second_airline ? tokens.navy : "#fff", color: !answers.second_airline ? "#fff" : tokens.navy, border: `2px solid ${tokens.navy}`, cursor: "pointer" }}>Yes, same airline</button>
+                    <select value={answers.second_airline} onChange={(e) => set("second_airline", e.target.value)} aria-label="Second airline" className="rounded-full px-4 py-2.5" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, background: answers.second_airline ? tokens.navy : "#fff", color: answers.second_airline ? "#fff" : tokens.navy, border: `2px solid ${tokens.navy}`, cursor: "pointer" }}>
+                      <option value="">Another airline too…</option>
+                      {airlineGroupsForRegion(tripTypeForRoute(answers.origin, answers.destination) === "domestic" ? "domestic" : (regionHint || "near")).flatMap(([, names]) => names).filter((n) => n !== answers.airline && n !== OTHER_AIRLINE).map((n) => <option key={n} value={n}>{n}</option>)}
+                    </select>
+                  </div>
+                </div>
+              )}
+              {answers.role !== "Service animal" && answers.connecting !== null && (
+                <div className="mt-6">
+                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Where will your {answers.animal === "Other" ? "pet" : String(answers.animal || "pet").toLowerCase()} ride?</div>
+                  <div className="flex flex-col gap-3">
+                    {TRAVEL_METHODS.map((m) => (
+                      <OptionCard key={m.id} label={m.label} sub={m.sub} selected={answers.pet_travel === m.id} onClick={() => set("pet_travel", m.id)} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              <NavRow onBack={back} onNext={next} nextDisabled={answers.connecting === null || (answers.role !== "Service animal" && !answers.pet_travel)} nextLabel="See my trip plan" />
+            </>
+          )}
+
+          {step === 6 && (
             <>
               <RequirementsPreview answers={answers} />
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">Choose your pass</h2>

@@ -878,7 +878,11 @@ function CurrentFlightTab({ userId }) {
         : { data: [] };
       if (cancel) return;
       const filtered = (reqs || []).filter((row) => matchesDestination(row, trip));
-      setResults(filtered.filter((r) => r.category !== "ELIGIBILITY NOTE").map((r) => (trip.paid ? r : { ...r, source_url: null, verified_at: null })));
+      // Two airlines on one trip: name the airline on each airline-specific rule.
+      const labeled = trip.second_airline
+        ? filtered.map((r) => (r.airline && r.airline !== "Any" ? { ...r, title: `${r.airline === "Alaska Airlines" && /hawaiian/i.test(trip.second_airline + trip.airline) && !/alaska/i.test(trip.second_airline + trip.airline) ? "Hawaiian Airlines" : r.airline}: ${r.title}` } : r))
+        : filtered;
+      setResults(labeled.filter((r) => r.category !== "ELIGIBILITY NOTE").map((r) => (trip.paid ? r : { ...r, source_url: null, verified_at: null })));
       if (trip.paid && !trip.details_first_viewed_at) supabase.rpc("mark_trip_details_viewed", { p_trip_id: trip.id });
       const { data: statusRows } = await supabase.from("trip_requirement_status").select("*").eq("trip_id", trip.id);
       if (cancel) return;
