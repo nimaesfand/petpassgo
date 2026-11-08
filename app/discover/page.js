@@ -79,7 +79,7 @@ export default function DiscoverPage() {
           </select>
         </div>
 
-        <div className="flex gap-2 overflow-x-auto mt-6 pb-1" role="tablist" aria-label="Categories">
+        <div className="flex gap-2 overflow-x-auto mt-6 pb-1 ppg-noscrollbar" role="tablist" aria-label="Categories">
           {[{ slug: "", short_name: "All", icon: "sparkle" }, ...CATEGORIES].map((c) => {
             const on = cat === c.slug;
             return (
