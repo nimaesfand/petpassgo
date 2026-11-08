@@ -103,6 +103,7 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose }) {
           <div className="ppg-pp-fade mt-7 text-center" style={{ maxWidth: 340 }}>
             <h2 style={{ fontFamily: font.display, fontSize: 30, fontWeight: 800, color: "#fff", lineHeight: 1.1 }}>{pet.name} is official!</h2>
             <p className="mt-2" style={{ fontFamily: font.body, fontSize: 15.5, color: "rgba(255,255,255,.78)" }}>Passport issued. The Pet ID and QR code are ready to show at the counter.</p>
+            <p className="mt-2" style={{ fontFamily: font.body, fontSize: 12.5, color: "rgba(255,255,255,.6)" }}>A PetPassGo digital pet profile, not a government passport or official travel document.</p>
           </div>
           <div className="ppg-pp-fade mt-5 flex flex-col gap-2.5 w-full" style={{ maxWidth: 340, animationDelay: ".2s" }}>
             <button type="button" onClick={share} className="rounded-full" style={{ height: 52, background: tokens.primary, color: "#fff", fontFamily: font.body, fontSize: 16, fontWeight: 700, border: "none", cursor: "pointer" }}>{copied ? "Link copied" : `Share ${pet.name}'s passport`}</button>

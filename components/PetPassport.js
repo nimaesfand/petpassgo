@@ -141,6 +141,7 @@ export default function PetPassport({
         </div>
 
         <div className="mt-5"><MrzStrip pet={pet} /></div>
+        <p className="mt-2" style={{ fontFamily: font.body, fontSize: 12, color: tokens.muted }}>A PetPassGo digital pet profile. Not a government passport or official travel document.</p>
 
         {pet.passport_issued_at ? (
           <PassportStamp date={pet.passport_issued_at} size={112} className="ppg-stamp-on-card" style={{ position: "absolute", right: 150, bottom: 22, opacity: 0.85, mixBlendMode: "multiply", pointerEvents: "none" }} />
