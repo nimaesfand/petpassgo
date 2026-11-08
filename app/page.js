@@ -9,6 +9,7 @@ import PassPhone from "../components/home/PassPhone";
 import VaultCluster from "../components/home/VaultCluster";
 import HomePricing from "../components/home/HomePricing";
 import PlanTripButton from "../components/home/PlanTripButton";
+import ScrollReveal from "../components/ScrollReveal";
 import { homeAirlineGroups } from "../lib/airlines";
 import { FAQ } from "../lib/faq";
 import { PRICES as P } from "../lib/pricing";
@@ -124,6 +125,7 @@ export default function PetPassGoLanding() {
       `}</style>
 
       <SiteHeader />
+      <ScrollReveal />
 
       <main>
       <section className={`${WRAP} pt-7 sm:pt-10 lg:pt-14 pb-8 lg:pb-12`}>
@@ -143,7 +145,7 @@ export default function PetPassGoLanding() {
         </ul>
       </section>
 
-      <section className={`${WRAP} py-12 lg:py-16`}>
+      <section data-reveal className={`${WRAP} py-12 lg:py-16`}>
         <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)] lg:gap-x-14 lg:gap-y-6 lg:items-start">
           <div className="order-1 lg:col-start-2 lg:row-start-1">
             <Eyebrow>TRAVEL PASS</Eyebrow>
@@ -161,7 +163,7 @@ export default function PetPassGoLanding() {
         </div>
       </section>
 
-      <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-12 lg:py-16">
+      <section data-reveal style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-12 lg:py-16">
         <div className={`${WRAP} flex flex-col gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(280px,440px)] lg:gap-x-14 lg:items-center`}>
           <div className="order-1 lg:col-start-1 lg:row-start-1">
             <Eyebrow>PET VAULT</Eyebrow>
@@ -182,7 +184,7 @@ export default function PetPassGoLanding() {
         </div>
       </section>
 
-      <section className={`${WRAP} py-12 lg:py-16`}>
+      <section data-reveal className={`${WRAP} py-12 lg:py-16`}>
         <Eyebrow>HOW IT WORKS</Eyebrow>
         <H2>3 easy steps to takeoff.</H2>
         <div className="grid md:grid-cols-3 gap-4 mt-8">
@@ -201,7 +203,7 @@ export default function PetPassGoLanding() {
         </div>
       </section>
 
-      <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-12 lg:py-16">
+      <section data-reveal style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-12 lg:py-16">
         <div className={WRAP}>
           <Eyebrow>AIRLINES</Eyebrow>
           <H2>Wherever you're flying, we've got you covered.</H2>
@@ -227,7 +229,7 @@ export default function PetPassGoLanding() {
         </div>
       </section>
 
-      <section id="pricing" style={{ background: tokens.navy }} className="py-12 lg:py-16">
+      <section data-reveal id="pricing" style={{ background: tokens.navy }} className="py-12 lg:py-16">
         <div className={WRAP}>
           <Eyebrow color={tokens.gold}>PRICING</Eyebrow>
           <H2 light>Pick your plan.</H2>
@@ -238,7 +240,7 @@ export default function PetPassGoLanding() {
         </div>
       </section>
 
-      <section className={`${WRAP} py-12 lg:py-16`}>
+      <section data-reveal className={`${WRAP} py-12 lg:py-16`}>
         <div className="max-w-3xl">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-6">
             <H2>Quick answers</H2>
@@ -258,7 +260,7 @@ export default function PetPassGoLanding() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden min-h-[520px] lg:min-h-[440px]" style={{ background: tokens.navyDeep }}>
+      <section data-reveal className="relative overflow-hidden min-h-[520px] lg:min-h-[440px]" style={{ background: tokens.navyDeep }}>
         <Image
           src="/images/hero-golden-retriever.jpg"
           alt=""

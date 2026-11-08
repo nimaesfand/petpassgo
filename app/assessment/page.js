@@ -5,7 +5,8 @@ import { PRICES as P, usd } from "../../lib/pricing";
 import { supabase } from "../../lib/supabaseClient";
 import { OTHER_AIRLINE, airlineGroupsForRegion } from "../../lib/airlines";
 import { pickTripPet } from "../../lib/tripPet";
-import { routeAllowed } from "../../lib/airports";
+import { routeAllowed, tripTypeForRoute } from "../../lib/airports";
+import RequirementsPreview from "../../components/RequirementsPreview";
 import { saveCheckoutTrip } from "../../lib/tripCheckout";
 import AirportField from "../../components/AirportField";
 import { readTripIntent } from "../../lib/tripIntent";
@@ -427,26 +428,45 @@ export default function PetPassGoQuiz() {
                 style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
                 className="rounded-xl px-4 py-3 outline-none w-full mb-4"
               />
-              <AirlineChoices query={airlineQuery} selected={answers.airline} onSelect={(name) => set("airline", name)} region={regionHint} />
+              <AirlineChoices
+                query={airlineQuery}
+                selected={answers.airline}
+                onSelect={(name) => { set("airline", name); setTimeout(() => setStep((s) => (s === 4 ? 5 : s)), 220); }}
+                region={tripTypeForRoute(answers.origin, answers.destination) === "domestic" ? "domestic" : (regionHint || "near")}
+              />
               <NavRow onBack={back} onNext={handleSeePlan} nextDisabled={!answers.airline} nextLabel="Continue" />
             </>
           )}
 
           {step === 5 && (
             <>
-              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-2">Choose your pass</h2>
-              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-5">Prices are in US dollars (USD).</p>
-              <MarketingOptIn checked={tips} onChange={setTips} />
+              <RequirementsPreview answers={answers} />
+              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">Choose your pass</h2>
+              <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-3">Prices are in US dollars (USD).</p>
               <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setConsentErr(""); }} error={consentErr} />
               {isMember ? (
-                <button disabled={buying} onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : `Travel Pass · ${usd(P.memberPass)}`}</button>
+                <button disabled={buying} onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5 mt-2" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : `Unlock my Travel Pass · ${usd(P.memberPass)}`}</button>
               ) : (
-                <>
-                  <button disabled={buying} onClick={() => handlePurchase("member")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : `Join + Pass · ${usd(P.joinToday)}`}</button>
-                  <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mt-2 text-center">{usd(P.joinToday)} today is {usd(P.member)} for Pet Vault plus a {usd(P.memberPass)} pass. Then {usd(P.member)}/mo. Cancel anytime.</p>
-                  <button type="button" disabled={buying} onClick={() => handlePurchase("pass")} className="w-full mt-4 py-2" style={{ background: "none", border: "none", fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy, cursor: "pointer", textDecoration: "underline" }}>Travel Pass only · {usd(P.pass)}</button>
-                </>
+                <div className="grid gap-3 mt-2">
+                  <div className="rounded-2xl p-5" style={{ border: `2px solid ${tokens.primary}`, background: "#FFFBF8" }}>
+                    <div className="flex items-baseline justify-between gap-3 flex-wrap">
+                      <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 19, color: tokens.navy }}>Travel Pass</div>
+                      <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 22, color: tokens.navy }}>{P.pass} <span style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.muted }}>one time</span></div>
+                    </div>
+                    <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }} className="mt-1 mb-4">Everything for this trip. No subscription. Pet Vault is included until 7 days after you land.</p>
+                    <button disabled={buying} onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : `Unlock my Travel Pass · ${usd(P.pass)}`}</button>
+                  </div>
+                  <div className="rounded-2xl p-5" style={{ border: `1px solid ${tokens.line}`, background: "#fff" }}>
+                    <div className="flex items-baseline justify-between gap-3 flex-wrap">
+                      <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 17, color: tokens.navy }}>Pet Vault + Travel Pass</div>
+                      <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 18, color: tokens.navy }}>{P.joinToday} <span style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.muted }}>today</span></div>
+                    </div>
+                    <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }} className="mt-1 mb-4">Keep your pet's ID, records and lost-pet help all year. {P.member} for Pet Vault plus a {P.memberPass} member pass, then {P.member}/mo. Cancel anytime.</p>
+                    <button type="button" disabled={buying} onClick={() => handlePurchase("member")} className="w-full rounded-full py-3" style={{ background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : `Join Pet Vault + Pass · ${usd(P.joinToday)}`}</button>
+                  </div>
+                </div>
               )}
+              <div className="mt-3"><MarketingOptIn checked={tips} onChange={setTips} /></div>
               <TrustBadges className="mt-4 text-left" />
               <div className="mt-6">
                 <button onClick={back} style={{ fontFamily: font.body, color: tokens.ink, fontSize: 16 }}>← Back</button>
