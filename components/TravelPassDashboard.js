@@ -1,5 +1,9 @@
 "use client";
 
+import VerdictCard from "./VerdictCard";
+import { tripVerdict } from "../lib/verdict";
+import { tripFitWarnings } from "../lib/tripFit";
+
 import { useEffect, useMemo, useState } from "react";
 import TripFitCard from "./TripFitCard";
 import Icon from "./Icon";
@@ -151,6 +155,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
         </div>
       )}
 
+      {results.length ? <VerdictCard verdict={tripVerdict({ rows: results, trip: { ...trip, petName: pet?.name || "your pet" }, fitWarnings: tripFitWarnings(trip) })} /> : null}
       <div className="rounded-3xl p-5 sm:p-6 mb-4" style={{ background: tokens.navy }}>
         <div className="flex flex-col lg:flex-row lg:items-center gap-4">
           <div className="flex items-center gap-3 min-w-0 flex-1">

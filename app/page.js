@@ -12,6 +12,7 @@ import PlanTripButton from "../components/home/PlanTripButton";
 import ScrollReveal from "../components/ScrollReveal";
 import WelcomeBack from "../components/home/WelcomeBack";
 import PetHub from "../components/home/PetHub";
+import SampleAnswer from "../components/home/SampleAnswer";
 import { homeAirlineGroups } from "../lib/airlines";
 import { FAQ } from "../lib/faq";
 import { PRICES as P } from "../lib/pricing";
@@ -21,7 +22,7 @@ const B = font.body;
 
 export const metadata = {
   title: { absolute: "Travel with your pet | PetPassGo" },
-  description: "Get the exact steps for your trip, your airline, and your pet. A Travel Pass is $49.99 for one trip. Pet Vault is $6.99 a month.",
+  description: "Find out free if your pet can fly your trip. Then get every step, deadline and official source with a $29.99 Travel Pass, and keep your pet's passport, ID and records in one place.",
 };
 
 const STRIP = [
@@ -48,7 +49,7 @@ const VAULT_BENEFITS = [
 ];
 
 const STEPS = [
-  { n: "1", title: "Answer 6 quick questions", body: "Tell us about your flight and your pet.", icon: "M4 6h16M4 12h10M4 18h7" },
+  { n: "1", title: "Check your trip free", body: "Answer a few questions and see if your pet can fly it.", icon: "M4 6h16M4 12h10M4 18h7" },
   { n: "2", title: "Get your Travel Pass", body: "Your step-by-step checklist built for your airline, route and pet.", icon: "M5 4h14v16H5zM8 9h8M8 13h8M8 17h5" },
   { n: "3", title: "Check it off and fly", body: "Follow the steps and keep your pet's ID and documents ready in your Pet Vault.", icon: "M5 13l4 4L19 7" },
 ];
@@ -58,7 +59,7 @@ const HOME_AIRLINE_GROUPS = homeAirlineGroups();
 const HOME_FAQ = [
   {
     q: FAQ[2].q,
-    a: "$49.99 for one trip, or $19.99 if you already have Pet Vault. You get the requirements for your airline, route, and animal, plus a checklist with deadlines and reminders. A step is shown only when we have the official page and the date we last checked it. Without Pet Vault, your Digital Pet ID and document vault stay open until 7 days after the trip ends. That is 7 days after the travel date on a one-way trip, or 7 days after the return date if you add a later return. One-way trips stay one date.",
+    a: "$29.99 for one trip, or $14.99 if you already have Pet Vault. You get the requirements for your airline, route, and animal, plus a checklist with deadlines and reminders. A step is shown only when we have the official page and the date we last checked it. Without Pet Vault, your Digital Pet ID and document vault stay open until 7 days after the trip ends. That is 7 days after the travel date on a one-way trip, or 7 days after the return date if you add a later return. One-way trips stay one date.",
   },
   { q: FAQ[6].q, a: FAQ[6].a },
   {
@@ -147,6 +148,10 @@ export default function PetPassGoLanding() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section data-reveal className={`${WRAP} py-12 lg:py-16`}>
+        <SampleAnswer />
       </section>
 
       <section data-reveal className={`${WRAP} py-12 lg:py-16`}>

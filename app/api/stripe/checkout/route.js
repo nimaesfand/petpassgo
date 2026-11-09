@@ -7,8 +7,8 @@ import { marketingSourceForPlan } from "@/lib/marketing";
 
 export const dynamic = "force-dynamic";
 
-// plan: "pass" ($49.99, non-members), "member_pass" ($19.99, active members only),
-// "join" ($6.99/mo membership + this trip at $19.99), "membership" (membership only).
+// plan: "pass" ($29.99, non-members), "member_pass" ($14.99, active members only),
+// "join" ($6.99/mo membership + this trip at $14.99), "membership" (membership only).
 export async function POST(req) {
   try {
     return await handle(req);
@@ -36,7 +36,7 @@ async function handle(req) {
 
   const sb = serviceClient();
   const member = await isMember(sb, user.id);
-  if (plan === "member_pass" && !member) return NextResponse.json({ error: "The $19.99 USD pass is for members." }, { status: 403 });
+  if (plan === "member_pass" && !member) return NextResponse.json({ error: "The $14.99 USD pass is for members." }, { status: 403 });
   if ((plan === "join" || plan === "membership") && member) return NextResponse.json({ error: "You're already a member." }, { status: 409 });
   // Members always get the member price.
   const effPlan = plan === "pass" && member ? "member_pass" : plan;

@@ -23,7 +23,7 @@ export default function GuaranteePage() {
       </UL>
 
       <H>What the refund covers</H>
-      <P>The refund is limited to the Travel Pass price you paid. That is $49.99, or $19.99 if you paid the member price. One refund per pass.</P>
+      <P>The refund is limited to the Travel Pass price you paid (today $29.99, or $14.99 at the member price; earlier passes are refunded at what you paid). One refund per pass.</P>
       <P>It does not include flights, airline fees, lodging, or other costs. It does not include Pet Vault membership fees.</P>
       <P>We reply within 24 hours. If the claim qualifies, the refund goes back to the original card within 24 hours of approval. Your bank may take a few days to show it. If we decline the claim, we say why. You can send more information and we will look again.</P>
 

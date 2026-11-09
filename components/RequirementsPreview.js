@@ -4,7 +4,10 @@ import { supabase } from "../lib/supabaseClient";
 import { tripTypeForRoute, destinationKeywordHit, findAirport } from "../lib/airports";
 import { tokens, font } from "../lib/theme";
 import Icon from "./Icon";
+import VerdictCard from "./VerdictCard";
+import { tripVerdict } from "../lib/verdict";
 import TripFitCard from "./TripFitCard";
+import { tripFitWarnings } from "../lib/tripFit";
 
 // Shown on the last question before payment. Reads the real rule rows for this
 // airline, pet and route (titles stay hidden until the pass is bought) so the
@@ -35,7 +38,7 @@ export default function RequirementsPreview({ answers }) {
     let alive = true;
     const types = tripTypeForRoute(answers.origin, answers.destination) === "international" ? ["international", "domestic"] : ["domestic"];
     supabase
-      .rpc("requirements_preview", { p_airline: answers.airline, p_animal: answers.animal, p_role: answers.role, p_trip_types: types, p_second_airline: (answers.connecting && answers.second_airline) || null })
+      .rpc("trip_verdict_preview", { p_airline: answers.airline, p_animal: answers.animal, p_role: answers.role, p_trip_types: types, p_second_airline: (answers.connecting && answers.second_airline) || null })
       .then(({ data, error }) => {
         if (!alive) return;
         if (error || !Array.isArray(data)) { setRows([]); return; }
@@ -60,7 +63,10 @@ export default function RequirementsPreview({ answers }) {
   const first = answers.airline && !/not sure/i.test(answers.airline) ? answers.airline : "your airline";
   const airline = answers.connecting && answers.second_airline ? `${first} + ${answers.second_airline}` : first;
 
-  if (rows && rows.length === 0) return <TripFitCard answers={answers} />;
+  const petWord = answers.role === "Service animal" ? "your service animal" : `your ${pet}`;
+  const verdict = rows ? tripVerdict({ rows, trip: { ...answers, petName: petWord }, fitWarnings: tripFitWarnings(answers) }) : null;
+
+  if (rows && rows.length === 0) return <><VerdictCard verdict={verdict} /><TripFitCard answers={answers} /></>;
 
   const action = rows ? rows.filter((r) => r.status === "attention").length : 0;
   const notes = rows ? rows.filter((r) => r.title) : [];
@@ -68,11 +74,12 @@ export default function RequirementsPreview({ answers }) {
 
   return (
     <>
+    <VerdictCard verdict={verdict} />
     <TripFitCard answers={answers} />
     <div className="rounded-2xl mb-6 overflow-hidden" style={{ border: `1px solid ${tokens.line}`, background: "#fff" }}>
       <div className="px-5 py-4 flex items-center justify-between gap-3 flex-wrap" style={{ background: tokens.navy, color: "#fff" }}>
         <div>
-          <div style={{ fontFamily: font.body, fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", color: tokens.gold, fontWeight: 700 }}>Your trip plan is ready</div>
+          <div style={{ fontFamily: font.body, fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", color: tokens.gold, fontWeight: 700 }}>Your full plan</div>
           <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700 }} className="mt-0.5">
             {cityOf(answers.origin)} → {cityOf(answers.destination)} · {airline}
           </div>
