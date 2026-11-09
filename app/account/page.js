@@ -38,14 +38,15 @@ import { fmtTripDate } from "../../lib/tripAccess";
 import { BUCKET, SignedImg, getSignedUrl, toStoragePath } from "../../lib/storage";
 import { tokens, font } from "../../lib/theme";
 import SavedToast from "../../components/SavedToast";
+import { Greeting, SectionTitle, UnpaidTripCard, PlanTripCard, PetsStrip, QuickActions } from "../../components/account/HomeParts";
 
 
 
 const TABS = [
-  { key: "dashboard", label: "Dashboard" },
-  { key: "vault", label: "Pet Vault" },
+  { key: "dashboard", label: "Home" },
   { key: "trips", label: "My Trips" },
-  { key: "billing", label: "Account & Billing" },
+  { key: "vault", label: "My Pets" },
+  { key: "billing", label: "Account" },
 ];
 
 function ComingSoon({ title, blurb }) {
@@ -320,7 +321,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
   return (
     <div id={`pet-top-${pet.id}`} data-pet-passport className="mb-6 grid gap-4">
       <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} />
-      <LostPanel pet={pet} userId={userId} onChanged={onPhotoUpdated} />
+      <div id={`lost-${pet.id}`} style={{ scrollMarginTop: 12 }}><LostPanel pet={pet} userId={userId} onChanged={onPhotoUpdated} /></div>
 
       <ActivationChecklist pet={pet} userId={userId} refreshKey={healthKey} />
       <WhatsNeededNext pet={pet} />
@@ -786,15 +787,12 @@ export function DashboardTab({ userId, onOpenTrips }) {
           </span>
           <a href="/assessment" onClick={(e) => e.stopPropagation()} className="rounded-full px-4 py-2 flex-shrink-0" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontSize: 15, fontWeight: 700, textDecoration: "none" }}>{PLAN_CTA}</a>
         </button>
-      ) : trip?.paid ? <TripCountdown trip={trip} pet={pet} done={doneCount} total={stepTotal} /> : (
-        <div className="rounded-2xl p-7 mb-6 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-          <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }} className="mb-5">Where are you and your pets flying to?</div>
-          <a href="/assessment" className="ppg-btn ppg-btn-primary">{PLAN_CTA}</a>
-        </div>
-      )}
+      ) : trip?.paid ? <TripCountdown trip={trip} pet={pet} done={doneCount} total={stepTotal} />
+        : trip && !tripIsPast(trip) ? <div className="mb-4"><UnpaidTripCard trip={trip} petName={pet?.name} onOpen={onOpenTrips} /></div>
+        : <div className="mb-4"><PlanTripCard /></div>}
       {trip?.paid && !tripIsPast(trip) && (
         <div className="rounded-2xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-          <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 700, color: tokens.navy }} className="mb-3">Needs action</div>
+          <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 800, color: tokens.navy }} className="mb-3">Needs action</div>
           {actions.length === 0 ? <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>Nothing needs action right now.</p> : <>
             <ul className="space-y-2">{visible.map((a) => (
               <li key={a.key} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
@@ -932,7 +930,7 @@ function CurrentFlightTab({ userId }) {
               <button key={row.id} type="button" onClick={() => openTrip(row)} className="w-full rounded-2xl px-4 py-3 text-left" style={{ background: "#fff", border: `2px solid ${open ? tokens.navy : tokens.line}`, cursor: "pointer" }}>
                 <span className="flex flex-wrap items-center gap-2 min-w-0">
                   <span className="min-w-0" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{row.origin} → {row.destination}</span>
-                  <span className="rounded-full px-2.5 py-1 whitespace-nowrap" style={{ background: row.paid ? tokens.sky : "#FDE8E2", color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>{row.paid ? "Paid" : "Unpaid"}</span>
+                  <span className="rounded-full px-2.5 py-1 whitespace-nowrap" style={{ background: row.paid ? "#E5F4EE" : "#FFF4DB", color: row.paid ? tokens.green : "#8A5A00", fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>{row.paid ? "Unlocked" : "Not unlocked yet"}</span>
                   {tripIsPast(row) ? <span className="rounded-full px-2.5 py-1 whitespace-nowrap" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 12, fontWeight: 700 }}>Past</span> : null}
                 </span>
                 <span className="block mt-1" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{row.travel_date ? fmtTripDate(row.travel_date) : "Date not set"}{row.airline ? ` · ${row.airline}` : ""}</span>
@@ -994,7 +992,7 @@ function CurrentFlightTab({ userId }) {
   return (
     <div>
       <div className="flex items-center justify-between gap-3 mb-4">
-        <h2 style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: tokens.navy }}>My Trips</h2>
+        <h1 style={{ fontFamily: font.display, fontSize: 34, fontWeight: 800, color: tokens.navy, lineHeight: 1.08 }}>My Trips</h1>
         <a href="/assessment" className="ppg-btn ppg-btn-primary">{PLAN_CTA}</a>
       </div>
       <TripList title="Upcoming" rows={roster.upcoming} total={roster.upTotal} onMore={() => setLimits((n) => ({ ...n, up: n.up + TRIP_PAGE }))} />
@@ -1055,6 +1053,30 @@ function BillingTab({ userId, email }) {
   );
 }
 
+function AccountMenu({ onLogout }) {
+  const items = [
+    { href: "/business/dashboard", icon: "home", label: "Business listings", sub: "Manage your Discover listing" },
+    { href: "/faq", icon: "help", label: "Help & FAQ", sub: "Answers to common questions" },
+    { href: "/contact", icon: "chat", label: "Contact support", sub: "support@petpassgo.com" },
+    { href: "/guarantee", icon: "shield", label: "Flight-Ready Guarantee", sub: "How it works" },
+  ];
+  return (
+    <div className="rounded-3xl overflow-hidden mb-5" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+      {items.map((it, i) => (
+        <a key={it.href} href={it.href} className="flex items-center gap-3.5 px-5 py-4" style={{ textDecoration: "none", borderTop: i ? `1px solid ${tokens.line}` : "none" }}>
+          <span className="rounded-xl flex items-center justify-center shrink-0" style={{ width: 40, height: 40, background: tokens.sky, color: tokens.navy }}><Icon name={it.icon} size={20} /></span>
+          <span className="flex-1 min-w-0"><span className="block" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{it.label}</span><span className="block" style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>{it.sub}</span></span>
+          <span style={{ color: tokens.muted }}>›</span>
+        </a>
+      ))}
+      <button type="button" onClick={onLogout} className="w-full flex items-center gap-3.5 px-5 py-4 text-left" style={{ background: "none", borderWidth: "1px 0 0", borderStyle: "solid", borderColor: tokens.line, cursor: "pointer" }}>
+        <span className="rounded-xl flex items-center justify-center shrink-0" style={{ width: 40, height: 40, background: "#FFF1EE", color: "#B4321C" }}><Icon name="x" size={20} /></span>
+        <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: "#B4321C" }}>Log out</span>
+      </button>
+    </div>
+  );
+}
+
 function CheckoutBanner() {
   const [msg, setMsg] = useState(null); const [sessionId, setSessionId] = useState(null);
   useEffect(() => {
@@ -1073,10 +1095,11 @@ function CheckoutBanner() {
         trackPurchaseOnce({ transactionId: sid, kind: "purchase" }); // amount unknown; still count the conversion once
       })();
     }
-    else if (q === "canceled") setMsg("Checkout canceled. You haven't been charged.");
+    else if (q === "canceled") { setMsg("Checkout canceled. You haven't been charged."); setTimeout(() => setMsg(null), 7000); }
+    if (q) { u.delete("checkout"); u.delete("session_id"); const qs = u.toString(); window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : "")); }
   }, []);
   if (!msg) return null;
-  return <><div className="rounded-xl p-4 mb-6" style={{ background: "#fff", border: `1px solid ${tokens.green}`, fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>{msg === "paid" ? <>Payment received. Thank you. {WITHDRAWAL_CONFIRMED} We also email that confirmation. Your trip unlocks in a few seconds. Refresh if it still looks locked. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Flight-Ready Guarantee. Terms.</a></> : msg}</div>
+  return <><div role="status" className="rounded-2xl p-4 mb-6 flex items-start gap-3 ppg-rise" style={{ background: "#fff", border: `1px solid ${msg === "paid" ? tokens.green : tokens.line}`, fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}><span className="flex-1">{msg === "paid" ? <>Payment received. Thank you. {WITHDRAWAL_CONFIRMED} We also email that confirmation. Your trip unlocks in a few seconds. Refresh if it still looks locked. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Flight-Ready Guarantee. Terms.</a></> : msg}</span><button type="button" aria-label="Dismiss" onClick={() => setMsg(null)} style={{ background: "none", border: "none", cursor: "pointer", color: tokens.muted, padding: 2 }}><Icon name="x" size={18} /></button></div>
   {sessionId && <FeedbackPrompt kind="purchase" refKey={sessionId} title="How did that feel?" blurb="A quick rating helps us make PetPassGo better." />}</>;
 }
 
@@ -1085,6 +1108,12 @@ function PostTripFeedback() {
   useEffect(() => { const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" }); supabase.from("trips").select("id,origin,destination,travel_date,return_date").eq("paid", true).lt("travel_date", today).order("travel_date", { ascending: false }).limit(1).then(async ({ data, error }) => { let row = data?.[0]; if (error) { const again = await supabase.from("trips").select("id,origin,destination,travel_date").eq("paid", true).lt("travel_date", today).order("travel_date", { ascending: false }).limit(1); row = again.data?.[0]; } if (row && (!row.return_date || row.return_date < today)) setTrip(row); }); }, []);
   if (!trip) return null;
   return <FeedbackPrompt kind="post_trip" tripId={trip.id} refKey={trip.id} title="How was the trip?" blurb={`Tell us how ${trip.origin} → ${trip.destination} went.`} />;
+}
+
+// Keep trying while the section loads (pets and records arrive a moment after the tab opens).
+function revealWhenReady(sel, tries = 25) {
+  if (revealAnchor(sel) || tries <= 0) return;
+  setTimeout(() => revealWhenReady(sel, tries - 1), 250);
 }
 
 function revealAnchor(sel) {
@@ -1135,7 +1164,14 @@ export default function AccountPage() {
   const bottomActive = (bottomKey === "passport" || bottomKey === "health") && activeTab === "vault" ? bottomKey : activeTab === "dashboard" ? "home" : activeTab === "trips" ? "travel" : activeTab === "billing" ? "more" : "passport";
   function openVaultAnchor(anchor) {
     setActiveTab("vault");
-    if (anchor) setTimeout(() => revealAnchor(anchor), 350);
+    if (anchor) setTimeout(() => revealWhenReady(anchor), 150);
+  }
+  // From Home: open one pet's passport, Pet ID, health records or lost-pet panel.
+  function openPet(petId, kind) {
+    setBottomKey(kind === "health" ? "health" : kind === "passport" ? "passport" : null);
+    const map = { passport: petId ? `#pet-top-${petId}` : "[data-pet-passport]", id: "#wallet-card", health: "#health-passport", lost: petId ? `#lost-${petId}` : '[id^="lost-"]' };
+    openVaultAnchor(map[kind] || (petId ? `#pet-top-${petId}` : null));
+    if (!map[kind] && !petId) { const sc = document.querySelector(".ppg-account-scroll"); (sc || window).scrollTo({ top: 0 }); }
   }
   // In-page links (#chip-vault, #health-passport…) open the collapsed section they point into.
   useEffect(() => {
@@ -1151,8 +1187,8 @@ export default function AccountPage() {
     setBottomKey(key);
     if (key === "home") setActiveTab("dashboard");
     else if (key === "travel") setActiveTab("trips");
-    else if (key === "passport") openVaultAnchor("[data-pet-passport]");
-    else if (key === "health") openVaultAnchor("#health-passport");
+    else if (key === "passport") { openVaultAnchor("[data-pet-passport]"); return; }
+    else if (key === "health") { openVaultAnchor("#health-passport"); return; }
     else setActiveTab("billing");
     const scroller = document.querySelector(".ppg-account-scroll");
     if (scroller) scroller.scrollTo({ top: 0, behavior: "smooth" });
@@ -1176,12 +1212,6 @@ export default function AccountPage() {
         <main className="ppg-account-scroll flex items-center justify-center py-24" style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</main>
       ) : (
       <main className="ppg-account-scroll w-full max-w-[1100px] mx-auto px-4 md:px-8 pt-8 md:pt-12 ppg-account-clear min-w-0 overflow-x-clip">
-        <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
-          <div>
-            <h1 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 34, color: tokens.navy, lineHeight: 1.1 }}>Your dashboard</h1>
-          </div>
-        </div>
-
         <CheckoutBanner />
         <PostTripFeedback />
         <div role="tablist" className="hidden md:inline-flex flex-wrap gap-1 mb-8 p-1 rounded-full" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
@@ -1207,18 +1237,30 @@ export default function AccountPage() {
         </div>
 
         {activeTab === "dashboard" && (<>
-          <DashboardTab userId={user?.id} onOpenTrips={() => setActiveTab("trips")} />
-          <VaultCard userId={user?.id} onOpenVault={(anchor) => { setActiveTab("vault"); if (anchor) setTimeout(() => revealAnchor(anchor), 350); const scroller = document.querySelector(".ppg-account-scroll"); if (scroller) scroller.scrollTo({ top: 0 }); else window.scrollTo({ top: 0 }); }} />
+          <Greeting user={user} />
+          <DashboardTab userId={user?.id} onOpenTrips={() => { setActiveTab("trips"); const sc = document.querySelector(".ppg-account-scroll"); (sc || window).scrollTo({ top: 0 }); }} />
+          <SectionTitle action={<button type="button" onClick={() => openPet(null, null)} style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.primary, background: "none", border: "none", cursor: "pointer" }}>See all →</button>}>My pets</SectionTitle>
+          <PetsStrip userId={user?.id} onOpen={(id, kind) => openPet(id, kind)} />
+          <SectionTitle>Shortcuts</SectionTitle>
+          <QuickActions onOpen={(id, kind) => openPet(id, kind)} />
+          <div className="h-6" />
         </>)}
 
         {activeTab === "vault" && (<>
-          <div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: tokens.navy }} className="mb-4">Pet Vault</div>
+          <div className="mb-5">
+            <h1 style={{ fontFamily: font.display, fontSize: 34, fontWeight: 800, color: tokens.navy, lineHeight: 1.08 }}>My Pets</h1>
+            <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mt-1">Profiles, passports, Pet ID, health records and lost-pet help.</p>
+          </div>
           <PetProfileTab userId={user?.id} />
         </>)}
 
         {activeTab === "trips" && <CurrentFlightTab userId={user?.id} />}
 
-        {activeTab === "billing" && <BillingTab userId={user?.id} email={user?.email} />}
+        {activeTab === "billing" && (<>
+          <h1 style={{ fontFamily: font.display, fontSize: 34, fontWeight: 800, color: tokens.navy, lineHeight: 1.08 }} className="mb-5">Account</h1>
+          <AccountMenu onLogout={handleLogout} />
+          <BillingTab userId={user?.id} email={user?.email} />
+        </>)}
       </main>
       )}
       <div className="ppg-account-dock">
