@@ -320,3 +320,11 @@ textarea {
 .ppg-pp-photo { width: 124px; height: 156px; }
 .ppg-pp-stampspot { left: 66px; top: 118px; }
 @media (min-width: 640px) { .ppg-pp-photo { width: 156px; height: 196px; } .ppg-pp-stampspot { left: 104px; top: 150px; } }
+
+/* Printable QR tag sheet */
+@media print {
+  @page { size: letter; margin: 0; }
+  .ppg-tag-sheet { margin: 0 !important; box-shadow: none !important; width: 8.5in !important; max-width: none !important; }
+  .ppg-tag-sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+@media print { body > header, header, nav, .ppg-contact-fab, .ppg-chat-launch, footer { display: none !important; } }
