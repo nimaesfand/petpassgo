@@ -114,8 +114,8 @@ export default function PetPassport({
               <div className="ppg-pp-photo relative rounded-xl overflow-hidden" style={{ border: `3px solid #fff`, outline: `1.5px solid ${tokens.gold}`, background: "#E8EEF7", boxShadow: "0 6px 16px rgba(20,33,61,0.14)" }}>
                 {photo || <div className="flex items-center justify-center h-full"><PetIllustration type={pet.animal_type} size={110} /></div>}
                 {onPhotoTap ? (
-                  <button type="button" onClick={onPhotoTap} aria-label={photo ? "Retake passport photo" : "Add passport photo"} className="ppg-no-print absolute inset-0 flex items-end justify-center pb-2" style={{ background: "linear-gradient(transparent 60%, rgba(20,33,61,.55))", border: "none", cursor: "pointer" }}>
-                    <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1" style={{ background: "#fff", color: tokens.navy, fontFamily: font.body, fontSize: 11.5, fontWeight: 800 }}><Icon name="camera" size={12} />{photo ? "Retake" : "Add photo"}</span>
+                  <button type="button" onClick={onPhotoTap} aria-label={photo ? "Retake passport photo" : "Add passport photo"} className="ppg-no-print absolute inset-0" style={{ background: "transparent", border: "none", cursor: "pointer" }}>
+                    <span className="absolute flex items-center justify-center rounded-full" style={{ top: 6, right: 6, width: 30, height: 30, background: "#fff", color: tokens.navy, boxShadow: "0 2px 8px rgba(20,33,61,.3)" }}><Icon name="camera" size={15} /></span>
                   </button>
                 ) : null}
               </div>
