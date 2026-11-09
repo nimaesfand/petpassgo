@@ -66,6 +66,7 @@ export default function PetPassport({
   sheet = false,
   sample = false,
   qr = null,
+  pending = false,
 }) {
   const [copied, setCopied] = useState(false);
   const url = profileUrl(pet);
@@ -143,6 +144,14 @@ export default function PetPassport({
         <div className="mt-5"><MrzStrip pet={pet} /></div>
         <p className="mt-2" style={{ fontFamily: font.body, fontSize: 12, color: tokens.muted }}>A PetPassGo digital pet profile. Not a government passport or official travel document.</p>
 
+        {pending ? (
+          <div className="ppg-no-print ppg-pending-stamp" aria-label="Not issued yet" role="img" style={{ position: "absolute", right: 150, bottom: 22, pointerEvents: "none" }}>
+            <div style={{ width: 112, height: 112, borderRadius: "50%", border: `3px dashed ${tokens.muted}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: tokens.muted, transform: "rotate(-13deg)", opacity: 0.55, textAlign: "center" }}>
+              <div style={{ fontFamily: font.body, fontSize: 9, fontWeight: 800, letterSpacing: "0.2em" }}>PETPASSGO</div>
+              <div style={{ fontFamily: font.display, fontSize: 17, fontWeight: 800, lineHeight: 1.05 }}>NOT YET<br />ISSUED</div>
+            </div>
+          </div>
+        ) : null}
         {pet.passport_issued_at ? (
           <PassportStamp date={pet.passport_issued_at} size={112} className="ppg-stamp-on-card" style={{ position: "absolute", right: 150, bottom: 22, opacity: 0.85, mixBlendMode: "multiply", pointerEvents: "none" }} />
         ) : null}

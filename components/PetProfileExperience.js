@@ -5,13 +5,15 @@ import { Wordmark } from "./Logo";
 import PawMark from "./PawMark";
 import PetQr from "../lib/PetQr";
 import { PetIllustration } from "./PetIdCard";
-import { WalletCard, HealthPassport } from "./PetIdV2";
+import { HealthPassport } from "./PetIdV2";
 import VetImport from "./VetImport";
 import PetPassport from "./PetPassport";
 import PassportReveal from "./PassportReveal";
 import PetBasicsCard from "./PetBasicsCard";
 import PetCareCard from "./PetCareCard";
 import PetDocumentsCard from "./PetDocumentsCard";
+import PetIdStudio from "./pets/PetIdStudio";
+import PassportQuest from "./pets/PassportQuest";
 import { documentFileError } from "../lib/petDocuments";
 import { todayPT } from "../lib/travelDates";
 import { SignedImg, BUCKET, getSignedUrl, toStoragePath } from "../lib/storage";
@@ -44,13 +46,6 @@ function CheckRow({ title, detail }) {
   );
 }
 
-const SIDEBAR = [
-  ["Travel info", "M4 7h16v10H4z M8 7V5h8v2"],
-  ["Document storage", "M7 3h7l5 5v13H7z M14 3v5h5"],
-  ["Emergency info", "M12 21s7-4.4 7-10a7 7 0 1 0-14 0c0 5.6 7 10 7 10z M12 11v4 M12 8.5h.01"],
-  ["Housing info", "M4 11 12 4l8 7 M6 10v9h12v-9"],
-  ["Up-to-date profile", "M12 8v5l3 2 M12 3a9 9 0 1 0 9 9"],
-];
 
 function Contactless() {
   return (
@@ -168,12 +163,10 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
   const [healthKey, setHealthKey] = useState(0);
   const [form, setForm] = useState(() => fromPet(pet));
   const [saving, setSaving] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [housingType, setHousingType] = useState(HOUSING_DOC_TYPES[0]);
   const [housingFile, setHousingFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
-  const [askRemove, setAskRemove] = useState(false);
   const [reveal, setReveal] = useState(null); // ISO time the passport is being issued
 
   const missing = owner ? passportMissing(pet) : [];
@@ -290,7 +283,6 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
     if (paths.length) await supabase.storage.from(BUCKET).remove(paths);
     await supabase.from("documents").delete().eq("pet_id", pet.id).eq("user_id", userId);
     await supabase.from("pets").delete().eq("id", pet.id).eq("user_id", userId);
-    setAskRemove(false);
     onChanged?.();
   }
 
@@ -342,15 +334,6 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
   return (
     <div data-pet-profile className="grid gap-4 min-w-0 max-w-full">
       {reveal ? <PassportReveal pet={pet} photo={photo} issuedAt={reveal} onClose={finishReveal} /> : null}
-      {showPassport && owner && !pet.passport_issued_at && missing.length > 0 ? (
-        <div className="rounded-2xl px-4 py-3 flex items-center gap-4" style={{ background: "#FFF9EC", border: `1.5px solid ${tokens.gold}` }}>
-          <div className="flex-shrink-0 rounded-full flex items-center justify-center" style={{ width: 44, height: 44, border: `2.5px dashed ${tokens.primary}`, color: tokens.primary, fontFamily: font.display, fontWeight: 800, fontSize: 15 }}>{PASSPORT_FIELDS.length - missing.length}/{PASSPORT_FIELDS.length}</div>
-          <div className="min-w-0">
-            <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{missing.length === 1 ? "One more detail" : `${missing.length} more details`} to issue {pet.name || "your pet"}'s passport</div>
-            <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>Still needed: {missing.join(", ")}.</div>
-          </div>
-        </div>
-      ) : null}
       {showPassport ? <PetPassport
         pet={pet}
         photo={photo}
@@ -361,7 +344,9 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
         onRemovePhoto={owner && pet.photo_url ? removePhoto : null}
         photoBusy={photoBusy}
         onDocuments={showDocsButton ? () => document.getElementById(`documents-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }) : null}
+        pending={owner && !pet.passport_issued_at}
       /> : null}
+      {showPassport && owner && !pet.passport_issued_at && missing.length > 0 ? <PassportQuest pet={pet} userId={userId} onChanged={onChanged} onPhoto={uploadPhoto} /> : null}
       {showPanel ? <section className="rounded-3xl overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.08)" }}>
         {!v ? <div className="px-4 py-2.5 flex items-center gap-3" style={{ background: tokens.navy }}>
           <span className="flex gap-1.5 flex-shrink-0" aria-hidden="true">
@@ -516,66 +501,8 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
       </section>}
 
       {owner && (!v || v === "id") ? (
-        <>
-          <section data-pet-details className="rounded-3xl overflow-hidden flex flex-col lg:flex-row" style={{ border: `1px solid ${tokens.line}` }}>
-            <aside className="p-5 lg:w-72 flex-shrink-0" style={{ background: tokens.navy }}>
-              <div className="flex items-center gap-2 mb-4"><Wordmark size={21} onDark /></div>
-              <ul className="grid gap-3" style={{ listStyle: "none", margin: 0, padding: 0 }}>
-                {SIDEBAR.map(([label, path]) => (
-                  <li key={label} className="flex items-center gap-3" style={{ color: "#fff", fontFamily: font.body, fontSize: 16, fontWeight: 700 }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={tokens.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={path} /></svg>
-                    {label}
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-5" style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.45, color: "rgba(255,255,255,0.82)" }}>This is a digital pet ID. It is not a government ID and does not grant special legal rights.</p>
-            </aside>
-            <div className="flex-1 p-5 bg-white grid gap-4">
-              <div>
-                <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 700, color: tokens.navy }}>Profile URL</div>
-                <div className="flex flex-col sm:flex-row gap-2 mt-2">
-                  <input readOnly value={profileLabel(pet)} aria-label="Profile URL" style={input} onFocus={(e) => e.target.select()} />
-                  <button type="button" onClick={async () => { try { await navigator.clipboard.writeText(profileUrl(pet)); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {} }} className="ppg-btn ppg-btn-secondary">{copied ? "Copied" : "Copy"}</button>
-                </div>
-              </div>
-              <div className="grid gap-2">
-                <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 16, color: tokens.navy }}>What the public page can show</div>
-                {[
-                  ["show_dob_on_public", "Show date of birth on the public page", pet.show_dob_on_public],
-                  ["show_weight_on_public", "Show weight on the public page", pet.show_weight_on_public],
-                  ["show_sex_on_public", "Show sex on the public page", pet.show_sex_on_public],
-                  ["show_color_on_public", "Show color on the public page", pet.show_color_on_public],
-                  ["show_about_on_public", "Show the About text on the public page", pet.show_about_on_public],
-                  ["show_medical_on_public", "Show medical info on the public page", pet.show_medical_on_public],
-                  ["show_contact_on_public_id", "Show emergency contact on the public page", pet.show_contact_on_public_id],
-                  ["show_documents_on_public", "Show documents on the public page", pet.show_documents_on_public],
-                  ["show_housing_on_public", "Show housing info on the public page", pet.show_housing_on_public],
-                  ["show_travel_on_public", "Show paid trips on the public page", pet.show_travel_on_public],
-                ].map(([key, label, on]) => (
-                  <label key={key} className="flex items-start gap-3" style={{ ...text, cursor: "pointer" }}>
-                    <input type="checkbox" checked={!!on} onChange={(e) => toggle(key, e.target.checked)} style={{ width: 22, height: 22, marginTop: 2, accentColor: tokens.navy }} />
-                    <span>{label}</span>
-                  </label>
-                ))}
-              </div>
-              <div id="wallet-card"><WalletCard pet={pet} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} /></div>
-              {askRemove ? (
-                <div role="dialog" aria-label="Remove pet" className="rounded-2xl p-4" style={{ border: `2px solid ${tokens.navy}` }}>
-                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-3">Remove {pet.name}'s profile? This can't be undone.</div>
-                  <div className="flex flex-wrap gap-2">
-                    <button type="button" onClick={removePet} className="ppg-btn ppg-btn-primary">Remove pet</button>
-                    <button type="button" onClick={() => setAskRemove(false)} className="ppg-btn ppg-btn-secondary">Cancel</button>
-                  </div>
-                </div>
-              ) : (
-                <button type="button" onClick={() => setAskRemove(true)} className="ppg-btn ppg-btn-secondary" style={{ justifySelf: "start" }}>Remove pet</button>
-              )}
-            </div>
-          </section>
-        </>
-      ) : (
-        null
-      )}
+        <PetIdStudio pet={pet} userId={userId} photo={photo || <PetIllustration type={pet.animal_type} size={72} />} card={<DigitalIdCard pet={pet} photo={photo} />} onChanged={onChanged} onRemove={removePet} />
+      ) : null}
     </div>
   );
 }

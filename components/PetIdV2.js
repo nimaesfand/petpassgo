@@ -134,6 +134,21 @@ export function HealthPassport({ pet, userId, refreshKey = 0, bare = false, onRo
   );
 }
 
+// Draws the pet ID card as a PNG and downloads it.
+export async function savePetIdImage(pet) {
+  const qr = await QRCode.toDataURL(`${PUBLIC_ID_BASE}${pet.public_slug || pet.id}`, { width: 360, margin: 1, errorCorrectionLevel: "H" });
+  const canvas = document.createElement("canvas"); canvas.width = 900; canvas.height = 540; const c = canvas.getContext("2d");
+  c.fillStyle = "#14213D"; c.fillRect(0, 0, 900, 120); c.fillStyle = "#fff"; c.fillRect(0, 120, 900, 420);
+  c.fillStyle = "#F2B84B"; c.font = "700 25px system-ui"; c.fillText("PETPASSGO · DIGITAL PET ID", 42, 72);
+  c.fillStyle = "#14213D"; c.font = "700 58px system-ui"; c.fillText(pet.name || "My pet", 42, 220);
+  c.font = "30px system-ui"; c.fillStyle = "#52606D"; c.fillText([pet.breed, pet.animal_type].filter(Boolean).join(" · "), 42, 270);
+  if (pet.passport_no) { c.font = "700 24px system-ui"; c.fillStyle = "#14213D"; c.fillText(`PetPassGo ID ${pet.passport_no}`, 42, 315); }
+  c.font = "700 26px system-ui"; c.fillStyle = "#C2410C"; c.fillText("SCAN IF FOUND", 42, 350);
+  c.font = "22px system-ui"; c.fillStyle = "#52606D"; c.fillText("Message the owner through PetPassGo.", 42, 390); c.fillText("No chip number or owner phone is shown.", 42, 425);
+  const img = new Image(); await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = qr; }); c.drawImage(img, 590, 160, 260, 260);
+  const a = document.createElement("a"); a.download = `${(pet.name || "pet").replace(/[^a-z0-9]+/gi, "-")}-petpassgo-id.png`; a.href = canvas.toDataURL("image/png"); a.click();
+}
+
 export function WalletCard({ pet, onDone, bare = false }) {
   const [busy, setBusy] = useState("");
   const [wallet, setWallet] = useState(false);
@@ -150,19 +165,7 @@ export function WalletCard({ pet, onDone, bare = false }) {
   async function downloadPng() {
     setBusy("png");
     setErr("");
-    try {
-      const qr = await QRCode.toDataURL(`${PUBLIC_ID_BASE}${pet.public_slug || pet.id}`, { width: 360, margin: 1, errorCorrectionLevel: "H" });
-      const canvas = document.createElement("canvas"); canvas.width = 900; canvas.height = 540; const c = canvas.getContext("2d");
-      c.fillStyle = "#14213D"; c.fillRect(0, 0, 900, 120); c.fillStyle = "#fff"; c.fillRect(0, 120, 900, 420);
-      c.fillStyle = "#F2B84B"; c.font = "700 25px system-ui"; c.fillText("PETPASSGO · DIGITAL PET ID", 42, 72);
-      c.fillStyle = "#14213D"; c.font = "700 58px system-ui"; c.fillText(pet.name || "My pet", 42, 220);
-      c.font = "30px system-ui"; c.fillStyle = "#52606D"; c.fillText([pet.breed, pet.animal_type].filter(Boolean).join(" · "), 42, 270);
-      if (pet.passport_no) { c.font = "700 24px system-ui"; c.fillStyle = "#14213D"; c.fillText(`PetPassGo ID ${pet.passport_no}`, 42, 315); }
-      c.font = "700 26px system-ui"; c.fillStyle = "#C2410C"; c.fillText("SCAN IF FOUND", 42, 350);
-      c.font = "22px system-ui"; c.fillStyle = "#52606D"; c.fillText("Message the owner through PetPassGo.", 42, 390); c.fillText("No chip number or owner phone is shown.", 42, 425);
-      const img = new Image(); await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = qr; }); c.drawImage(img, 590, 160, 260, 260);
-      const a = document.createElement("a"); a.download = `${(pet.name || "pet").replace(/[^a-z0-9]+/gi, "-")}-petpassgo-id.png`; a.href = canvas.toDataURL("image/png"); a.click(); onDone?.();
-    } finally { setBusy(""); }
+    try { await savePetIdImage(pet); onDone?.(); } finally { setBusy(""); }
   }
   async function downloadPass() {
     setBusy("wallet");

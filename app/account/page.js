@@ -29,6 +29,8 @@ import FeedbackPrompt from "../../components/FeedbackPrompt";
 import MobileBottomNav from "../../components/MobileBottomNav";
 import LostPanel from "../../components/LostPanel";
 import PetIdCard, { PetIllustration } from "../../components/PetIdCard";
+import PetHero from "../../components/pets/PetHero";
+import { SECTION_THEME } from "../../lib/petSections";
 import PetProfileExperience from "../../components/PetProfileExperience";
 import MarketingOptIn from "../../components/MarketingOptIn";
 import MarketingSettings from "../../components/MarketingSettings";
@@ -82,6 +84,27 @@ function calculateAge(dob) {
   if (years < 1) return `${months} month${months === 1 ? "" : "s"} old`;
   if (months === 0) return `${years} year${years === 1 ? "" : "s"} old`;
   return `${years}y ${months}m old`;
+}
+
+const BANNERS = {
+  health: [(n) => `${n}'s health`, (n) => "Vaccines, meds, weight and vet in one place. Snap a vet record and we fill it in."],
+  docs: [() => "Documents", (n) => `Health certificates, rabies papers and housing forms for ${n}, ready when someone asks.`],
+  lost: [(n) => `If ${n} goes missing`, () => "One tap turns the ID into a lost poster and alerts you when the tag is scanned."],
+  about: [(n) => `All about ${n}`, () => "Personality, favorite things and quirks. Great for sitters and new vets."],
+};
+
+function SectionBanner({ k, title, text }) {
+  const th = SECTION_THEME[k];
+  return (
+    <div className="relative overflow-hidden rounded-3xl px-5 py-5 flex items-center gap-4" style={{ background: `linear-gradient(120deg, ${th.color}, ${th.deep})`, color: "#fff" }}>
+      <div aria-hidden="true" className="ppg-hero-paws" />
+      <div className="relative flex items-center justify-center rounded-2xl flex-shrink-0" style={{ width: 52, height: 52, background: "rgba(255,255,255,0.18)" }}><Icon name={th.icon} size={28} /></div>
+      <div className="relative min-w-0">
+        <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 23, lineHeight: 1.15 }}>{title}</div>
+        <div style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.45, opacity: 0.95 }}>{text}</div>
+      </div>
+    </div>
+  );
 }
 
 function PetCard({ pet, userId, onPhotoUpdated }) {
@@ -350,29 +373,23 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
 
   return (
     <div id={`pet-top-${pet.id}`} className="mb-8 grid gap-4">
-      <div className="flex items-center gap-3">
-        <div className="rounded-2xl overflow-hidden flex items-center justify-center shrink-0" style={{ width: 52, height: 52, background: "#FBF6EC", border: `2px solid ${tokens.gold}` }}>
-          {photoEl || <PetIllustration type={pet.animal_type} size={46} />}
-        </div>
-        <div className="min-w-0">
-          <div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 800, color: tokens.navy, lineHeight: 1.1 }}>{pet.name}</div>
-          <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="truncate">{[pet.breed || pet.animal_type, pet.weight_lb ? `${pet.weight_lb} lb` : null].filter(Boolean).join(" · ")}</div>
-        </div>
-      </div>
+      <PetHero pet={pet} photo={photoEl} photoBusy={uploadingPhoto} onPhoto={handlePhotoUpload} onGo={(k) => { setSection(k); setTimeout(() => document.getElementById(`pet-nav-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 30); }} />
 
-      <div className="ppg-pet-nav ppg-noscrollbar sticky top-0 z-20 flex gap-2 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 py-2" style={{ background: tokens.sky }} role="tablist" aria-label={`${pet.name} sections`}>
+      <div id={`pet-nav-${pet.id}`} className="ppg-pet-nav ppg-noscrollbar sticky top-0 z-20 flex gap-2 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 py-2" style={{ background: tokens.sky, scrollMarginTop: 8 }} role="tablist" aria-label={`${pet.name} sections`}>
         {sections.map(([key, label, icon]) => {
           const on = section === key;
+          const th = SECTION_THEME[key];
           return (
-            <button key={key} type="button" role="tab" aria-selected={on} onClick={() => setSection(key)} className="shrink-0 inline-flex items-center gap-2 rounded-full px-4 py-2.5"
-              style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, cursor: "pointer", background: on ? tokens.navy : "#fff", color: on ? "#fff" : tokens.navy, border: `1.5px solid ${on ? tokens.navy : tokens.line}` }}>
-              <Icon name={icon} size={17} />{label}
+            <button key={key} type="button" role="tab" aria-selected={on} onClick={() => setSection(key)} className="ppg-tab shrink-0 inline-flex items-center gap-2 rounded-full px-4 py-2.5"
+              style={{ fontFamily: font.body, fontWeight: 800, fontSize: 15, cursor: "pointer", background: on ? th.color : "#fff", color: on ? "#fff" : tokens.navy, border: `1.5px solid ${on ? th.color : tokens.line}`, boxShadow: on ? `0 6px 16px ${th.color}40` : "none" }}>
+              <span style={{ color: on ? "#fff" : th.color, display: "inline-flex" }}><Icon name={icon} size={17} /></span>{label}
             </button>
           );
         })}
       </div>
 
       <div data-pet-section={section} className="grid gap-4 ppg-rise" key={section}>
+        {BANNERS[section] ? <SectionBanner k={section} title={BANNERS[section][0](pet.name)} text={BANNERS[section][1](pet.name)} /> : null}
         {section === "passport" && (
           <div data-pet-passport className="grid gap-4">
             <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="passport" />
