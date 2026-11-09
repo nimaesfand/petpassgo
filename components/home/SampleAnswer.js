@@ -34,7 +34,7 @@ export default function SampleAnswer() {
     <div className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center">
       <div>
         <div style={{ fontFamily: font.body, fontSize: 13, fontWeight: 800, letterSpacing: ".14em", color: tokens.primary }}>FREE TRIP CHECK</div>
-        <h2 style={{ fontFamily: font.display, color: tokens.navy, lineHeight: 1.12 }} className="text-[32px] md:text-[42px] font-bold mt-2">"Pet-friendly" doesn't mean your pet can go.</h2>
+        <h2 style={{ fontFamily: font.display, color: tokens.navy, lineHeight: 1.12 }} className="text-[32px] md:text-[42px] font-bold mt-2">Can your pet fly this trip? Find out free.</h2>
         <p style={{ fontFamily: font.body, fontSize: 18, lineHeight: 1.5, color: tokens.ink }} className="mt-3">
           Answer a few questions and get a straight answer for your airline, route and pet: Can fly, Action needed, Not allowed, or Check with airline. Free, no card.
         </p>
