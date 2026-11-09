@@ -168,6 +168,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
   const [uploading, setUploading] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [reveal, setReveal] = useState(null); // ISO time the passport is being issued
+  const [justIssued, setJustIssued] = useState(false);
 
   const missing = owner ? passportMissing(pet) : [];
   const readyToIssue = owner && pet?.id && !pet.passport_issued_at && missing.length === 0;
@@ -182,7 +183,9 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
     setReveal(null);
     try { sessionStorage.setItem(`ppg-issued-${pet.id}`, "1"); } catch {}
     await supabase.from("pets").update({ passport_issued_at: at }).eq("id", pet.id).eq("user_id", userId);
+    setJustIssued(true);
     onChanged?.();
+    setTimeout(() => document.querySelector(`[data-pet-profile="${pet.id}"] [data-pet-passport]`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 120);
   }
 
   useEffect(() => { setForm(fromPet(pet)); }, [pet.id, pet.updated_at, pet.name, pet.breed, pet.about_bio, pet.housing_notes, pet.allergies, pet.color, pet.weight_lb]);
@@ -238,7 +241,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
     if (want) setTab(want);
   }, [v]);
   const showPassport = !v || v === "passport";
-  const showPanel = !v || v === "health" || v === "docs" || v === "about";
+  const showPanel = !v || v === "docs" || v === "about";
 
   async function save(patch) {
     if (!owner) return false;
@@ -332,7 +335,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
     : (pet.microchipped ? "On file" : "");
 
   return (
-    <div data-pet-profile className="grid gap-4 min-w-0 max-w-full">
+    <div data-pet-profile={pet.id} className="grid gap-4 min-w-0 max-w-full">
       {reveal ? <PassportReveal pet={pet} photo={photo} issuedAt={reveal} onClose={finishReveal} /> : null}
       {showPassport ? <PetPassport
         pet={pet}
@@ -340,11 +343,8 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
         stamps={stampRows}
         owner={owner}
         chipValue={chipValue}
-        onPhoto={owner ? uploadPhoto : null}
-        onRemovePhoto={owner && pet.photo_url ? removePhoto : null}
-        photoBusy={photoBusy}
-        onDocuments={showDocsButton ? () => document.getElementById(`documents-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }) : null}
         pending={owner && !pet.passport_issued_at}
+        justIssued={justIssued}
       /> : null}
       {showPassport && owner && !pet.passport_issued_at && missing.length > 0 ? <PassportQuest pet={pet} userId={userId} onChanged={onChanged} onPhoto={uploadPhoto} /> : null}
       {showPanel ? <section className="rounded-3xl overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.08)" }}>
@@ -357,7 +357,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
           <div className="flex-1 min-w-0 rounded-full px-3 py-1 text-center truncate" style={{ background: "rgba(255,255,255,0.12)", color: "#fff", fontFamily: font.body, fontSize: 15 }}>{profileLabel(pet)}</div>
         </div> : null}
         <div className="p-4 sm:p-6">
-          {v ? <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 800, color: tokens.navy }} className="mb-3">{{ health: "Health & vet", docs: "Housing paperwork", about: `About ${pet.name || "your pet"}` }[v]}</div> : null}
+          {v === "about" ? <div style={{ fontFamily: font.display, fontSize: 21, fontWeight: 800, color: tokens.navy }} className="mb-3">In your words</div> : null}
           {!v && declared ? <div className="mb-3" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.ink }}>{declared}, as declared by the owner</div> : null}
           {!v && chips.length > 0 ? <div className="flex flex-wrap gap-2 mb-4">{chips.map((c) => <Chip key={c}>{c}</Chip>)}</div> : null}
 
@@ -489,9 +489,9 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
         </div>
       </section> : null}
 
-      {owner && (!v || v === "passport") ? <PetBasicsCard pet={pet} userId={userId} onChanged={onChanged} /> : null}
-      {owner && (!v || v === "health") ? <PetCareCard pet={pet} userId={userId} onChanged={onChanged} /> : null}
-      {owner && (!v || v === "docs") ? <PetDocumentsCard pet={pet} userId={userId} /> : null}
+      {owner && !v ? <PetBasicsCard pet={pet} userId={userId} onChanged={onChanged} /> : null}
+      {owner && !v ? <PetCareCard pet={pet} userId={userId} onChanged={onChanged} /> : null}
+      {owner && !v ? <PetDocumentsCard pet={pet} userId={userId} /> : null}
 
       {!owner && docs.length > 0 && <section id={`documents-${pet.id}`} className="rounded-3xl p-4 sm:p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
         <h3 style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }}>Documents</h3>

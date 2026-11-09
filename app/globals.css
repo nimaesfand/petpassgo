@@ -172,17 +172,23 @@ textarea {
 .ppg-account-app .ppg-account-clear { padding-bottom: 1.25rem; }
 .ppg-saved-toast { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
 .ppg-account-app .ppg-saved-toast { bottom: calc(var(--ppg-dock-h, 130px) + 12px); }
-.ppg-account-dock { display: block; flex-shrink: 0; background: #fff; }
+.ppg-account-dock { display: block; flex-shrink: 0; background: #fff; position: relative; }
+/* Help buttons float just above the bottom bar instead of taking a full white strip. */
 .ppg-support-dock {
+  position: absolute;
+  left: 0; right: 0; bottom: 100%;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 12px;
-  min-height: 64px;
-  padding: 8px 16px;
-  background: #fff;
-  border-top: 1px solid #DCE3EC;
+  gap: 10px;
+  padding: 0 14px 12px;
+  background: transparent;
+  pointer-events: none;
+  z-index: 61;
 }
+.ppg-support-dock > * > * { pointer-events: auto; }
+.ppg-support-dock .ppg-contact-fab { width: 48px; height: 48px; box-shadow: 0 8px 22px rgba(20,33,61,.28); }
+.ppg-account-app .ppg-account-clear { padding-bottom: 84px; }
 #ppg-chat-slot:empty { display: none; }
 #ppg-chat-slot { margin-right: auto; }
 .ppg-chat-launch { border: none; cursor: pointer; min-height: 48px; }
@@ -282,3 +288,21 @@ textarea {
 .ppg-flip:focus-visible .ppg-flip-inner { outline: 3px solid #0F766E; outline-offset: 4px; border-radius: 24px; }
 @media (max-width: 639px) { .ppg-pending-stamp { right: 12px !important; bottom: 70px !important; transform: scale(.8); } }
 @media (prefers-reduced-motion: reduce) { .ppg-flip-inner, .ppg-tab { transition: none; } }
+.ppg-pp-photo { width: 104px; height: 128px; }
+.ppg-pp-name { font-size: 30px; }
+@media (min-width: 640px) { .ppg-pp-photo { width: 132px; height: 160px; } .ppg-pp-name { font-size: 40px; } }
+.ppg-chip-btn { font-family: var(--font-body), system-ui, sans-serif; font-weight: 800; font-size: 14px; color: #14213D; background: #fff; border: 1.5px solid #DCE3EC; border-radius: 999px; padding: 8px 16px; min-height: 40px; cursor: pointer; transition: border-color .15s, transform .15s; }
+.ppg-chip-btn:hover { border-color: #14213D; }
+.ppg-chip-btn:active { transform: scale(.97); }
+.ppg-revealing .ppg-account-dock, .ppg-revealing .ppg-contact-fab, .ppg-revealing .ppg-chat-launch, .ppg-revealing header { visibility: hidden; }
+.ppg-hero-photo { width: 76px; height: 76px; border: 3px solid #F2B84B; background: #E8EEF7; }
+.ppg-hero-name { font-size: 28px; }
+@media (min-width: 640px) { .ppg-hero-photo { width: 104px; height: 104px; border-width: 4px; } .ppg-hero-name { font-size: 38px; } }
+.ppg-fold summary::-webkit-details-marker { display: none; }
+.ppg-fold[open] { box-shadow: 0 8px 22px rgba(20,33,61,.07); }
+.ppg-fold-body > section { border: none !important; padding: 0 !important; box-shadow: none !important; background: transparent !important; border-radius: 0 !important; }
+.ppg-fold-body > section > h3:first-child { display: none; }
+.ppg-tab-label { font-size: 11px; }
+@media (min-width: 640px) { .ppg-tab-label { font-size: 13.5px; } }
+.ppg-fold-body [data-pet-profile] > section { border: none !important; box-shadow: none !important; background: transparent !important; }
+.ppg-fold-body [data-pet-profile] > section > div { padding: 0 !important; }

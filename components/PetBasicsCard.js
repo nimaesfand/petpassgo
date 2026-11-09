@@ -20,8 +20,8 @@ function Field({ k, v }) {
   );
 }
 
-export default function PetBasicsCard({ pet, userId, onChanged }) {
-  const [open, setOpen] = useState(false);
+export default function PetBasicsCard({ pet, userId, onChanged, bare = false }) {
+  const [open, setOpen] = useState(bare);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(() => ({
     name: pet.name || "",
@@ -54,7 +54,7 @@ export default function PetBasicsCard({ pet, userId, onChanged }) {
     };
     const { error } = await supabase.from("pets").update(patch).eq("id", pet.id).eq("user_id", userId);
     setSaving(false);
-    if (!error) { pingSaved(); setOpen(false); onChanged?.(); }
+    if (!error) { pingSaved(); if (!bare) setOpen(false); onChanged?.(); }
     else alert("Couldn't save the profile. Please try again.");
   }
 
@@ -71,11 +71,11 @@ export default function PetBasicsCard({ pet, userId, onChanged }) {
 
   return (
     <section data-pet-basics className="rounded-3xl p-4 sm:p-6 min-w-0 max-w-full" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-      <div className="flex items-center justify-between gap-3 mb-3">
+      {bare ? null : <div className="flex items-center justify-between gap-3 mb-3">
         <h3 style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }}>Basics</h3>
         <button type="button" onClick={() => setOpen((v) => !v)} className="ppg-btn ppg-btn-secondary">{open ? "Close" : "Edit"}</button>
-      </div>
-      {pet.passport_no ? <div className="mb-3" style={{ fontFamily: font.body, fontSize: 17, color: tokens.ink }}><b style={{ color: tokens.navy }}>PetPassGo ID </b>{pet.passport_no}</div> : null}
+      </div>}
+      {!bare && pet.passport_no ? <div className="mb-3" style={{ fontFamily: font.body, fontSize: 17, color: tokens.ink }}><b style={{ color: tokens.navy }}>PetPassGo ID </b>{pet.passport_no}</div> : null}
       {!open ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">{rows.map(([k, v]) => <Field key={k} k={k} v={v} />)}</div>
       ) : (
@@ -100,7 +100,7 @@ export default function PetBasicsCard({ pet, userId, onChanged }) {
           </label>
           <div className="flex items-center gap-3 flex-wrap">
             <button type="submit" disabled={saving} className="ppg-btn ppg-btn-primary">{saving ? "Saving…" : "Save basics"}</button>
-            <button type="button" onClick={() => setOpen(false)} className="ppg-btn ppg-btn-secondary">Cancel</button>
+            {bare ? null : <button type="button" onClick={() => setOpen(false)} className="ppg-btn ppg-btn-secondary">Cancel</button>}
           </div>
         </form>
       )}

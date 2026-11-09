@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Icon from "../Icon";
+import Fold from "./Fold";
 import PetQr from "../../lib/PetQr";
 import { savePetIdImage } from "../PetIdV2";
 import { supabase } from "../../lib/supabaseClient";
@@ -106,10 +107,7 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
       {/* The card */}
       <section className="rounded-3xl p-4 sm:p-6" style={{ background: `linear-gradient(160deg, ${T.soft}, #fff 70%)`, border: `1px solid ${tokens.line}` }}>
         <div className="flex items-center justify-between gap-3 mb-3">
-          <div>
-            <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 24, color: tokens.navy }}>{pet.name}'s Pet ID</div>
-            <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Put the QR on a tag or collar. Anyone who scans it can reach you.</div>
-          </div>
+          <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>Put the QR on a tag or collar. Anyone who scans it can reach you.</div>
           <button type="button" onClick={() => setFlipped((f) => !f)} className="ppg-btn ppg-btn-secondary flex-shrink-0" style={{ borderColor: T.color, color: T.color }}>
             <Icon name="repeat" size={16} /> {flipped ? "Front" : "QR side"}
           </button>
@@ -140,12 +138,9 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
       </div>
 
       {/* Privacy: switches + live preview */}
-      <section className="rounded-3xl overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-        <div className="px-5 pt-5">
-          <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 21, color: tokens.navy }}>What people see when they scan</div>
-          <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Name, photo, breed and a "message the owner" button always show. You choose the rest.</div>
-        </div>
-        <div className="grid lg:grid-cols-[1fr_300px] gap-5 p-5">
+      <Fold icon="lock" color={T.color} soft={T.soft} title="What people see when they scan" hint={`Name, photo, breed + ${visible.length} you chose`}>
+        <p className="mb-3" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>Name, photo, breed and a "message the owner" button always show. You choose the rest.</p>
+        <div className="grid lg:grid-cols-[1fr_300px] gap-5">
           <ul className="grid gap-1" style={{ listStyle: "none", margin: 0, padding: 0 }}>
             {TOGGLES.map(([k, label, icon]) => (
               <li key={k} className="flex items-center gap-3 rounded-2xl px-3 py-2.5" style={{ background: isOn(k) ? T.soft : "transparent", transition: "background .2s" }}>
@@ -184,11 +179,10 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
             <div className="mt-2 text-center" style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>Live preview</div>
           </div>
         </div>
-      </section>
+      </Fold>
 
-      <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>This is a digital pet ID. It is not a government ID and does not grant special legal rights.</p>
-
-      <div className="pt-2" style={{ borderTop: `1px dashed ${tokens.line}` }}>
+      <div className="flex items-center justify-between gap-3 flex-wrap pt-1">
+        <p style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.muted }}>A digital pet ID, not a government ID.</p>
         {askRemove ? (
           <div role="dialog" aria-label="Remove pet" className="rounded-2xl p-4" style={{ border: `2px solid ${tokens.navy}`, background: "#fff" }}>
             <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-3">Remove {pet.name}'s profile? This can't be undone.</div>
@@ -198,7 +192,7 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
             </div>
           </div>
         ) : (
-          <button type="button" onClick={() => setAskRemove(true)} style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.muted, background: "none", border: "none", cursor: "pointer", textDecoration: "underline", padding: "8px 0" }}>Remove {pet.name}</button>
+          <button type="button" onClick={() => setAskRemove(true)} style={{ fontFamily: font.body, fontSize: 13, fontWeight: 700, color: tokens.muted, background: "none", border: "none", cursor: "pointer", textDecoration: "underline", padding: "6px 0" }}>Remove {pet.name}</button>
         )}
       </div>
     </div>

@@ -30,6 +30,10 @@ import MobileBottomNav from "../../components/MobileBottomNav";
 import LostPanel from "../../components/LostPanel";
 import PetIdCard, { PetIllustration } from "../../components/PetIdCard";
 import PetHero from "../../components/pets/PetHero";
+import Fold from "../../components/pets/Fold";
+import PetBasicsCard from "../../components/PetBasicsCard";
+import PetCareCard from "../../components/PetCareCard";
+import PetDocumentsCard from "../../components/PetDocumentsCard";
 import { SECTION_THEME } from "../../lib/petSections";
 import PetProfileExperience from "../../components/PetProfileExperience";
 import MarketingOptIn from "../../components/MarketingOptIn";
@@ -92,6 +96,8 @@ const BANNERS = {
   lost: [(n) => `If ${n} goes missing`, () => "One tap turns the ID into a lost poster and alerts you when the tag is scanned."],
   about: [(n) => `All about ${n}`, () => "Personality, favorite things and quirks. Great for sitters and new vets."],
 };
+
+const th = (k) => SECTION_THEME[k];
 
 function SectionBanner({ k, title, text }) {
   const th = SECTION_THEME[k];
@@ -359,8 +365,8 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
     ["passport", "Passport", "passport"],
     ["id", "Pet ID", "tag"],
     ["health", "Health", "health"],
-    ["docs", "Documents", "file"],
-    ["lost", "Lost pet", "alert"],
+    ["docs", "Docs", "file"],
+    ["lost", "Lost", "alert"],
     ["about", "About", "paw"],
   ];
   const panel = { background: "#fff", border: `1px solid ${tokens.line}` };
@@ -375,40 +381,49 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
     <div id={`pet-top-${pet.id}`} className="mb-8 grid gap-4">
       <PetHero pet={pet} photo={photoEl} photoBusy={uploadingPhoto} onPhoto={handlePhotoUpload} onGo={(k) => { setSection(k); setTimeout(() => document.getElementById(`pet-nav-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 30); }} />
 
-      <div id={`pet-nav-${pet.id}`} className="ppg-pet-nav ppg-noscrollbar sticky top-0 z-20 flex gap-2 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 py-2" style={{ background: tokens.sky, scrollMarginTop: 8 }} role="tablist" aria-label={`${pet.name} sections`}>
+      <div id={`pet-nav-${pet.id}`} className="ppg-pet-nav grid grid-cols-6 gap-1.5 sm:gap-2" style={{ scrollMarginTop: 8 }} role="tablist" aria-label={`${pet.name} sections`}>
         {sections.map(([key, label, icon]) => {
           const on = section === key;
-          const th = SECTION_THEME[key];
+          const t = SECTION_THEME[key];
           return (
-            <button key={key} type="button" role="tab" aria-selected={on} onClick={() => setSection(key)} className="ppg-tab shrink-0 inline-flex items-center gap-2 rounded-full px-4 py-2.5"
-              style={{ fontFamily: font.body, fontWeight: 800, fontSize: 15, cursor: "pointer", background: on ? th.color : "#fff", color: on ? "#fff" : tokens.navy, border: `1.5px solid ${on ? th.color : tokens.line}`, boxShadow: on ? `0 6px 16px ${th.color}40` : "none" }}>
-              <span style={{ color: on ? "#fff" : th.color, display: "inline-flex" }}><Icon name={icon} size={17} /></span>{label}
+            <button key={key} type="button" role="tab" aria-selected={on} onClick={() => setSection(key)} className="ppg-tab flex flex-col items-center justify-center gap-1 rounded-2xl py-2.5 sm:py-3 min-w-0"
+              style={{ cursor: "pointer", background: on ? t.color : "#fff", border: `1.5px solid ${on ? t.color : tokens.line}`, boxShadow: on ? `0 8px 18px ${t.color}45` : "none" }}>
+              <span className="flex items-center justify-center rounded-xl" style={{ width: 32, height: 32, background: on ? "rgba(255,255,255,0.2)" : t.soft, color: on ? "#fff" : t.color }}><Icon name={icon} size={18} /></span>
+              <span className="ppg-tab-label" style={{ fontFamily: font.body, fontWeight: 800, color: on ? "#fff" : tokens.navy, lineHeight: 1.1, textAlign: "center" }}>{label}</span>
             </button>
           );
         })}
       </div>
 
-      <div data-pet-section={section} className="grid gap-4 ppg-rise" key={section}>
+      <div data-pet-section={section} className="grid gap-3 ppg-rise" key={section}>
         {BANNERS[section] ? <SectionBanner k={section} title={BANNERS[section][0](pet.name)} text={BANNERS[section][1](pet.name)} /> : null}
-        {section === "passport" && (
-          <div data-pet-passport className="grid gap-4">
-            <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="passport" />
-          </div>
-        )}
+
+        {section === "passport" && (<>
+          <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="passport" />
+          <Fold icon="file" color={th("passport").color} soft={th("passport").soft} title={`Edit ${pet.name}'s details`} hint="Name, breed, birthday, weight, microchip">
+            <PetBasicsCard pet={pet} userId={userId} onChanged={onPhotoUpdated} bare />
+          </Fold>
+        </>)}
 
         {section === "id" && (<>
           <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="id" />
-          <div className="rounded-3xl p-5" style={panel}>
-            {sectionTitle("Care card", "A one-page card for sitters, boarders or an emergency.")}
+          <Fold icon="send" color={th("id").color} soft={th("id").soft} title="Care card for sitters" hint="A private link that expires">
             <ShareCard pet={pet} userId={userId} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
-          </div>
+          </Fold>
         </>)}
 
         {section === "health" && (<>
-          <div id="health-passport-wrap"><PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="health" /></div>
-          <WhatsNeededNext pet={pet} />
-          <div className="rounded-3xl p-5" style={panel}>
-            {sectionTitle("Weight", current ? `Latest: ${current.value} ${current.unit || "lbs"}` : "Log a weight to track changes and fill in the passport.")}
+          <div id="health-passport-wrap" className="rounded-3xl p-4 sm:p-5" style={panel}>
+            {sectionTitle("Vaccines & records", rab?.text || null)}
+            <HealthPassport pet={pet} userId={userId} bare refreshKey={healthKey} onRows={setHealthRows} />
+          </div>
+          <Fold icon="camera" color={th("health").color} soft={th("health").soft} title="Scan a vet record" hint="Snap a photo, we fill it in">
+            <VetImport pet={pet} userId={userId} onSaved={() => { setHealthKey((n) => n + 1); onPhotoUpdated(); }} />
+          </Fold>
+          <Fold icon="stethoscope" color={th("health").color} soft={th("health").soft} title="Vet, allergies & care" hint={pet.vet_name || "Food, routine, carrier size"}>
+            <PetCareCard pet={pet} userId={userId} onChanged={onPhotoUpdated} />
+          </Fold>
+          <Fold icon="scale" color={th("health").color} soft={th("health").soft} title="Weight" hint={current ? `${current.value} ${current.unit || "lbs"}` : (pet.weight_lb ? `${pet.weight_lb} lb` : "Not logged yet")}>
             {measurements.length > 0 && (
               <div className="flex flex-col gap-1.5 mb-2">
                 {measurements.slice(0, showLog ? undefined : 3).map((m) => (
@@ -427,33 +442,35 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
               <input type="date" aria-label="Date" value={newDate} onChange={(e) => setNewDate(e.target.value)} style={field} className="rounded-lg px-3 py-2 outline-none flex-1 min-w-0" />
               <button type="submit" disabled={saving} className="ppg-btn ppg-btn-primary">{saving ? "Saving…" : "Log"}</button>
             </form>
-          </div>
-          <div id={`chip-${pet.id}`} className="rounded-3xl p-5" style={panel}>
-            {sectionTitle("Microchip", pet.microchip_number ? `•••• ${String(pet.microchip_number).replace(/[^0-9A-Za-z]/g, "").slice(-4)}` : "Add the chip number so a shelter or vet can reach you.")}
+          
+          </Fold>
+          <Fold id={`chip-${pet.id}`} icon="tag" color={th("health").color} soft={th("health").soft} title="Microchip" hint={pet.microchip_number ? `•••• ${String(pet.microchip_number).replace(/[^0-9A-Za-z]/g, "").slice(-4)}` : "Not added yet"}>
             <ChipVault pet={pet} userId={userId} onChanged={onPhotoUpdated} bare />
-          </div>
-          <div className="rounded-3xl p-5" style={panel}>
-            {sectionTitle("Find a vet")}
+          </Fold>
+          <Fold icon="search" color={th("health").color} soft={th("health").soft} title="Find a vet" hint="Near you or where you're going">
             <FindAVet pet={pet} />
-          </div>
+          </Fold>
         </>)}
 
-        {section === "docs" && <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="docs" />}
+        {section === "docs" && (<>
+          <PetDocumentsCard pet={pet} userId={userId} />
+          <Fold icon="home" color={th("docs").color} soft={th("docs").soft} title="Housing paperwork" hint="Pet resume, landlord forms, references">
+            <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="docs" />
+          </Fold>
+        </>)}
 
         {section === "lost" && (
-          <div id={`lost-${pet.id}`} className="rounded-3xl p-5" style={panel}>
-            {sectionTitle(`If ${pet.name} goes missing`, "Turn on a lost poster, get alerts when the tag is scanned, and print a flyer.")}
+          <div id={`lost-${pet.id}`} className="rounded-3xl p-4 sm:p-5" style={panel}>
             <LostPanel pet={pet} userId={userId} onChanged={onPhotoUpdated} />
-            <a href="/lost-flyer" className="inline-block mt-4" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.primary }}>Make a printable lost pet flyer →</a>
+            <a href="/lost-flyer" className="inline-block mt-4" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 800, color: th("lost").color }}>Make a printable lost pet flyer →</a>
           </div>
         )}
 
         {section === "about" && (<>
           <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="about" />
-          <div className="rounded-3xl p-5" style={panel}>
-            {sectionTitle("Trips flown")}
+          <Fold icon="plane" color={th("about").color} soft={th("about").soft} title="Trips flown" hint="Every Travel Pass adds a stamp">
             <TravelStamps pet={pet} />
-          </div>
+          </Fold>
         </>)}
       </div>
     </div>
@@ -1367,10 +1384,7 @@ export default function AccountPage() {
         </>)}
 
         {activeTab === "vault" && (<>
-          <div className="mb-5">
-            <h1 style={{ fontFamily: font.display, fontSize: 34, fontWeight: 800, color: tokens.navy, lineHeight: 1.08 }}>My Pets</h1>
-            <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mt-1">Profiles, passports, Pet ID, health records and lost-pet help.</p>
-          </div>
+          <h1 className="sr-only">My Pets</h1>
           <PetProfileTab userId={user?.id} />
         </>)}
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Wordmark } from "./Logo";
 import { PetIllustration } from "./PetIdCard";
 import { PassportStamp, MrzStrip } from "./PetPassport";
@@ -22,7 +23,15 @@ const BITS = Array.from({ length: 26 }, (_, i) => ({
 export default function PassportReveal({ pet, photo, issuedAt, onClose }) {
   const [stage, setStage] = useState(0); // 0 pop, 1 open, 2 stamped
   const [copied, setCopied] = useState(false);
+  const [host, setHost] = useState(null);
   const closeRef = useRef(null);
+  // Render on top of the whole page (not inside the scrolling account area), and
+  // hide the header, tabs, bottom bar and chat button while it plays.
+  useEffect(() => {
+    setHost(document.body);
+    document.documentElement.classList.add("ppg-revealing");
+    return () => document.documentElement.classList.remove("ppg-revealing");
+  }, []);
 
   useEffect(() => {
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -54,8 +63,9 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose }) {
 
   const label = (k) => <div style={{ fontFamily: font.body, fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: tokens.muted }}>{k}</div>;
 
-  return (
-    <div role="dialog" aria-modal="true" aria-label={`${pet.name}'s passport is issued`} className="fixed inset-0 z-[80] flex flex-col items-center justify-center px-5 py-8 overflow-hidden" style={{ background: "radial-gradient(120% 80% at 50% 30%, #1B2C52 0%, #0B1529 70%)" }}>
+  if (!host) return null;
+  return createPortal(
+    <div role="dialog" aria-modal="true" aria-label={`${pet.name}'s passport is issued`} className="fixed inset-0 z-[1000] flex flex-col items-center justify-center px-5 py-8 overflow-hidden" style={{ background: "radial-gradient(120% 80% at 50% 30%, #1B2C52 0%, #0B1529 70%)" }}>
       <div className="ppg-pp-fade" style={{ fontFamily: font.body, fontSize: 12, fontWeight: 800, letterSpacing: "0.2em", color: tokens.gold }}>{stage < 2 ? "ISSUING PASSPORT…" : "PASSPORT ISSUED"}</div>
 
       <div className="ppg-pp-book relative mt-5" style={{ width: 300, height: 410, maxWidth: "86vw" }}>
@@ -116,6 +126,7 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose }) {
           </div>
         </>
       ) : null}
-    </div>
+    </div>,
+    host
   );
 }

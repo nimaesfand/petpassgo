@@ -59,14 +59,11 @@ export default function PetPassport({
   stamps = [],
   owner = false,
   chipValue = "",
-  onPhoto,
-  onRemovePhoto,
-  photoBusy = false,
-  onDocuments,
   sheet = false,
   sample = false,
   qr = null,
   pending = false,
+  justIssued = false,
 }) {
   const [copied, setCopied] = useState(false);
   const url = profileUrl(pet);
@@ -74,11 +71,11 @@ export default function PetPassport({
   const rows = [
     ["Type", pet.animal_type],
     ["Breed", pet.breed],
-    ["Date of birth", fmtDob(pet.date_of_birth)],
+    ["Sex", pet.sex],
+    ["Born", fmtDob(pet.date_of_birth)],
+    ["Weight", pet.weight_lb ? `${pet.weight_lb} lb` : ""],
     ["Color", pet.color],
     ["Microchip", chipValue],
-    ["Owner", pet.handler_name],
-    ["Emergency contact", contact],
   ].filter(([, v]) => filled(v));
 
   async function share() {
@@ -94,94 +91,96 @@ export default function PetPassport({
   }
 
   return (
-    <article data-pet-passport className="ppg-passport ppg-sheen rounded-3xl overflow-hidden min-w-0 max-w-full relative" style={{ background: "#FBF7EE", border: `1px solid #E6DCC6`, boxShadow: "0 18px 44px rgba(20,33,61,0.14)" }}>
-      <div className="ppg-guilloche-dark px-4 sm:px-5 py-3.5 flex items-center justify-between gap-3 min-w-0" style={{ background: tokens.navy }}>
-        <div className="flex items-center gap-2.5 min-w-0">
-          <Wordmark size={20} onDark />
-          <div className="hidden sm:block" style={{ fontFamily: font.body, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.18em", color: tokens.gold, whiteSpace: "nowrap", borderLeft: "1px solid rgba(242,184,75,0.45)", paddingLeft: 10 }}>PET PASSPORT · PASSEPORT</div>
+    <div className="grid gap-3 min-w-0">
+      <article data-pet-passport className="ppg-passport ppg-sheen rounded-[22px] overflow-hidden min-w-0 max-w-full relative" style={{ background: "#FBF7EE", boxShadow: "0 1px 0 #E6DCC6, 0 22px 50px rgba(20,33,61,0.18)" }}>
+        <div className="ppg-guilloche-dark px-4 sm:px-6 py-3 flex items-center justify-between gap-3 min-w-0" style={{ background: `linear-gradient(120deg, ${tokens.navy}, #22386A)` }}>
+          <div className="min-w-0">
+            <Wordmark size={19} onDark />
+            <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 9.5, letterSpacing: "0.22em", color: tokens.gold, marginTop: 2 }}>PET PASSPORT</div>
+          </div>
+          {pet.passport_no ? (
+            <div className="text-right flex-shrink-0">
+              <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.16em", color: tokens.gold }}>PASSPORT NO.</div>
+              <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 14, color: "#fff", whiteSpace: "nowrap", letterSpacing: "0.04em" }}>{pet.passport_no}</div>
+            </div>
+          ) : null}
         </div>
-        {pet.passport_no ? (
-          <div className="text-right flex-shrink-0">
-            <div style={{ fontFamily: font.body, fontSize: 10.5, fontWeight: 800, letterSpacing: "0.12em", color: tokens.gold }}>PASSPORT NO.</div>
-            <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 15, color: "#fff", whiteSpace: "nowrap", letterSpacing: "0.04em" }}>{pet.passport_no}</div>
-          </div>
-        ) : null}
-      </div>
-      <div style={{ height: 4, background: `linear-gradient(90deg, ${tokens.gold}, #E9C77A 50%, ${tokens.gold})` }} />
+        <div style={{ height: 3, background: `linear-gradient(90deg, ${tokens.gold}, #F7D98C 50%, ${tokens.gold})` }} />
 
-      <div className="ppg-guilloche-light p-4 sm:p-6 min-w-0 relative">
-        <div className="relative min-w-0">
-        <div className="flex flex-col sm:flex-row gap-5 min-w-0">
-          <div className="relative self-center sm:self-start flex-shrink-0">
-            <div className="rounded-2xl overflow-hidden" style={{ width: 132, height: 160, border: `3px solid ${tokens.gold}`, background: "#E8EEF7", boxShadow: "0 6px 16px rgba(20,33,61,0.12)" }}>
-              {photo || <div className="flex items-center justify-center h-full"><PetIllustration type={pet.animal_type} size={132} /></div>}
+        <div className="ppg-guilloche-light px-4 sm:px-6 pt-4 sm:pt-5 pb-4 min-w-0 relative">
+          <div className="flex gap-4 sm:gap-6 min-w-0">
+            <div className="flex-shrink-0">
+              <div className="ppg-pp-photo rounded-xl overflow-hidden" style={{ border: `3px solid #fff`, outline: `1.5px solid ${tokens.gold}`, background: "#E8EEF7", boxShadow: "0 6px 16px rgba(20,33,61,0.14)" }}>
+                {photo || <div className="flex items-center justify-center h-full"><PetIllustration type={pet.animal_type} size={110} /></div>}
+              </div>
             </div>
-            {owner && onPhoto ? (
-              <label className="ppg-no-print absolute flex items-center justify-center" style={{ right: -4, bottom: -4, width: 36, height: 36, borderRadius: "50%", background: tokens.navy, color: "#fff", border: "2px solid #fff", cursor: "pointer" }}>
-                <span className="sr-only">Change photo</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
-                <input type="file" accept="image/*" className="ppg-hp" onChange={onPhoto} />
-              </label>
-            ) : null}
-            {photoBusy ? <div className="mt-1 text-center" style={{ fontFamily: font.body, fontSize: 13, fontWeight: 700, color: tokens.navy }}>Uploading photo…</div> : null}
-            {owner && onRemovePhoto && photo ? <button type="button" onClick={onRemovePhoto} className="ppg-btn ppg-btn-secondary ppg-btn-compact ppg-no-print mt-2">Remove photo</button> : null}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div style={{ fontFamily: font.body, fontSize: 10.5, fontWeight: 800, letterSpacing: "0.12em", color: tokens.muted }}>NAME</div>
-            <h2 style={{ fontFamily: font.display, fontWeight: 800, fontSize: 38, lineHeight: 1.02, letterSpacing: "-0.02em", color: tokens.navy, overflowWrap: "anywhere" }}>{pet.name}</h2>
-            <div className="mt-4 grid grid-cols-2 gap-x-5 gap-y-3 min-w-0">
-              {rows.map(([k, v]) => <Cell key={k} k={k} v={v} />)}
+            <div className="flex-1 min-w-0">
+              <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>NAME</div>
+              <h2 className="ppg-pp-name" style={{ fontFamily: font.display, fontWeight: 800, lineHeight: 1, letterSpacing: "-0.02em", color: tokens.navy, overflowWrap: "anywhere" }}>{pet.name}</h2>
+              <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 min-w-0">
+                {rows.map(([k, v]) => <Cell key={k} k={k} v={v} />)}
+              </div>
+            </div>
+            <div className="hidden sm:flex flex-col items-center flex-shrink-0">
+              <div className="rounded-xl p-1.5" style={{ border: `1.5px solid ${tokens.gold}`, background: "#fff" }}>
+                {qr || <PetQr petId={pet.id} publicKey={pet.public_slug || pet.id} size={96} color={tokens.navy} />}
+              </div>
+              <div className="mt-1" style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.12em", color: tokens.navy }}>SCAN IF FOUND</div>
             </div>
           </div>
-          <div className="flex flex-col items-center flex-shrink-0 self-center sm:self-start">
-            <div className="rounded-xl p-2" style={{ border: `2px solid ${tokens.gold}`, background: "#fff" }}>
-              {qr || <PetQr petId={pet.id} publicKey={pet.public_slug || pet.id} size={108} color={tokens.navy} />}
-            </div>
-            <div className="mt-1.5" style={{ fontFamily: font.body, fontSize: 10.5, fontWeight: 800, letterSpacing: "0.12em", color: tokens.navy }}>SCAN IF FOUND</div>
-          </div>
-        </div>
 
-        <div className="mt-5"><MrzStrip pet={pet} /></div>
-        <p className="mt-2" style={{ fontFamily: font.body, fontSize: 12, color: tokens.muted }}>A PetPassGo digital pet profile. Not a government passport or official travel document.</p>
-
-        {pending ? (
-          <div className="ppg-no-print ppg-pending-stamp" aria-label="Not issued yet" role="img" style={{ position: "absolute", right: 150, bottom: 22, pointerEvents: "none" }}>
-            <div style={{ width: 112, height: 112, borderRadius: "50%", border: `3px dashed ${tokens.muted}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: tokens.muted, transform: "rotate(-13deg)", opacity: 0.55, textAlign: "center" }}>
-              <div style={{ fontFamily: font.body, fontSize: 9, fontWeight: 800, letterSpacing: "0.2em" }}>PETPASSGO</div>
-              <div style={{ fontFamily: font.display, fontSize: 17, fontWeight: 800, lineHeight: 1.05 }}>NOT YET<br />ISSUED</div>
+          {contact ? (
+            <div className="mt-4 rounded-xl px-3 py-2 flex items-center justify-between gap-3 min-w-0" style={{ background: "rgba(20,33,61,0.05)" }}>
+              <div className="min-w-0">
+                <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>IF FOUND, CONTACT</div>
+                <div className="truncate" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>{contact}</div>
+              </div>
+              <div className="sm:hidden flex-shrink-0 rounded-lg p-1" style={{ background: "#fff", border: `1.5px solid ${tokens.gold}` }}>
+                {qr || <PetQr petId={pet.id} publicKey={pet.public_slug || pet.id} size={52} color={tokens.navy} />}
+              </div>
             </div>
-          </div>
-        ) : null}
-        {pet.passport_issued_at ? (
-          <PassportStamp date={pet.passport_issued_at} size={112} className="ppg-stamp-on-card" style={{ position: "absolute", right: 150, bottom: 22, opacity: 0.85, mixBlendMode: "multiply", pointerEvents: "none" }} />
-        ) : null}
+          ) : null}
+
+          <div className="mt-3"><MrzStrip pet={pet} /></div>
+
+          {pending ? (
+            <div className="ppg-no-print" aria-label="Not issued yet" role="img" style={{ position: "absolute", right: 14, top: 64, pointerEvents: "none" }}>
+              <div style={{ width: 96, height: 96, borderRadius: "50%", border: `2.5px dashed #9AA4B2`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#7B8595", transform: "rotate(-12deg)", textAlign: "center", background: "rgba(251,247,238,0.6)" }}>
+                <div style={{ fontFamily: font.body, fontSize: 8, fontWeight: 800, letterSpacing: "0.2em" }}>PETPASSGO</div>
+                <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 800, lineHeight: 1.05 }}>NOT YET<br />ISSUED</div>
+              </div>
+            </div>
+          ) : null}
+          {pet.passport_issued_at ? (
+            <PassportStamp date={pet.passport_issued_at} size={104} className={justIssued ? "ppg-pp-stamp" : ""} style={{ position: "absolute", right: 14, top: 56, opacity: 0.9, mixBlendMode: "multiply", pointerEvents: "none" }} />
+          ) : null}
         </div>
 
         {stamps.length > 0 ? (
-          <div className="mt-6 pt-5 min-w-0" style={{ borderTop: `1px dashed #D9CDB2` }}>
-            <div style={{ fontFamily: font.body, fontSize: 10.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.navy }} className="mb-3">TRIP STAMPS</div>
-            <div className="flex flex-wrap gap-3 min-w-0">
-              {stamps.map((s, i) => (
-                <div key={s.id || i} className="min-w-0" style={{ width: 148, maxWidth: "100%", transform: i % 2 ? "rotate(4deg)" : "rotate(-6deg)" }}>
-                  <div className="flex flex-col items-center justify-center text-center px-2 py-3" style={{ minHeight: 112, border: `3px solid ${tokens.primary}`, borderRadius: 16, color: tokens.primary, background: "rgba(194,65,12,0.05)" }}>
-                    <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 13, lineHeight: 1.25, overflowWrap: "anywhere" }}>{[s.origin, s.destination].filter(Boolean).join(" → ")}</div>
-                    <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 18, letterSpacing: "0.14em", marginTop: 4 }}>ISSUED</div>
-                    {stampDate(s.travelDate || s.travel_date) ? <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 12, marginTop: 2 }}>{stampDate(s.travelDate || s.travel_date)}</div> : null}
+          <div className="px-4 sm:px-6 pb-5 min-w-0" style={{ background: "#FBF7EE" }}>
+            <div className="pt-4" style={{ borderTop: `1px dashed #D9CDB2` }}>
+              <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.16em", color: tokens.navy }} className="mb-3">TRIP STAMPS</div>
+              <div className="flex flex-wrap gap-3 min-w-0">
+                {stamps.map((s, i) => (
+                  <div key={s.id || i} className="flex flex-col items-center justify-center text-center px-2 py-2" style={{ width: 120, minHeight: 84, border: `2.5px solid ${[tokens.primary, "#0F766E", "#7C3AED"][i % 3]}`, borderRadius: 14, color: [tokens.primary, "#0F766E", "#7C3AED"][i % 3], transform: i % 2 ? "rotate(4deg)" : "rotate(-5deg)" }}>
+                    <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 12, lineHeight: 1.2, overflowWrap: "anywhere" }}>{[s.origin, s.destination].filter(Boolean).join(" → ")}</div>
+                    <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 14, letterSpacing: "0.14em", marginTop: 2 }}>ENTRY</div>
+                    {stampDate(s.travelDate || s.travel_date) ? <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 11 }}>{stampDate(s.travelDate || s.travel_date)}</div> : null}
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         ) : null}
+      </article>
 
-        {sample ? null : (
-          <div className="ppg-no-print flex flex-wrap gap-2 mt-5">
-            <button type="button" onClick={() => { if (sheet || !(owner && pet?.id)) window.print(); else window.open(`/account/passport/print?pet=${pet.id}`, "_blank"); }} className="ppg-btn ppg-btn-primary">Print</button>
-            <button type="button" onClick={share} className="ppg-btn ppg-btn-secondary">{copied ? "Link copied" : "Share"}</button>
-            {owner && onDocuments ? <button type="button" onClick={onDocuments} className="ppg-btn ppg-btn-secondary">View documents</button> : null}
-          </div>
-        )}
-      </div>
-    </article>
+      {sample || sheet ? null : (
+        <div className="ppg-no-print flex items-center gap-2 flex-wrap">
+          <button type="button" onClick={share} className="ppg-chip-btn">{copied ? "Link copied" : "Share"}</button>
+          <button type="button" onClick={() => { if (!(owner && pet?.id)) window.print(); else window.open(`/account/passport/print?pet=${pet.id}`, "_blank"); }} className="ppg-chip-btn">Print</button>
+          <span className="ml-auto" style={{ fontFamily: font.body, fontSize: 12, color: tokens.muted }}>Digital pet profile, not a government document.</span>
+        </div>
+      )}
+    </div>
   );
 }
