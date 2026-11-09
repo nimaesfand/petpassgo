@@ -108,6 +108,7 @@ const FOOTER_LINKS = [
   { href: "#pricing", label: "Pricing" },
   { href: "/faq", label: "FAQ" },
   { href: "/contact", label: "Contact" },
+  { href: "/service-dog", label: "Flying with a service dog" },
   { href: "/lost-flyer", label: "Free lost pet flyer" },
   { href: "/guarantee", label: "Flight-Ready Guarantee" },
   { href: "/business", label: "For Businesses — Advertise with PetPassGo" },
