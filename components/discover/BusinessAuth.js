@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import PasswordInput from "../PasswordInput";
 import { supabase } from "../../lib/supabaseClient";
 import { tokens, font } from "../../lib/theme";
 
@@ -46,7 +47,7 @@ export default function BusinessAuth({ title = "Create your business account", s
       <form onSubmit={submit} className="flex flex-col gap-3">
         {mode === "signup" && <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" aria-label="Your name" autoComplete="name" style={input} required />}
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" aria-label="Email" autoComplete="email" style={input} required />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === "signup" ? "Create a password (8+ characters)" : "Password"} aria-label="Password" autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={mode === "signup" ? 8 : undefined} style={input} required />
+        <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === "signup" ? "Create a password (8+ characters)" : "Password"} aria-label="Password" autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={mode === "signup" ? 8 : undefined} style={input} required />
         {msg && <div className="rounded-xl px-3 py-2.5" style={{ background: "#FFF8EC", fontFamily: font.body, fontSize: 14.5, color: "#7A4F00" }}>{msg}</div>}
         <button type="submit" disabled={busy} className="rounded-full py-3.5 mt-1" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer", opacity: busy ? 0.7 : 1 }}>
           {busy ? "One moment…" : mode === "signup" ? "Create account" : "Log in"}

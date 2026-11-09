@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import PasswordInput from "../../components/PasswordInput";
 import { supabase } from "../../lib/supabaseClient";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
@@ -102,9 +103,10 @@ export default function LoginPage() {
               className="rounded-xl px-4 py-3 outline-none"
             />
             {mode !== "forgot" && (
-            <input
-              type="password"
+            <PasswordInput
               required
+              autoComplete={mode === "reset" ? "new-password" : "current-password"}
+              aria-label={mode === "reset" ? "New password" : "Password"}
               placeholder={mode === "reset" ? "New password" : "Password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}

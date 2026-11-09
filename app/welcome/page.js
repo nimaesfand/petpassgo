@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import PasswordInput from "../../components/PasswordInput";
 import { supabase } from "../../lib/supabaseClient";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
@@ -63,7 +64,7 @@ export default function WelcomePage() {
               {(info.plan === "pass" || info.plan === "join") && <div className="mb-4"><GuaranteeLine /></div>}
               <form onSubmit={finish} className="flex flex-col gap-3">
                 <input type="email" value={info.email || ""} readOnly aria-label="Email" style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, background: "#F5F7FA", color: tokens.navy }} className="rounded-xl px-4 py-3 outline-none" />
-                <input type="password" required minLength={6} autoFocus autoComplete="new-password" placeholder="Password (6+ characters)" value={password} onChange={(e) => setPassword(e.target.value)} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-4 py-3 outline-none" />
+                <PasswordInput required aria-label="Password" minLength={6} autoFocus autoComplete="new-password" placeholder="Password (6+ characters)" value={password} onChange={(e) => setPassword(e.target.value)} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-4 py-3 outline-none" />
                 <MarketingOptIn checked={tips} onChange={setTips} />
                 {err && <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.stamp }}>{err}</div>}
                 <button type="submit" disabled={busy} style={btn} className="btn-primary rounded-full py-3.5 text-[16px] mt-1">{busy ? "Finishing…" : "Finish"}</button>
