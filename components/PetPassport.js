@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Wordmark } from "./Logo";
+import Icon from "./Icon";
 import PetQr from "../lib/PetQr";
 import { PetIllustration } from "./PetIdCard";
 import { tokens, font } from "../lib/theme";
@@ -64,13 +65,13 @@ export default function PetPassport({
   qr = null,
   pending = false,
   justIssued = false,
+  onPhotoTap = null,
 }) {
   const [copied, setCopied] = useState(false);
   const url = profileUrl(pet);
   const contact = [pet.emergency_contact_name, pet.emergency_contact_phone].filter(filled).join(" · ");
   const rows = [
-    ["Type", pet.animal_type],
-    ["Breed", pet.breed],
+    ["Breed", pet.breed || pet.animal_type],
     ["Sex", pet.sex],
     ["Born", fmtDob(pet.date_of_birth)],
     ["Weight", pet.weight_lb ? `${pet.weight_lb} lb` : ""],
@@ -110,14 +111,19 @@ export default function PetPassport({
         <div className="ppg-guilloche-light px-4 sm:px-6 pt-4 sm:pt-5 pb-4 min-w-0 relative">
           <div className="flex gap-3 sm:gap-6 min-w-0">
             <div className="flex-shrink-0">
-              <div className="ppg-pp-photo rounded-xl overflow-hidden" style={{ border: `3px solid #fff`, outline: `1.5px solid ${tokens.gold}`, background: "#E8EEF7", boxShadow: "0 6px 16px rgba(20,33,61,0.14)" }}>
+              <div className="ppg-pp-photo relative rounded-xl overflow-hidden" style={{ border: `3px solid #fff`, outline: `1.5px solid ${tokens.gold}`, background: "#E8EEF7", boxShadow: "0 6px 16px rgba(20,33,61,0.14)" }}>
                 {photo || <div className="flex items-center justify-center h-full"><PetIllustration type={pet.animal_type} size={110} /></div>}
+                {onPhotoTap ? (
+                  <button type="button" onClick={onPhotoTap} aria-label={photo ? "Retake passport photo" : "Add passport photo"} className="ppg-no-print absolute inset-0 flex items-end justify-center pb-2" style={{ background: "linear-gradient(transparent 60%, rgba(20,33,61,.55))", border: "none", cursor: "pointer" }}>
+                    <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1" style={{ background: "#fff", color: tokens.navy, fontFamily: font.body, fontSize: 11.5, fontWeight: 800 }}><Icon name="camera" size={12} />{photo ? "Retake" : "Add photo"}</span>
+                  </button>
+                ) : null}
               </div>
             </div>
             <div className="flex-1 min-w-0">
               <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>NAME</div>
               <h2 className="ppg-pp-name" style={{ fontFamily: font.display, fontWeight: 800, lineHeight: 1, letterSpacing: "-0.02em", color: tokens.navy, overflowWrap: "anywhere" }}>{pet.name}</h2>
-              <div className="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-2 min-w-0">
+              <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1.5 sm:gap-y-2 min-w-0">
                 {rows.map(([k, v]) => <Cell key={k} k={k} v={v} />)}
               </div>
             </div>

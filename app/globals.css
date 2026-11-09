@@ -316,3 +316,7 @@ textarea {
 @media (min-width: 640px) { .ppg-pp-photo { width: 132px; height: 160px; } .ppg-pp-val { font-size: 16px; } .ppg-pp-stampspot { left: 108px; top: 120px; } }
 .ppg-pp-stampspot { left: 42px; top: 82px; }
 @media (min-width: 640px) { .ppg-pp-stampspot { left: 82px; top: 116px; } }
+/* Bigger passport photo */
+.ppg-pp-photo { width: 124px; height: 156px; }
+.ppg-pp-stampspot { left: 66px; top: 118px; }
+@media (min-width: 640px) { .ppg-pp-photo { width: 156px; height: 196px; } .ppg-pp-stampspot { left: 104px; top: 150px; } }

@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import PhotoBooth from "./PhotoBooth";
+
 import Icon from "../Icon";
 import { PetIllustration } from "../PetIdCard";
 import { tokens, font } from "../../lib/theme";
@@ -28,6 +31,7 @@ function Ring({ pct }) {
 // Big, warm header for each pet: photo, quick facts, how complete the profile is,
 // and the single most useful next step.
 export default function PetHero({ pet, photo, onGo, onPhoto, photoBusy }) {
+  const [booth, setBooth] = useState(false);
   const prog = profileProgress(pet);
   const missingPassport = passportMissing(pet);
   const issued = !!pet.passport_issued_at;
@@ -47,6 +51,8 @@ export default function PetHero({ pet, photo, onGo, onPhoto, photoBusy }) {
   }
 
   return (
+    <>
+    {booth ? <PhotoBooth pet={pet} onClose={() => setBooth(false)} onSave={(f) => onPhoto({ target: { files: [f], value: "" } })} /> : null}
     <section className="ppg-pet-hero relative overflow-hidden rounded-3xl p-4 sm:p-6" style={{ background: `linear-gradient(135deg, ${tokens.navy} 0%, #1D3463 55%, #0F5E5A 100%)`, color: "#fff" }}>
       <div aria-hidden="true" className="ppg-hero-paws" />
       <div className="relative flex items-center gap-4">
@@ -56,11 +62,9 @@ export default function PetHero({ pet, photo, onGo, onPhoto, photoBusy }) {
               {photo || <div className="flex items-center justify-center h-full"><PetIllustration type={pet.animal_type} size={68} /></div>}
             </div>
             {onPhoto ? (
-              <label className="absolute flex items-center justify-center" title="Change photo" style={{ right: -4, bottom: -4, width: 30, height: 30, borderRadius: "50%", background: tokens.gold, color: tokens.navy, border: "3px solid #fff", cursor: "pointer" }}>
-                <span className="sr-only">Change photo</span>
+              <button type="button" onClick={() => setBooth(true)} aria-label="Change photo" className="absolute flex items-center justify-center" style={{ right: -4, bottom: -4, width: 30, height: 30, borderRadius: "50%", background: tokens.gold, color: tokens.navy, border: "3px solid #fff", cursor: "pointer" }}>
                 <Icon name="camera" size={14} />
-                <input type="file" accept="image/*" className="ppg-hp" onChange={onPhoto} />
-              </label>
+              </button>
             ) : null}
           </div>
           <div className="min-w-0">
@@ -95,5 +99,6 @@ export default function PetHero({ pet, photo, onGo, onPhoto, photoBusy }) {
         </button>
       ) : null}
     </section>
+    </>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Icon from "../Icon";
 import BreedInput from "../BreedInput";
+import PhotoBooth from "./PhotoBooth";
 import { supabase } from "../../lib/supabaseClient";
 import { tokens, font } from "../../lib/theme";
 import { PASSPORT_FIELDS, filled } from "../../lib/petProfile";
@@ -18,6 +19,16 @@ function Field({ k, pet, value, setValue }) {
   if (k === "emergency_contact_phone") return <input aria-label="Emergency contact phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="Phone number" value={value} onChange={(e) => setValue(e.target.value)} style={input} />;
   if (k === "emergency_contact_name") return <input aria-label="Emergency contact name" autoComplete="name" placeholder="Who should someone call?" value={value} onChange={(e) => setValue(e.target.value)} style={input} />;
   return <input aria-label="Name" value={value} onChange={(e) => setValue(e.target.value)} style={input} />;
+}
+
+function PhotoStep({ pet, onPhoto }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)} className="ppg-btn ppg-btn-primary"><Icon name="camera" size={17} /> Open the photo booth</button>
+      {open ? <PhotoBooth pet={pet} onClose={() => setOpen(false)} onSave={(f) => onPhoto({ target: { files: [f], value: "" } })} /> : null}
+    </>
+  );
 }
 
 function Step({ k, label, pet, userId, onChanged, onPhoto, open, onOpen }) {
@@ -48,10 +59,7 @@ function Step({ k, label, pet, userId, onChanged, onPhoto, open, onOpen }) {
       {!done && open ? (
         k === "photo_url" ? (
           <div className="px-4 pb-4">
-            <label className="ppg-btn ppg-btn-primary" style={{ cursor: "pointer" }}>
-              <Icon name="camera" size={17} /> Choose a photo
-              <input type="file" accept="image/*" className="ppg-hp" onChange={onPhoto} />
-            </label>
+            <PhotoStep pet={pet} onPhoto={onPhoto} />
           </div>
         ) : (
           <form onSubmit={save} className="px-4 pb-4 flex flex-col sm:flex-row gap-2">

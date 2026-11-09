@@ -14,6 +14,7 @@ import PetCareCard from "./PetCareCard";
 import PetDocumentsCard from "./PetDocumentsCard";
 import PetIdStudio from "./pets/PetIdStudio";
 import PassportQuest from "./pets/PassportQuest";
+import PhotoBooth from "./pets/PhotoBooth";
 import { documentFileError } from "../lib/petDocuments";
 import { todayPT } from "../lib/travelDates";
 import { SignedImg, BUCKET, getSignedUrl, toStoragePath } from "../lib/storage";
@@ -169,6 +170,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
   const [photoBusy, setPhotoBusy] = useState(false);
   const [reveal, setReveal] = useState(null); // ISO time the passport is being issued
   const [justIssued, setJustIssued] = useState(false);
+  const [booth, setBooth] = useState(false);
 
   const missing = owner ? passportMissing(pet) : [];
   const readyToIssue = owner && pet?.id && !pet.passport_issued_at && missing.length === 0;
@@ -345,7 +347,9 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
         chipValue={chipValue}
         pending={owner && !pet.passport_issued_at}
         justIssued={justIssued}
+        onPhotoTap={owner ? () => setBooth(true) : null}
       /> : null}
+      {booth ? <PhotoBooth pet={pet} onClose={() => setBooth(false)} onSave={(f) => uploadPhoto({ target: { files: [f], value: "" } })} /> : null}
       {showPassport && owner && !pet.passport_issued_at && missing.length > 0 ? <PassportQuest pet={pet} userId={userId} onChanged={onChanged} onPhoto={uploadPhoto} /> : null}
       {showPanel ? <section className="rounded-3xl overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.08)" }}>
         {!v ? <div className="px-4 py-2.5 flex items-center gap-3" style={{ background: tokens.navy }}>
