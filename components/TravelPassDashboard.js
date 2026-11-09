@@ -12,7 +12,8 @@ import { findAirport, tripTypeForRoute } from "../lib/airports";
 import { fmtTripDate } from "../lib/tripAccess";
 import { fmtTime, LiveFlightCard } from "./FlightLookup";
 import { SignedImg, getSignedUrl } from "../lib/storage";
-import { buildPassCards, cardDone, groupCards, isServiceRole, passProgress } from "../lib/passCards";
+import { cardDone, groupCards, isServiceRole, passProgress } from "../lib/passCards";
+import { passReady, segmentPlans } from "../lib/segments";
 import { reminderSchedule, classifyReminder, fmt } from "../lib/travelDates";
 import { useTodayPT } from "../lib/useTodayPT";
 import { supabase } from "../lib/supabaseClient";
@@ -87,9 +88,12 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
   const [health, setHealth] = useState(null);
   const pack = useTripExtras(trip?.id);
   const today = useTodayPT();
-  const cards = useMemo(() => buildPassCards(results, { ...trip, pet }), [results, trip, pet]);
+  const plans = useMemo(() => segmentPlans(results, { ...trip, pet }), [results, trip, pet]);
+  const cards = useMemo(() => plans.flatMap((plan) => plan.cards), [plans]);
   const groups = useMemo(() => groupCards(cards, statusMap), [cards, statusMap]);
   const progress = passProgress(groups);
+  const ready = passReady(progress, plans);
+  const needsCheck = plans.some((plan) => !plan.resolved);
   const snapshot = trip?.flight_snapshot || null;
   const from = codeOf(trip.origin);
   const to = codeOf(trip.destination);
@@ -155,7 +159,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
         </div>
       )}
 
-      {results.length ? <VerdictCard verdict={tripVerdict({ rows: results, trip: { ...trip, petName: pet?.name || "your pet" }, fitWarnings: tripFitWarnings(trip) })} /> : null}
+      {results.length ? <VerdictCard verdict={needsCheck ? { key: "check", title: "A flight still needs checking", text: "We don't have a verified requirement for every flight on this trip." } : tripVerdict({ rows: results, trip: { ...trip, petName: pet?.name || "your pet" }, fitWarnings: tripFitWarnings(trip) })} /> : null}
       <div className="rounded-3xl p-5 sm:p-6 mb-4" style={{ background: tokens.navy }}>
         <div className="flex flex-col lg:flex-row lg:items-center gap-4">
           <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -191,7 +195,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
         <div className="mt-4">
           <div className="flex items-center justify-between gap-3 mb-1.5">
             <span style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.sky }}>Trip readiness</span>
-            <span style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: "#fff" }}>{progress.total ? (progress.complete ? "Travel Pass complete" : `${progress.done} of ${progress.total} steps complete`) : "Checklist coming up"}</span>
+            <span style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: "#fff" }}>{needsCheck ? "A flight still needs checking" : progress.total ? (ready ? "Travel Pass complete" : `${progress.done} of ${progress.total} steps complete`) : "Checklist coming up"}</span>
           </div>
           <div className="w-full h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.18)" }}>
             <div className="h-full rounded-full transition-all duration-500" style={{ width: `${progress.pct}%`, background: "#7DCEA0" }} />
@@ -249,7 +253,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
           </SoftCard>
 
           <SoftCard title="Travel checklist">
-            <p style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: progress.complete ? tokens.green : tokens.navy }} className="mb-2">{progress.total ? `${progress.done} of ${progress.total} complete` : "No steps for this trip yet."}</p>
+            <p style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: ready ? tokens.green : tokens.navy }} className="mb-2">{needsCheck ? "A flight still needs checking" : progress.total ? `${progress.done} of ${progress.total} complete` : "No steps for this trip yet."}</p>
             <ul className="space-y-2">
               {shownSteps.map((step) => (
                 <li key={step.id} className="flex items-center gap-2">
