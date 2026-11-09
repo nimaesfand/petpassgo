@@ -328,3 +328,11 @@ textarea {
   .ppg-tag-sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 @media print { body > header, header, nav, .ppg-contact-fab, .ppg-chat-launch, footer { display: none !important; } }
+/* Bev the photo clerk */
+.ppg-bev { animation: ppg-bev-bob 3.2s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes ppg-bev-bob { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg) translateY(-1px); } }
+.ppg-bev-eyes { animation: ppg-bev-blink 4.5s infinite; transform-origin: 60px 65px; }
+@keyframes ppg-bev-blink { 0%,92%,100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+.ppg-caret { display: inline-block; width: 2px; height: 1.05em; margin-left: 2px; vertical-align: -2px; background: #C2410C; animation: ppg-caret 0.9s steps(1) infinite; }
+@keyframes ppg-caret { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .ppg-bev, .ppg-bev-eyes, .ppg-caret { animation: none; } }

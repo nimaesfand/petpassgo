@@ -13,7 +13,7 @@ const OUT_H = 1000;
 const FRAME = 4 / 5; // width / height
 
 const LINES = {
-  pick: (n) => `Next! …Pet passport photo for ${n}? Take a number. Okay. Bright light, face forward, eyes open, ears in the frame. No sunglasses. Yes, I have to say that every time.`,
+  pick: (n) => `Next! …Passport photo for ${n}? Okay. Bright light. Face forward. Both ears in the frame. No sunglasses. Yes, I have to say that every time.`,
   loaded: () => "Hmm. Drag the photo so the face sits inside the oval. Pinch or use the slider to zoom. I'll wait. I'm always waiting.",
   dark: () => "It's very dark in here. Is this a pet or a cave? A spot near a window works best. You can try another, or use this one and I'll pretend I didn't see.",
   small: () => "This photo is tiny. It'll look blurry on the passport. A closer, sharper shot would be better.",
@@ -31,13 +31,84 @@ function loadImage(file) {
   });
 }
 
-function Clerk({ text }) {
+// Bev, Window 3. Original illustrated character: grey bun with a pencil, big glasses,
+// cardigan, name badge. Blinks now and then; very much not in a hurry.
+function BevFace({ size = 76 }) {
   return (
-    <div className="flex items-start gap-3">
-      <div className="flex-shrink-0 flex items-center justify-center rounded-full" aria-hidden="true" style={{ width: 46, height: 46, background: tokens.gold, fontSize: 26, border: "3px solid #fff", boxShadow: "0 4px 10px rgba(0,0,0,.2)" }}>👩‍💼</div>
-      <div className="ppg-rise rounded-2xl rounded-tl-sm px-4 py-3 flex-1" key={text} style={{ background: "#fff", color: tokens.navy, fontFamily: font.body, fontSize: 15, lineHeight: 1.45, boxShadow: "0 6px 18px rgba(0,0,0,.18)" }}>
-        <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".14em", color: tokens.muted }} className="mb-0.5">PHOTO CLERK · WINDOW 3</div>
-        {text}
+    <svg width={size} height={size} viewBox="0 0 120 120" aria-hidden="true">
+      <circle cx="60" cy="60" r="58" fill="#FDE7C3" />
+      <circle cx="60" cy="60" r="58" fill="none" stroke="#F2B84B" strokeWidth="4" />
+      {/* bun + pencil */}
+      <ellipse cx="60" cy="22" rx="17" ry="13" fill="#B8BEC9" />
+      <rect x="66" y="6" width="5" height="26" rx="2" fill="#F2B84B" transform="rotate(28 68 19)" />
+      <polygon points="74,30 77,36 71,34" fill="#3B2A1A" transform="rotate(28 68 19)" />
+      {/* hair */}
+      <path d="M26 58 C24 34 44 26 60 26 C78 26 96 34 94 58 C90 46 80 40 60 40 C42 40 30 46 26 58Z" fill="#C9CED7" />
+      {/* face */}
+      <ellipse cx="60" cy="66" rx="30" ry="32" fill="#FFD9B8" />
+      {/* cheeks */}
+      <circle cx="42" cy="76" r="6" fill="#F7A8A0" opacity=".55" />
+      <circle cx="78" cy="76" r="6" fill="#F7A8A0" opacity=".55" />
+      {/* glasses */}
+      <g fill="#fff" fillOpacity=".55" stroke="#14213D" strokeWidth="3">
+        <circle cx="47" cy="64" r="10" />
+        <circle cx="73" cy="64" r="10" />
+      </g>
+      <path d="M57 64 h6" stroke="#14213D" strokeWidth="3" />
+      <path d="M37 62 l-7 -3 M83 62 l7 -3" stroke="#14213D" strokeWidth="2.5" strokeLinecap="round" />
+      {/* half-lidded, unimpressed eyes */}
+      <g className="ppg-bev-eyes">
+        <path d="M42 66 q5 -3 10 0" stroke="#14213D" strokeWidth="3" fill="none" strokeLinecap="round" />
+        <path d="M68 66 q5 -3 10 0" stroke="#14213D" strokeWidth="3" fill="none" strokeLinecap="round" />
+      </g>
+      {/* flat little mouth */}
+      <path d="M53 86 q7 2 14 0" stroke="#9A4B3A" strokeWidth="3" fill="none" strokeLinecap="round" />
+      {/* cardigan + badge */}
+      <path d="M22 118 C26 100 40 96 60 96 C80 96 94 100 98 118Z" fill="#C2410C" />
+      <path d="M60 96 L52 118 M60 96 L68 118" stroke="#9A3412" strokeWidth="2" />
+      <rect x="72" y="104" width="16" height="9" rx="2" fill="#fff" />
+      <rect x="74" y="107" width="12" height="2" rx="1" fill="#14213D" />
+    </svg>
+  );
+}
+
+function useTyped(text, speed = 22) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    setN(0);
+    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { setN(text.length); return; }
+    let i = 0;
+    let t;
+    const tick = () => {
+      i += 1;
+      setN(i);
+      if (i < text.length) {
+        const ch = text[i - 1];
+        // She pauses at punctuation. Of course she does.
+        t = setTimeout(tick, ch === "." || ch === "…" || ch === "?" || ch === "!" ? speed * 14 : ch === "," ? speed * 6 : speed);
+      }
+    };
+    t = setTimeout(tick, 350);
+    return () => clearTimeout(t);
+  }, [text, speed]);
+  return text.slice(0, n);
+}
+
+function Clerk({ text }) {
+  const shown = useTyped(text);
+  const typing = shown.length < text.length;
+  return (
+    <div className="flex items-end gap-3">
+      <div className="flex-shrink-0 ppg-bev"><BevFace /></div>
+      <div className="relative flex-1 rounded-3xl rounded-bl-md px-4 py-3.5" style={{ background: "#FFFDF8", boxShadow: "0 10px 26px rgba(0,0,0,.22)" }}>
+        <div className="flex items-center gap-2 mb-1">
+          <span style={{ fontFamily: font.display, fontWeight: 800, fontSize: 16, color: tokens.navy }}>Bev</span>
+          <span className="rounded-full px-2 py-0.5" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 10.5, letterSpacing: ".1em" }}>WINDOW 3</span>
+        </div>
+        <p aria-live="polite" style={{ fontFamily: font.body, fontSize: 16.5, lineHeight: 1.5, color: tokens.ink, margin: 0, minHeight: "3em" }}>
+          <span className="sr-only">{text}</span>
+          <span aria-hidden="true">{shown}{typing ? <span className="ppg-caret" /> : null}</span>
+        </p>
       </div>
     </div>
   );
@@ -189,7 +260,10 @@ export default function PhotoBooth({ pet, onSave, onClose }) {
   return createPortal(
     <div role="dialog" aria-modal="true" aria-label="Passport photo booth" className="fixed inset-0 z-[1000] flex flex-col" style={{ background: `radial-gradient(120% 80% at 50% 0%, #22386A, ${tokens.navy} 60%, #0B1428)` }}>
       <div className="flex items-center justify-between px-4 py-3" style={{ color: "#fff" }}>
-        <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 19 }}>Passport photo</div>
+        <div className="flex items-center gap-2">
+          <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 19 }}>Passport photos</div>
+          <span className="rounded-md px-2 py-0.5" style={{ background: "#fff", color: tokens.navy, fontFamily: "ui-monospace, Menlo, monospace", fontWeight: 800, fontSize: 12, transform: "rotate(-3deg)" }}>NOW SERVING 042</span>
+        </div>
         <button type="button" onClick={onClose} aria-label="Close photo booth" className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: "rgba(255,255,255,.12)", color: "#fff", border: "none", cursor: "pointer" }}><Icon name="x" size={20} /></button>
       </div>
 
