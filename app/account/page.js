@@ -1,6 +1,7 @@
 "use client";
 
 import Icon from "../../components/Icon";
+import BreedInput from "../../components/BreedInput";
 import { telHref } from "../../lib/linkify";
 import { VAULT_NAME, VAULT_SUB, MEMBERSHIP_TERMS } from "../../lib/travelPassOffer";
 import TrustBadges from "../../components/TrustBadges";
@@ -690,8 +691,10 @@ function PetProfileTab({ userId }) {
                 <option>Service animal</option>
               </select>
             </div>
-            <input
-              placeholder="Breed (optional)"
+            <BreedInput
+              placeholder="Breed (optional) — start typing"
+              aria-label="Breed"
+              animal={form.animal_type}
               value={form.breed}
               onChange={(e) => setForm((f) => ({ ...f, breed: e.target.value }))}
               style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
@@ -1278,6 +1281,22 @@ export default function AccountPage() {
     if (scroller) scroller.scrollTo({ top: 0, behavior: "smooth" });
     else window.scrollTo({ top: 0, behavior: "smooth" });
   }
+
+  // While typing on a phone, the keyboard takes half the screen: get the bottom bar,
+  // chat button and sticky section tabs out of the way so the field stays visible.
+  useEffect(() => {
+    const root = document.documentElement;
+    const isField = (el) => el && (el.tagName === "TEXTAREA" || el.tagName === "SELECT" || (el.tagName === "INPUT" && !/^(checkbox|radio|button|submit|file|range|color)$/i.test(el.type)));
+    function onIn(e) {
+      if (window.innerWidth >= 1024 || !isField(e.target)) return;
+      root.classList.add("ppg-typing");
+      setTimeout(() => e.target.scrollIntoView?.({ block: "center", behavior: "smooth" }), 300);
+    }
+    function onOut() { setTimeout(() => { if (!isField(document.activeElement)) root.classList.remove("ppg-typing"); }, 120); }
+    document.addEventListener("focusin", onIn);
+    document.addEventListener("focusout", onOut);
+    return () => { document.removeEventListener("focusin", onIn); document.removeEventListener("focusout", onOut); root.classList.remove("ppg-typing"); };
+  }, []);
 
   useEffect(() => {
     const dock = document.querySelector(".ppg-account-dock");

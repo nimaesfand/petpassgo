@@ -260,3 +260,9 @@ textarea {
 
 .ppg-noscrollbar { scrollbar-width: none; }
 .ppg-noscrollbar::-webkit-scrollbar { display: none; }
+
+/* Phone keyboard open: keep the field in view */
+@media (max-width: 1023px) {
+  .ppg-typing .ppg-account-dock { display: none; }
+  .ppg-typing .ppg-pet-nav { position: static; }
+}

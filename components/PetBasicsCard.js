@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import BreedInput from "./BreedInput";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
 import { fmtDob, weightLabel, filled } from "../lib/petProfile";
@@ -82,7 +83,7 @@ export default function PetBasicsCard({ pet, userId, onChanged }) {
           <label style={label}>Name<input required aria-label="Name" value={form.name} onChange={set("name")} style={input} /></label>
           <div className="grid sm:grid-cols-2 gap-3">
             <label style={label}>Type<select aria-label="Type" value={form.animal_type} onChange={set("animal_type")} style={input}><option>Dog</option><option>Cat</option><option>Other</option></select></label>
-            <label style={label}>Breed<input aria-label="Breed" value={form.breed} onChange={set("breed")} style={input} /></label>
+            <label style={label}>Breed<BreedInput aria-label="Breed" value={form.breed} onChange={set("breed")} animal={form.animal_type} placeholder="Start typing, e.g. Dachshund" style={input} /></label>
             <label style={label}>Date of birth<input type="date" aria-label="Date of birth" value={form.date_of_birth} onChange={set("date_of_birth")} style={input} /></label>
             <label style={label}>Weight (lb)<input type="number" step="0.1" min="0.1" aria-label="Weight in pounds" value={form.weight_lb} onChange={set("weight_lb")} style={input} /></label>
             <label style={label}>Sex<select aria-label="Sex" value={form.sex} onChange={set("sex")} style={input}><option value="">Select</option><option>Male</option><option>Female</option></select></label>
