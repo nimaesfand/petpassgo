@@ -92,7 +92,7 @@ export default function TagSheet({ pet, photoUrl }) {
       <div className="ppg-no-print" style={{ maxWidth: 820, margin: "0 auto", padding: "20px 16px 8px" }}>
         <h1 style={{ fontFamily: font.display, fontSize: 30, fontWeight: 800, color: tokens.navy }}>{pet.name}'s QR tags</h1>
         <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink, marginTop: 4 }}>One sheet: 8 collar tags, 2 carrier stickers and a fold-over wallet card.</p>
-        <ol style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, margin: "12px 0 0", paddingLeft: 20, lineHeight: 1.6 }}>
+        <ol style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, margin: "12px 0 0", paddingLeft: 20, lineHeight: 1.6, listStyle: "decimal" }}>
           <li>Print at <b>100% / Actual size</b> (not "fit to page") on cardstock or sticker paper.</li>
           <li>Scan one with your phone camera before cutting, to make sure it opens {pet.name}'s page.</li>
           <li>Cut on the dashed lines. Cover collar tags with clear packing tape, or slip one into a clear tag holder (about $5 online).</li>
