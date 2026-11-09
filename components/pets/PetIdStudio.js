@@ -38,17 +38,16 @@ function Switch({ on, onClick, label }) {
 function ActionTile({ icon, title, sub, onClick, href, busy }) {
   const inner = (
     <>
-      <span className="flex items-center justify-center rounded-2xl flex-shrink-0" style={{ width: 44, height: 44, background: T.soft, color: T.color }}><Icon name={icon} size={22} /></span>
-      <span className="min-w-0 text-left">
-        <span className="block" style={{ fontFamily: font.body, fontWeight: 800, fontSize: 16, color: tokens.navy }}>{busy || title}</span>
-        <span className="block" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>{sub}</span>
-      </span>
+      <span className="flex items-center justify-center rounded-2xl" style={{ width: 44, height: 44, background: T.soft, color: T.color }}><Icon name={icon} size={21} /></span>
+      <span className="block text-center" style={{ fontFamily: font.body, fontWeight: 800, fontSize: 13.5, color: tokens.navy, lineHeight: 1.15 }}>{busy || title}</span>
+      <span className="hidden sm:block text-center" style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.muted }}>{sub}</span>
     </>
   );
+  const cls = "ppg-lift flex flex-col items-center gap-1.5 rounded-2xl px-2 py-3 min-w-0";
   const style = { background: "#fff", border: `1.5px solid ${tokens.line}`, cursor: "pointer", textDecoration: "none" };
   return href
-    ? <a href={href} target="_blank" rel="noopener" className="ppg-lift flex items-center gap-3 rounded-2xl p-3.5" style={style}>{inner}</a>
-    : <button type="button" onClick={onClick} className="ppg-lift flex items-center gap-3 rounded-2xl p-3.5" style={style}>{inner}</button>;
+    ? <a href={href} target="_blank" rel="noopener" className={cls} style={style}>{inner}</a>
+    : <button type="button" onClick={onClick} className={cls} style={style}>{inner}</button>;
 }
 
 
@@ -142,7 +141,7 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
       {/* The card */}
       <section className="w-full mx-auto" style={{ maxWidth: 460 }}>
         <div className="flex items-center justify-between gap-3 mb-3">
-          <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>Put the QR on a tag or collar. Anyone who scans it can reach you.</div>
+          <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>Scan the QR and a finder can reach you.</div>
           <button type="button" onClick={() => setFlipped((f) => !f)} className="ppg-btn ppg-btn-secondary flex-shrink-0" style={{ borderColor: T.color, color: T.color }}>
             <Icon name="repeat" size={16} /> {flipped ? "Front" : "QR side"}
           </button>
@@ -153,7 +152,7 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
             <div className="ppg-flip-face ppg-flip-back rounded-[22px] flex flex-col items-center justify-center p-4 text-center" style={{ background: tokens.navy, color: "#fff" }}>
               <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 12, letterSpacing: "0.16em", color: tokens.gold }}>SCAN IF FOUND</div>
               <div className="rounded-2xl p-3 mt-3" style={{ background: "#fff" }}>
-                <PetQr petId={pet.id} publicKey={pet.public_slug || pet.id} size={132} color={tokens.navy} />
+                <PetQr petId={pet.id} publicKey={pet.public_slug || pet.id} size={112} color={tokens.navy} />
               </div>
               <div className="mt-2" style={{ fontFamily: font.body, fontSize: 13, opacity: 0.85 }}>{profileLabel(pet)}</div>
             </div>
@@ -162,11 +161,11 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
       </section>
 
       {/* Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <ActionTile icon="smartphone" title="Save to phone" sub="Card image with the QR code" onClick={saveImage} busy={busy === "png" ? "Saving…" : ""} />
-        <ActionTile icon="link" title={copied ? "Link copied" : "Copy link"} sub={profileLabel(pet)} onClick={copy} />
-        <ActionTile icon="external" title="See the public page" sub="What a finder sees" href={profileUrl(pet)} />
-        {wallet ? <ActionTile icon="bag" title="Add to Apple Wallet" sub="Keep it next to your cards" onClick={addWallet} busy={busy === "wallet" ? "Preparing…" : ""} /> : null}
+      <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${wallet ? 4 : 3}, minmax(0,1fr))` }}>
+        <ActionTile icon="smartphone" title="Save to phone" sub="Card image with QR" onClick={saveImage} busy={busy === "png" ? "Saving…" : ""} />
+        <ActionTile icon="link" title={copied ? "Copied!" : "Copy link"} sub="Share the profile" onClick={copy} />
+        <ActionTile icon="external" title="Public page" sub="What a finder sees" href={profileUrl(pet)} />
+        {wallet ? <ActionTile icon="bag" title="Apple Wallet" sub="Next to your cards" onClick={addWallet} busy={busy === "wallet" ? "Preparing…" : ""} /> : null}
       </div>
 
       {/* Privacy: switches + live preview */}

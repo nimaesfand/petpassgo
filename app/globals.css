@@ -310,3 +310,7 @@ textarea {
 .ppg-mrz { font-size: 10.5px; letter-spacing: 0.04em; }
 @media (min-width: 640px) { .ppg-pp-stampspot { left: 108px; top: 120px; } .ppg-mrz { font-size: 12.5px; letter-spacing: 0.12em; } }
 [data-pet-passport] { scroll-margin-top: 12px; }
+.ppg-pp-photo { width: 92px; height: 114px; }
+.ppg-pp-val { font-size: 14.5px; line-height: 1.25; }
+.ppg-pp-stampspot { left: 60px; top: 86px; }
+@media (min-width: 640px) { .ppg-pp-photo { width: 132px; height: 160px; } .ppg-pp-val { font-size: 16px; } .ppg-pp-stampspot { left: 108px; top: 120px; } }

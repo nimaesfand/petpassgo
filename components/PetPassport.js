@@ -14,7 +14,7 @@ function Cell({ k, v }) {
   return (
     <div className="min-w-0">
       <div style={{ fontFamily: font.body, fontSize: 10.5, fontWeight: 800, letterSpacing: "0.12em", color: tokens.muted }}>{String(k).toUpperCase()}</div>
-      <div style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy, overflowWrap: "anywhere" }}>{v}</div>
+      <div className="ppg-pp-val" style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy, overflowWrap: "break-word" }}>{v}</div>
     </div>
   );
 }
@@ -108,7 +108,7 @@ export default function PetPassport({
         <div style={{ height: 3, background: `linear-gradient(90deg, ${tokens.gold}, #F7D98C 50%, ${tokens.gold})` }} />
 
         <div className="ppg-guilloche-light px-4 sm:px-6 pt-4 sm:pt-5 pb-4 min-w-0 relative">
-          <div className="flex gap-4 sm:gap-6 min-w-0">
+          <div className="flex gap-3 sm:gap-6 min-w-0">
             <div className="flex-shrink-0">
               <div className="ppg-pp-photo rounded-xl overflow-hidden" style={{ border: `3px solid #fff`, outline: `1.5px solid ${tokens.gold}`, background: "#E8EEF7", boxShadow: "0 6px 16px rgba(20,33,61,0.14)" }}>
                 {photo || <div className="flex items-center justify-center h-full"><PetIllustration type={pet.animal_type} size={110} /></div>}
@@ -117,7 +117,7 @@ export default function PetPassport({
             <div className="flex-1 min-w-0">
               <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>NAME</div>
               <h2 className="ppg-pp-name" style={{ fontFamily: font.display, fontWeight: 800, lineHeight: 1, letterSpacing: "-0.02em", color: tokens.navy, overflowWrap: "anywhere" }}>{pet.name}</h2>
-              <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 min-w-0">
+              <div className="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-2 min-w-0">
                 {rows.map(([k, v]) => <Cell key={k} k={k} v={v} />)}
               </div>
             </div>
