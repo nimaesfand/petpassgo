@@ -185,7 +185,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
     await supabase.from("pets").update({ passport_issued_at: at }).eq("id", pet.id).eq("user_id", userId);
     setJustIssued(true);
     onChanged?.();
-    setTimeout(() => document.querySelector(`[data-pet-profile="${pet.id}"] [data-pet-passport]`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 120);
+    setTimeout(() => document.querySelector(`[data-pet-profile="${pet.id}"] [data-pet-passport]`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 120);
   }
 
   useEffect(() => { setForm(fromPet(pet)); }, [pet.id, pet.updated_at, pet.name, pet.breed, pet.about_bio, pet.housing_notes, pet.allergies, pet.color, pet.weight_lb]);
@@ -335,7 +335,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
     : (pet.microchipped ? "On file" : "");
 
   return (
-    <div data-pet-profile={pet.id} className="grid gap-4 min-w-0 max-w-full">
+    <div data-pet-profile={pet.id} className="grid grid-cols-1 gap-4 min-w-0 max-w-full">
       {reveal ? <PassportReveal pet={pet} photo={photo} issuedAt={reveal} onClose={finishReveal} /> : null}
       {showPassport ? <PetPassport
         pet={pet}

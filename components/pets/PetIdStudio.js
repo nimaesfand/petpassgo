@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Icon from "../Icon";
 import Fold from "./Fold";
 import PetQr from "../../lib/PetQr";
+import { Wordmark } from "../Logo";
 import { savePetIdImage } from "../PetIdV2";
 import { supabase } from "../../lib/supabaseClient";
 import { tokens, font } from "../../lib/theme";
@@ -48,6 +49,40 @@ function ActionTile({ icon, title, sub, onClick, href, busy }) {
   return href
     ? <a href={href} target="_blank" rel="noopener" className="ppg-lift flex items-center gap-3 rounded-2xl p-3.5" style={style}>{inner}</a>
     : <button type="button" onClick={onClick} className="ppg-lift flex items-center gap-3 rounded-2xl p-3.5" style={style}>{inner}</button>;
+}
+
+
+function CardFront({ pet, photo }) {
+  const facts = [["Born", fmtDob(pet.date_of_birth)], ["Weight", weightLabel(pet.weight_lb)], ["Sex", pet.sex]].filter(([, v]) => filled(v));
+  return (
+    <div className="ppg-idcard relative overflow-hidden rounded-[22px] p-4 sm:p-5 h-full" style={{ background: `linear-gradient(135deg, ${T.color} 0%, #115E59 45%, ${tokens.navy} 100%)`, color: "#fff", boxShadow: "0 18px 40px rgba(15,94,89,.35)" }}>
+      <div aria-hidden="true" className="ppg-hero-paws" />
+      <div aria-hidden="true" className="absolute" style={{ right: -40, top: -40, width: 160, height: 160, borderRadius: "50%", background: "rgba(242,184,75,.16)" }} />
+      <div className="relative flex items-center justify-between">
+        <Wordmark size={18} onDark />
+        <span className="rounded-full px-2.5 py-0.5" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 10.5, letterSpacing: ".14em" }}>PET ID</span>
+      </div>
+      <div className="relative flex gap-4 mt-4 items-center">
+        <div className="rounded-2xl overflow-hidden flex-shrink-0" style={{ width: 88, height: 104, border: `3px solid ${tokens.gold}`, background: "#E8EEF7" }}>{photo}</div>
+        <div className="min-w-0 flex-1">
+          <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 28, lineHeight: 1, overflowWrap: "anywhere" }}>{pet.name}</div>
+          <div className="mt-1" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, opacity: 0.9 }}>{[pet.breed || pet.animal_type].filter(Boolean).join(" · ")}</div>
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+            {facts.map(([k, v]) => (
+              <div key={k}>
+                <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: ".12em", color: tokens.gold }}>{k.toUpperCase()}</div>
+                <div style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 700 }}>{v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="relative mt-4 flex items-center justify-between">
+        <div style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 13, fontWeight: 700, letterSpacing: ".08em" }}>{pet.passport_no || ""}</div>
+        <div className="flex items-center gap-1.5" style={{ fontFamily: font.body, fontSize: 11.5, fontWeight: 800, opacity: .9 }}>Tap to flip <Icon name="repeat" size={14} /></div>
+      </div>
+    </div>
+  );
 }
 
 // The Pet ID tab: the card itself first (tap to flip to the QR), quick actions,
@@ -103,9 +138,9 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
   const visible = TOGGLES.filter(([k]) => isOn(k));
 
   return (
-    <div className="grid gap-4">
+    <div className="grid grid-cols-1 gap-4 min-w-0">
       {/* The card */}
-      <section className="rounded-3xl p-4 sm:p-6" style={{ background: `linear-gradient(160deg, ${T.soft}, #fff 70%)`, border: `1px solid ${tokens.line}` }}>
+      <section className="w-full mx-auto" style={{ maxWidth: 460 }}>
         <div className="flex items-center justify-between gap-3 mb-3">
           <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>Put the QR on a tag or collar. Anyone who scans it can reach you.</div>
           <button type="button" onClick={() => setFlipped((f) => !f)} className="ppg-btn ppg-btn-secondary flex-shrink-0" style={{ borderColor: T.color, color: T.color }}>
@@ -114,19 +149,16 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
         </div>
         <div className="ppg-flip" data-flipped={flipped ? "1" : "0"} onClick={() => setFlipped((f) => !f)} role="button" tabIndex={0} aria-label="Flip the ID card" onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFlipped((f) => !f); } }}>
           <div className="ppg-flip-inner">
-            <div className="ppg-flip-face">{card}</div>
-            <div className="ppg-flip-face ppg-flip-back rounded-3xl flex flex-col items-center justify-center p-6 text-center" style={{ background: tokens.navy, color: "#fff" }}>
+            <div className="ppg-flip-face"><CardFront pet={pet} photo={photo} /></div>
+            <div className="ppg-flip-face ppg-flip-back rounded-[22px] flex flex-col items-center justify-center p-4 text-center" style={{ background: tokens.navy, color: "#fff" }}>
               <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 12, letterSpacing: "0.16em", color: tokens.gold }}>SCAN IF FOUND</div>
               <div className="rounded-2xl p-3 mt-3" style={{ background: "#fff" }}>
-                <PetQr petId={pet.id} publicKey={pet.public_slug || pet.id} size={176} color={tokens.navy} />
+                <PetQr petId={pet.id} publicKey={pet.public_slug || pet.id} size={132} color={tokens.navy} />
               </div>
-              <div className="mt-3" style={{ fontFamily: font.display, fontWeight: 800, fontSize: 22 }}>{pet.name}</div>
-              {pet.passport_no ? <div style={{ fontFamily: font.body, fontSize: 14, opacity: 0.85 }}>PetPassGo ID {pet.passport_no}</div> : null}
-              <div className="mt-1" style={{ fontFamily: font.body, fontSize: 13.5, opacity: 0.85 }}>{profileLabel(pet)}</div>
+              <div className="mt-2" style={{ fontFamily: font.body, fontSize: 13, opacity: 0.85 }}>{profileLabel(pet)}</div>
             </div>
           </div>
         </div>
-        <div className="mt-2 text-center" style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>Tap the card to flip it</div>
       </section>
 
       {/* Actions */}

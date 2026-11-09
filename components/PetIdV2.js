@@ -106,6 +106,13 @@ export function ChipVault({ pet, userId, onChanged, bare = false }) {
 
 const KIND = [["vaccine", "Vaccine"], ["medication", "Medication"], ["allergy", "Allergy"], ["note", "Care note"]];
 
+const KIND_LOOK = {
+  vaccine: { emoji: "💉", color: "#BE185D", soft: "#FDEBF3" },
+  medication: { emoji: "💊", color: "#4338CA", soft: "#EEF0FF" },
+  allergy: { emoji: "⚠️", color: "#B45309", soft: "#FEF3C7" },
+  note: { emoji: "📝", color: "#0F766E", soft: "#E3F5F2" },
+};
+
 export function HealthPassport({ pet, userId, refreshKey = 0, bare = false, onRows }) {
   const [rows, setRows] = useState([]); const [loading, setLoading] = useState(true); const [show, setShow] = useState(false);
   const [f, setF] = useState({ kind: "vaccine", name: "", date_given: "", expires_on: "", clinic: "", notes: "", show_to_finder: false });
@@ -115,9 +122,9 @@ export function HealthPassport({ pet, userId, refreshKey = 0, bare = false, onRo
   async function remove(id) { if (window.confirm("Remove this health record?")) { await supabase.from("pet_health_records").delete().eq("id", id); load(); } }
   async function toggle(row) { await supabase.from("pet_health_records").update({ show_to_finder: !row.show_to_finder }).eq("id", row.id); load(); }
   return (
-    <section id="health-passport" style={bare ? {} : section} aria-label="Health records">
-      <div className="flex items-start justify-between gap-3 flex-wrap"><div>{!bare && <div style={h3}>Health records</div>}<div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>Vaccines, meds and allergies you enter.</div></div><button onClick={() => setShow((v) => !v)} className="ppg-btn ppg-btn-secondary">{show ? "Cancel" : "Add record"}</button></div>
-      {show && <form onSubmit={add} className="grid sm:grid-cols-2 gap-2 mt-3 rounded-xl p-3" style={{ background: tokens.paper }}>
+    <section id="health-passport" style={bare ? { display: "flex", flexDirection: "column" } : section} aria-label="Health records">
+      {bare ? null : <div className="flex items-start justify-between gap-3 flex-wrap"><div><div style={h3}>Health records</div><div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>Vaccines, meds and allergies you enter.</div></div><button onClick={() => setShow((v) => !v)} className="ppg-btn ppg-btn-secondary">{show ? "Cancel" : "Add record"}</button></div>}
+      {show && <form onSubmit={add} className="grid sm:grid-cols-2 gap-2 mt-3 rounded-xl p-3" style={{ background: tokens.paper, order: bare ? 3 : 0 }}>
         <label style={label}>Type<select style={input} value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })}>{KIND.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
         <label style={label}>Name<input required style={input} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Rabies, medication, allergy…" /></label>
         <label style={label}>Date given<input type="date" style={input} value={f.date_given} onChange={(e) => setF({ ...f, date_given: e.target.value })} /></label>
@@ -127,9 +134,10 @@ export function HealthPassport({ pet, userId, refreshKey = 0, bare = false, onRo
         <label className="flex gap-2 items-center sm:col-span-2" style={{ fontFamily: font.body, fontSize: 14 }}><input type="checkbox" checked={f.show_to_finder} onChange={(e) => setF({ ...f, show_to_finder: e.target.checked })} /> Show this on the public Pet ID / share card</label>
         <button className="ppg-btn ppg-btn-primary">Save record</button>
       </form>}
-      {loading ? <div style={{ fontFamily: font.body, color: tokens.muted }} className="mt-2">Loading…</div> : rows.length === 0 ? <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="mt-2">No vaccines, medicines or allergies recorded yet.</p> : <div className="mt-3 space-y-2">{rows.map((r) => { const ex = expiryState(r.expires_on); return <div key={r.id} className="rounded-xl p-3 flex gap-3 items-start justify-between" style={{ background: tokens.paper }}>
-        <div className="min-w-0"><div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>{KIND.find(([k]) => k === r.kind)?.[1]} · {r.name}</div><div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>{[r.date_given ? `Given ${fmtDate(r.date_given)}` : "", r.clinic || "", r.notes || ""].filter(Boolean).join(" · ")}</div><div className="flex gap-2 mt-1 flex-wrap">{ex && <DueBadge tone={ex.tone}>{ex.text}</DueBadge>}<DueBadge tone={r.show_to_finder ? "good" : "muted"}>{r.show_to_finder ? "Shown publicly" : "Private"}</DueBadge></div></div>
-        <div className="flex flex-col gap-1 flex-shrink-0"><button onClick={() => toggle(r)} style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 700, color: tokens.navy }}>{r.show_to_finder ? "Hide" : "Show"}</button><button onClick={() => remove(r.id)} style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.stamp }}>Remove</button></div></div>; })}</div>}
+      {loading ? <div style={{ fontFamily: font.body, color: tokens.muted }} className="mt-2">Loading…</div> : rows.length === 0 ? <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-2">No vaccines, medicines or allergies yet. Add one, or scan a vet record below.</p> : <div className="mt-3 grid gap-2">{rows.map((r) => { const ex = expiryState(r.expires_on); const look = KIND_LOOK[r.kind] || KIND_LOOK.note; return <div key={r.id} className="rounded-2xl p-3 flex gap-3 items-start min-w-0" style={{ background: tokens.paper }}>
+        <span className="flex items-center justify-center rounded-xl flex-shrink-0" style={{ width: 40, height: 40, background: look.soft, color: look.color, fontSize: 19 }} aria-hidden="true">{look.emoji}</span>
+        <div className="min-w-0 flex-1"><div className="flex items-start justify-between gap-2"><div className="min-w-0" style={{ fontFamily: font.body, fontWeight: 800, fontSize: 16, color: tokens.navy, overflowWrap: "anywhere" }}>{r.name}</div>{ex && <DueBadge tone={ex.tone}>{ex.text}</DueBadge>}</div><div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>{[KIND.find(([k]) => k === r.kind)?.[1], r.date_given ? `Given ${fmtDate(r.date_given)}` : "", r.clinic || ""].filter(Boolean).join(" · ")}</div>{r.notes ? <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink }}>{r.notes}</div> : null}<div className="flex gap-3 mt-1.5 items-center flex-wrap" style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 700 }}><span style={{ color: r.show_to_finder ? tokens.green : tokens.muted }}>{r.show_to_finder ? "Shown on Pet ID" : "Private"}</span><button onClick={() => toggle(r)} style={{ color: tokens.navy, textDecoration: "underline" }}>{r.show_to_finder ? "Make private" : "Show on Pet ID"}</button><button onClick={() => remove(r.id)} style={{ color: tokens.muted, textDecoration: "underline" }}>Remove</button></div></div></div>; })}</div>}
+      {bare ? <button onClick={() => setShow((v) => !v)} className="ppg-btn ppg-btn-secondary mt-3" style={{ order: 4, alignSelf: "flex-start" }}>{show ? "Cancel" : "+ Add a record"}</button> : null}
     </section>
   );
 }

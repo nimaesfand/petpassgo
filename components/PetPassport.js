@@ -5,7 +5,7 @@ import { Wordmark } from "./Logo";
 import PetQr from "../lib/PetQr";
 import { PetIllustration } from "./PetIdCard";
 import { tokens, font } from "../lib/theme";
-import { filled, fmtDob, profileUrl, mrzLines, issuedLabel } from "../lib/petProfile";
+import { filled, fmtDob, profileUrl, mrzLines, issuedLabel, chipMask } from "../lib/petProfile";
 
 const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 
@@ -45,7 +45,7 @@ export function PassportStamp({ date, size = 118, className = "", style }) {
 export function MrzStrip({ pet }) {
   const [a, b] = mrzLines(pet);
   return (
-    <div aria-hidden="true" className="rounded-lg px-3 py-2 overflow-hidden" style={{ background: "#F1EADA", fontFamily: MONO, fontSize: 12.5, fontWeight: 600, letterSpacing: "0.12em", lineHeight: 1.55, color: tokens.navy, whiteSpace: "pre" }}>
+    <div aria-hidden="true" className="ppg-mrz rounded-lg px-3 py-2 overflow-hidden" style={{ background: "#F1EADA", fontFamily: MONO, fontWeight: 600, lineHeight: 1.55, color: tokens.navy, whiteSpace: "pre" }}>
       {a}
       {"\n"}
       {b}
@@ -75,7 +75,7 @@ export default function PetPassport({
     ["Born", fmtDob(pet.date_of_birth)],
     ["Weight", pet.weight_lb ? `${pet.weight_lb} lb` : ""],
     ["Color", pet.color],
-    ["Microchip", chipValue],
+    ["Microchip", owner && !sheet ? chipMask(chipValue) : chipValue],
   ].filter(([, v]) => filled(v));
 
   async function share() {
@@ -144,7 +144,7 @@ export default function PetPassport({
           <div className="mt-3"><MrzStrip pet={pet} /></div>
 
           {pending ? (
-            <div className="ppg-no-print" aria-label="Not issued yet" role="img" style={{ position: "absolute", right: 14, top: 64, pointerEvents: "none" }}>
+            <div className="ppg-no-print ppg-pp-stampspot" aria-label="Not issued yet" role="img" style={{ position: "absolute", pointerEvents: "none" }}>
               <div style={{ width: 96, height: 96, borderRadius: "50%", border: `2.5px dashed #9AA4B2`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#7B8595", transform: "rotate(-12deg)", textAlign: "center", background: "rgba(251,247,238,0.6)" }}>
                 <div style={{ fontFamily: font.body, fontSize: 8, fontWeight: 800, letterSpacing: "0.2em" }}>PETPASSGO</div>
                 <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 800, lineHeight: 1.05 }}>NOT YET<br />ISSUED</div>
@@ -152,7 +152,7 @@ export default function PetPassport({
             </div>
           ) : null}
           {pet.passport_issued_at ? (
-            <PassportStamp date={pet.passport_issued_at} size={104} className={justIssued ? "ppg-pp-stamp" : ""} style={{ position: "absolute", right: 14, top: 56, opacity: 0.9, mixBlendMode: "multiply", pointerEvents: "none" }} />
+            <div className="ppg-pp-stampspot" style={{ position: "absolute", pointerEvents: "none", mixBlendMode: "multiply" }}><PassportStamp date={pet.passport_issued_at} size={96} className={justIssued ? "ppg-pp-stamp" : ""} style={{ opacity: 0.9 }} /></div>
           ) : null}
         </div>
 
@@ -178,7 +178,7 @@ export default function PetPassport({
         <div className="ppg-no-print flex items-center gap-2 flex-wrap">
           <button type="button" onClick={share} className="ppg-chip-btn">{copied ? "Link copied" : "Share"}</button>
           <button type="button" onClick={() => { if (!(owner && pet?.id)) window.print(); else window.open(`/account/passport/print?pet=${pet.id}`, "_blank"); }} className="ppg-chip-btn">Print</button>
-          <span className="ml-auto" style={{ fontFamily: font.body, fontSize: 12, color: tokens.muted }}>Digital pet profile, not a government document.</span>
+          <span className="ml-auto" style={{ fontFamily: font.body, fontSize: 12, color: tokens.muted }}>Not a government document</span>
         </div>
       )}
     </div>

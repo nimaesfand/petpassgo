@@ -124,8 +124,7 @@ export default function PetDocumentsCard({ pet, userId }) {
 
   return (
     <section id={`documents-${pet.id}`} data-pet-documents className="rounded-3xl p-4 sm:p-6 min-w-0 max-w-full overflow-x-clip" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-      <h3 style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }} className="mb-4">Documents</h3>
-      {docs.length === 0 ? <p className="mb-4" style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>No documents yet</p> : null}
+      <h3 style={{ fontFamily: font.display, fontSize: 21, fontWeight: 800, color: tokens.navy }} className="mb-3">{docs.length ? `${docs.length} on file` : "Nothing on file yet"}</h3>
       <div className="grid gap-3 min-w-0">
         {docs.map((doc) => {
           const status = documentStatus(doc.expires_on, today);
@@ -164,26 +163,34 @@ export default function PetDocumentsCard({ pet, userId }) {
         })}
       </div>
 
-      <form onSubmit={add} className="grid gap-3 mt-5 min-w-0">
-        <label style={label}>Type
+      {!form.file ? (
+        <label className="ppg-lift mt-4 flex items-center gap-4 rounded-2xl p-4 cursor-pointer min-w-0" style={{ border: "2px dashed #4338CA", background: "#EEF0FF" }}>
+          <span className="flex items-center justify-center rounded-2xl flex-shrink-0" style={{ width: 48, height: 48, background: "#4338CA", color: "#fff", fontSize: 28, fontWeight: 700, lineHeight: 1 }} aria-hidden="true">+</span>
+          <span className="min-w-0">
+            <span className="block" style={{ fontFamily: font.body, fontSize: 17, fontWeight: 800, color: tokens.navy }}>Add a document</span>
+            <span className="block" style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>PDF or photo: health certificate, rabies, vet records</span>
+          </span>
+          <input aria-label="Document file" type="file" accept={DOC_ACCEPT} className="ppg-hp" onChange={(e) => setForm({ ...form, file: e.target.files?.[0] || null })} />
+        </label>
+      ) : (
+      <form onSubmit={add} className="grid gap-3 mt-4 min-w-0 rounded-2xl p-4" style={{ background: "#EEF0FF" }}>
+        <div className="flex items-center justify-between gap-3 min-w-0">
+          <span className="truncate" style={{ fontFamily: font.body, fontSize: 16, fontWeight: 800, color: tokens.navy }}>{form.file.name}</span>
+          <button type="button" onClick={() => setForm({ ...form, file: null })} style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.muted, background: "none", border: "none", cursor: "pointer" }}>Cancel</button>
+        </div>
+        <label style={label}>What is it?
           <select aria-label="Document type" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} style={input}>
             {VAULT_DOC_TYPES.map((t) => <option key={t}>{t}</option>)}
           </select>
         </label>
-        <div className="min-w-0">
-          <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }} className="mb-1.5">File</div>
-          <label className="flex items-center min-h-[52px] rounded-2xl px-4 cursor-pointer min-w-0" style={{ border: `2px dashed ${tokens.navy}`, background: tokens.paper }}>
-            <span className="truncate" style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{form.file ? form.file.name : "Choose a file"}</span>
-            <input aria-label="Document file" type="file" accept={DOC_ACCEPT} className="ppg-hp" onChange={(e) => setForm({ ...form, file: e.target.files?.[0] || null })} />
-          </label>
+        <div className="grid grid-cols-2 gap-3 min-w-0">
+          <label style={label}>Issued<input type="date" aria-label="Issue date" value={form.issuedOn} onChange={(e) => setForm({ ...form, issuedOn: e.target.value })} style={input} /></label>
+          <label style={label}>Expires<input type="date" aria-label="Expiry date" value={form.expiresOn} onChange={(e) => setForm({ ...form, expiresOn: e.target.value })} style={input} /></label>
         </div>
-        <div className="grid sm:grid-cols-2 gap-3 min-w-0">
-          <label style={label}>Issue date<input type="date" aria-label="Issue date" value={form.issuedOn} onChange={(e) => setForm({ ...form, issuedOn: e.target.value })} style={input} /></label>
-          <label style={label}>Expiry date<input type="date" aria-label="Expiry date" value={form.expiresOn} onChange={(e) => setForm({ ...form, expiresOn: e.target.value })} style={input} /></label>
-        </div>
-        <label style={label}>Note<input aria-label="Document note" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} maxLength={500} style={input} /></label>
-        <button type="submit" disabled={busy} className="ppg-btn ppg-btn-primary" style={{ justifySelf: "start" }}>{busy ? "Uploading…" : "Upload"}</button>
+        <label style={label}>Note (optional)<input aria-label="Document note" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} maxLength={500} style={input} /></label>
+        <button type="submit" disabled={busy} className="ppg-btn ppg-btn-primary" style={{ justifySelf: "start" }}>{busy ? "Uploading…" : "Save document"}</button>
       </form>
+      )}
     </section>
   );
 }

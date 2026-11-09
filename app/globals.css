@@ -306,3 +306,7 @@ textarea {
 @media (min-width: 640px) { .ppg-tab-label { font-size: 13.5px; } }
 .ppg-fold-body [data-pet-profile] > section { border: none !important; box-shadow: none !important; background: transparent !important; }
 .ppg-fold-body [data-pet-profile] > section > div { padding: 0 !important; }
+.ppg-pp-stampspot { left: 74px; top: 96px; }
+.ppg-mrz { font-size: 10.5px; letter-spacing: 0.04em; }
+@media (min-width: 640px) { .ppg-pp-stampspot { left: 108px; top: 120px; } .ppg-mrz { font-size: 12.5px; letter-spacing: 0.12em; } }
+[data-pet-passport] { scroll-margin-top: 12px; }

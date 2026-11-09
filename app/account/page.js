@@ -91,10 +91,10 @@ function calculateAge(dob) {
 }
 
 const BANNERS = {
-  health: [(n) => `${n}'s health`, (n) => "Vaccines, meds, weight and vet in one place. Snap a vet record and we fill it in."],
-  docs: [() => "Documents", (n) => `Health certificates, rabies papers and housing forms for ${n}, ready when someone asks.`],
-  lost: [(n) => `If ${n} goes missing`, () => "One tap turns the ID into a lost poster and alerts you when the tag is scanned."],
-  about: [(n) => `All about ${n}`, () => "Personality, favorite things and quirks. Great for sitters and new vets."],
+  health: [(n) => `${n}'s health`, () => "Vaccines, meds, weight and vet in one place."],
+  docs: [() => "Documents", () => "Certificates and records, ready when someone asks."],
+  lost: [(n) => `If ${n} goes missing`, () => "One tap turns the Pet ID into a lost poster."],
+  about: [(n) => `All about ${n}`, () => "Personality and quirks for sitters and vets."],
 };
 
 const th = (k) => SECTION_THEME[k];
@@ -378,7 +378,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
   );
 
   return (
-    <div id={`pet-top-${pet.id}`} className="mb-8 grid gap-4">
+    <div id={`pet-top-${pet.id}`} className="mb-8 grid grid-cols-1 gap-4 min-w-0">
       <PetHero pet={pet} photo={photoEl} photoBusy={uploadingPhoto} onPhoto={handlePhotoUpload} onGo={(k) => { setSection(k); setTimeout(() => document.getElementById(`pet-nav-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 30); }} />
 
       <div id={`pet-nav-${pet.id}`} className="ppg-pet-nav grid grid-cols-6 gap-1.5 sm:gap-2" style={{ scrollMarginTop: 8 }} role="tablist" aria-label={`${pet.name} sections`}>
@@ -386,7 +386,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
           const on = section === key;
           const t = SECTION_THEME[key];
           return (
-            <button key={key} type="button" role="tab" aria-selected={on} onClick={() => setSection(key)} className="ppg-tab flex flex-col items-center justify-center gap-1 rounded-2xl py-2.5 sm:py-3 min-w-0"
+            <button key={key} type="button" role="tab" aria-selected={on} onClick={() => setSection(key)} className="ppg-tab flex flex-col items-center justify-center gap-1 rounded-2xl py-2.5 sm:py-3 min-w-0 px-0.5"
               style={{ cursor: "pointer", background: on ? t.color : "#fff", border: `1.5px solid ${on ? t.color : tokens.line}`, boxShadow: on ? `0 8px 18px ${t.color}45` : "none" }}>
               <span className="flex items-center justify-center rounded-xl" style={{ width: 32, height: 32, background: on ? "rgba(255,255,255,0.2)" : t.soft, color: on ? "#fff" : t.color }}><Icon name={icon} size={18} /></span>
               <span className="ppg-tab-label" style={{ fontFamily: font.body, fontWeight: 800, color: on ? "#fff" : tokens.navy, lineHeight: 1.1, textAlign: "center" }}>{label}</span>
@@ -395,7 +395,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         })}
       </div>
 
-      <div data-pet-section={section} className="grid gap-3 ppg-rise" key={section}>
+      <div data-pet-section={section} className="grid grid-cols-1 gap-3 ppg-rise min-w-0" key={section}>
         {BANNERS[section] ? <SectionBanner k={section} title={BANNERS[section][0](pet.name)} text={BANNERS[section][1](pet.name)} /> : null}
 
         {section === "passport" && (<>
@@ -437,9 +437,9 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
                 {delta !== null && delta !== 0 && <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>{delta > 0 ? "+" : ""}{delta} since {previous.recorded_date}</div>}
               </div>
             )}
-            <form onSubmit={handleAddWeight} className="flex gap-2 items-center">
-              <input required type="number" step="0.1" placeholder="lbs" aria-label="Weight in pounds" value={newValue} onChange={(e) => setNewValue(e.target.value)} style={{ ...field, width: 90 }} className="rounded-lg px-3 py-2 outline-none" />
-              <input type="date" aria-label="Date" value={newDate} onChange={(e) => setNewDate(e.target.value)} style={field} className="rounded-lg px-3 py-2 outline-none flex-1 min-w-0" />
+            <form onSubmit={handleAddWeight} className="grid gap-2 items-center min-w-0" style={{ gridTemplateColumns: "84px minmax(0,1fr) auto" }}>
+              <input required type="number" step="0.1" placeholder="lbs" aria-label="Weight in pounds" value={newValue} onChange={(e) => setNewValue(e.target.value)} style={{ ...field, width: "100%" }} className="rounded-lg px-3 py-2 outline-none" />
+              <input type="date" aria-label="Date" value={newDate} onChange={(e) => setNewDate(e.target.value)} style={field} className="rounded-lg px-3 py-2 outline-none w-full min-w-0" />
               <button type="submit" disabled={saving} className="ppg-btn ppg-btn-primary">{saving ? "Saving…" : "Log"}</button>
             </form>
           
