@@ -84,6 +84,19 @@ function calculateAge(dob) {
 }
 
 function PetCard({ pet, userId, onPhotoUpdated }) {
+  const [section, setSection] = useState(() => {
+    const want = typeof window !== "undefined" ? window.__ppgPetSection : null;
+    return want && (!want.petId || want.petId === pet.id) ? want.section : "passport";
+  });
+  useEffect(() => {
+    function go(e) {
+      const d = e.detail || {};
+      if (d.petId && d.petId !== pet.id) return;
+      if (d.section) setSection(d.section);
+    }
+    window.addEventListener("ppg-pet-section", go);
+    return () => window.removeEventListener("ppg-pet-section", go);
+  }, [pet.id]);
   const [measurements, setMeasurements] = useState([]);
   const [loadingLog, setLoadingLog] = useState(true);
   const [showLog, setShowLog] = useState(false);
@@ -318,46 +331,112 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
   const sub = (t) => <div style={{ fontFamily: font.body, fontSize: 13, fontWeight: 700, color: tokens.navy }} className="mt-2">{t}</div>;
   const photoEl = pet.photo_url ? <SignedImg value={pet.photo_url} alt={pet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : null;
 
+  const sections = [
+    ["passport", "Passport", "passport"],
+    ["id", "Pet ID", "tag"],
+    ["health", "Health", "health"],
+    ["docs", "Documents", "file"],
+    ["lost", "Lost pet", "alert"],
+    ["about", "About", "paw"],
+  ];
+  const panel = { background: "#fff", border: `1px solid ${tokens.line}` };
+  const sectionTitle = (t, s) => (
+    <div className="mb-3">
+      <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 800, color: tokens.navy }}>{t}</div>
+      {s ? <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>{s}</div> : null}
+    </div>
+  );
+
   return (
-    <div id={`pet-top-${pet.id}`} data-pet-passport className="mb-6 grid gap-4">
-      <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} />
-      <div id={`lost-${pet.id}`} style={{ scrollMarginTop: 12 }}><LostPanel pet={pet} userId={userId} onChanged={onPhotoUpdated} /></div>
+    <div id={`pet-top-${pet.id}`} className="mb-8 grid gap-4">
+      <div className="flex items-center gap-3">
+        <div className="rounded-2xl overflow-hidden flex items-center justify-center shrink-0" style={{ width: 52, height: 52, background: "#FBF6EC", border: `2px solid ${tokens.gold}` }}>
+          {photoEl || <PetIllustration type={pet.animal_type} size={46} />}
+        </div>
+        <div className="min-w-0">
+          <div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 800, color: tokens.navy, lineHeight: 1.1 }}>{pet.name}</div>
+          <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="truncate">{[pet.breed || pet.animal_type, pet.weight_lb ? `${pet.weight_lb} lb` : null].filter(Boolean).join(" · ")}</div>
+        </div>
+      </div>
 
-      <ActivationChecklist pet={pet} userId={userId} refreshKey={healthKey} />
-      <WhatsNeededNext pet={pet} />
+      <div className="ppg-pet-nav ppg-noscrollbar sticky top-0 z-20 flex gap-2 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 py-2" style={{ background: tokens.sky }} role="tablist" aria-label={`${pet.name} sections`}>
+        {sections.map(([key, label, icon]) => {
+          const on = section === key;
+          return (
+            <button key={key} type="button" role="tab" aria-selected={on} onClick={() => setSection(key)} className="shrink-0 inline-flex items-center gap-2 rounded-full px-4 py-2.5"
+              style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, cursor: "pointer", background: on ? tokens.navy : "#fff", color: on ? "#fff" : tokens.navy, border: `1.5px solid ${on ? tokens.navy : tokens.line}` }}>
+              <Icon name={icon} size={17} />{label}
+            </button>
+          );
+        })}
+      </div>
 
+      <div data-pet-section={section} className="grid gap-4 ppg-rise" key={section}>
+        {section === "passport" && (
+          <div data-pet-passport className="grid gap-4">
+            <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="passport" />
+          </div>
+        )}
 
-      <div className="mt-3 rounded-2xl overflow-hidden" style={{ border: `1px solid ${tokens.line}` }}>
-        <VaultSection id={`pet-id-${pet.id}`} title="Care card" hint="Sitter or emergency">
-          <ShareCard pet={pet} userId={userId} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
-        </VaultSection>
-        <VaultSection id={`weight-${pet.id}`} title="Weight" hint={loadingLog ? "" : current ? `${current.value} ${current.unit || "lbs"}` : "Not logged"}>
-          {measurements.length > 0 && (
-            <div className="flex flex-col gap-1.5">
-              {measurements.slice(0, showLog ? undefined : 3).map((m) => (
-                <div key={m.id} className="flex justify-between items-center" style={{ fontFamily: font.body, fontSize: 14.5 }}>
-                  <span style={{ color: tokens.muted }}>{m.recorded_date}</span>
-                  <span className="flex items-center gap-3"><b style={{ color: tokens.navy }}>{m.value} {m.unit || "lbs"}</b>
-                    <button aria-label="Delete entry" onClick={async () => { await supabase.from("pet_measurements").delete().eq("id", m.id); loadMeasurements(); }} style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted, textDecoration: "underline" }}>Delete</button></span>
-                </div>
-              ))}
-              {measurements.length > 3 && <button onClick={() => setShowLog((v) => !v)} className="self-start" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.navy, textDecoration: "underline" }}>{showLog ? "Show less" : "Show all"}</button>}
-              {delta !== null && delta !== 0 && <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>{delta > 0 ? "+" : ""}{delta} since {previous.recorded_date}</div>}
-            </div>
-          )}
-          <form onSubmit={handleAddWeight} className="mt-2 flex gap-2 items-center">
-            <input required type="number" step="0.1" placeholder="lbs" value={newValue} onChange={(e) => setNewValue(e.target.value)} style={{ ...field, width: 90 }} className="rounded-lg px-3 py-2 outline-none" />
-            <input type="date" value={newDate} onChange={(e) => setNewDate(e.target.value)} style={field} className="rounded-lg px-3 py-2 outline-none flex-1 min-w-0" />
-            <button type="submit" disabled={saving} className="ppg-btn ppg-btn-primary">{saving ? "Saving…" : "Log"}</button>
-          </form>
-        </VaultSection>
-        <VaultSection id={`chip-${pet.id}`} title="Microchip" hint={pet.microchip_number ? `•••• ${String(pet.microchip_number).replace(/[^0-9A-Za-z]/g, "").slice(-4)}` : "Not added"}>
-          <ChipVault pet={pet} userId={userId} onChanged={onPhotoUpdated} bare />
-        </VaultSection>
-        <VaultSection id={`more-${pet.id}`} title="Find a vet and trips flown" hint="" last>
-          <FindAVet pet={pet} />
-          <TravelStamps pet={pet} />
-        </VaultSection>
+        {section === "id" && (<>
+          <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="id" />
+          <div className="rounded-3xl p-5" style={panel}>
+            {sectionTitle("Care card", "A one-page card for sitters, boarders or an emergency.")}
+            <ShareCard pet={pet} userId={userId} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
+          </div>
+        </>)}
+
+        {section === "health" && (<>
+          <div id="health-passport-wrap"><PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="health" /></div>
+          <WhatsNeededNext pet={pet} />
+          <div className="rounded-3xl p-5" style={panel}>
+            {sectionTitle("Weight", current ? `Latest: ${current.value} ${current.unit || "lbs"}` : "Log a weight to track changes and fill in the passport.")}
+            {measurements.length > 0 && (
+              <div className="flex flex-col gap-1.5 mb-2">
+                {measurements.slice(0, showLog ? undefined : 3).map((m) => (
+                  <div key={m.id} className="flex justify-between items-center" style={{ fontFamily: font.body, fontSize: 14.5 }}>
+                    <span style={{ color: tokens.muted }}>{m.recorded_date}</span>
+                    <span className="flex items-center gap-3"><b style={{ color: tokens.navy }}>{m.value} {m.unit || "lbs"}</b>
+                      <button aria-label="Delete entry" onClick={async () => { await supabase.from("pet_measurements").delete().eq("id", m.id); loadMeasurements(); }} style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted, textDecoration: "underline" }}>Delete</button></span>
+                  </div>
+                ))}
+                {measurements.length > 3 && <button onClick={() => setShowLog((v) => !v)} className="self-start" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.navy, textDecoration: "underline" }}>{showLog ? "Show less" : "Show all"}</button>}
+                {delta !== null && delta !== 0 && <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>{delta > 0 ? "+" : ""}{delta} since {previous.recorded_date}</div>}
+              </div>
+            )}
+            <form onSubmit={handleAddWeight} className="flex gap-2 items-center">
+              <input required type="number" step="0.1" placeholder="lbs" aria-label="Weight in pounds" value={newValue} onChange={(e) => setNewValue(e.target.value)} style={{ ...field, width: 90 }} className="rounded-lg px-3 py-2 outline-none" />
+              <input type="date" aria-label="Date" value={newDate} onChange={(e) => setNewDate(e.target.value)} style={field} className="rounded-lg px-3 py-2 outline-none flex-1 min-w-0" />
+              <button type="submit" disabled={saving} className="ppg-btn ppg-btn-primary">{saving ? "Saving…" : "Log"}</button>
+            </form>
+          </div>
+          <div id={`chip-${pet.id}`} className="rounded-3xl p-5" style={panel}>
+            {sectionTitle("Microchip", pet.microchip_number ? `•••• ${String(pet.microchip_number).replace(/[^0-9A-Za-z]/g, "").slice(-4)}` : "Add the chip number so a shelter or vet can reach you.")}
+            <ChipVault pet={pet} userId={userId} onChanged={onPhotoUpdated} bare />
+          </div>
+          <div className="rounded-3xl p-5" style={panel}>
+            {sectionTitle("Find a vet")}
+            <FindAVet pet={pet} />
+          </div>
+        </>)}
+
+        {section === "docs" && <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="docs" />}
+
+        {section === "lost" && (
+          <div id={`lost-${pet.id}`} className="rounded-3xl p-5" style={panel}>
+            {sectionTitle(`If ${pet.name} goes missing`, "Turn on a lost poster, get alerts when the tag is scanned, and print a flyer.")}
+            <LostPanel pet={pet} userId={userId} onChanged={onPhotoUpdated} />
+            <a href="/lost-flyer" className="inline-block mt-4" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.primary }}>Make a printable lost pet flyer →</a>
+          </div>
+        )}
+
+        {section === "about" && (<>
+          <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="about" />
+          <div className="rounded-3xl p-5" style={panel}>
+            {sectionTitle("Trips flown")}
+            <TravelStamps pet={pet} />
+          </div>
+        </>)}
       </div>
     </div>
   );
@@ -1144,9 +1223,8 @@ export default function AccountPage() {
     if (want) setActiveTab({ vault: "vault", profile: "vault", trips: "trips", flight: "trips", history: "trips", billing: "billing", dashboard: "dashboard" }[want] || "dashboard");
     // ?focus=id (header "Pet ID" link): open Pet Vault and scroll to the pet's ID card once it has loaded.
     if (new URLSearchParams(window.location.search).get("focus") === "id") {
+      window.__ppgPetSection = { petId: null, section: "id" };
       setActiveTab("vault");
-      let tries = 0;
-      const t = setInterval(() => { tries += 1; if (revealAnchor("[data-pet-passport]") || tries > 20) clearInterval(t); }, 400);
     }
     else if (localStorage.getItem("petpassgo_open_flight_tab")) {
       setActiveTab("trips");
@@ -1168,10 +1246,16 @@ export default function AccountPage() {
   }
   // From Home: open one pet's passport, Pet ID, health records or lost-pet panel.
   function openPet(petId, kind) {
-    setBottomKey(kind === "health" ? "health" : kind === "passport" ? "passport" : null);
-    const map = { passport: petId ? `#pet-top-${petId}` : "[data-pet-passport]", id: "#wallet-card", health: "#health-passport", lost: petId ? `#lost-${petId}` : '[id^="lost-"]' };
-    openVaultAnchor(map[kind] || (petId ? `#pet-top-${petId}` : null));
-    if (!map[kind] && !petId) { const sc = document.querySelector(".ppg-account-scroll"); (sc || window).scrollTo({ top: 0 }); }
+    const section = { passport: "passport", id: "id", health: "health", lost: "lost" }[kind] || null;
+    setBottomKey(section === "health" ? "health" : section === "passport" ? "passport" : null);
+    if (section) {
+      window.__ppgPetSection = { petId, section };
+      window.dispatchEvent(new CustomEvent("ppg-pet-section", { detail: { petId, section } }));
+    }
+    setActiveTab("vault");
+    const sc = document.querySelector(".ppg-account-scroll");
+    if (petId) setTimeout(() => revealWhenReady(`#pet-top-${petId}`), 150);
+    else (sc || window).scrollTo({ top: 0 });
   }
   // In-page links (#chip-vault, #health-passport…) open the collapsed section they point into.
   useEffect(() => {
@@ -1187,8 +1271,8 @@ export default function AccountPage() {
     setBottomKey(key);
     if (key === "home") setActiveTab("dashboard");
     else if (key === "travel") setActiveTab("trips");
-    else if (key === "passport") { openVaultAnchor("[data-pet-passport]"); return; }
-    else if (key === "health") { openVaultAnchor("#health-passport"); return; }
+    else if (key === "passport") openPet(null, "passport");
+    else if (key === "health") openPet(null, "health");
     else setActiveTab("billing");
     const scroller = document.querySelector(".ppg-account-scroll");
     if (scroller) scroller.scrollTo({ top: 0, behavior: "smooth" });

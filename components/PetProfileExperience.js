@@ -156,8 +156,10 @@ function fromPet(pet) {
   };
 }
 
-export default function PetProfileExperience({ pet, userId, mode = "owner", onChanged }) {
+export default function PetProfileExperience({ pet, userId, mode = "owner", onChanged, view = null }) {
   const owner = mode === "owner";
+  // Owner pages show one focused section at a time (passport, health, docs, about, id).
+  const v = owner ? view : null;
   const [tab, setTab] = useState("travel");
   const [docs, setDocs] = useState([]);
   const [trips, setTrips] = useState([]);
@@ -238,6 +240,12 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
   useEffect(() => {
     if (publicTabs.length && !publicTabs.some(([id]) => id === tab)) setTab(publicTabs[0][0]);
   }, [publicTabs, tab]);
+  useEffect(() => {
+    const want = { health: "medical", docs: "housing", about: "about" }[v];
+    if (want) setTab(want);
+  }, [v]);
+  const showPassport = !v || v === "passport";
+  const showPanel = !v || v === "health" || v === "docs" || v === "about";
 
   async function save(patch) {
     if (!owner) return false;
@@ -334,7 +342,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
   return (
     <div data-pet-profile className="grid gap-4 min-w-0 max-w-full">
       {reveal ? <PassportReveal pet={pet} photo={photo} issuedAt={reveal} onClose={finishReveal} /> : null}
-      {owner && !pet.passport_issued_at && missing.length > 0 ? (
+      {showPassport && owner && !pet.passport_issued_at && missing.length > 0 ? (
         <div className="rounded-2xl px-4 py-3 flex items-center gap-4" style={{ background: "#FFF9EC", border: `1.5px solid ${tokens.gold}` }}>
           <div className="flex-shrink-0 rounded-full flex items-center justify-center" style={{ width: 44, height: 44, border: `2.5px dashed ${tokens.primary}`, color: tokens.primary, fontFamily: font.display, fontWeight: 800, fontSize: 15 }}>{PASSPORT_FIELDS.length - missing.length}/{PASSPORT_FIELDS.length}</div>
           <div className="min-w-0">
@@ -343,7 +351,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
           </div>
         </div>
       ) : null}
-      <PetPassport
+      {showPassport ? <PetPassport
         pet={pet}
         photo={photo}
         stamps={stampRows}
@@ -353,21 +361,22 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
         onRemovePhoto={owner && pet.photo_url ? removePhoto : null}
         photoBusy={photoBusy}
         onDocuments={showDocsButton ? () => document.getElementById(`documents-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }) : null}
-      />
-      <section className="rounded-3xl overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.08)" }}>
-        <div className="px-4 py-2.5 flex items-center gap-3" style={{ background: tokens.navy }}>
+      /> : null}
+      {showPanel ? <section className="rounded-3xl overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.08)" }}>
+        {!v ? <div className="px-4 py-2.5 flex items-center gap-3" style={{ background: tokens.navy }}>
           <span className="flex gap-1.5 flex-shrink-0" aria-hidden="true">
             <i className="rounded-full" style={{ width: 10, height: 10, background: tokens.gold, display: "block" }} />
             <i className="rounded-full" style={{ width: 10, height: 10, background: "rgba(255,255,255,0.45)", display: "block" }} />
             <i className="rounded-full" style={{ width: 10, height: 10, background: "rgba(255,255,255,0.25)", display: "block" }} />
           </span>
           <div className="flex-1 min-w-0 rounded-full px-3 py-1 text-center truncate" style={{ background: "rgba(255,255,255,0.12)", color: "#fff", fontFamily: font.body, fontSize: 15 }}>{profileLabel(pet)}</div>
-        </div>
+        </div> : null}
         <div className="p-4 sm:p-6">
-          {declared ? <div className="mb-3" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.ink }}>{declared}, as declared by the owner</div> : null}
-          {chips.length > 0 ? <div className="flex flex-wrap gap-2 mb-4">{chips.map((c) => <Chip key={c}>{c}</Chip>)}</div> : null}
+          {v ? <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 800, color: tokens.navy }} className="mb-3">{{ health: "Health & vet", docs: "Housing paperwork", about: `About ${pet.name || "your pet"}` }[v]}</div> : null}
+          {!v && declared ? <div className="mb-3" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.ink }}>{declared}, as declared by the owner</div> : null}
+          {!v && chips.length > 0 ? <div className="flex flex-wrap gap-2 mb-4">{chips.map((c) => <Chip key={c}>{c}</Chip>)}</div> : null}
 
-          {publicTabs.length > 0 ? (
+          {!v && publicTabs.length > 0 ? (
             <div className="flex flex-wrap gap-2 mt-5" role="tablist">
               {publicTabs.map(([id, label]) => (
                 <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)} style={{ ...btn, background: tab === id ? tokens.navy : "#fff", color: tab === id ? "#fff" : tokens.navy, border: `2px solid ${tokens.navy}` }}>{label}</button>
@@ -375,7 +384,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
             </div>
           ) : null}
 
-          <div className="mt-4" role="tabpanel">
+          <div className={v ? "" : "mt-4"} role="tabpanel">
             {tab === "travel" && (owner || trips.length > 0) ? (
               <div className="grid gap-3">
                 {trips.length === 0 && owner ? (
@@ -493,9 +502,11 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
             ) : null}
           </div>
         </div>
-      </section>
+      </section> : null}
 
-      {owner ? <><PetBasicsCard pet={pet} userId={userId} onChanged={onChanged} /><PetCareCard pet={pet} userId={userId} onChanged={onChanged} /><PetDocumentsCard pet={pet} userId={userId} /></> : null}
+      {owner && (!v || v === "passport") ? <PetBasicsCard pet={pet} userId={userId} onChanged={onChanged} /> : null}
+      {owner && (!v || v === "health") ? <PetCareCard pet={pet} userId={userId} onChanged={onChanged} /> : null}
+      {owner && (!v || v === "docs") ? <PetDocumentsCard pet={pet} userId={userId} /> : null}
 
       {!owner && docs.length > 0 && <section id={`documents-${pet.id}`} className="rounded-3xl p-4 sm:p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
         <h3 style={{ fontFamily: font.display, fontSize: 22, fontWeight: 700, color: tokens.navy }}>Documents</h3>
@@ -504,7 +515,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
         ))}
       </section>}
 
-      {owner ? (
+      {owner && (!v || v === "id") ? (
         <>
           <section data-pet-details className="rounded-3xl overflow-hidden flex flex-col lg:flex-row" style={{ border: `1px solid ${tokens.line}` }}>
             <aside className="p-5 lg:w-72 flex-shrink-0" style={{ background: tokens.navy }}>
