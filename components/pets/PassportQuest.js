@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Icon from "../Icon";
 import BreedInput from "../BreedInput";
 import PhotoBooth from "./PhotoBooth";
@@ -48,7 +48,7 @@ function Step({ k, label, pet, userId, onChanged, onPhoto, open, onOpen }) {
   }
 
   return (
-    <li className="rounded-2xl" style={{ background: done ? "#F4FAF6" : "#fff", border: `1.5px solid ${done ? "#CFE7D7" : open ? T.color : tokens.line}`, transition: "border-color .2s" }}>
+    <li data-quest-field={k} className="rounded-2xl" style={{ scrollMarginTop: 90, background: done ? "#F4FAF6" : "#fff", border: `1.5px solid ${done ? "#CFE7D7" : open ? T.color : tokens.line}`, transition: "border-color .2s" }}>
       <button type="button" disabled={done} onClick={onOpen} className="w-full flex items-center gap-3 px-4 py-3 text-left" style={{ background: "none", border: "none", cursor: done ? "default" : "pointer" }}>
         <span className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: 30, height: 30, background: done ? tokens.green : T.soft, color: done ? "#fff" : T.color, border: done ? "none" : `2px dashed ${T.color}` }}>
           {done ? <Icon name="check" size={16} /> : <Icon name="plus" size={15} />}
@@ -80,9 +80,30 @@ export default function PassportQuest({ pet, userId, onChanged, onPhoto }) {
   const doneCount = PASSPORT_FIELDS.length - missingKeys.length;
   const pct = Math.round((doneCount / PASSPORT_FIELDS.length) * 100);
   const openKey = missingKeys.includes(open) ? open : missingKeys[0];
+  const rootRef = useRef(null);
+
+  // "Add weight to issue the passport" (and similar) jumps straight to that field.
+  useEffect(() => {
+    function onFocus(e) {
+      if (e.detail?.petId !== pet.id) return;
+      const k = e.detail.field;
+      setOpen(k);
+      setTimeout(() => {
+        const li = rootRef.current?.querySelector(`[data-quest-field="${k}"]`);
+        if (!li) return;
+        li.scrollIntoView({ behavior: "smooth", block: "center" });
+        const input = li.querySelector("input, select, textarea");
+        if (input) setTimeout(() => input.focus({ preventScroll: true }), 350);
+        li.classList.add("ppg-flash");
+        setTimeout(() => li.classList.remove("ppg-flash"), 1600);
+      }, 80);
+    }
+    window.addEventListener("ppg-focus-field", onFocus);
+    return () => window.removeEventListener("ppg-focus-field", onFocus);
+  }, [pet.id]);
 
   return (
-    <section className="rounded-3xl overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.08)" }}>
+    <section ref={rootRef} className="rounded-3xl overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.08)" }}>
       <div className="px-5 py-4 flex items-center gap-4" style={{ background: `linear-gradient(120deg, ${T.color}, #E0782F)`, color: "#fff" }}>
         <div className="flex items-center justify-center rounded-2xl flex-shrink-0" style={{ width: 48, height: 48, background: "rgba(255,255,255,0.18)" }}><Icon name="passport" size={26} /></div>
         <div className="flex-1 min-w-0">

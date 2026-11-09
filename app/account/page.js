@@ -379,7 +379,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
 
   return (
     <div id={`pet-top-${pet.id}`} className="mb-8 grid grid-cols-1 gap-4 min-w-0">
-      <PetHero pet={pet} photo={photoEl} photoBusy={uploadingPhoto} onPhoto={handlePhotoUpload} onGo={(k) => { setSection(k); setTimeout(() => document.getElementById(`pet-nav-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 30); }} />
+      <PetHero pet={pet} photo={photoEl} photoBusy={uploadingPhoto} onPhoto={handlePhotoUpload} onGo={(k, field) => { setSection(k); setTimeout(() => { if (field) window.dispatchEvent(new CustomEvent("ppg-focus-field", { detail: { petId: pet.id, field } })); else document.getElementById(`pet-nav-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60); }} />
 
       <div id={`pet-nav-${pet.id}`} className="ppg-pet-nav grid grid-cols-6 gap-1.5 sm:gap-2" style={{ scrollMarginTop: 8 }} role="tablist" aria-label={`${pet.name} sections`}>
         {sections.map(([key, label, icon]) => {

@@ -6,7 +6,7 @@ import PhotoBooth from "./PhotoBooth";
 import Icon from "../Icon";
 import { PetIllustration } from "../PetIdCard";
 import { tokens, font } from "../../lib/theme";
-import { passportMissing } from "../../lib/petProfile";
+import { passportMissing, PASSPORT_FIELDS, filled } from "../../lib/petProfile";
 import { profileProgress, petAge, SECTION_THEME } from "../../lib/petSections";
 
 function Ring({ pct }) {
@@ -41,6 +41,7 @@ export default function PetHero({ pet, photo, onGo, onPhoto, photoBusy }) {
   if (!issued && missingPassport.length) {
     next = {
       section: "passport",
+      field: (PASSPORT_FIELDS.find(([k]) => !filled(pet?.[k])) || [])[0],
       text: missingPassport.length === 1
         ? `Add ${missingPassport[0].toLowerCase()} to issue ${pet.name}'s passport`
         : `${missingPassport.length} details left to issue ${pet.name}'s passport`,
@@ -87,7 +88,7 @@ export default function PetHero({ pet, photo, onGo, onPhoto, photoBusy }) {
         <Ring pct={prog.pct} />
       </div>
       {next ? (
-        <button type="button" onClick={() => onGo?.(next.section)} className="relative mt-4 w-full flex items-center justify-between gap-3 rounded-2xl px-3.5 py-2.5 text-left ppg-lift"
+        <button type="button" onClick={() => onGo?.(next.section, next.field)} className="relative mt-4 w-full flex items-center justify-between gap-3 rounded-2xl px-3.5 py-2.5 text-left ppg-lift"
           style={{ background: "#fff", color: tokens.navy, border: "none", cursor: "pointer" }}>
           <span className="flex items-center gap-3 min-w-0">
             <span className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: 32, height: 32, background: SECTION_THEME[next.section].soft, color: SECTION_THEME[next.section].color }}>
