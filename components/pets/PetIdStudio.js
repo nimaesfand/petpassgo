@@ -165,7 +165,7 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
         <ActionTile icon="smartphone" title="Save image" sub="Card image with QR" onClick={saveImage} busy={busy === "png" ? "Saving…" : ""} />
         <ActionTile icon="link" title={copied ? "Copied!" : "Copy link"} sub="Share the profile" onClick={copy} />
         <ActionTile icon="external" title="Public page" sub="What a finder sees" href={profileUrl(pet)} />
-        <ActionTile icon="tag" title="Print tags" sub="Collar tags + stickers" href={`/account/tags?pet=${pet.id}`} />
+        <ActionTile icon="tag" title="Print QR tags" sub="Free to print · metal tags soon" href={`/account/tags?pet=${pet.id}`} />
         {wallet ? <ActionTile icon="bag" title="Apple Wallet" sub="Next to your cards" onClick={addWallet} busy={busy === "wallet" ? "Preparing…" : ""} /> : null}
       </div>
 
