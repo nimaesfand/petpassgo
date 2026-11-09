@@ -11,7 +11,7 @@ const EXAMPLES = {
   alaska: {
     tab: "Alaska Airlines",
     route: "Los Angeles → Honolulu · dog in the cabin",
-    verdict: { key: "go", title: "Yes, your dog can fly this trip", text: "13 things to do first. Here are a few of them." },
+    verdict: { key: "go", title: "Yes, your dog can fly this trip", text: "14 things to do first. Here are a few of them." },
     steps: [
       { cat: "Start 2–3 months ahead", title: "FAVN rabies blood test", body: "Needed for fast release at Honolulu airport. Lab results alone can take 6–8 weeks.", src: "Hawaii Dept. of Agriculture" },
       { cat: "10 days before arrival", title: "Hawaii Dog & Cat Import Form (AQS-279)", body: "One per pet, with two original rabies certificates. You can submit it online.", src: "Hawaii Dept. of Agriculture" },
@@ -70,7 +70,7 @@ export default function SampleAnswer() {
                 </div>
               </li>
             ))}
-            <li className="rounded-2xl p-3 text-center" style={{ border: `1.5px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.muted }}>+ 9 more steps in the Travel Pass</li>
+            <li className="rounded-2xl p-3 text-center" style={{ border: `1.5px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.muted }}>+ 10 more steps in the Travel Pass</li>
           </ol>
         ) : (
           <div className="rounded-2xl p-4" style={{ background: tokens.sky, fontFamily: font.body, fontSize: 15, color: tokens.ink }}>
