@@ -3,7 +3,8 @@ import { useMemo, useState } from "react";
 import Icon from "./Icon";
 import { tokens, font } from "../lib/theme";
 import { useTodayPT } from "../lib/useTodayPT";
-import { buildPassCards, groupCards, cardDone, dueChip, passProgress, ASK_AIRLINE } from "../lib/passCards";
+import { groupCards, cardDone, dueChip, passProgress, ASK_AIRLINE } from "../lib/passCards";
+import { passReady, segmentPlans } from "../lib/segments";
 import ServiceAnimalTrack from "./ServiceAnimalTrack";
 import LinkText from "./LinkText";
 import { isTel, prettyPhone } from "../lib/linkify";
@@ -136,8 +137,11 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRe
 
 export default function PassChecklist({ trip, requirements = [], statusMap = {}, onSetDone, onOpenRelief }) {
   const today = useTodayPT();
-  const cards = useMemo(() => buildPassCards(requirements, trip), [requirements, trip]);
+  const plans = useMemo(() => segmentPlans(requirements, trip), [requirements, trip]);
+  const multi = plans.length > 1;
+  const cards = useMemo(() => plans.flatMap((plan) => plan.cards), [plans]);
   const groups = useMemo(() => groupCards(cards, statusMap), [cards, statusMap]);
+  const ready = passReady(passProgress(groups), plans);
   const [openId, setOpenId] = useState(null);
   const [doneOpen, setDoneOpen] = useState(false);
   const [nudge, setNudge] = useState(null);
@@ -165,9 +169,9 @@ export default function PassChecklist({ trip, requirements = [], statusMap = {},
     }
   }
 
-  const block = (list) => list.map((card) => (
-    card.askAirline ? <AskAirlineCard key={card.id} card={card} /> : <PassCard
-      key={card.id}
+  const block = (list, prefix = "") => list.map((card) => (
+    card.askAirline ? <AskAirlineCard key={`${prefix}${card.id}`} card={card} /> : <PassCard
+      key={`${prefix}${card.id}`}
       card={card}
       open={openId === card.id}
       done={cardDone(card, statusMap)}
@@ -180,25 +184,43 @@ export default function PassChecklist({ trip, requirements = [], statusMap = {},
   ));
 
   const progress = passProgress(groups);
-  const savedOpen = doneOpen || progress.complete;
+  const savedOpen = doneOpen || ready;
+  const legBody = (plan) => {
+    const legGroups = groupCards(plan.cards, statusMap);
+    return (
+      <section key={plan.label} className="mb-4">
+        <h3 style={{ fontFamily: font.display, fontSize: 20, fontWeight: 700, color: tokens.navy }} className="mt-2 mb-2">{plan.label}</h3>
+        {!plan.resolved && (
+          <article className="rounded-2xl mb-2 px-3 py-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+            <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{plan.reason === "outside" ? "This route is outside the United States, Canada, and Mexico." : "This flight needs checking."}</div>
+            {plan.source ? <a href={plan.source} target="_blank" rel="noopener noreferrer" className="inline-block mt-2" style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.primary }}>Official source</a> : null}
+          </article>
+        )}
+        {block(legGroups.first, plan.label)}
+        {block(legGroups.general, plan.label)}
+        {block(legGroups.know, plan.label)}
+      </section>
+    );
+  };
 
   return (
     <div>
-      <ProgressMark pct={progress.pct} complete={progress.complete} />
+      <ProgressMark pct={progress.pct} complete={ready} />
       {nudge && (
         <div className="rounded-2xl px-4 py-3 mb-3 flex items-center justify-between gap-3" style={{ background: "#EAF6EE", border: `1px solid ${tokens.green}` }}>
-          <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.green }}>{progress.complete ? "Travel Pass complete" : "Checked off. It’s saved on this pass."}</span>
+          <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.green }}>{ready ? "Travel Pass complete" : "Checked off. It’s saved on this pass."}</span>
           {nudge.id ? (
             <button type="button" onClick={() => { setOpenId(nudge.id); setNudge(null); }} style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>Next: {nudge.title}</button>
           ) : null}
         </div>
       )}
-      {groups.first.length > 0 && <SectionLabel hint="Time-sensitive">Do these first</SectionLabel>}
-      {block(groups.first)}
-      {(groups.general.length > 0 || groups.know.length > 0) && <SectionLabel hint="The rest of this trip">General prep</SectionLabel>}
-      {block(groups.general)}
-      {groups.know.length > 0 && <SectionLabel hint="Kept for reference">Reference</SectionLabel>}
-      {block(groups.know)}
+      {multi ? plans.map(legBody) : null}
+      {!multi && groups.first.length > 0 && <SectionLabel hint="Time-sensitive">Do these first</SectionLabel>}
+      {!multi && block(groups.first)}
+      {!multi && (groups.general.length > 0 || groups.know.length > 0) && <SectionLabel hint="The rest of this trip">General prep</SectionLabel>}
+      {!multi && block(groups.general)}
+      {!multi && groups.know.length > 0 && <SectionLabel hint="Kept for reference">Reference</SectionLabel>}
+      {!multi && block(groups.know)}
       <SectionLabel hint={groups.done.length ? `${groups.done.length} checked` : "Nothing yet"}>Saved on this pass</SectionLabel>
       <button type="button" onClick={() => setDoneOpen((v) => !v)} className="w-full rounded-2xl px-4 py-3 text-left flex items-center justify-between" style={{ background: "#fff", border: `1px solid ${tokens.line}`, cursor: "pointer", minHeight: 48 }}>
         <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>Saved ({groups.done.length})</span>

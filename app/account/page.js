@@ -16,7 +16,7 @@ import { JOIN_CTA, PLAN_CTA } from "../../lib/cta";
 import { startStripe } from "../../lib/checkout";
 import { trackBeginCheckout, trackPurchaseOnce, getAttribution } from "../../lib/analytics";
 import { requirementAirline } from "../../lib/airlines";
-import { tripTypeForRoute } from "../../lib/airports";
+import { requirementQueryTypes, segmentPlans } from "../../lib/segments";
 import SiteHeader from "../../components/SiteHeader";
 import { useTripPet, TripCountdown } from "../../components/TripLive";
 import TravelPassDashboard from "../../components/TravelPassDashboard";
@@ -875,7 +875,7 @@ export function DashboardTab({ userId, onOpenTrips }) {
         const genericLate = state === "do_now" && /Open your checklist|Confirm carrier fit|Pack your documents and carrier/.test(it.body || "");
         if (!genericLate && (state === "do_now" || state === "today")) list.push({ key: `rem-${it.kind}`, label: it.title, hint: state === "today" ? "Due today" : "Do this before you fly" });
       }
-      const { data: reqs } = await supabase.rpc("get_trip_requirements", { p_trip_id: current.id, p_trip_types: tripTypeForRoute(current.origin, current.destination) === "international" ? ["international", "domestic"] : ["domestic"] });
+      const { data: reqs } = await supabase.rpc("get_trip_requirements", { p_trip_id: current.id, p_trip_types: requirementQueryTypes(current) });
       const { data: statusRows } = await supabase.from("trip_requirement_status").select("*").eq("trip_id", current.id);
       const doneMap = {};
       (statusRows || []).forEach((s) => { if (s.completed) doneMap[s.requirement_id] = true; });
@@ -987,16 +987,22 @@ function CurrentFlightTab({ userId }) {
       const { data: reqs } = trip.paid
         ? await supabase.rpc("get_trip_requirements", {
             p_trip_id: trip.id,
-            p_trip_types: tripTypeForRoute(trip.origin, trip.destination) === "international" ? ["international", "domestic"] : ["domestic"],
+            p_trip_types: requirementQueryTypes(trip),
           })
         : { data: [] };
       if (cancel) return;
-      const filtered = (reqs || []).filter((row) => matchesDestination(row, trip));
-      // Two airlines on one trip: name the airline on each airline-specific rule.
-      const labeled = trip.second_airline
-        ? filtered.map((r) => (r.airline && r.airline !== "Any" ? { ...r, title: `${r.airline === "Alaska Airlines" && /hawaiian/i.test(trip.second_airline + trip.airline) && !/alaska/i.test(trip.second_airline + trip.airline) ? "Hawaiian Airlines" : r.airline}: ${r.title}` } : r))
-        : filtered;
-      setResults(labeled.filter((r) => r.category !== "ELIGIBILITY NOTE").map((r) => (trip.paid ? r : { ...r, source_url: null, verified_at: null })));
+      const rows = (reqs || []).filter((r) => r.category !== "ELIGIBILITY NOTE");
+      const multi = (Array.isArray(trip.segments) && trip.segments.length > 1) || !!(trip.connecting && trip.second_airline);
+      const filtered = (multi ? rows : rows.filter((row) => matchesDestination(row, trip))).map((r) => (trip.paid ? r : { ...r, source_url: null, verified_at: null }));
+      setResults(filtered);
+      if (trip.paid && reqs) {
+        const plans = segmentPlans(filtered, trip);
+        const nextStatus = plans.length && plans.every((plan) => plan.resolved) ? "ready" : "checking";
+        if (trip.status !== nextStatus) {
+          supabase.from("trips").update({ status: nextStatus }).eq("id", trip.id);
+          setTrip((current) => (current && current.id === trip.id ? { ...current, status: nextStatus } : current));
+        }
+      }
       if (trip.paid && !trip.details_first_viewed_at) supabase.rpc("mark_trip_details_viewed", { p_trip_id: trip.id });
       const { data: statusRows } = await supabase.from("trip_requirement_status").select("*").eq("trip_id", trip.id);
       if (cancel) return;
