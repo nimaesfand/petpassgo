@@ -68,18 +68,18 @@ export async function POST(req) {
     if (!date) return NextResponse.json({ configured: true, found: false, error: "Pick the flight date first. We won't assume today or set your travel date for you." }, { status: 400 });
 
     const { user, sb: authSb } = await requireUser(req);
-    if (!user) return NextResponse.json({ configured: true, found: false, error: "Sign in to look up a flight." }, { status: 401 });
-    const sb = authSb || serviceClient();
-    if (!sb || !(await userIsPaid(sb, user.id))) {
-      return NextResponse.json({ configured: true, found: false, error: "Flight lookup is available on a paid Travel Pass or Pet Vault." }, { status: 403 });
-    }
+    const paid = !!(user && authSb && (await userIsPaid(authSb, user.id)));
+    const sb = paid ? authSb : serviceClient();
+    if (!sb) return NextResponse.json({ configured: true, found: false, error: "Flight lookup is unavailable right now. You can enter your trip manually." });
     const ip = clientIp(req);
-    const [userOk, ipOk] = await Promise.all([
-      allowRequest(sb, `flight_lookup:user:${user.id}`, 20, 600),
-      allowRequest(sb, `flight_lookup:ip:${ip}`, 40, 600),
-    ]);
-    if (!userOk || !ipOk) {
-      return NextResponse.json({ configured: true, found: false, error: "Too many flight lookups. Try again in a few minutes." }, { status: 429 });
+    // Paid customers get generous limits. Visitors on the trip check get a few lookups,
+    // and all visitors together share a daily cap so ad traffic can't drain the API plan.
+    const checks = paid
+      ? [allowRequest(sb, `flight_lookup:user:${user.id}`, 20, 600), allowRequest(sb, `flight_lookup:ip:${ip}`, 40, 600)]
+      : [allowRequest(sb, `flight_lookup:guest:${ip}`, 5, 600), allowRequest(sb, `flight_lookup:guest_day:${ip}`, 12, 86400)];
+    const oks = await Promise.all(checks);
+    if (oks.some((ok) => !ok)) {
+      return NextResponse.json({ configured: true, found: false, error: "Too many flight lookups. Enter your trip below instead." }, { status: 429 });
     }
 
     // 1) Cache first — a fresh hit never spends API quota.
@@ -92,6 +92,9 @@ export async function POST(req) {
 
     const key = process.env.AVIATIONSTACK_API_KEY;
     if (!key) return NextResponse.json({ configured: false, found: false, flight: null });
+    if (!paid && !(await allowRequest(sb, "flight_lookup:guest_all", 40, 86400))) {
+      return NextResponse.json({ configured: true, found: false, error: "Flight lookup is busy right now. Enter your trip below instead." });
+    }
 
     // 2) Live call. Prefer an exact flight.iata match (AviationStack also returns codeshares).
     const url = `https://api.aviationstack.com/v1/flights?access_key=${encodeURIComponent(key)}&flight_iata=${encodeURIComponent(flight)}&flight_date=${encodeURIComponent(date)}&limit=10`;
@@ -112,7 +115,7 @@ export async function POST(req) {
       );
     }
 
-    if (body.trip_id && shaped && sb) {
+    if (paid && body.trip_id && shaped && sb) {
       await sb.from("trips").update({ flight_number: flight, flight_snapshot: shaped, flight_checked_at: fetchedAt }).eq("id", body.trip_id).eq("user_id", user.id).eq("paid", true);
     }
 

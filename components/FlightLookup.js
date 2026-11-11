@@ -28,7 +28,7 @@ export async function lookupFlight(flight, date, tripId) {
   const { data: s } = await supabase.auth.getSession().catch(() => ({ data: null }));
   const r = await fetch("/api/flight-lookup", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ flight, date: date || undefined, trip_id: tripId || undefined }) });
   const j = await r.json().catch(() => ({ configured: true, found: false }));
-  if (r.status === 401 || r.status === 403 || r.status === 429) return { ...j, configured: true, found: false, error: j.error || "Flight lookup is available on a paid Travel Pass or Pet Vault." };
+  if (r.status === 401 || r.status === 403 || r.status === 429) return { ...j, configured: true, found: false, error: j.error || "Flight lookup isn't available right now. Enter your trip below." };
   return j;
 }
 
@@ -78,7 +78,7 @@ export default function FlightLookup({ date, onFill, mode = "outbound" }) {
   return (
     <div className="rounded-xl p-4 mb-4" style={{ background: tokens.sky, border: `1px solid ${tokens.line}` }}>
       <div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy, fontSize: 15 }}>{mode === "return" ? "Optional return flight" : "Have a flight number? Skip the typing"}</div>
-      <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mb-3">{mode === "return" ? "Add a return flight number only if you want. Pick the return date first — we never assume today." : "Pick the date, then we’ll fill in your airports and airline. If you skip the date, nothing is set to today."}</p>
+      <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mb-3">{mode === "return" ? "Add a return flight number only if you want. Pick the return date first — we never assume today." : "Enter the number and date. We fill in the airports and airline for you."}</p>
       <div className="flex flex-wrap gap-2">
         <input value={flight} onChange={(e) => setFlight(e.target.value)} placeholder="Flight # e.g. UA1234" aria-label="Flight number" style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }} className="rounded-xl px-3 py-2.5 outline-none flex-1 min-w-[150px]" />
         <input type="date" value={day} onChange={(e) => setDay(e.target.value)} aria-label="Flight date" style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 15 }} className="rounded-xl px-3 py-2.5 outline-none" />

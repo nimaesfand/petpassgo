@@ -10,6 +10,7 @@ import { routeAllowed, tripTypeForRoute } from "../../lib/airports";
 import RequirementsPreview from "../../components/RequirementsPreview";
 import { saveCheckoutTrip } from "../../lib/tripCheckout";
 import AirportField from "../../components/AirportField";
+import FlightLookup, { airportLabel, airlineFromFlight } from "../../components/FlightLookup";
 import { readTripIntent } from "../../lib/tripIntent";
 import { fmtTripDate } from "../../lib/tripAccess";
 import { trackEvent, trackBeginCheckout, getAttribution } from "../../lib/analytics";
@@ -368,6 +369,19 @@ export default function PetPassGoQuiz() {
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-5">
                 Where are you flying from and to?
               </h2>
+              <FlightLookup
+                date={answers.date}
+                onFill={(f) => {
+                  const origin = airportLabel(f.departure?.iata, f.departure?.airport);
+                  const destination = airportLabel(f.arrival?.iata, f.arrival?.airport);
+                  const airline = airlineFromFlight(f);
+                  const date = f.flight_date || answers.date;
+                  setAnswers((a) => ({ ...a, origin, destination, date, airline: airline || a.airline, flight_number: f.flight_iata || f.requested_iata || "", flight_snapshot: f }));
+                  // Everything we need came from the flight: skip ahead to "how does your pet fly?"
+                  if (airline && date && routeAllowed(origin, destination)) setTimeout(() => setStep(5), 900);
+                }}
+              />
+              <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.muted }} className="mb-2">Or type your cities</div>
               <div className="flex flex-col gap-3" style={{ position: "relative", zIndex: 1 }}>
                 <AirportField key={`o-${answers.origin}`} label="Departing from (type a city)" value={answers.origin} onSelect={(v) => set("origin", v)} />
                 <AirportField key={`d-${answers.destination}`} label="Flying to (type a city)" value={answers.destination} onSelect={(v) => set("destination", v)} />
