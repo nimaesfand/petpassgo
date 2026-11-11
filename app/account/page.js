@@ -91,10 +91,10 @@ function calculateAge(dob) {
 }
 
 const BANNERS = {
-  health: [(n) => `${n}'s health`, () => "Vaccines, meds, weight and vet in one place."],
-  docs: [() => "Documents", () => "Certificates and records, ready when someone asks."],
-  lost: [(n) => `If ${n} goes missing`, () => "One tap turns the Pet ID into a lost poster."],
-  about: [(n) => `All about ${n}`, () => "Personality and quirks for sitters and vets."],
+  health: [(n) => `${n}'s health`, () => "Vaccines, meds and vet in one place. We remind you before anything expires."],
+  docs: [() => "Documents", () => "Upload certificates once. Show them at the counter or share a link."],
+  lost: [(n) => `If ${n} goes missing`, () => "One tap makes a lost poster and alerts you when the tag is scanned."],
+  about: [(n) => `All about ${n}`, () => "Personality and quirks, ready to share with sitters and vets."],
 };
 
 const th = (k) => SECTION_THEME[k];
@@ -734,6 +734,9 @@ function PetProfileTab({ userId }) {
               style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
               className="rounded-xl px-4 py-3 outline-none"
             />
+            <details className="rounded-xl" style={{ border: `1px dashed ${tokens.line}` }}>
+              <summary className="px-4 py-3" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy, cursor: "pointer" }}>More details (optional): sex, weight, carrier size</summary>
+              <div className="flex flex-col gap-3 px-3 pb-3">
             <select
               value={form.sex}
               onChange={(e) => setForm((f) => ({ ...f, sex: e.target.value }))}
@@ -750,6 +753,8 @@ function PetProfileTab({ userId }) {
               <label className="min-w-0" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>W (in)<input type="number" step="0.1" min="0.1" placeholder="W" aria-label="Carrier width in inches" value={form.carrier_width_in} onChange={(e) => setForm((f) => ({ ...f, carrier_width_in: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, width: "100%", minWidth: 0 }} className="rounded-xl px-3 py-3 outline-none mt-1" /></label>
               <label className="min-w-0" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>H (in)<input type="number" step="0.1" min="0.1" placeholder="H" aria-label="Carrier height in inches" value={form.carrier_height_in} onChange={(e) => setForm((f) => ({ ...f, carrier_height_in: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, width: "100%", minWidth: 0 }} className="rounded-xl px-3 py-3 outline-none mt-1" /></label>
             </div>
+              </div>
+            </details>
           </div>
           <div className="flex gap-3 mt-4">
             <button
