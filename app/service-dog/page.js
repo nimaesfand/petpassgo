@@ -49,7 +49,7 @@ export default function ServiceDogPage() {
             Here's what U.S. airlines can actually ask for. Then let us fill in the official DOT form for your trip, ready to sign.
           </p>
           <div className="flex flex-wrap gap-3 mt-6">
-            <a href={CTA} className="inline-flex items-center justify-center rounded-full px-8 min-h-[54px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Check my trip free</a>
+            <a href={CTA} className="inline-flex items-center justify-center rounded-full px-8 min-h-[54px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Check my trip</a>
             <a href="#what-you-need" className="inline-flex items-center justify-center rounded-full px-6 min-h-[54px]" style={{ background: "#fff", color: tokens.navy, border: `1.5px solid ${tokens.line}`, fontFamily: B, fontWeight: 800, fontSize: 16, textDecoration: "none" }}>What you need</a>
           </div>
         </section>
@@ -106,7 +106,7 @@ export default function ServiceDogPage() {
           <p className="mt-4 max-w-[44rem]" style={{ fontFamily: B, fontSize: 14, lineHeight: 1.5, color: tokens.muted }}>
             The DOT form is an official U.S. government document. You sign it yourself, and knowingly false statements can lead to fines and other penalties. Source: <a href={DOT_AIR_FORM_PAGE} target="_blank" rel="noopener" style={{ color: tokens.navy }}>U.S. Department of Transportation</a>.
           </p>
-          <a href={CTA} className="inline-flex items-center justify-center rounded-full px-8 min-h-[54px] mt-6" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Check my trip free</a>
+          <a href={CTA} className="inline-flex items-center justify-center rounded-full px-8 min-h-[54px] mt-6" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Check my trip</a>
         </section>
       </main>
     </div>

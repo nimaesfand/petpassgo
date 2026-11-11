@@ -22,7 +22,7 @@ const B = font.body;
 
 export const metadata = {
   title: { absolute: "Travel with your pet | PetPassGo" },
-  description: "Find out free if your pet can fly your trip. Then get every step, deadline and official source with a $29.99 Travel Pass, and keep your pet's passport, ID and records in one place.",
+  description: "Know before you book. See what your pet needs for your trip, then get every step, fee and deadline with a $29.99 Travel Pass, and keep your pet's passport, ID and records in one place.",
 };
 
 const STRIP = [
@@ -49,7 +49,7 @@ const VAULT_BENEFITS = [
 ];
 
 const STEPS = [
-  { n: "1", title: "Check your trip free", body: "Answer a few questions and see if your pet can fly it.", icon: "M4 6h16M4 12h10M4 18h7" },
+  { n: "1", title: "Check your trip", body: "Answer a few questions and see the fee, carrier size and steps for your airline. Free.", icon: "M4 6h16M4 12h10M4 18h7" },
   { n: "2", title: "Get your Travel Pass", body: "Your step-by-step checklist built for your airline, route and pet.", icon: "M5 4h14v16H5zM8 9h8M8 13h8M8 17h5" },
   { n: "3", title: "Check it off and fly", body: "Follow the steps and keep your pet's ID and documents ready in your Pet Vault.", icon: "M5 13l4 4L19 7" },
 ];

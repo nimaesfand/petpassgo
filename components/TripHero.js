@@ -49,7 +49,7 @@ export default function TripHero() {
             Travel with your pet.
           </h1>
           <p style={{ fontFamily: B, color: tokens.ink, fontSize: 18, lineHeight: 1.5 }} className="mt-4 max-w-[36rem]">
-            Find out free if your pet can fly your trip. Then get every step and deadline, and keep their passport, ID and records in one place.
+            <b>Know before you book.</b> See exactly what your pet needs for your trip, then get every step, deadline and document in one place.
           </p>
         </div>
 
@@ -88,8 +88,9 @@ export default function TripHero() {
           </fieldset>
           <div>
             <a href={href} data-testid="hero-plan" className="btn-primary inline-flex items-center justify-center rounded-full px-8 py-3.5 min-h-[52px] w-full max-sm:w-[calc(100%-4.75rem)] sm:w-auto" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>
-              Check my trip free
+              Check my trip
             </a>
+            <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mt-2 max-sm:w-[calc(100%-4.75rem)] sm:pl-4 text-center sm:text-left">Free · takes a minute</div>
           </div>
         </div>
       </div>

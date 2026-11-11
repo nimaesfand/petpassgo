@@ -5,7 +5,7 @@ import { tripTypeForRoute, destinationKeywordHit, findAirport } from "../lib/air
 import { tokens, font } from "../lib/theme";
 import Icon from "./Icon";
 import VerdictCard from "./VerdictCard";
-import { tripVerdict } from "../lib/verdict";
+import { tripVerdict, tripFacts } from "../lib/verdict";
 import TripFitCard from "./TripFitCard";
 import { tripFitWarnings } from "../lib/tripFit";
 
@@ -69,17 +69,19 @@ export default function RequirementsPreview({ answers }) {
   if (rows && rows.length === 0) return <><VerdictCard verdict={verdict} /><TripFitCard answers={answers} /></>;
 
   const action = rows ? rows.filter((r) => r.status === "attention").length : 0;
-  const notes = rows ? rows.filter((r) => r.title) : [];
-  const locked = rows ? rows.filter((r) => !r.title) : [];
+  const facts = rows ? tripFacts(rows, answers) : null;
+  const notes = rows ? rows.filter((r) => r.title && !["PET FEE", "KENNEL REQUIREMENT"].includes(r.category)) : [];
+  const locked = rows ? rows.filter((r) => !r.title || ["PET FEE", "KENNEL REQUIREMENT"].includes(r.category)) : [];
+  const preview = Math.min(shown, 4);
 
   return (
     <>
-    <VerdictCard verdict={verdict} />
+    {verdict && verdict.key !== "go" ? <VerdictCard verdict={verdict} /> : null}
     <TripFitCard answers={answers} />
     <div className="rounded-2xl mb-6 overflow-hidden" style={{ border: `1px solid ${tokens.line}`, background: "#fff" }}>
       <div className="px-5 py-4 flex items-center justify-between gap-3 flex-wrap" style={{ background: tokens.navy, color: "#fff" }}>
         <div>
-          <div style={{ fontFamily: font.body, fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", color: tokens.gold, fontWeight: 700 }}>Your full plan</div>
+          <div style={{ fontFamily: font.body, fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", color: tokens.gold, fontWeight: 700 }}>What this trip takes</div>
           <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700 }} className="mt-0.5">
             {cityOf(answers.origin)} → {cityOf(answers.destination)} · {airline}
           </div>
@@ -98,10 +100,25 @@ export default function RequirementsPreview({ answers }) {
           </div>
         ) : (
           <>
-            <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink, lineHeight: 1.45 }} className="mb-3">
-              We found <b>{rows.length} steps</b> for flying your {pet} on {airline}
-              {action ? <>, and <b style={{ color: tokens.primary }}>{action} need action before you fly</b></> : null}.
-            </p>
+            {verdict?.key !== "no" && facts ? (
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                {[
+                  ["Pet fee", facts.fee || "In your pass", "tag"],
+                  ["Carrier", facts.carrier || "In your pass", "bag"],
+                  ["To do", `${rows.length} steps`, "check"],
+                ].map(([k, v, icon]) => (
+                  <div key={k} className="rounded-xl p-3 min-w-0" style={{ background: tokens.sky }}>
+                    <div className="flex items-center gap-1.5" style={{ fontFamily: font.body, fontSize: 11.5, fontWeight: 800, letterSpacing: ".06em", color: tokens.muted }}><Icon name={icon} size={13} />{k.toUpperCase()}</div>
+                    <div className="mt-1" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 800, color: tokens.navy, lineHeight: 1.25, overflowWrap: "anywhere" }}>{v}</div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            {action ? (
+              <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }} className="mb-3">
+                <b style={{ color: tokens.primary }}>{action} steps need action before you fly</b>, some with deadlines weeks ahead. Here's a peek:
+              </p>
+            ) : null}
 
             {notes.map((r) => (
               <div key={r.id} className="rounded-xl p-3 mb-2" style={{ background: "#FFF7F2", border: `1px solid #F6D3BF` }}>
@@ -111,7 +128,7 @@ export default function RequirementsPreview({ answers }) {
             ))}
 
             <ul className="flex flex-col gap-1.5">
-              {locked.slice(0, shown).map((r) => (
+              {locked.slice(0, preview).map((r) => (
                 <li key={r.id} className="flex items-center gap-3 rounded-lg px-3 py-2 ppg-rise" style={{ background: tokens.sky }}>
                   <span className="shrink-0 rounded-full flex items-center justify-center" style={{ width: 22, height: 22, border: `2px solid ${r.status === "attention" ? tokens.primary : tokens.line}` }} />
                   <div className="min-w-0 flex-1">
@@ -123,7 +140,7 @@ export default function RequirementsPreview({ answers }) {
               ))}
             </ul>
             <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mt-3">
-              Unlock the full steps, due dates and official sources with your Travel Pass.
+              {locked.length > 4 ? `+ ${locked.length - 4} more. ` : ""}Your Travel Pass puts every step in order, with due dates, reminders and the official source for each.
             </p>
           </>
         )}
