@@ -10,6 +10,7 @@ import { routeAllowed, tripTypeForRoute } from "../../lib/airports";
 import { connectionReady, rulesRole, segmentsToStore } from "../../lib/segments";
 import { saveCheckoutTrip } from "../../lib/tripCheckout";
 import AirportField from "../../components/AirportField";
+import RequirementsPreview from "../../components/RequirementsPreview";
 import FlightLookup, { airportLabel, airlineFromFlight } from "../../components/FlightLookup";
 import { readTripIntent } from "../../lib/tripIntent";
 import { fmtTripDate } from "../../lib/tripAccess";
@@ -377,6 +378,7 @@ export default function PetPassGoQuiz() {
               </h2>
               <FlightLookup
                 date={answers.date}
+                onNumberOnly={(num, d) => setAnswers((a) => ({ ...a, flight_number: num, date: d || a.date }))}
                 onFill={(f) => {
                   const origin = airportLabel(f.departure?.iata, f.departure?.airport);
                   const destination = airportLabel(f.arrival?.iata, f.arrival?.airport);
@@ -517,6 +519,7 @@ export default function PetPassGoQuiz() {
 
           {step === 6 && (
             <>
+              <RequirementsPreview answers={answers} />
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-3">Choose your pass</h2>
               <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setConsentErr(""); }} error={consentErr} />
               {isMember ? (

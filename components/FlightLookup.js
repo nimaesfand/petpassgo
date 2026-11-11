@@ -49,7 +49,7 @@ export function FlightSummary({ f }) {
   );
 }
 
-export default function FlightLookup({ date, onFill, mode = "outbound" }) {
+export default function FlightLookup({ date, onFill, onNumberOnly, mode = "outbound" }) {
   const [flight, setFlight] = useState("");
   const [day, setDay] = useState(date || "");
   const [busy, setBusy] = useState(false);
@@ -67,7 +67,17 @@ export default function FlightLookup({ date, onFill, mode = "outbound" }) {
     try {
       const j = await lookupFlight(flight, lookupDate);
       if (j.configured === false) { setHidden(true); return; }
-      if (!j.found || !j.flight) { setMsg(j.error || "We couldn't find that flight — double-check the number and date, or just enter your route manually below. Nothing is lost."); return; }
+      if (!j.found || !j.flight) {
+        const daysOut = Math.round((new Date(`${lookupDate}T12:00:00`) - new Date()) / 864e5);
+        const num = flight.trim().toUpperCase().replace(/\s+/g, "");
+        if (!j.error && daysOut > 1 && onNumberOnly) {
+          onNumberOnly(num, lookupDate);
+          setMsg(`Saved ${num}. Live times, gate and status show up in your Travel Pass closer to the flight. For now, enter your cities below.`);
+          return;
+        }
+        setMsg(j.error || "We couldn't find that flight. Double-check the number and date, or enter your route below.");
+        return;
+      }
       const filled = { ...j.flight, date_was_requested: true };
       setResult(filled);
       onFill && onFill(filled);
