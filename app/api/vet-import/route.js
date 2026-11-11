@@ -34,7 +34,7 @@ function clean(out) {
 }
 
 export async function POST(req) {
-  const p = aiProvider();
+  const p = aiProvider(req);
   if (!p) return NextResponse.json({ error: "Smart import isn't available yet. You can still add everything by hand below.", code: "NO_AI_PROVIDER", key_needed: AI_KEY_HINT }, { status: 503 });
   const token = req.headers.get("x-sb-token") || "";
   if (!token) return NextResponse.json({ error: "Please sign in." }, { status: 401 });

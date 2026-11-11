@@ -3,19 +3,11 @@ import { SYSTEM_PROMPT } from "../../../lib/chatPrompt";
 
 export const dynamic = "force-dynamic";
 
-// Provider: Vercel AI Gateway (AI_GATEWAY_API_KEY) or OpenAI (OPENAI_API_KEY).
-// Both speak the OpenAI chat-completions format. Keys stay server-side.
-function provider() {
-  if (process.env.AI_GATEWAY_API_KEY)
-    return { url: "https://ai-gateway.vercel.sh/v1/chat/completions", key: process.env.AI_GATEWAY_API_KEY, model: process.env.CHAT_MODEL || "openai/gpt-4o-mini" };
-  if (process.env.OPENAI_API_KEY)
-    return { url: "https://api.openai.com/v1/chat/completions", key: process.env.OPENAI_API_KEY, model: process.env.CHAT_MODEL || "gpt-4o-mini" };
-  return null;
-}
+import { aiProvider } from "../../../lib/aiProvider";
 
 export async function POST(req) {
   if (process.env.NEXT_PUBLIC_CHAT_ENABLED !== "true") return NextResponse.json({ error: "Chat is not enabled." }, { status: 404 });
-  const p = provider();
+  const p = aiProvider(req, "CHAT_MODEL");
   if (!p) return NextResponse.json({ error: "Chat is not configured yet." }, { status: 503 });
 
   let body;

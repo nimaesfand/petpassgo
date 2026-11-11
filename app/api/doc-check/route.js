@@ -11,7 +11,7 @@ Only report what is visibly on the document. Never guess. Use null when unsure. 
 
 export async function POST(req) {
   if (process.env.NEXT_PUBLIC_DOC_CHECK_ENABLED !== "true") return NextResponse.json({ error: "Not enabled." }, { status: 404 });
-  const p = provider();
+  const p = provider(req);
   if (!p) return NextResponse.json({ error: "Document check is not configured yet." }, { status: 503 });
 
   const token = req.headers.get("x-sb-token") || "";
