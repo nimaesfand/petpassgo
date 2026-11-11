@@ -134,6 +134,7 @@ export default function PetPassGoQuiz() {
   const [guestPlan, setGuestPlan] = useState(""); // signed-out buyer: email sheet open for "pass" | "join"
   const [buying, setBuying] = useState(false);
   const [consent, setConsent] = useState(false);
+  const [verdictKey, setVerdictKey] = useState(null);
   const [tips, setTips] = useState(false);
   const [consentErr, setConsentErr] = useState("");
   const [airlineQuery, setAirlineQuery] = useState("");
@@ -519,7 +520,13 @@ export default function PetPassGoQuiz() {
 
           {step === 6 && (
             <>
-              <RequirementsPreview answers={answers} />
+              <RequirementsPreview answers={answers} onVerdict={setVerdictKey} />
+              {verdictKey === "no" ? (
+                <div className="flex flex-col gap-2 mt-2">
+                  <button type="button" onClick={() => setStep(4)} className="w-full rounded-full py-3.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>Try a different airline</button>
+                  <button type="button" onClick={() => setStep(5)} className="w-full rounded-full py-3.5" style={{ background: "#fff", color: tokens.navy, fontFamily: font.body, fontWeight: 700, fontSize: 16, border: `1.5px solid ${tokens.line}`, cursor: "pointer" }}>Change cabin or hold</button>
+                </div>
+              ) : <>
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-3">Choose your pass</h2>
               <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setConsentErr(""); }} error={consentErr} />
               {isMember ? (
@@ -546,6 +553,7 @@ export default function PetPassGoQuiz() {
               )}
               <div className="mt-3"><MarketingOptIn checked={tips} onChange={setTips} /></div>
               <TrustBadges className="mt-4 text-left" />
+              </>}
               <div className="mt-6">
                 <button onClick={back} style={{ fontFamily: font.body, color: tokens.ink, fontSize: 16 }}>← Back</button>
               </div>

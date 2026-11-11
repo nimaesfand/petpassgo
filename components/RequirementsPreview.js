@@ -30,7 +30,7 @@ function cityOf(label) {
   return a ? a.city : String(label || "").split(",")[0];
 }
 
-export default function RequirementsPreview({ answers }) {
+export default function RequirementsPreview({ answers, onVerdict }) {
   const [rows, setRows] = useState(null);
   const [shown, setShown] = useState(0);
 
@@ -65,6 +65,9 @@ export default function RequirementsPreview({ answers }) {
 
   const petWord = answers.role === "Service animal" ? "your service animal" : `your ${pet}`;
   const verdict = rows ? tripVerdict({ rows, trip: { ...answers, petName: petWord }, fitWarnings: tripFitWarnings(answers) }) : null;
+  const vKey = verdict?.key || null;
+  useEffect(() => { onVerdict?.(vKey); }, [vKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  const blocked = vKey === "no";
 
   if (rows && rows.length === 0) return <><VerdictCard verdict={verdict} /><TripFitCard answers={answers} /></>;
 
@@ -101,20 +104,20 @@ export default function RequirementsPreview({ answers }) {
         ) : (
           <>
             {verdict?.key !== "no" && facts ? (
-              <div className="grid grid-cols-3 gap-2 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
                 {[
                   ["Pet fee", facts.fee || "In your pass", "tag"],
                   ["Carrier", facts.carrier || "In your pass", "bag"],
-                  ["To do", `${rows.length} steps`, "check"],
+                  ["Steps", `${rows.length} for this trip`, "check"],
                 ].map(([k, v, icon]) => (
-                  <div key={k} className="rounded-xl p-3 min-w-0" style={{ background: tokens.sky }}>
-                    <div className="flex items-center gap-1.5" style={{ fontFamily: font.body, fontSize: 11.5, fontWeight: 800, letterSpacing: ".06em", color: tokens.muted }}><Icon name={icon} size={13} />{k.toUpperCase()}</div>
-                    <div className="mt-1" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 800, color: tokens.navy, lineHeight: 1.25, overflowWrap: "anywhere" }}>{v}</div>
+                  <div key={k} className="rounded-xl px-3 py-2.5 sm:p-3 min-w-0 flex sm:block items-center justify-between gap-3" style={{ background: tokens.sky }}>
+                    <div className="flex items-center gap-1.5 flex-shrink-0" style={{ fontFamily: font.body, fontSize: 11.5, fontWeight: 800, letterSpacing: ".06em", color: tokens.muted }}><Icon name={icon} size={13} />{k.toUpperCase()}</div>
+                    <div className="sm:mt-1 text-right sm:text-left" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 800, color: tokens.navy, lineHeight: 1.25, overflowWrap: "anywhere" }}>{v}</div>
                   </div>
                 ))}
               </div>
             ) : null}
-            {action ? (
+            {action && !blocked ? (
               <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }} className="mb-3">
                 <b style={{ color: tokens.primary }}>{action} steps need action before you fly</b>, some with deadlines weeks ahead. Here's a peek:
               </p>
@@ -128,7 +131,7 @@ export default function RequirementsPreview({ answers }) {
             ))}
 
             <ul className="flex flex-col gap-1.5">
-              {locked.slice(0, preview).map((r) => (
+              {(blocked ? [] : locked.slice(0, preview)).map((r) => (
                 <li key={r.id} className="flex items-center gap-3 rounded-lg px-3 py-2 ppg-rise" style={{ background: tokens.sky }}>
                   <span className="shrink-0 rounded-full flex items-center justify-center" style={{ width: 22, height: 22, border: `2px solid ${r.status === "attention" ? tokens.primary : tokens.line}` }} />
                   <div className="min-w-0 flex-1">
@@ -139,9 +142,11 @@ export default function RequirementsPreview({ answers }) {
                 </li>
               ))}
             </ul>
+            {blocked ? null : (
             <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }} className="mt-3">
               {locked.length > 4 ? `+ ${locked.length - 4} more. ` : ""}Your Travel Pass puts every step in order, with due dates, reminders and the official source for each.
             </p>
+            )}
           </>
         )}
       </div>
