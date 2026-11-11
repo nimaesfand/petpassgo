@@ -67,10 +67,9 @@ export function StatusChip({ children, tone = "ok" }) {
 }
 
 export const PASS_TAB_LIST = [
-  ["overview", "Overview"],
-  ["flight", "Flight & Weather"],
-  ["checklist", "Checklist"],
-  ["reminders", "Reminders"],
-  ["documents", "Documents"],
+  ["overview", "Today"],
+  ["checklist", "Steps"],
+  ["flight", "Flight"],
+  ["documents", "Docs"],
   ["destination", "Destination"],
 ];

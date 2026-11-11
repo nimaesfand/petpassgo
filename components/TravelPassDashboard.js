@@ -1,7 +1,9 @@
 "use client";
 
 import VerdictCard from "./VerdictCard";
-import { tripVerdict } from "../lib/verdict";
+import { tripVerdict, tripFacts } from "../lib/verdict";
+import PassHome from "./pass/PassHome";
+import StepsTools from "./pass/StepsTools";
 import { tripFitWarnings } from "../lib/tripFit";
 
 import { useEffect, useMemo, useState } from "react";
@@ -116,6 +118,14 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
   const hot = [pack.weather?.origin?.weather, destWeather].some((w) => w?.status === "ok" && w.highF >= 85);
   const cold = [pack.weather?.origin?.weather, destWeather].some((w) => w?.status === "ok" && w.lowF <= 45);
   const originAirport = findAirport(trip.origin);
+  const facts = (() => {
+    const f = tripFacts(results, trip);
+    if (f.fee && trip.return_date && /each way/i.test(f.fee)) {
+      const n = Number((f.fee.match(/\$(\d+(?:\.\d+)?)/) || [])[1]);
+      if (n) f.fee = `${f.fee.replace(/\s*\(.*\)$/, "")} · $${Math.round(n * 2)} round trip`;
+    }
+    return f;
+  })();
 
   useEffect(() => {
     if (!trip?.id) return;
@@ -155,7 +165,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
         </div>
       )}
 
-      {results.length ? <VerdictCard verdict={tripVerdict({ rows: results, trip: { ...trip, petName: pet?.name || "your pet" }, fitWarnings: tripFitWarnings(trip) })} /> : null}
+      {(() => { const v = results.length ? tripVerdict({ rows: results, trip: { ...trip, petName: pet?.name || "your pet" }, fitWarnings: tripFitWarnings(trip) }) : null; return v && v.key !== "go" ? <VerdictCard verdict={v} /> : null; })()}
       <div className="rounded-3xl p-5 sm:p-6 mb-4" style={{ background: tokens.navy }}>
         <div className="flex flex-col lg:flex-row lg:items-center gap-4">
           <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -197,107 +207,27 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
             <div className="h-full rounded-full transition-all duration-500" style={{ width: `${progress.pct}%`, background: "#7DCEA0" }} />
           </div>
         </div>
-        {pet?.id ? (
-          <a href={`/id/${pet.id}`} className="ppg-btn ppg-btn-secondary mt-4 w-full sm:w-auto">View your Pet ID</a>
-        ) : (
-          <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.sky }} className="mt-3">Link a pet and the Pet ID opens from here.</p>
-        )}
+
       </div>
 
       <PassTabs tabs={PASS_TAB_LIST} value={section} onChange={setSection} label="Trip sections" />
 
       {section === "overview" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <SoftCard title="Flight status" action={flightStatus ? <StatusChip tone={flightStatus.tone}>{flightStatus.label}</StatusChip> : null}>
-            <RouteLine from={from} to={to} />
-            <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mt-3">{[when, nonstop, duration].filter(Boolean).join(" · ")}</p>
-            <div className="mt-3"><TextButton onClick={() => setSection("flight")}>View full flight details</TextButton></div>
-          </SoftCard>
-
-          <SoftCard title="Weather">
-            {!pack.weather && <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>Checking the weather…</p>}
-            {pack.weather?.failed && <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>Weather isn’t available right now.</p>}
-            {destWeather?.status === "ok" && (
-              <>
-                <div className="flex items-center gap-3">
-                  <span style={{ color: tokens.navy }}><Icon name={wxIcon(destWeather.symbol)} size={36} /></span>
-                  <div>
-                    <div style={{ fontFamily: font.display, fontSize: 32, fontWeight: 700, color: tokens.navy, lineHeight: 1 }}>{destWeather.tempF ?? destWeather.highF}°</div>
-                    <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>{pack.weather.destination.city} · {wxWord(destWeather.symbol)}</div>
-                  </div>
-                </div>
-                <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mt-2">High {destWeather.highF}° · Low {destWeather.lowF}°{destWeather.windMph != null ? ` · Wind ${destWeather.windMph} mph` : ""}</p>
-                {precipLine(destWeather.precipMm) && <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>{precipLine(destWeather.precipMm)}</p>}
-              </>
-            )}
-            {destWeather?.status === "later" && <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>The forecast shows up closer to your trip, about 9 days out.</p>}
-            {pack.weather?.origin?.weather?.status === "ok" && <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-2">Departing {pack.weather.origin.city}: {pack.weather.origin.weather.tempF ?? pack.weather.origin.weather.highF}°, high {pack.weather.origin.weather.highF}° / low {pack.weather.origin.weather.lowF}°.</p>}
-            {(hot || cold) && <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }} className="mt-2">{hot ? "It may be hot for cargo. " : ""}{cold ? "It may be cold for cargo. " : ""}The full check is under Flight & Weather.</p>}
-            <div className="mt-3"><TextButton onClick={() => setSection("flight")}>Weather and cargo check</TextButton></div>
-          </SoftCard>
-
-          <SoftCard title="Vets and pet stores">
-            <div className="flex gap-4">
-              {[["stethoscope", "Vets", countKind(pack.spots, "vet")], ["bag", "Pet stores", countKind(pack.spots, "pet_store")]].map(([icon, label, n]) => (
-                <button key={label} type="button" onClick={() => setSection("destination")} className="flex flex-col items-center gap-2" style={{ background: "none", border: "none", cursor: "pointer" }}>
-                  <span className="flex items-center justify-center rounded-full" style={{ width: 64, height: 64, background: tokens.sky, color: tokens.navy }}><Icon name={icon} size={28} /></span>
-                  <span style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>{label}{n > 0 ? ` · ${n}` : ""}</span>
-                </button>
-              ))}
-            </div>
-            <div className="mt-3"><TextButton onClick={() => setSection("destination")}>View map and locations</TextButton></div>
-          </SoftCard>
-
-          <SoftCard title="Travel checklist">
-            <p style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: progress.complete ? tokens.green : tokens.navy }} className="mb-2">{progress.total ? `${progress.done} of ${progress.total} complete` : "No steps for this trip yet."}</p>
-            <ul className="space-y-2">
-              {shownSteps.map((step) => (
-                <li key={step.id} className="flex items-center gap-2">
-                  <CheckDot on={cardDone(step, statusMap)} />
-                  <span style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>{step.shortTitle}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-3"><TextButton onClick={() => setSection("checklist")}>Open the checklist</TextButton></div>
-          </SoftCard>
-
-          <SoftCard title="Important reminders">
-            {reminders.length === 0 && expirations.length === 0 ? (
-              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>Reminders use the travel date on this pass, plus expiration dates saved in the Vault.</p>
-            ) : (
-              <ul className="space-y-3">
-                {reminders.slice(0, 3).map((r) => (
-                  <li key={r.kind} className="flex items-center gap-3">
-                    <span className="flex items-center justify-center rounded-xl flex-shrink-0" style={{ width: 40, height: 40, background: tokens.sky, color: tokens.navy }}><Icon name="calendar" size={20} /></span>
-                    <span>
-                      <span className="block" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{r.title}</span>
-                      <span className="block" style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>{fmt(r.date)}</span>
-                    </span>
-                  </li>
-                ))}
-                {expirations.slice(0, 2).map((r) => (
-                  <li key={r.key} className="flex items-center gap-3">
-                    <span className="flex items-center justify-center rounded-xl flex-shrink-0" style={{ width: 40, height: 40, background: tokens.sky, color: tokens.navy }}><Icon name={r.icon} size={20} /></span>
-                    <span>
-                      <span className="block" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>{r.title}</span>
-                      <span className="inline-flex rounded-full px-2.5 py-1 mt-1" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 13, fontWeight: 700 }}>Expires {fmt(r.date)}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <div className="mt-3"><TextButton onClick={() => setSection("reminders")}>All reminders</TextButton></div>
-          </SoftCard>
-
-          <SoftCard title="Your documents">
-            <div className="grid grid-cols-2 gap-2">
-              <DocTile label="Pet ID" on={!!pet?.id} onClick={() => pet?.id && (window.location.href = `/id/${pet.id}`)} />
-              <DocTile label="Vaccination records" on={vaxOn} onClick={() => setSection("documents")} />
-              <DocTile label="DOT form" on={dotOn} hint={service ? "PDF you sign" : "Service-dog trips"} onClick={() => setSection("documents")} />
-              <DocTile label="Travel Pass summary" on onClick={() => setSection("documents")} />
-            </div>
-          </SoftCard>
-        </div>
+        <PassHome
+          facts={facts}
+          progress={progress}
+          nextStep={openSteps[0] || null}
+          today={today}
+          petName={pet?.name}
+          onGo={setSection}
+          onDone={(step) => onSetDone?.(step.mergedIds?.length ? step.mergedIds : [step.id], true)}
+          shortcuts={[
+            { icon: "plane", label: "Flight", sub: flightStatus?.label || (trip.flight_number ? trip.flight_number : "Add flight #"), onClick: () => setSection("flight") },
+            { icon: "cloudSun", label: "Weather", sub: destWeather?.status === "ok" ? `${destWeather.tempF ?? destWeather.highF}° ${to}` : "Closer to trip", onClick: () => setSection("flight") },
+            { icon: "stethoscope", label: "Vets", sub: countKind(pack.spots, "vet") ? `${countKind(pack.spots, "vet")} near ${to}` : `Near ${to}`, onClick: () => setSection("destination") },
+            { icon: "file", label: "Docs", sub: service ? (dotOn ? "DOT form ✓" : "DOT form") : vaxOn ? "Vaccines ✓" : "Add vaccines", onClick: () => setSection("documents") },
+          ]}
+        />
       )}
 
       {section === "flight" && (
@@ -321,6 +251,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
               <button type="button" onClick={onSetRolePet} className="ppg-btn ppg-btn-primary">Switch this trip to the pet path</button>
             </div>
           )}
+          <StepsTools trip={trip} pet={pet} facts={facts} service={service} steps={openSteps} />
           <RoundTripAddon trip={trip} onSave={onSaveReturn} />
           <TripFitCard answers={trip} className="mb-5" />
           <VetGuidance trip={trip} requirements={[...results, ...cards.filter((c) => String(c.id).startsWith("syn:"))]} paid />
@@ -332,8 +263,14 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
         </>
       )}
 
-      {section === "reminders" && (
-        <>
+      {section === "checklist" && (
+        <details className="ppg-fold group rounded-2xl mt-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+          <summary className="flex items-center gap-3 px-4 py-3.5" style={{ cursor: "pointer", listStyle: "none" }}>
+            <span className="flex items-center justify-center rounded-xl flex-shrink-0" style={{ width: 38, height: 38, background: tokens.sky, color: tokens.navy }}><Icon name="calendar" size={19} /></span>
+            <span className="flex-1" style={{ fontFamily: font.body, fontWeight: 800, fontSize: 16, color: tokens.navy }}>Reminder dates{expirations.length ? " and expirations" : ""}</span>
+            <span style={{ fontFamily: font.body, fontSize: 18, color: tokens.muted }}>›</span>
+          </summary>
+          <div className="ppg-fold-body px-4 pb-4">
           <TripTimeline trip={trip} requirements={results} statusMap={statusMap} />
           {expirations.length > 0 && (
             <SoftCard title="Vault expirations">
@@ -347,7 +284,8 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
               </ul>
             </SoftCard>
           )}
-        </>
+</div>
+        </details>
       )}
 
       {section === "documents" && (
