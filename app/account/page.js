@@ -1122,7 +1122,7 @@ function CurrentFlightTab({ userId }) {
         <h1 style={{ fontFamily: font.display, fontSize: 34, fontWeight: 800, color: tokens.navy, lineHeight: 1.08 }}>My Trips</h1>
         <a href="/assessment" className="ppg-btn ppg-btn-primary">{PLAN_CTA}</a>
       </div>
-      <TripList title="Upcoming" rows={roster.upcoming} total={roster.upTotal} onMore={() => setLimits((n) => ({ ...n, up: n.up + TRIP_PAGE }))} />
+      {roster.upcoming.length + roster.past.length > 1 ? <TripList title="Upcoming" rows={roster.upcoming} total={roster.upTotal} onMore={() => setLimits((n) => ({ ...n, up: n.up + TRIP_PAGE }))} /> : null}
       <TripList title="Past" rows={roster.past} total={roster.pastTotal} onMore={() => setLimits((n) => ({ ...n, past: n.past + TRIP_PAGE }))} />
       {detail}
     </div>

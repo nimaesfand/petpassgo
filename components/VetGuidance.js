@@ -2,6 +2,7 @@
 import { tokens, font } from "../lib/theme";
 import { isShownRule } from "../lib/passCards";
 import Icon from "./Icon";
+import { isMexicoAirport } from "../lib/airports";
 
 // Builds trip-specific vet guidance ONLY from the filtered airline_requirements rows
 // already loaded for this trip. No invented airline facts.
@@ -62,8 +63,12 @@ export default function VetGuidance({ trip, requirements = [], paid }) {
     }
     if (/favn/.test(t)) ask.push("FAVN rabies blood test status and lab timing");
     if (/screwworm|nws/.test(t)) {
-      bring.push("Your itinerary (arrival date in Mexico)");
-      ask.push("New World Screwworm inspection certificate (USDA-accredited vet; ≤ 5 days before arrival)");
+      if (isMexicoAirport(trip?.destination)) {
+        bring.push("Your itinerary (arrival date in Mexico)");
+        ask.push("New World Screwworm inspection certificate (USDA-accredited vet; ≤ 5 days before arrival)");
+      } else {
+        ask.push("Add the New World Screwworm statement to the health certificate");
+      }
     }
     if (/cdc dog import|microchip/.test(t)) {
       bring.push("Proof of ISO microchip implantation");

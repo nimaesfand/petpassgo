@@ -122,6 +122,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
   const hot = [pack.weather?.origin?.weather, destWeather].some((w) => w?.status === "ok" && w.highF >= 85);
   const cold = [pack.weather?.origin?.weather, destWeather].some((w) => w?.status === "ok" && w.lowF <= 45);
   const originAirport = findAirport(trip.origin);
+  const daysToGo = trip.travel_date ? Math.round((new Date(`${String(trip.travel_date).slice(0, 10)}T12:00:00`) - new Date(`${today}T12:00:00`)) / 864e5) : null;
   const facts = (() => {
     const f = tripFacts(results, trip);
     if (f.fee && trip.return_date && /each way/i.test(f.fee)) {
@@ -178,24 +179,19 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
       <div className="rounded-3xl p-5 sm:p-6 mb-4" style={{ background: tokens.navy }}>
         <div className="flex flex-col lg:flex-row lg:items-center gap-4">
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" style={{ width: 72, height: 72, background: tokens.gold, border: "3px solid #fff" }}>
-              {pet?.photo_url ? <SignedImg value={pet.photo_url} alt={pet.name || "Pet"} className="object-cover" style={{ width: "100%", height: "100%" }} /> : <span style={{ color: tokens.navy }}><Icon name="paw" size={32} /></span>}
+            <div className="rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" style={{ width: 52, height: 52, background: tokens.gold, border: "2px solid #fff" }}>
+              {pet?.photo_url ? <SignedImg value={pet.photo_url} alt={pet.name || "Pet"} className="object-cover" style={{ width: "100%", height: "100%" }} /> : <span style={{ color: tokens.navy }}><Icon name="paw" size={24} /></span>}
             </div>
-            <div className="min-w-0">
-              <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, letterSpacing: "0.08em", color: tokens.gold }}>YOUR TRIP</div>
-              <div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: "#fff", lineHeight: 1.15 }}>{pet?.name || "Your trip"}</div>
-              <div className="flex flex-wrap items-center gap-2 mt-1">
-                {meta && <span style={{ fontFamily: font.body, fontSize: 16, color: tokens.sky }}>{meta}</span>}
-                <span className="rounded-full px-3 py-1" style={{ background: "rgba(255,255,255,0.14)", color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 15 }}>{animal}</span>
-                {service && !serviceDogMismatch && <span className="rounded-full px-3 py-1" style={{ background: "rgba(255,255,255,0.14)", color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 15 }}>Service dog</span>}
-                {pet?.passport_no && <span style={{ fontFamily: font.body, fontSize: 15, color: tokens.sky }}>{pet.passport_no}</span>}
+            <div className="min-w-0 flex-1">
+              <div className="truncate" style={{ fontFamily: font.display, fontSize: 22, fontWeight: 800, color: "#fff", lineHeight: 1.15 }}>{pet?.name || "Your pet"} · {codeOf(trip.origin)} → {codeOf(trip.destination)}</div>
+              <div className="truncate" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky }}>{trip.travel_date ? fmtTripDate(trip.travel_date) : "Date not set"}{trip.return_date ? ` · back ${fmtTripDate(trip.return_date)}` : ""} · {trip.airline}{service && !serviceDogMismatch ? " · Service dog" : ""}</div>
+            </div>
+            {daysToGo != null && daysToGo >= 0 ? (
+              <div className="flex-shrink-0 text-center rounded-2xl px-3 py-1.5" style={{ background: "rgba(255,255,255,0.12)" }}>
+                <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 800, color: tokens.gold, lineHeight: 1 }}>{daysToGo}</div>
+                <div style={{ fontFamily: font.body, fontSize: 11, fontWeight: 700, color: tokens.sky }}>{daysToGo === 1 ? "day" : "days"}</div>
               </div>
-            </div>
-          </div>
-          <div className="lg:text-right">
-            <div style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: "#fff" }}>{trip.travel_date ? fmtTripDate(trip.travel_date) : "Date not set"}{trip.return_date ? ` · back ${fmtTripDate(trip.return_date)}` : ""}</div>
-            <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.sky }}>{from} to {to}{[nonstop, duration].filter(Boolean).length ? ` · ${[nonstop, duration].filter(Boolean).join(" · ")}` : ""}{tripTypeForRoute(trip.origin, trip.destination) === "international" ? " · International" : ""}</div>
-            <div style={{ fontFamily: font.body, fontSize: 15, color: tokens.sky }}>{trip.airline}</div>
+            ) : null}
           </div>
         </div>
         {!trip.pet_id && petChoices.length > 1 && (
@@ -263,14 +259,21 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
             </div>
           )}
           <StepsTools trip={trip} pet={pet} facts={facts} service={service} steps={openSteps} />
-          <RoundTripAddon trip={trip} onSave={onSaveReturn} />
           <TripFitCard answers={trip} className="mb-5" />
-          <VetGuidance trip={trip} requirements={[...results, ...cards.filter((c) => String(c.id).startsWith("syn:"))]} paid />
           {cards.length === 0 ? (
             <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 16, color: tokens.ink }}>No requirements found for this exact combination yet.</div>
           ) : (
             <PassChecklist trip={trip} requirements={results} statusMap={statusMap} onSetDone={onSetDone} onOpenRelief={() => { setSection("flight"); setTimeout(() => document.getElementById("pet-relief")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }} />
           )}
+          <div className="mt-4"><RoundTripAddon trip={trip} onSave={onSaveReturn} /></div>
+          <details className="ppg-fold group rounded-2xl mt-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+            <summary className="flex items-center gap-3 px-4 py-3.5" style={{ cursor: "pointer", listStyle: "none" }}>
+              <span className="flex items-center justify-center rounded-xl flex-shrink-0" style={{ width: 38, height: 38, background: tokens.sky, color: tokens.navy }}><Icon name="stethoscope" size={19} /></span>
+              <span className="flex-1" style={{ fontFamily: font.body, fontWeight: 800, fontSize: 16, color: tokens.navy }}>Before your vet visit</span>
+              <span style={{ fontFamily: font.body, fontSize: 18, color: tokens.muted }}>›</span>
+            </summary>
+            <div className="ppg-fold-body px-4 pb-4"><VetGuidance trip={trip} requirements={[...results, ...cards.filter((c) => String(c.id).startsWith("syn:"))]} paid /></div>
+          </details>
         </>
       )}
 
