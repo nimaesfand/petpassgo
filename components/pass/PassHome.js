@@ -37,13 +37,13 @@ function dueText(iso, today) {
   return `Due ${fmt(iso)} · in ${d} days`;
 }
 
-export default function PassHome({ facts, progress, nextStep, today, onDone, onGo, shortcuts, petName }) {
+export default function PassHome({ facts, progress, ready, needsCheck, nextStep, today, onDone, onGo, shortcuts, petName }) {
   return (
     <div className="grid gap-3">
       <div className="grid grid-cols-3 gap-2">
         <Glance label="Pet fee" icon="tag" value={facts?.fee || "See steps"} />
         <Glance label="Carrier" icon="bag" value={facts?.carrier || "See steps"} />
-        <Glance label="Ready" icon="check" value={progress.total ? `${progress.done} of ${progress.total}` : "—"} tone={progress.complete ? tokens.green : undefined} />
+        <Glance label="Ready" icon="check" value={needsCheck ? "Check flights" : progress.total ? `${progress.done} of ${progress.total}` : "—"} tone={ready ? tokens.green : undefined} />
       </div>
 
       {nextStep ? (
@@ -56,7 +56,7 @@ export default function PassHome({ facts, progress, nextStep, today, onDone, onG
             <button type="button" onClick={() => onGo("checklist")} className="ppg-btn ppg-btn-secondary">See all steps</button>
           </div>
         </div>
-      ) : progress.total ? (
+      ) : progress.total && ready ? (
         <div className="rounded-3xl p-5 text-center" style={{ background: "#E8F6EC", border: `2px solid ${tokens.green}` }}>
           <div style={{ fontFamily: font.display, fontSize: 22, fontWeight: 800, color: tokens.navy }}>{petName || "Your pet"} is ready to fly 🎉</div>
           <div className="mt-1" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>Every step is done. Keep your documents handy on travel day.</div>

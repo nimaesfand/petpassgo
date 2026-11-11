@@ -7,7 +7,7 @@ import { OTHER_AIRLINE, airlineGroupsForRegion } from "../../lib/airlines";
 import { TRAVEL_METHODS } from "../../lib/tripFit";
 import { pickTripPet } from "../../lib/tripPet";
 import { routeAllowed, tripTypeForRoute } from "../../lib/airports";
-import RequirementsPreview from "../../components/RequirementsPreview";
+import { connectionReady, rulesRole, segmentsToStore } from "../../lib/segments";
 import { saveCheckoutTrip } from "../../lib/tripCheckout";
 import AirportField from "../../components/AirportField";
 import FlightLookup, { airportLabel, airlineFromFlight } from "../../components/FlightLookup";
@@ -167,6 +167,9 @@ export default function PetPassGoQuiz() {
     esa: false,
     connecting: null,
     second_airline: "",
+    second_date: "",
+    second_mode: "",
+    stop: "",
     pet_travel: "",
   });
   const set = (k, v) => setAnswers((a) => ({ ...a, [k]: v }));
@@ -238,8 +241,8 @@ export default function PetPassGoQuiz() {
       flight_number: answers.flight_number || null,
       flight_snapshot: answers.flight_snapshot || null,
       animal_type: answers.animal,
-      role: answers.role,
-      status: "ready",
+      role: rulesRole(answers.role, answers.esa),
+      status: answers.connecting ? "checking" : "ready",
     };
     const { data: pets } = await supabase.from("pets").select("id,animal_type").eq("user_id", data.user.id);
     const linked = pickTripPet(pets, { animal_type: answers.animal });
@@ -254,8 +257,11 @@ export default function PetPassGoQuiz() {
     if (answers.connecting) extras.connecting = true;
     if (answers.connecting && answers.second_airline) extras.second_airline = answers.second_airline;
     if (answers.pet_travel) extras.pet_travel = answers.pet_travel;
+    const segments = segmentsToStore(answers);
+    if (segments) extras.segments = segments;
     const saved = await saveCheckoutTrip(supabase, { userId: data.user.id, baseTrip, extras, answers });
     if (saved.paid) { setBuying(false); alert("This trip is already unlocked. Open My Trips to see it."); return; }
+    if (saved.droppedSegments) alert("The connection city was not stored yet. Apply the database update, then plan the trip again. The first and second airline were saved.");
     if (saved.droppedReturn) alert("Your trip was saved as a one-way trip. The return date can be added from your pass once the account update is in place.");
     const trip = saved.trip;
     if (saved.error || !trip) { setBuying(false); alert("Sorry, something went wrong saving your trip. Please try again."); return; }
@@ -461,19 +467,21 @@ export default function PetPassGoQuiz() {
 
           {step === 5 && (
             <>
-              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
+              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-5">
                 How does the trip fly?
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-5">
-                Connections and a second airline can change the rules.
-              </p>
               <div className="grid grid-cols-2 gap-3">
-                <OptionCard label="Nonstop" sub="One flight" selected={answers.connecting === false} onClick={() => setAnswers((a) => ({ ...a, connecting: false, second_airline: "" }))} />
-                <OptionCard label="Connecting" sub="Two or more flights" selected={answers.connecting === true} onClick={() => setAnswers((a) => ({ ...a, connecting: true }))} />
+                <OptionCard label="Nonstop" sub="One flight" selected={answers.connecting === false} onClick={() => setAnswers((a) => ({ ...a, connecting: false, second_airline: "", stop: "", second_date: "", second_mode: "" }))} />
+                <OptionCard label="Connecting" sub="Two flights" selected={answers.connecting === true} onClick={() => setAnswers((a) => ({ ...a, connecting: true }))} />
               </div>
               {answers.connecting === true && (
                 <div className="mt-5">
-                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Are all flights on {answers.airline && !/not sure/i.test(answers.airline) ? answers.airline : "the same airline"}?</div>
+                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Where do you change planes?</div>
+                  <AirportField key={`stop-${answers.stop}`} label="Stop city" value={answers.stop} onSelect={(stop) => set("stop", stop)} />
+                  <label className="block mt-3" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>Second flight date
+                    <input type="date" aria-label="Second flight date" value={answers.second_date || answers.date} min={answers.date || undefined} onChange={(e) => set("second_date", e.target.value)} className="mt-1 w-full rounded-xl px-3" style={{ fontFamily: font.body, fontSize: 16, height: 52, border: `2px solid ${tokens.line}` }} />
+                  </label>
+                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mt-4 mb-2">Are all flights on {answers.airline && !/not sure/i.test(answers.airline) ? answers.airline : "the same airline"}?</div>
                   <div className="flex flex-wrap gap-2">
                     <button type="button" onClick={() => set("second_airline", "")} className="rounded-full px-4 py-2.5" style={{ fontFamily: font.body, fontWeight: 700, background: !answers.second_airline ? tokens.navy : "#fff", color: !answers.second_airline ? "#fff" : tokens.navy, border: `2px solid ${tokens.navy}`, cursor: "pointer" }}>Yes, same airline</button>
                     <select value={answers.second_airline} onChange={(e) => set("second_airline", e.target.value)} aria-label="Second airline" className="rounded-full px-4 py-2.5" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, background: answers.second_airline ? tokens.navy : "#fff", color: answers.second_airline ? "#fff" : tokens.navy, border: `2px solid ${tokens.navy}`, cursor: "pointer" }}>
@@ -483,9 +491,19 @@ export default function PetPassGoQuiz() {
                   </div>
                 </div>
               )}
+              {answers.role !== "Service animal" && answers.connecting === true && (
+                <div className="mt-4">
+                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Second flight</div>
+                  <div className="flex flex-col gap-3">
+                    {TRAVEL_METHODS.filter((m) => m.id !== "unsure").map((m) => (
+                      <OptionCard key={m.id} label={m.label} sub={m.sub} selected={(answers.second_mode || answers.pet_travel) === m.id} onClick={() => set("second_mode", m.id)} />
+                    ))}
+                  </div>
+                </div>
+              )}
               {answers.role !== "Service animal" && answers.connecting !== null && (
                 <div className="mt-6">
-                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Where will your {answers.animal === "Other" ? "pet" : String(answers.animal || "pet").toLowerCase()} ride?</div>
+                    <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">{answers.connecting ? "First flight" : `Where will your ${answers.animal === "Other" ? "pet" : String(answers.animal || "pet").toLowerCase()} ride?`}</div>
                   <div className="flex flex-col gap-3">
                     {TRAVEL_METHODS.map((m) => (
                       <OptionCard key={m.id} label={m.label} sub={m.sub} selected={answers.pet_travel === m.id} onClick={() => set("pet_travel", m.id)} />
@@ -493,15 +511,13 @@ export default function PetPassGoQuiz() {
                   </div>
                 </div>
               )}
-              <NavRow onBack={back} onNext={next} nextDisabled={answers.connecting === null || (answers.role !== "Service animal" && !answers.pet_travel)} nextLabel="See my trip plan" />
+              <NavRow onBack={back} onNext={next} nextDisabled={answers.connecting === null || (answers.role !== "Service animal" && !answers.pet_travel) || !connectionReady(answers)} nextLabel="Continue" />
             </>
           )}
 
           {step === 6 && (
             <>
-              <RequirementsPreview answers={answers} />
-              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">Choose your pass</h2>
-              <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mb-3">Prices are in US dollars (USD).</p>
+              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-3">Choose your pass</h2>
               <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setConsentErr(""); }} error={consentErr} />
               {isMember ? (
                 <button disabled={buying} onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5 mt-2" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : `Unlock my Travel Pass · ${usd(P.memberPass)}`}</button>
