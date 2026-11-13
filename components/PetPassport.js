@@ -174,9 +174,9 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
                 <div className="ppg-no-print flex-shrink-0" aria-label="Not issued yet" role="img" style={{ width: 82, height: 82, borderRadius: "50%", border: "2.5px dashed #9AA4B2", display: "flex", alignItems: "center", justifyContent: "center", color: "#7B8595", transform: "rotate(-12deg)", textAlign: "center", fontFamily: font.display, fontSize: 12, fontWeight: 800, lineHeight: 1.05 }}>NOT YET<br />ISSUED</div>
               ) : null}
             </div>
-            <div className="ppg-pp-fields mt-3 pt-3 grid gap-x-4 gap-y-2.5 min-w-0" style={{ borderTop: "1px dashed #D9CDB2" }}>
-              {fields.map(([k, v]) => <Field key={k} k={k} v={v} mono={k === "Microchip"} />)}
-            </div>
+          </div>
+          <div className="ppg-pp-fields pt-3 grid gap-x-4 gap-y-2.5 min-w-0" style={{ borderTop: "1px dashed #D9CDB2" }}>
+            {fields.map(([k, v]) => <Field key={k} k={k} v={v} mono={k === "Microchip"} />)}
           </div>
         </div>
 
