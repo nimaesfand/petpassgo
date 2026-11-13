@@ -141,7 +141,7 @@ function MobileMenu({ open, onClose, main, more, signedIn, onLogout, here }) {
           )}
         </div>
         <div className="p-4" style={{ borderTop: `1px solid ${tokens.line}` }}>
-          <a href="/assessment" className="block text-center rounded-full py-3.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>{signedIn ? "Plan a trip" : PLAN_CTA}</a>
+          {signedIn ? <a href="/assessment" className="block text-center rounded-full py-3" style={{ background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>+ Plan another trip</a> : <a href="/assessment" className="block text-center rounded-full py-3.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>{PLAN_CTA}</a>}
         </div>
       </div>
     </div>
@@ -195,7 +195,11 @@ export default function SiteHeader({ onLogout }) {
               <a href="/login" style={link} className="hidden sm:inline">{LOGIN_CTA}</a>
             </>
           )}
-          <a href="/assessment" onClick={(e) => { const href = readHomeIntentHref(); if (href !== "/assessment") { e.preventDefault(); window.location.href = href; } }} className="btn-primary rounded-full px-3 sm:px-5 py-2" style={{ ...link, background: tokens.primary, color: "#fff", fontWeight: 700, fontSize: 15 }}>{signedIn ? "Plan a trip" : PLAN_CTA}</a>
+          {signedIn ? (
+            <a href="/account" aria-label="My account" className="lg:hidden rounded-full flex items-center justify-center" style={{ width: 40, height: 40, background: tokens.gold || "#F2B84B", color: tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 16, textDecoration: "none" }}>{initial || "•"}</a>
+          ) : (
+            <a href="/assessment" onClick={(e) => { const href = readHomeIntentHref(); if (href !== "/assessment") { e.preventDefault(); window.location.href = href; } }} className="btn-primary rounded-full px-3 sm:px-5 py-2" style={{ ...link, background: tokens.primary, color: "#fff", fontWeight: 700, fontSize: 15 }}>{signedIn ? "Plan a trip" : PLAN_CTA}</a>
+          )}
           <button type="button" onClick={() => setMenu(true)} aria-label="Open menu" aria-expanded={menu} className="lg:hidden rounded-xl flex items-center justify-center" style={{ width: 40, height: 40, background: tokens.sky, border: "none", color: tokens.navy }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
           </button>

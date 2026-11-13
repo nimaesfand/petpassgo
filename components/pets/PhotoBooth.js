@@ -13,12 +13,13 @@ const OUT_H = 1000;
 const FRAME = 4 / 5; // width / height
 
 const LINES = {
-  pick: (n) => `Next! …Passport photo for ${n}? Okay. Bright light. Face forward. Both ears in the frame. No sunglasses. Yes, I have to say that every time.`,
-  loaded: () => "Hmm. Drag the photo so the face sits inside the oval. Pinch or use the slider to zoom. I'll wait. I'm always waiting.",
-  dark: () => "It's very dark in here. Is this a pet or a cave? A spot near a window works best. You can try another, or use this one and I'll pretend I didn't see.",
-  small: () => "This photo is tiny. It'll look blurry on the passport. A closer, sharper shot would be better.",
-  good: () => "…Hm. Nice light. Face centered. I'm looking for a reason to reject it and I can't find one.",
-  saving: () => "Stamping. Don't move. Not you, the photo.",
+  pick: (n) => `Next! …Oh. Passport photo for ${n}? Bright light, face forward, both ears in. No sunglasses. Yes, I say that every time.`,
+  loaded: () => "Hmm. Slide the photo until the face sits in the oval. Pinch or tap + to zoom. Take your time. I have all day. Literally.",
+  dark: () => "It's very dark in here. Is this a pet or a cave? Try one near a window, or use this one and I'll pretend I didn't see.",
+  small: () => "This photo is tiny. It'll look blurry. A closer, sharper shot would be better.",
+  inspect: () => "Hmm… let me take a look.",
+  good: () => "…Nice light. Face centered. I'm looking for a reason to reject it and I can't find one.",
+  saving: () => "APPROVED. Don't move. Not you, the photo.",
 };
 
 function loadImage(file) {
@@ -33,46 +34,68 @@ function loadImage(file) {
 
 // Bev, Window 3. Original illustrated character: grey bun with a pencil, big glasses,
 // cardigan, name badge. Blinks now and then; very much not in a hurry.
-function BevFace({ size = 76 }) {
+function BevFace({ size = 76, mood = "neutral" }) {
+  const squint = mood === "inspect";
+  const happy = mood === "happy";
   return (
     <svg width={size} height={size} viewBox="0 0 120 120" aria-hidden="true">
       <circle cx="60" cy="60" r="58" fill="#FDE7C3" />
       <circle cx="60" cy="60" r="58" fill="none" stroke="#F2B84B" strokeWidth="4" />
-      {/* bun + pencil */}
-      <ellipse cx="60" cy="22" rx="17" ry="13" fill="#B8BEC9" />
+      {/* bun, pencil and a little flower */}
+      <ellipse cx="60" cy="22" rx="18" ry="14" fill="#C5CAD3" />
+      <path d="M48 20 q12 -8 24 0" stroke="#AEB4BF" strokeWidth="2" fill="none" />
       <rect x="66" y="6" width="5" height="26" rx="2" fill="#F2B84B" transform="rotate(28 68 19)" />
       <polygon points="74,30 77,36 71,34" fill="#3B2A1A" transform="rotate(28 68 19)" />
+      <g transform="translate(40 26)"><circle r="5" fill="#F7A8A0" /><circle r="2" fill="#F2B84B" /></g>
       {/* hair */}
-      <path d="M26 58 C24 34 44 26 60 26 C78 26 96 34 94 58 C90 46 80 40 60 40 C42 40 30 46 26 58Z" fill="#C9CED7" />
+      <path d="M25 60 C22 34 44 26 60 26 C78 26 98 34 95 60 C92 46 80 39 60 39 C42 39 29 46 25 60Z" fill="#D3D7DE" />
       {/* face */}
-      <ellipse cx="60" cy="66" rx="30" ry="32" fill="#FFD9B8" />
-      {/* cheeks */}
-      <circle cx="42" cy="76" r="6" fill="#F7A8A0" opacity=".55" />
-      <circle cx="78" cy="76" r="6" fill="#F7A8A0" opacity=".55" />
-      {/* glasses */}
-      <g fill="#fff" fillOpacity=".55" stroke="#14213D" strokeWidth="3">
-        <circle cx="47" cy="64" r="10" />
-        <circle cx="73" cy="64" r="10" />
-      </g>
-      <path d="M57 64 h6" stroke="#14213D" strokeWidth="3" />
-      <path d="M37 62 l-7 -3 M83 62 l7 -3" stroke="#14213D" strokeWidth="2.5" strokeLinecap="round" />
-      {/* half-lidded, unimpressed eyes */}
+      <ellipse cx="60" cy="67" rx="31" ry="32" fill="#FFDDBF" />
+      {/* pearl earrings */}
+      <circle cx="29" cy="76" r="3" fill="#fff" stroke="#E5D9C3" /><circle cx="91" cy="76" r="3" fill="#fff" stroke="#E5D9C3" />
+      {/* rosy cheeks */}
+      <circle cx="40" cy="79" r="7.5" fill="#F7A8A0" opacity={happy ? ".85" : ".6"} />
+      <circle cx="80" cy="79" r="7.5" fill="#F7A8A0" opacity={happy ? ".85" : ".6"} />
+      {/* eyes: round and sparkly, or squinting when she inspects */}
       <g className="ppg-bev-eyes">
-        <path d="M42 66 q5 -3 10 0" stroke="#14213D" strokeWidth="3" fill="none" strokeLinecap="round" />
-        <path d="M68 66 q5 -3 10 0" stroke="#14213D" strokeWidth="3" fill="none" strokeLinecap="round" />
+        {squint ? (
+          <>
+            <path d="M41 65 h11" stroke="#14213D" strokeWidth="3.2" strokeLinecap="round" />
+            <path d="M68 65 h11" stroke="#14213D" strokeWidth="3.2" strokeLinecap="round" />
+          </>
+        ) : happy ? (
+          <>
+            <path d="M41 66 q5.5 -6 11 0" stroke="#14213D" strokeWidth="3.2" fill="none" strokeLinecap="round" />
+            <path d="M68 66 q5.5 -6 11 0" stroke="#14213D" strokeWidth="3.2" fill="none" strokeLinecap="round" />
+          </>
+        ) : (
+          <>
+            <circle cx="47" cy="65" r="4.2" fill="#14213D" /><circle cx="73" cy="65" r="4.2" fill="#14213D" />
+            <circle cx="48.6" cy="63.4" r="1.5" fill="#fff" /><circle cx="74.6" cy="63.4" r="1.5" fill="#fff" />
+          </>
+        )}
       </g>
-      {/* flat little mouth */}
-      <path d="M53 86 q7 2 14 0" stroke="#9A4B3A" strokeWidth="3" fill="none" strokeLinecap="round" />
-      {/* cardigan + badge */}
-      <path d="M22 118 C26 100 40 96 60 96 C80 96 94 100 98 118Z" fill="#C2410C" />
-      <path d="M60 96 L52 118 M60 96 L68 118" stroke="#9A3412" strokeWidth="2" />
-      <rect x="72" y="104" width="16" height="9" rx="2" fill="#fff" />
-      <rect x="74" y="107" width="12" height="2" rx="1" fill="#14213D" />
+      {/* big glasses on a chain */}
+      <g fill="#fff" fillOpacity=".35" stroke="#7C3AED" strokeWidth="2.6">
+        <circle cx="47" cy="65" r="11" />
+        <circle cx="73" cy="65" r="11" />
+      </g>
+      <path d="M58 65 h4" stroke="#7C3AED" strokeWidth="2.6" />
+      <path d="M36 66 C30 80 32 92 38 98 M84 66 C90 80 88 92 82 98" stroke="#F2B84B" strokeWidth="1.4" fill="none" strokeDasharray="2 2" />
+      {/* mouth */}
+      {happy ? <path d="M51 85 q9 9 18 0" stroke="#9A4B3A" strokeWidth="3" fill="#E9806E" strokeLinecap="round" /> : squint ? <path d="M54 88 h12" stroke="#9A4B3A" strokeWidth="3" strokeLinecap="round" /> : <path d="M52 86 q8 5 16 0" stroke="#9A4B3A" strokeWidth="3" fill="none" strokeLinecap="round" />}
+      {/* cardigan, collar and badge */}
+      <path d="M20 118 C24 100 40 96 60 96 C80 96 96 100 100 118Z" fill="#C2410C" />
+      <path d="M48 97 L60 108 L72 97" fill="#FFF8EE" />
+      <path d="M60 108 L60 118" stroke="#9A3412" strokeWidth="2" />
+      <rect x="72" y="104" width="17" height="10" rx="2" fill="#fff" />
+      <rect x="74" y="107" width="13" height="2" rx="1" fill="#14213D" />
+      <rect x="74" y="110.5" width="8" height="1.6" rx=".8" fill="#9AA4B2" />
     </svg>
   );
 }
 
-function useTyped(text, speed = 22) {
+function useTyped(text, speed = 34, delay = 900) {
   const [n, setN] = useState(0);
   useEffect(() => {
     setN(0);
@@ -85,27 +108,29 @@ function useTyped(text, speed = 22) {
       if (i < text.length) {
         const ch = text[i - 1];
         // She pauses at punctuation. Of course she does.
-        t = setTimeout(tick, ch === "." || ch === "…" || ch === "?" || ch === "!" ? speed * 14 : ch === "," ? speed * 6 : speed);
+        t = setTimeout(tick, ch === "." || ch === "…" || ch === "?" || ch === "!" ? speed * 11 : ch === "," ? speed * 5 : speed);
       }
     };
-    t = setTimeout(tick, 350);
+    t = setTimeout(tick, delay);
     return () => clearTimeout(t);
-  }, [text, speed]);
+  }, [text, speed, delay]);
   return text.slice(0, n);
 }
 
-function Clerk({ text }) {
-  const shown = useTyped(text);
+function Clerk({ text, mood }) {
+  const first = useRef(true);
+  const shown = useTyped(text, 34, first.current ? 1300 : 350);
+  useEffect(() => { first.current = false; }, []);
   const typing = shown.length < text.length;
   return (
     <div className="flex items-end gap-3">
-      <div className="flex-shrink-0 ppg-bev"><BevFace /></div>
-      <div className="relative flex-1 rounded-3xl rounded-bl-md px-4 py-3.5" style={{ background: "#FFFDF8", boxShadow: "0 10px 26px rgba(0,0,0,.22)" }}>
+      <div className="flex-shrink-0 ppg-bev"><BevFace size={92} mood={mood} /></div>
+      <div className="ppg-bev-bubble relative flex-1 rounded-3xl rounded-bl-md px-4 py-3.5" style={{ background: "#FFFDF8", boxShadow: "0 10px 26px rgba(0,0,0,.22), 0 0 0 3px rgba(242,184,75,.55)" }}>
         <div className="flex items-center gap-2 mb-1">
           <span style={{ fontFamily: font.display, fontWeight: 800, fontSize: 16, color: tokens.navy }}>Bev</span>
           <span className="rounded-full px-2 py-0.5" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 10.5, letterSpacing: ".1em" }}>WINDOW 3</span>
         </div>
-        <p aria-live="polite" style={{ fontFamily: font.body, fontSize: 16.5, lineHeight: 1.5, color: tokens.ink, margin: 0, minHeight: "3em" }}>
+        <p aria-live="polite" style={{ fontFamily: font.body, fontSize: 17.5, lineHeight: 1.5, color: tokens.ink, margin: 0, minHeight: "4.5em" }}>
           <span className="sr-only">{text}</span>
           <span aria-hidden="true">{shown}{typing ? <span className="ppg-caret" /> : null}</span>
         </p>
@@ -181,7 +206,7 @@ export default function PhotoBooth({ pet, onSave, onClose }) {
     try {
       const loaded = await loadImage(f);
       setImg(loaded);
-      setZoom(1);
+      setZoom(1.15);
       setPos({ x: 0, y: 0 });
       setApproved(false);
       setLine(judge(loaded.img));
@@ -190,46 +215,53 @@ export default function PhotoBooth({ pet, onSave, onClose }) {
     }
   }
 
+  const pointers = useRef(new Map());
   function onPointerDown(e) {
     if (!img) return;
     e.currentTarget.setPointerCapture?.(e.pointerId);
-    drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY, start: pos };
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pointers.current.size === 2) {
+      const [a, b] = [...pointers.current.values()];
+      pinch.current = { d: Math.hypot(a.x - b.x, a.y - b.y), z: zoom };
+      drag.current = null;
+    } else {
+      drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY, start: pos };
+    }
   }
   function onPointerMove(e) {
-    if (!drag.current || drag.current.id !== e.pointerId || pinch.current) return;
+    if (!pointers.current.has(e.pointerId)) return;
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pinch.current && pointers.current.size >= 2) {
+      const [a, b] = [...pointers.current.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      const z = Math.min(4, Math.max(1, pinch.current.z * (d / pinch.current.d)));
+      setZoom(z);
+      setPos((p) => clamp(p, z));
+      return;
+    }
+    if (!drag.current || drag.current.id !== e.pointerId) return;
     const dx = e.clientX - drag.current.x;
     const dy = e.clientY - drag.current.y;
     setPos(clamp({ x: drag.current.start.x + dx, y: drag.current.start.y + dy }));
   }
-  function onPointerUp() { drag.current = null; }
-  function onTouchStart(e) {
-    if (e.touches.length === 2) {
-      const [a, b] = e.touches;
-      pinch.current = { d: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY), z: zoom };
-    }
+  function onPointerUp(e) {
+    pointers.current.delete(e.pointerId);
+    if (pointers.current.size < 2) pinch.current = null;
+    if (pointers.current.size === 0) drag.current = null;
   }
-  function onTouchMove(e) {
-    if (e.touches.length === 2 && pinch.current) {
-      e.preventDefault();
-      const [a, b] = e.touches;
-      const d = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
-      const z = Math.min(4, Math.max(1, pinch.current.z * (d / pinch.current.d)));
-      setZoom(z);
-      setPos((p) => clamp(p, z));
-    }
-  }
-  function onTouchEnd(e) { if (e.touches.length < 2) pinch.current = null; }
-  function onWheel(e) {
-    if (!img) return;
-    const z = Math.min(4, Math.max(1, zoom * (e.deltaY < 0 ? 1.08 : 0.93)));
+  function zoomBy(f) {
+    const z = Math.min(4, Math.max(1, zoom * f));
     setZoom(z);
     setPos((p) => clamp(p, z));
+  }
+  function onWheel(e) {
+    if (!img) return;
+    zoomBy(e.deltaY < 0 ? 1.08 : 0.93);
   }
 
   async function approve() {
     if (!img || busy) return;
     setBusy(true);
-    setLine("good");
     // Draw the visible frame at full resolution.
     const c = document.createElement("canvas");
     c.width = OUT_W; c.height = OUT_H;
@@ -243,13 +275,18 @@ export default function PhotoBooth({ pet, onSave, onClose }) {
     g.imageSmoothingQuality = "high";
     g.drawImage(img.img, x, y, w, h);
     const blob = await new Promise((r) => c.toBlob(r, "image/jpeg", 0.9));
-    await new Promise((r) => setTimeout(r, 1100)); // the clerk is thorough
-    setApproved(true);
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    setLine("inspect");          // she squints at it…
+    await wait(2600);
+    setLine("good");             // …grudging approval…
+    await wait(3400);
+    setApproved(true);           // …and the stamp comes down.
     setLine("saving");
+    try { frameRef.current?.classList.remove("ppg-booth-shake"); void frameRef.current?.offsetWidth; frameRef.current?.classList.add("ppg-booth-shake"); } catch {}
     try {
       const file = new File([blob], `passport-photo.jpg`, { type: "image/jpeg" });
       await onSave?.(file);
-      await new Promise((r) => setTimeout(r, 900));
+      await wait(2200);
       onClose?.();
     } finally {
       setBusy(false);
@@ -262,18 +299,18 @@ export default function PhotoBooth({ pet, onSave, onClose }) {
       <div className="flex items-center justify-between px-4 py-3" style={{ color: "#fff" }}>
         <div className="flex items-center gap-2">
           <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 19 }}>Passport photos</div>
-          <span className="rounded-md px-2 py-0.5" style={{ background: "#fff", color: tokens.navy, fontFamily: "ui-monospace, Menlo, monospace", fontWeight: 800, fontSize: 12, transform: "rotate(-3deg)" }}>NOW SERVING 042</span>
+          <span className="ppg-bev-ding rounded-md px-2 py-0.5" style={{ background: "#fff", color: tokens.navy, fontFamily: "ui-monospace, Menlo, monospace", fontWeight: 800, fontSize: 12 }}>NOW SERVING 042</span>
         </div>
         <button type="button" onClick={onClose} aria-label="Close photo booth" className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: "rgba(255,255,255,.12)", color: "#fff", border: "none", cursor: "pointer" }}><Icon name="x" size={20} /></button>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 pb-4">
         <div className="mx-auto grid gap-4" style={{ maxWidth: 440 }}>
-          <Clerk text={LINES[line](pet.name)} />
+          <Clerk text={LINES[line](pet.name)} mood={line === "inspect" ? "inspect" : (line === "good" || line === "saving") ? "happy" : "neutral"} />
 
-          <div ref={frameRef} className="relative mx-auto w-full overflow-hidden rounded-2xl select-none" style={{ maxWidth: 300, aspectRatio: "4 / 5", background: "#fff", touchAction: "none", cursor: img ? "grab" : "default", boxShadow: "0 20px 50px rgba(0,0,0,.4)", border: `4px solid ${approved ? tokens.green : "#fff"}`, transition: "border-color .3s" }}
+          <div ref={frameRef} className="relative mx-auto w-full overflow-hidden rounded-2xl select-none" style={{ maxWidth: 330, aspectRatio: "4 / 5", background: "#fff", touchAction: "none", cursor: img ? "grab" : "default", boxShadow: "0 20px 50px rgba(0,0,0,.4)", border: `4px solid ${approved ? tokens.green : "#fff"}`, transition: "border-color .3s" }}
             onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
-            onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onWheel={onWheel}>
+            onWheel={onWheel} onDoubleClick={() => { setZoom(1.15); setPos({ x: 0, y: 0 }); }}>
             {img ? (
               <img src={img.url} alt="" draggable={false} style={{ position: "absolute", left: "50%", top: "50%", width: dispW, height: dispH, maxWidth: "none", transform: `translate(calc(-50% + ${pos.x}px), calc(-50% + ${pos.y}px))`, pointerEvents: "none" }} />
             ) : (
@@ -299,10 +336,12 @@ export default function PhotoBooth({ pet, onSave, onClose }) {
 
           {img ? (
             <div className="grid gap-3">
-              <label className="flex items-center gap-3" style={{ color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 14 }}>
-                Zoom
-                <input type="range" min="1" max="4" step="0.01" value={zoom} onChange={(e) => { const z = Number(e.target.value); setZoom(z); setPos((p) => clamp(p, z)); }} className="flex-1" style={{ accentColor: tokens.gold }} aria-label="Zoom" />
-              </label>
+              <div className="flex items-center gap-2" style={{ color: "#fff" }}>
+                <button type="button" onClick={() => zoomBy(0.85)} aria-label="Zoom out" className="flex items-center justify-center rounded-full" style={{ width: 48, height: 48, background: "rgba(255,255,255,.14)", color: "#fff", border: "none", fontSize: 26, fontWeight: 800, cursor: "pointer" }}>−</button>
+                <input type="range" min="1" max="4" step="0.01" value={zoom} onChange={(e) => { const z = Number(e.target.value); setZoom(z); setPos((p) => clamp(p, z)); }} className="flex-1" style={{ accentColor: tokens.gold, height: 28 }} aria-label="Zoom" />
+                <button type="button" onClick={() => zoomBy(1.18)} aria-label="Zoom in" className="flex items-center justify-center rounded-full" style={{ width: 48, height: 48, background: "rgba(255,255,255,.14)", color: "#fff", border: "none", fontSize: 26, fontWeight: 800, cursor: "pointer" }}>+</button>
+              </div>
+              <p className="text-center" style={{ fontFamily: font.body, fontSize: 14, color: "rgba(255,255,255,.8)", margin: 0 }}>Drag with one finger to move. Double-tap to re-center.</p>
               <button type="button" onClick={approve} disabled={busy} className="ppg-btn ppg-btn-primary w-full" style={{ minHeight: 52, fontSize: 17 }}>{busy ? (approved ? "Saving…" : "Inspecting…") : "Submit to the clerk"}</button>
               <label className="ppg-btn w-full text-center" style={{ minHeight: 48, background: "rgba(255,255,255,.12)", color: "#fff", border: "1.5px solid rgba(255,255,255,.35)", cursor: "pointer" }}>
                 Use a different photo

@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Icon from "./Icon";
 import { tokens, font } from "../lib/theme";
 import { useTodayPT } from "../lib/useTodayPT";
@@ -61,7 +61,7 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRe
   const tone = CHIP[chip.tone] || CHIP.later;
   const showChip = !card.fact || !!card.dueDate;
   return (
-    <article className="rounded-2xl mb-2 overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: open ? "0 8px 24px rgba(20,33,61,0.08)" : "none" }}>
+    <article id={`step-${card.id}`} className="rounded-2xl mb-2 overflow-hidden" style={{ scrollMarginTop: 90, background: "#fff", border: `1px solid ${open ? tokens.primary : tokens.line}`, boxShadow: open ? "0 8px 24px rgba(20,33,61,0.08)" : "none" }}>
       <button
         type="button"
         aria-expanded={open}
@@ -135,7 +135,7 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRe
   );
 }
 
-export default function PassChecklist({ trip, requirements = [], statusMap = {}, onSetDone, onOpenRelief }) {
+export default function PassChecklist({ trip, requirements = [], statusMap = {}, onSetDone, onOpenRelief, focusId }) {
   const today = useTodayPT();
   const plans = useMemo(() => segmentPlans(requirements, trip), [requirements, trip]);
   const multi = plans.length > 1;
@@ -145,6 +145,12 @@ export default function PassChecklist({ trip, requirements = [], statusMap = {},
   const [openId, setOpenId] = useState(null);
   const [doneOpen, setDoneOpen] = useState(false);
   const [nudge, setNudge] = useState(null);
+  // Opened from "Next up": open that step and bring it into view.
+  useEffect(() => {
+    if (!focusId) return;
+    setOpenId(focusId);
+    setTimeout(() => { try { document.getElementById(`step-${focusId}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); } catch {} }, 120);
+  }, [focusId]);
 
   function toggleOpen(id) {
     setOpenId((cur) => (cur === id ? null : id));

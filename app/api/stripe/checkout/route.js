@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { stripe, priceId, userFromReq, isMember, customerFor, siteUrl, serviceClient } from "@/lib/stripeServer";
 import { consentAccepted, WITHDRAWAL_BLOCKED } from "@/lib/withdrawal";
+import { needsWithdrawalConsent } from "@/lib/geo";
 import { attachConsentSession, consentMetadata, recordWithdrawalConsent } from "@/lib/withdrawalRecord";
 import { saveMarketingConsent } from "@/lib/marketingServer";
 import { marketingSourceForPlan } from "@/lib/marketing";
@@ -27,12 +28,14 @@ async function handle(req) {
   const tripId = body?.trip_id || null;
   // First-touch attribution -> Stripe metadata (whitelisted, length-capped; optional).
   const attribution = {};
-  for (const k of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "fbclid"]) {
+  for (const k of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "fbclid", "ttclid"]) {
     const v = body?.attribution?.[k];
     if (typeof v === "string" && v) attribution[k] = v.slice(0, 200);
   }
   if (!["pass", "member_pass", "join", "membership"].includes(plan)) return NextResponse.json({ error: "Unknown plan" }, { status: 400 });
-  if (!consentAccepted(body)) return NextResponse.json({ error: WITHDRAWAL_BLOCKED }, { status: 400 });
+  // The 14-day withdrawal waiver only applies to EU/EEA/UK/Swiss buyers.
+  const euUk = needsWithdrawalConsent(req);
+  if (euUk && !consentAccepted(body)) return NextResponse.json({ error: WITHDRAWAL_BLOCKED }, { status: 400 });
 
   const sb = serviceClient();
   const member = await isMember(sb, user.id);
@@ -53,8 +56,8 @@ async function handle(req) {
   if (body?.marketing_opt_in === true) {
     await saveMarketingConsent(sb, user.id, { optIn: true, source: marketingSourceForPlan(effPlan) });
   }
-  const consent = await recordWithdrawalConsent(sb, { userId: user.id, email: user.email, plan: effPlan });
-  const meta = { user_id: user.id, trip_id: effPlan === "membership" ? "" : tripId, plan: effPlan, ...attribution, ...consentMetadata(consent.id, consent.consented_at) };
+  const consent = euUk ? await recordWithdrawalConsent(sb, { userId: user.id, email: user.email, plan: effPlan }) : null;
+  const meta = { user_id: user.id, trip_id: effPlan === "membership" ? "" : tripId, plan: effPlan, ...attribution, ...(consent ? consentMetadata(consent.id, consent.consented_at) : {}) };
   const params = {
     customer,
     client_reference_id: user.id,
@@ -75,12 +78,12 @@ async function handle(req) {
     const items = [{ price: await priceId("membership"), quantity: 1 }];
     if (effPlan === "join") items.push({ price: await priceId("member_pass"), quantity: 1 });
     Object.assign(params, {
-      mode: "subscription", line_items: items, subscription_data: { metadata: { user_id: user.id, ...attribution, ...consentMetadata(consent.id, consent.consented_at) } },
+      mode: "subscription", line_items: items, subscription_data: { metadata: { user_id: user.id, ...attribution, ...(consent ? consentMetadata(consent.id, consent.consented_at) : {}) } },
       payment_method_data: { allow_redisplay: "always" }, // card can be offered again on later Travel Pass checkouts
       saved_payment_method_options: { allow_redisplay_filters: ["always", "limited", "unspecified"] },
     });
   }
   const session = await stripe().checkout.sessions.create(params);
-  await attachConsentSession(sb, consent.id, session.id);
+  if (consent) await attachConsentSession(sb, consent.id, session.id);
   return NextResponse.json({ url: session.url });
 }

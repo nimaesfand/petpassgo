@@ -36,8 +36,9 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose }) {
   useEffect(() => {
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     if (reduced) { setStage(2); return undefined; }
-    const a = setTimeout(() => setStage(1), 900);
-    const b = setTimeout(() => setStage(2), 2150);
+    // Let it breathe: the closed book, then it opens, a beat to read it, then the stamp.
+    const a = setTimeout(() => setStage(1), 2000);
+    const b = setTimeout(() => setStage(2), 4600);
     return () => { clearTimeout(a); clearTimeout(b); };
   }, []);
 
@@ -66,7 +67,7 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose }) {
   if (!host) return null;
   return createPortal(
     <div role="dialog" aria-modal="true" aria-label={`${pet.name}'s passport is issued`} className="fixed inset-0 z-[1000] flex flex-col items-center justify-center px-5 py-8 overflow-hidden" style={{ background: "radial-gradient(120% 80% at 50% 30%, #1B2C52 0%, #0B1529 70%)" }}>
-      <div className="ppg-pp-fade" style={{ fontFamily: font.body, fontSize: 12, fontWeight: 800, letterSpacing: "0.2em", color: tokens.gold }}>{stage < 2 ? "ISSUING PASSPORT…" : "PASSPORT ISSUED"}</div>
+      <div className="ppg-pp-fade" style={{ fontFamily: font.body, fontSize: 12, fontWeight: 800, letterSpacing: "0.2em", color: tokens.gold }}>{stage === 0 ? `PRINTING ${String(pet.name || "").toUpperCase()}'S PASSPORT…` : stage === 1 ? "CHECKING THE DETAILS…" : "PASSPORT ISSUED"}</div>
 
       <div className="ppg-pp-book relative mt-5" style={{ width: 300, height: 410, maxWidth: "86vw" }}>
         <div className={`ppg-pp-page ppg-guilloche-light absolute inset-0 rounded-2xl overflow-hidden flex flex-col ${stage === 2 ? "is-thud" : ""}`} style={{ background: "#FBF7EE", boxShadow: "0 30px 60px rgba(0,0,0,.45)" }}>

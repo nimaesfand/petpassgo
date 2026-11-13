@@ -341,29 +341,14 @@ export default function PetPassGoQuiz() {
 
           {step === 1 && (
             <>
-              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
-                Pet, service dog, or ESA?
+              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-5">
+                Who&apos;s flying with you?
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-5">
-                A psychiatric service dog (PSD) is a service dog. An emotional support animal is not.
-              </p>
               <div className="flex flex-col gap-3">
-                <OptionCard label="Pet" sub="Traveling for companionship, not task-trained" selected={answers.role === "Pet" && !answers.esa} onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: false, psd: false }))} />
-                <OptionCard label="Service dog" sub="Task-trained dog, including a psychiatric service dog (PSD)" selected={answers.role === "Service animal"} onClick={() => setAnswers((a) => ({ ...a, role: "Service animal", esa: false }))} />
-                <OptionCard label="Emotional support animal" sub="Flies as a pet" selected={answers.role === "Pet" && answers.esa} onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: true, psd: false }))} />
+                <OptionCard label="Pet" sub={`Your ${answers.animal === "Cat" ? "cat" : answers.animal === "Dog" ? "dog" : "pet"}, flying as a pet`} selected={answers.role === "Pet" && !answers.esa} onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: false, psd: false }))} />
+                <OptionCard label="Service dog" sub="Trained to do tasks for a disability. Includes psychiatric service dogs." selected={answers.role === "Service animal"} onClick={() => setAnswers((a) => ({ ...a, role: "Service animal", esa: false }))} />
+                <OptionCard label="Emotional support animal" sub="US airlines treat ESAs as pets. We'll show you the pet rules." selected={answers.role === "Pet" && answers.esa} onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: true, psd: false }))} />
               </div>
-              {answers.esa && (
-                <div className="rounded-xl p-4 mt-4" style={{ background: tokens.sky }}>
-                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>Your ESA flies as a pet</div>
-                  <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink, lineHeight: 1.45 }} className="mt-1">The Travel Pass uses the pet path after you pay.</p>
-                </div>
-              )}
-              {answers.role === "Service animal" && answers.animal === "Dog" && (
-                <label className="flex items-start gap-3 mt-4 rounded-xl p-4" style={{ background: tokens.sky, cursor: "pointer" }}>
-                  <input type="checkbox" checked={!!answers.psd} onChange={(e) => set("psd", e.target.checked)} className="mt-1" />
-                  <span style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}><b>This is a PSD.</b> A psychiatric service dog is a service dog. It is not an emotional support animal.</span>
-                </label>
-              )}
               {answers.role === "Service animal" && answers.animal && answers.animal !== "Dog" && (
                 <div className="rounded-xl p-4 mt-4" style={{ background: "#FFF7F2", border: `1px solid ${tokens.primary}` }}>
                   <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>U.S. airlines recognize dogs as service animals</div>
@@ -535,27 +520,32 @@ export default function PetPassGoQuiz() {
               {isMember ? (
                 <button disabled={buying} onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5 mt-2" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : `Unlock my Travel Pass · ${usd(P.memberPass)}`}</button>
               ) : (
-                <div className="grid gap-3 mt-2">
+                <div className="mt-2">
                   <div className="rounded-2xl p-5" style={{ border: `2px solid ${tokens.primary}`, background: "#FFFBF8" }}>
-                    <div className="flex items-baseline justify-between gap-3 flex-wrap">
+                    <div className="flex items-baseline justify-between gap-3">
                       <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 19, color: tokens.navy }}>Travel Pass</div>
                       <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 22, color: tokens.navy }}>{P.pass} <span style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.muted }}>one time</span></div>
                     </div>
-                    <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }} className="mt-1 mb-4">Everything for this trip. No subscription. Pet Vault is included until 7 days after you land.</p>
+                    <ul className="mt-2 mb-4 flex flex-col gap-1.5">
+                      {["Every step for this trip, in order", "Due dates and reminders", "Official source on each rule", "Pet Vault free until 7 days after you land"].map((t) => (
+                        <li key={t} className="flex items-start gap-2" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.4 }}>
+                          <span style={{ color: tokens.primary, marginTop: 1 }}><Icon name="check" size={16} /></span>{t}
+                        </li>
+                      ))}
+                    </ul>
                     <button disabled={buying} onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : `Unlock my Travel Pass · ${usd(P.pass)}`}</button>
                   </div>
-                  <div className="rounded-2xl p-5" style={{ border: `1px solid ${tokens.line}`, background: "#fff" }}>
-                    <div className="flex items-baseline justify-between gap-3 flex-wrap">
-                      <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 17, color: tokens.navy }}>Pet Vault + Travel Pass</div>
-                      <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 18, color: tokens.navy }}>{P.joinToday} <span style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.muted }}>today</span></div>
-                    </div>
-                    <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }} className="mt-1 mb-4">Keep your pet's ID, records and lost-pet help all year. {P.member} for Pet Vault plus a {P.memberPass} member pass, then {P.member}/mo. Cancel anytime.</p>
-                    <button type="button" disabled={buying} onClick={() => handlePurchase("member")} className="w-full rounded-full py-3" style={{ background: "#fff", color: tokens.navy, border: `2px solid ${tokens.navy}`, fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : `Join Pet Vault + Pass · ${usd(P.joinToday)}`}</button>
-                  </div>
+                  <button type="button" disabled={buying} onClick={() => handlePurchase("member")} className="w-full rounded-2xl px-4 py-3 mt-3 text-left flex items-center gap-3" style={{ background: "#fff", border: `1px solid ${tokens.line}`, cursor: "pointer", opacity: buying ? 0.7 : 1 }}>
+                    <span className="flex-1 min-w-0">
+                      <span className="block" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, color: tokens.navy }}>Or join Pet Vault + Pass · {usd(P.joinToday)} today</span>
+                      <span className="block" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted, lineHeight: 1.4 }}>Pet ID, records and lost-pet help all year. Then {P.member}/mo, cancel anytime.</span>
+                    </span>
+                    <span style={{ color: tokens.navy, fontSize: 20, fontWeight: 700 }}>›</span>
+                  </button>
                 </div>
               )}
               <div className="mt-3"><MarketingOptIn checked={tips} onChange={setTips} /></div>
-              <TrustBadges className="mt-4 text-left" />
+              <TrustBadges compact className="mt-5" />
               </>}
               <div className="mt-6">
                 <button onClick={back} style={{ fontFamily: font.body, color: tokens.ink, fontSize: 16 }}>← Back</button>

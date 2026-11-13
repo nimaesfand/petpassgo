@@ -11,7 +11,7 @@ import { usePetAccess } from "../../lib/access";
 import WinBack from "../../components/WinBack";
 import { PRICES as P, usd } from "../../lib/pricing";
 import WithdrawalConsent from "../../components/WithdrawalConsent";
-import { WITHDRAWAL_BLOCKED, WITHDRAWAL_CONFIRMED } from "../../lib/withdrawal";
+import { WITHDRAWAL_BLOCKED } from "../../lib/withdrawal";
 import { JOIN_CTA, PLAN_CTA } from "../../lib/cta";
 import { startStripe } from "../../lib/checkout";
 import { trackBeginCheckout, trackPurchaseOnce, getAttribution } from "../../lib/analytics";
@@ -36,11 +36,12 @@ import PetCareCard from "../../components/PetCareCard";
 import PetDocumentsCard from "../../components/PetDocumentsCard";
 import { SECTION_THEME } from "../../lib/petSections";
 import PetProfileExperience from "../../components/PetProfileExperience";
+import PassportWizard from "../../components/pets/PassportWizard";
 import MarketingOptIn from "../../components/MarketingOptIn";
 import MarketingSettings from "../../components/MarketingSettings";
-import { buildPassCards, groupCards, matchesDestination, passProgress } from "../../lib/passCards";
+import { buildPassCards, dueChip, groupCards, matchesDestination, passProgress } from "../../lib/passCards";
 import { pickTripPet } from "../../lib/tripPet";
-import { reminderSchedule, classifyReminder, todayPT } from "../../lib/travelDates";
+import { todayPT } from "../../lib/travelDates";
 import { fmtTripDate } from "../../lib/tripAccess";
 import { BUCKET, SignedImg, getSignedUrl, toStoragePath } from "../../lib/storage";
 import { tokens, font } from "../../lib/theme";
@@ -91,10 +92,10 @@ function calculateAge(dob) {
 }
 
 const BANNERS = {
-  health: [(n) => `${n}'s health`, () => "Vaccines, meds and vet in one place. We remind you before anything expires."],
+  health: [(n) => `${n}'s Health`, () => "Vaccines, meds and vet in one place. We remind you before anything expires."],
   docs: [() => "Documents", () => "Upload certificates once. Show them at the counter or share a link."],
-  lost: [(n) => `If ${n} goes missing`, () => "One tap makes a lost poster and alerts you when the tag is scanned."],
-  about: [(n) => `All about ${n}`, () => "Personality and quirks, ready to share with sitters and vets."],
+  lost: [(n) => `If ${n} Goes Missing`, () => "One tap makes a lost poster and alerts you when the tag is scanned."],
+  about: [(n) => `All About ${n}`, () => "Personality and quirks, ready to share with sitters and vets."],
 };
 
 const th = (k) => SECTION_THEME[k];
@@ -642,23 +643,7 @@ function PetProfileTab({ userId }) {
           <button onClick={loadPets} className="ppg-btn ppg-btn-primary ml-2">Retry</button>
         </div>
       ) : pets.length === 0 && !showForm ? (
-        <div
-          className="rounded-xl p-8 text-center"
-          style={{ background: "#fff", border: `1px dashed ${tokens.line}` }}
-        >
-          <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-2">
-            No pets yet
-          </div>
-          <div style={{ fontFamily: font.body, fontSize: 15.5, opacity: 0.7 }} className="mb-4">
-            Add your pet's info here — it'll carry over to every trip you plan.
-          </div>
-          <button
-            onClick={() => setShowForm(true)}
-            className="ppg-btn ppg-btn-primary"
-          >
-            Add your pet
-          </button>
-        </div>
+        <PassportWizard userId={userId} onCancel={() => window.history.back()} onDone={() => { loadPets(); setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50); }} />
       ) : (
         <>
           {pets.map((pet) => (
@@ -687,92 +672,11 @@ function PetProfileTab({ userId }) {
       )}
 
       {showForm && (
-        <form
-          onSubmit={handleAddPet}
-          className="rounded-xl p-5 mt-4"
-          style={{ background: tokens.paper, border: `1px solid ${tokens.line}` }}
-        >
-          <div style={{ fontFamily: font.display, fontSize: 17, color: tokens.navy }} className="mb-3">
-            Add a pet
-          </div>
-          <div className="flex flex-col gap-3">
-            <input
-              required
-              placeholder="Name"
-              value={form.name}
-              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
-              className="rounded-xl px-4 py-3 outline-none"
-            />
-            <div className="flex gap-3">
-              <select
-                value={form.animal_type}
-                onChange={(e) => setForm((f) => ({ ...f, animal_type: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, background: "#fff" }}
-              className="rounded-xl px-4 py-3 outline-none flex-1"
-            >
-                <option>Dog</option>
-                <option>Cat</option>
-                <option>Other</option>
-              </select>
-              <select
-                value={form.role}
-                onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
-                style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, background: "#fff" }}
-                className="rounded-xl px-4 py-3 outline-none flex-1"
-              >
-                <option>Pet</option>
-                <option>Service animal</option>
-              </select>
-            </div>
-            <BreedInput
-              placeholder="Breed (optional) — start typing"
-              aria-label="Breed"
-              animal={form.animal_type}
-              value={form.breed}
-              onChange={(e) => setForm((f) => ({ ...f, breed: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
-              className="rounded-xl px-4 py-3 outline-none"
-            />
-            <details className="rounded-xl" style={{ border: `1px dashed ${tokens.line}` }}>
-              <summary className="px-4 py-3" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy, cursor: "pointer" }}>More details (optional): sex, weight, carrier size</summary>
-              <div className="flex flex-col gap-3 px-3 pb-3">
-            <select
-              value={form.sex}
-              onChange={(e) => setForm((f) => ({ ...f, sex: e.target.value }))}
-              style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, background: "#fff" }}
-              className="rounded-xl px-4 py-3 outline-none"
-            >
-              <option value="">Sex (optional)</option>
-              <option>Male</option>
-              <option>Female</option>
-            </select>
-            <input type="number" step="0.1" min="0.1" placeholder="Weight in pounds (optional)" aria-label="Weight in pounds" value={form.weight_lb} onChange={(e) => setForm((f) => ({ ...f, weight_lb: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-4 py-3 outline-none" />
-            <div className="grid grid-cols-3 gap-2 min-w-0">
-              <label className="min-w-0" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>L (in)<input type="number" step="0.1" min="0.1" placeholder="L" aria-label="Carrier length in inches" value={form.carrier_length_in} onChange={(e) => setForm((f) => ({ ...f, carrier_length_in: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, width: "100%", minWidth: 0 }} className="rounded-xl px-3 py-3 outline-none mt-1" /></label>
-              <label className="min-w-0" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>W (in)<input type="number" step="0.1" min="0.1" placeholder="W" aria-label="Carrier width in inches" value={form.carrier_width_in} onChange={(e) => setForm((f) => ({ ...f, carrier_width_in: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, width: "100%", minWidth: 0 }} className="rounded-xl px-3 py-3 outline-none mt-1" /></label>
-              <label className="min-w-0" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>H (in)<input type="number" step="0.1" min="0.1" placeholder="H" aria-label="Carrier height in inches" value={form.carrier_height_in} onChange={(e) => setForm((f) => ({ ...f, carrier_height_in: e.target.value }))} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, width: "100%", minWidth: 0 }} className="rounded-xl px-3 py-3 outline-none mt-1" /></label>
-            </div>
-              </div>
-            </details>
-          </div>
-          <div className="flex gap-3 mt-4">
-            <button
-              type="submit"
-              disabled={saving}
-              className="ppg-btn ppg-btn-primary"
-            >
-              {saving ? "Saving…" : "Save pet"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowForm(false)}
-              className="ppg-btn ppg-btn-secondary"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+        <PassportWizard
+          userId={userId}
+          onCancel={() => setShowForm(false)}
+          onDone={() => { setForm(blankPet); setShowForm(false); loadPets(); setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50); }}
+        />
       )}
     </div>
   );
@@ -875,11 +779,7 @@ export function DashboardTab({ userId, onOpenTrips }) {
     const list = []; let doneN = 0;
     if (current?.paid && !tripIsPast(current)) {
       const today = todayPT();
-      for (const it of reminderSchedule(current, today)) {
-        const { state } = classifyReminder(it, current, { today });
-        const genericLate = state === "do_now" && /Open your checklist|Confirm carrier fit|Pack your documents and carrier/.test(it.body || "");
-        if (!genericLate && (state === "do_now" || state === "today")) list.push({ key: `rem-${it.kind}`, label: it.title, hint: state === "today" ? "Due today" : "Do this before you fly" });
-      }
+      // Only real checklist steps here. Reminder headings ("30 days before your flight") are not tasks.
       const { data: reqs } = await supabase.rpc("get_trip_requirements", { p_trip_id: current.id, p_trip_types: requirementQueryTypes(current) });
       const { data: statusRows } = await supabase.from("trip_requirement_status").select("*").eq("trip_id", current.id);
       const doneMap = {};
@@ -891,7 +791,8 @@ export function DashboardTab({ userId, onOpenTrips }) {
       for (const card of [...grouped.first, ...grouped.general]) {
         if (seen.has(card.shortTitle.toLowerCase())) continue;
         seen.add(card.shortTitle.toLowerCase());
-        list.push({ key: `card-${card.id}`, label: card.shortTitle, hint: "Checklist" });
+        const chip = dueChip(card.dueDate, today, { suggested: card.dueSuggested, dayOf: card.dueKind === "dayof" });
+        list.push({ key: `card-${card.id}`, label: card.shortTitle, hint: card.dueDate ? chip.label : "Before you fly" });
       }
     }
     setActions(list); setDoneCount(doneN); if (!current?.paid) setStepTotal(0); setLoading(false);
@@ -913,16 +814,16 @@ export function DashboardTab({ userId, onOpenTrips }) {
         : <div className="mb-4"><PlanTripCard /></div>}
       {trip?.paid && !tripIsPast(trip) && (
         <div className="rounded-2xl p-5 mb-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-          <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 800, color: tokens.navy }} className="mb-3">Needs action</div>
-          {actions.length === 0 ? <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>Nothing needs action right now.</p> : <>
+          <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 800, color: tokens.navy }} className="mb-3">Up next for this trip</div>
+          {actions.length === 0 ? <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>Nothing due right now.</p> : <>
             <ul className="space-y-2">{visible.map((a) => (
-              <li key={a.key} className="flex items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: tokens.paper }}>
-                <span style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>{a.label}</span>
-                <span style={{ fontFamily: font.mono, fontSize: 11, color: tokens.stamp, whiteSpace: "nowrap" }}>{a.hint.toUpperCase()}</span>
-              </li>))}
+              <li key={a.key}><button type="button" onClick={onOpenTrips} className="w-full flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-left" style={{ background: tokens.paper, border: "none", cursor: "pointer", minHeight: 52 }}>
+                <span style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{a.label}</span>
+                <span className="flex items-center gap-2" style={{ fontFamily: font.body, fontSize: 13, fontWeight: 700, color: tokens.primary, whiteSpace: "nowrap" }}>{a.hint}<span aria-hidden="true">›</span></span>
+              </button></li>))}
             </ul>
             {actions.length > 4 && <button onClick={() => setShowAll((s) => !s)} style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.navy, background: "none", border: "none", padding: "8px 0 0", cursor: "pointer", textDecoration: "underline" }}>{showAll ? "Show less" : `Show ${actions.length - 4} more`}</button>}
-            <div className="mt-4"><button onClick={onOpenTrips} className="ppg-btn ppg-btn-primary">Open in My Trips</button></div>
+            <div className="mt-4"><button onClick={onOpenTrips} className="ppg-btn ppg-btn-primary">View trip</button></div>
           </>}
         </div>
       )}
@@ -1120,7 +1021,7 @@ function CurrentFlightTab({ userId }) {
     <div>
       <div className="flex items-center justify-between gap-3 mb-4">
         <h1 style={{ fontFamily: font.display, fontSize: 34, fontWeight: 800, color: tokens.navy, lineHeight: 1.08 }}>My Trips</h1>
-        <a href="/assessment" className="ppg-btn ppg-btn-primary">{PLAN_CTA}</a>
+        <a href="/assessment" style={{ fontFamily: font.body, fontSize: 15.5, fontWeight: 700, color: tokens.navy, textDecoration: "underline" }}>+ New trip</a>
       </div>
       {roster.upcoming.length + roster.past.length > 1 ? <TripList title="Upcoming" rows={roster.upcoming} total={roster.upTotal} onMore={() => setLimits((n) => ({ ...n, up: n.up + TRIP_PAGE }))} /> : null}
       <TripList title="Past" rows={roster.past} total={roster.pastTotal} onMore={() => setLimits((n) => ({ ...n, past: n.past + TRIP_PAGE }))} />
@@ -1226,7 +1127,7 @@ function CheckoutBanner() {
     if (q) { u.delete("checkout"); u.delete("session_id"); const qs = u.toString(); window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : "")); }
   }, []);
   if (!msg) return null;
-  return <><div role="status" className="rounded-2xl p-4 mb-6 flex items-start gap-3 ppg-rise" style={{ background: "#fff", border: `1px solid ${msg === "paid" ? tokens.green : tokens.line}`, fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}><span className="flex-1">{msg === "paid" ? <>Payment received. Thank you. {WITHDRAWAL_CONFIRMED} We also email that confirmation. Your trip unlocks in a few seconds. Refresh if it still looks locked. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Flight-Ready Guarantee. Terms.</a></> : msg}</span><button type="button" aria-label="Dismiss" onClick={() => setMsg(null)} style={{ background: "none", border: "none", cursor: "pointer", color: tokens.muted, padding: 2 }}><Icon name="x" size={18} /></button></div>
+  return <><div role="status" className="rounded-2xl p-4 mb-6 flex items-start gap-3 ppg-rise" style={{ background: "#fff", border: `1px solid ${msg === "paid" ? tokens.green : tokens.line}`, fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}><span className="flex-1">{msg === "paid" ? <><b>You&apos;re all set.</b> Everything is unlocked below. If something still looks locked, give it a few seconds and refresh.</> : msg}</span><button type="button" aria-label="Dismiss" onClick={() => setMsg(null)} style={{ background: "none", border: "none", cursor: "pointer", color: tokens.muted, padding: 2 }}><Icon name="x" size={18} /></button></div>
   {sessionId && <FeedbackPrompt kind="purchase" refKey={sessionId} title="How did that feel?" blurb="A quick rating helps us make PetPassGo better." />}</>;
 }
 

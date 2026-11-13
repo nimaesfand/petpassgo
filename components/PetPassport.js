@@ -70,13 +70,20 @@ export default function PetPassport({
   const [copied, setCopied] = useState(false);
   const url = profileUrl(pet);
   const contact = [pet.emergency_contact_name, pet.emergency_contact_phone].filter(filled).join(" · ");
-  const rows = [
+  const roleWord = /service/i.test(pet.role || "") ? "Service dog" : /emotional/i.test(pet.role || "") ? "Emotional support" : "Pet";
+  const top = [
     ["Breed", pet.breed || pet.animal_type],
+    ["Type", [pet.animal_type, roleWord].filter(filled).join(" · ")],
+  ].filter(([, v]) => filled(v));
+  const rows = [
     ["Sex", pet.sex],
     ["Born", fmtDob(pet.date_of_birth)],
     ["Weight", pet.weight_lb ? `${pet.weight_lb} lb` : ""],
     ["Color", pet.color],
+    ["Owner", pet.handler_name],
     ["Microchip", owner && !sheet ? chipMask(chipValue) : chipValue],
+    ["Issued", pet.passport_issued_at ? fmtDob(String(pet.passport_issued_at).slice(0, 10)) : ""],
+    ["Trips", stamps.length ? String(stamps.length) : ""],
   ].filter(([, v]) => filled(v));
 
   async function share() {
@@ -123,8 +130,8 @@ export default function PetPassport({
             <div className="flex-1 min-w-0">
               <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>NAME</div>
               <h2 className="ppg-pp-name" style={{ fontFamily: font.display, fontWeight: 800, lineHeight: 1, letterSpacing: "-0.02em", color: tokens.navy, overflowWrap: "anywhere" }}>{pet.name}</h2>
-              <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1.5 sm:gap-y-2 min-w-0">
-                {rows.map(([k, v]) => <Cell key={k} k={k} v={v} />)}
+              <div className="mt-2.5 grid grid-cols-1 gap-y-1.5 sm:gap-y-2 min-w-0">
+                {top.map(([k, v]) => <Cell key={k} k={k} v={v} />)}
               </div>
             </div>
             <div className="hidden sm:flex flex-col items-center flex-shrink-0">
@@ -134,6 +141,12 @@ export default function PetPassport({
               <div className="mt-1" style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.12em", color: tokens.navy }}>SCAN IF FOUND</div>
             </div>
           </div>
+
+          {rows.length ? (
+            <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-x-3 gap-y-2.5 min-w-0 pt-3" style={{ borderTop: "1px dashed #D9CDB2" }}>
+              {rows.map(([k, v]) => <Cell key={k} k={k} v={v} />)}
+            </div>
+          ) : null}
 
           {contact ? (
             <div className="mt-4 rounded-xl px-3 py-2 flex items-center justify-between gap-3 min-w-0" style={{ background: "rgba(20,33,61,0.05)" }}>
@@ -169,7 +182,7 @@ export default function PetPassport({
               <div className="flex flex-wrap gap-3 min-w-0">
                 {stamps.map((s, i) => (
                   <div key={s.id || i} className="flex flex-col items-center justify-center text-center px-2 py-2" style={{ width: 120, minHeight: 84, border: `2.5px solid ${[tokens.primary, "#0F766E", "#7C3AED"][i % 3]}`, borderRadius: 14, color: [tokens.primary, "#0F766E", "#7C3AED"][i % 3], transform: i % 2 ? "rotate(4deg)" : "rotate(-5deg)" }}>
-                    <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 12, lineHeight: 1.2, overflowWrap: "anywhere" }}>{[s.origin, s.destination].filter(Boolean).join(" → ")}</div>
+                    <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 15, lineHeight: 1.2, overflowWrap: "anywhere" }}>{[s.origin, s.destination].filter(Boolean).map((x) => (String(x).match(/\(([A-Z]{3})\)/) || [])[1] || x).join(" → ")}</div>
                     <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 14, letterSpacing: "0.14em", marginTop: 2 }}>ENTRY</div>
                     {stampDate(s.travelDate || s.travel_date) ? <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 11 }}>{stampDate(s.travelDate || s.travel_date)}</div> : null}
                   </div>

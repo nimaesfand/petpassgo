@@ -13,7 +13,25 @@ const BADGES = [
 
 const linkStyle = { color: tokens.navy, fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 3 };
 
-export default function TrustBadges({ className = "" }) {
+const SHORT = [
+  { icon: "lock", label: "Secure Stripe checkout" },
+  { icon: "link", label: "Official airline sources" },
+  { icon: "checkCircle", label: "Flight-Ready Guarantee", href: "/guarantee", testId: "guarantee-link" },
+];
+
+export default function TrustBadges({ className = "", compact = false }) {
+  if (compact) {
+    return (
+      <ul className={`flex flex-wrap justify-center gap-x-4 gap-y-2 ${className}`}>
+        {SHORT.map((b) => (
+          <li key={b.label} className="flex items-center gap-1.5" style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 700, color: tokens.muted }}>
+            <span aria-hidden style={{ color: tokens.navy }}><Icon name={b.icon} size={15} /></span>
+            {b.href ? <a href={b.href} data-testid={b.testId} style={{ color: tokens.muted, textDecoration: "underline", textUnderlineOffset: 3 }}>{b.label}</a> : b.label}
+          </li>
+        ))}
+      </ul>
+    );
+  }
   return (
     <ul className={`grid grid-cols-1 sm:grid-cols-2 gap-3 ${className}`}>
       {BADGES.map((b) => (

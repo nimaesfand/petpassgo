@@ -6,7 +6,7 @@ import { supabase } from "../../lib/supabaseClient";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
 import GuaranteeLine from "../../components/GuaranteeLine";
-import { WITHDRAWAL_CONFIRMED, clearWithdrawalConsent } from "../../lib/withdrawal";
+import { clearWithdrawalConsent } from "../../lib/withdrawal";
 import MarketingOptIn from "../../components/MarketingOptIn";
 import { trackPurchaseOnce, trackEvent } from "../../lib/analytics";
 
@@ -62,7 +62,7 @@ export default function WelcomePage() {
           ) : s === "new" ? (
             <>
               <h1 style={h} className="mb-1">You're in{info.first_name ? `, ${info.first_name}` : ""}!</h1>
-              <p style={{ ...p, fontSize: 16, color: tokens.ink }} className="mb-3">Payment received. {WITHDRAWAL_CONFIRMED} We also email that confirmation. Create a password to finish.</p>
+              <p style={{ ...p, fontSize: 16, color: tokens.ink }} className="mb-3">Payment received. Create a password to open your {info.plan === "membership" ? "Pet Vault" : "Travel Pass"}.</p>
               {(info.plan === "pass" || info.plan === "join") && <div className="mb-4"><GuaranteeLine /></div>}
               <form onSubmit={finish} className="flex flex-col gap-3">
                 <input type="email" value={info.email || ""} readOnly aria-label="Email" style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, background: "#F5F7FA", color: tokens.navy }} className="rounded-xl px-4 py-3 outline-none" />

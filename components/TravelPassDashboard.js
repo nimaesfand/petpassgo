@@ -86,6 +86,7 @@ function CheckDot({ on }) {
 
 export default function TravelPassDashboard({ trip, pet, petChoices = [], onPickPet, onSetRolePet, results = [], statusMap = {}, onSetDone, onSaveReturn, isMember }) {
   const [section, setSection] = useState("overview");
+  const [focusStep, setFocusStep] = useState(null);
   const [docs, setDocs] = useState(null);
   const [health, setHealth] = useState(null);
   const pack = useTripExtras(trip?.id);
@@ -173,7 +174,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
       {(() => {
         if (!results.length) return null;
         if (needsCheck) return <VerdictCard verdict={{ key: "check", title: "A flight still needs checking", text: "We don't have a verified requirement for every flight on this trip." }} />;
-        const v = tripVerdict({ rows: results, trip: { ...trip, petName: pet?.name || "your pet" }, fitWarnings: tripFitWarnings(trip) });
+        const v = tripVerdict({ rows: results, trip: { ...trip, petName: pet?.name || "your pet" }, fitWarnings: tripFitWarnings(trip), stepCount: progress.total - progress.done });
         return v && v.key !== "go" ? <VerdictCard verdict={v} /> : null;
       })()}
       <div className="rounded-3xl p-5 sm:p-6 mb-4" style={{ background: tokens.navy }}>
@@ -227,6 +228,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
           today={today}
           petName={pet?.name}
           onGo={setSection}
+          onOpenStep={(step) => { setFocusStep(step.id); setSection("checklist"); }}
           onDone={(step) => onSetDone?.(step.mergedIds?.length ? step.mergedIds : [step.id], true)}
           shortcuts={[
             { icon: "plane", label: "Flight", sub: flightStatus?.label || (trip.flight_number ? trip.flight_number : "Add flight #"), onClick: () => setSection("flight") },
@@ -263,7 +265,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
           {cards.length === 0 ? (
             <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 16, color: tokens.ink }}>No requirements found for this exact combination yet.</div>
           ) : (
-            <PassChecklist trip={trip} requirements={results} statusMap={statusMap} onSetDone={onSetDone} onOpenRelief={() => { setSection("flight"); setTimeout(() => document.getElementById("pet-relief")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }} />
+            <PassChecklist trip={trip} requirements={results} statusMap={statusMap} onSetDone={onSetDone} focusId={focusStep} onOpenRelief={() => { setSection("flight"); setTimeout(() => document.getElementById("pet-relief")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }} />
           )}
           <div className="mt-4"><RoundTripAddon trip={trip} onSave={onSaveReturn} /></div>
           <details className="ppg-fold group rounded-2xl mt-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>

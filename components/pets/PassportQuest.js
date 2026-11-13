@@ -31,6 +31,13 @@ function PhotoStep({ pet, onPhoto }) {
   );
 }
 
+function shown(k, v) {
+  if (k === "photo_url") return "Added";
+  if (k === "weight_lb") return `${v} lb`;
+  if (k === "date_of_birth" && /^\d{4}-\d{2}-\d{2}/.test(String(v))) { const [y, m, d] = String(v).slice(0, 10).split("-"); return `${Number(m)}/${Number(d)}/${y}`; }
+  return String(v);
+}
+
 function Step({ k, label, pet, userId, onChanged, onPhoto, open, onOpen }) {
   const [value, setValue] = useState("");
   const [busy, setBusy] = useState(false);
@@ -53,7 +60,10 @@ function Step({ k, label, pet, userId, onChanged, onPhoto, open, onOpen }) {
         <span className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: 30, height: 30, background: done ? tokens.green : T.soft, color: done ? "#fff" : T.color, border: done ? "none" : `2px dashed ${T.color}` }}>
           {done ? <Icon name="check" size={16} /> : <Icon name="plus" size={15} />}
         </span>
-        <span className="flex-1" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: done ? tokens.muted : tokens.navy, textDecoration: done ? "line-through" : "none" }}>{label}</span>
+        <span className="flex-1 min-w-0" style={{ fontFamily: font.body, fontSize: 16, color: tokens.navy }}>
+          <span style={{ fontWeight: done ? 600 : 700, color: done ? tokens.muted : tokens.navy }}>{label}{done && k !== "photo_url" ? ": " : ""}</span>
+          {done ? <b style={{ overflowWrap: "anywhere" }}>{shown(k, pet?.[k])}</b> : null}
+        </span>
         {!done ? <span style={{ fontFamily: font.body, fontWeight: 800, fontSize: 14, color: T.color }}>{open ? "" : "Add"}</span> : null}
       </button>
       {!done && open ? (
