@@ -362,3 +362,9 @@ textarea {
 @keyframes ppg-holo-spin { to { filter: hue-rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .ppg-holo { animation: none; } }
 @media print { .ppg-holo { animation: none; } }
+/* Flip fallback: blend modes and filters inside a face can stop the browser from
+   hiding its back side, so swap which face is visible halfway through the turn. */
+.ppg-flip-face { transition: visibility 0s linear .32s; }
+.ppg-flip[data-flipped="1"] .ppg-flip-face:not(.ppg-flip-back) { visibility: hidden; }
+.ppg-flip[data-flipped="0"] .ppg-flip-back { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .ppg-flip-face { transition: none; } }
