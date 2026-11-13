@@ -541,9 +541,12 @@ export default function PetPassGoQuiz() {
               ) : (
                 <div className="mt-2">
                   <div className="rounded-2xl p-5" style={{ border: `2px solid ${tokens.primary}`, background: "#FFFBF8" }}>
-                    <div className="flex items-baseline justify-between gap-3">
-                      <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 19, color: tokens.navy }}>Travel Pass</div>
-                      <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 22, color: tokens.navy }}>{P.pass} <span style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.muted }}>one time</span></div>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 20, color: tokens.navy, lineHeight: 1.15 }}>Travel Pass</div>
+                        <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.muted }}>One time, for this trip</div>
+                      </div>
+                      <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 24, color: tokens.navy, whiteSpace: "nowrap" }}>{P.pass}</div>
                     </div>
                     <ul className="mt-2 mb-4 flex flex-col gap-1.5">
                       {["Every step for this trip, in order", "Due dates and reminders", "Official source on each rule", "Pet Vault free until 7 days after you land"].map((t) => (
@@ -552,7 +555,7 @@ export default function PetPassGoQuiz() {
                         </li>
                       ))}
                     </ul>
-                    <button disabled={buying} onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : `Unlock my Travel Pass · ${usd(P.pass)}`}</button>
+                    <button disabled={buying} onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : "Unlock my Travel Pass"}</button>
                   </div>
                   <button type="button" disabled={buying} onClick={() => handlePurchase("member")} className="w-full rounded-2xl px-4 py-3 mt-3 text-left flex items-center gap-3" style={{ background: "#fff", border: `1px solid ${tokens.line}`, cursor: "pointer", opacity: buying ? 0.7 : 1 }}>
                     <span className="flex-1 min-w-0">

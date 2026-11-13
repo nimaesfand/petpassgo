@@ -27,7 +27,14 @@ export default function AirportField({ label, value, onSelect }) {
         value={query}
         onChange={(e) => { setQuery(e.target.value); setOpen(true); onSelect(""); }}
         onFocus={() => { setOpen(true); lift(); }}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        onBlur={() => {
+          // Typed an exact airport code (or there's only one match) and tapped away:
+          // pick it, so Continue isn't left greyed out with no reason shown.
+          const code = query.trim().toUpperCase();
+          const exact = matches.find((a) => a.code === code) || (matches.length === 1 ? matches[0] : null);
+          if (exact && query !== formatAirport(exact)) { const lab = formatAirport(exact); setQuery(lab); onSelect(lab); }
+          setTimeout(() => setOpen(false), 150);
+        }}
         enterKeyHint="search"
         placeholder={label}
         style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }}
