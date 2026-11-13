@@ -9,7 +9,8 @@ export const runtime = "nodejs";
 const clip = (v, n) => String(v || "").replace(/[\u0000-\u001f]/g, " ").trim().slice(0, n);
 
 async function load(sb, token) {
-  const { data: v } = await sb.from("vet_verifications").select("*").eq("token_hash", hashToken(token)).maybeSingle();
+  const { data: v, error } = await sb.from("vet_verifications").select("*").eq("token_hash", hashToken(token)).maybeSingle();
+  if (error) console.error("vet_verify_load", error.code, error.message);
   if (!v) return { error: "This link isn't valid.", status: 404 };
   if (v.used_at) return { error: "These records were already confirmed. Thank you!", status: 410 };
   if (new Date(v.expires_at) < new Date()) return { error: "This link has expired. The owner can send a new one.", status: 410 };
