@@ -368,3 +368,9 @@ textarea {
 .ppg-flip[data-flipped="1"] .ppg-flip-face:not(.ppg-flip-back) { visibility: hidden; }
 .ppg-flip[data-flipped="0"] .ppg-flip-back { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { .ppg-flip-face { transition: none; } }
+
+/* Passport v3: bigger photo */
+.ppg-pp-photo { width: 132px; height: 166px; }
+@media (min-width: 640px) { .ppg-pp-photo { width: 190px; height: 238px; } }
+@media (max-width: 639px) { .ppg-pp-photo { width: 132px; height: 166px; } }
+.ppg-pp-photo img { object-fit: cover; width: 100%; height: 100%; }

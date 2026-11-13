@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { Wordmark } from "./Logo";
 import { PetIllustration } from "./PetIdCard";
 import { PassportStamp, MrzStrip } from "./PetPassport";
+import { chipMask } from "../lib/petProfile";
 import { tokens, font } from "../lib/theme";
 import { fmtDob, profileUrl } from "../lib/petProfile";
 
@@ -77,34 +78,41 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose }) {
             <span style={{ fontFamily: font.body, fontSize: 10, fontWeight: 800, letterSpacing: "0.1em", color: tokens.muted }}>PETPASSGO</span>
           </div>
           <div className="px-4 pt-3 flex gap-3">
-            <div className="rounded-xl overflow-hidden flex-shrink-0" style={{ width: 96, height: 118, border: `3px solid ${tokens.gold}`, background: "#E8EEF7" }}>
-              {photo || <div className="flex items-center justify-center h-full"><PetIllustration type={pet.animal_type} size={92} /></div>}
+            <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+              <div className="rounded-xl overflow-hidden" style={{ width: 112, height: 140, border: "3px solid #fff", outline: `1.5px solid ${tokens.gold}`, background: "#E8EEF7", boxShadow: "0 6px 16px rgba(20,33,61,.14)" }}>
+                {photo || <div className="flex items-center justify-center h-full"><PetIllustration type={pet.animal_type} size={100} /></div>}
+              </div>
+              <div aria-hidden="true" className="ppg-holo rounded-full" style={{ width: 26, height: 26 }} />
             </div>
-            <div className="min-w-0 flex flex-col gap-1.5" style={{ paddingRight: 92 }}>
-              <div>{label("NAME")}<div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 800, lineHeight: 1.05, color: tokens.navy, overflowWrap: "anywhere" }}>{pet.name}</div></div>
-              {pet.breed ? <div>{label("BREED")}<div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.navy, overflowWrap: "anywhere" }}>{pet.breed}</div></div> : null}
-              <div>{label("TYPE")}<div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.navy }}>{pet.animal_type || "Pet"}</div></div>
+            <div className="min-w-0 flex flex-col gap-1" style={{ paddingRight: 70 }}>
+              <div>{label("NAME")}<div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 800, lineHeight: 1.05, color: tokens.navy, overflowWrap: "break-word" }}>{pet.name}</div></div>
+              <span className="self-start rounded-md px-2 py-0.5" style={{ background: /service/i.test(pet.role || "") ? "#0F766E" : /emotional|esa/i.test(pet.role || "") ? "#6D28D9" : tokens.gold, color: /service|emotional|esa/i.test(pet.role || "") ? "#fff" : tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 9.5, letterSpacing: "0.14em" }}>{/service/i.test(pet.role || "") ? "SERVICE DOG" : /emotional|esa/i.test(pet.role || "") ? "SUPPORT ANIMAL" : "PET"}</span>
+              {pet.breed ? <div className="mt-1">{label("BREED")}<div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.navy, overflowWrap: "anywhere" }}>{pet.breed}</div></div> : null}
             </div>
           </div>
-          <div className="px-4 pt-3 pb-1 grid grid-cols-2 gap-x-3 gap-y-2">
+          <div className="px-4 pt-3 pb-1 grid grid-cols-3 gap-x-3 gap-y-2" style={{ borderTop: "1px dashed #D9CDB2", marginTop: 12 }}>
             {[
-              pet.date_of_birth && ["BORN", fmtDob(pet.date_of_birth)],
+              pet.animal_type && ["SPECIES", pet.animal_type],
               pet.sex && ["SEX", pet.sex],
+              pet.date_of_birth && ["BORN", fmtDob(pet.date_of_birth)],
               Number(pet.weight_lb) > 0 && ["WEIGHT", `${pet.weight_lb} lb`],
               pet.color && ["COLOR", pet.color],
+              pet.trained != null && ["TRAINED", pet.trained ? "Yes" : "Not yet"],
+              pet.microchip_number && ["MICROCHIP", chipMask(pet.microchip_number)],
               pet.handler_name && ["OWNER", pet.handler_name],
               pet.passport_no && ["PASSPORT NO.", pet.passport_no],
-            ].filter(Boolean).map(([k, v], i) => (
-              <div key={k} className="min-w-0" style={{ opacity: stage >= 2 ? 1 : 0, transform: stage >= 2 ? "none" : "translateY(6px)", transition: `opacity .45s ease ${i * 0.28}s, transform .45s ease ${i * 0.28}s` }}>
+            ].filter(Boolean).slice(0, 9).map(([k, v], i) => (
+              <div key={k} className={`min-w-0 ${k === "OWNER" || k === "PASSPORT NO." ? "col-span-2" : ""}`} style={{ paddingTop: i < 3 ? 8 : 0, opacity: stage >= 2 ? 1 : 0, transform: stage >= 2 ? "none" : "translateY(6px)", transition: `opacity .45s ease ${i * 0.22}s, transform .45s ease ${i * 0.22}s` }}>
                 {label(k)}
-                <div className="truncate" style={{ fontFamily: k === "PASSPORT NO." ? "ui-monospace, Menlo, monospace" : font.body, fontSize: 13.5, fontWeight: 700, color: tokens.navy }}>{v}</div>
+                <div className="truncate" style={{ fontFamily: k === "PASSPORT NO." || k === "MICROCHIP" ? "ui-monospace, Menlo, monospace" : font.body, fontSize: 13, fontWeight: 700, color: tokens.navy }}>{v}</div>
               </div>
             ))}
           </div>
+          <div aria-hidden="true" className="px-4 pt-2 overflow-hidden whitespace-nowrap" style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 6, letterSpacing: "0.18em", color: "rgba(20,33,61,.28)" }}>{"PETPASSGO · PET PASSPORT · ".repeat(8)}</div>
           <div className="px-2.5 pt-2 pb-3" style={{ transform: "scale(0.86)", transformOrigin: "left bottom" }}><MrzStrip pet={pet} /></div>
           {stage >= 3 ? (
-            <div className="ppg-pp-stamp absolute" style={{ right: 8, top: 34, mixBlendMode: "multiply" }}>
-              <PassportStamp date={issuedAt} size={100} style={{ transform: "none" }} />
+            <div className="ppg-pp-stamp absolute" style={{ right: 6, top: 34, mixBlendMode: "multiply" }}>
+              <PassportStamp date={issuedAt} size={84} style={{ transform: "none" }} />
             </div>
           ) : null}
         </div>
