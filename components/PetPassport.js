@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import QRCode from "qrcode";
+import { supabase } from "../lib/supabaseClient";
 import { Wordmark } from "./Logo";
 import Icon from "./Icon";
 import PetQr from "../lib/PetQr";
@@ -107,7 +109,35 @@ function Field({ k, v, wide = false, mono = false }) {
   );
 }
 
-function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPhotoTap, onFlip }) {
+// Replaces a fake machine-readable line: the real passport number and a signed
+// code anyone can check at petpassgo.com/verify.
+export function VerifyStrip({ no, code }) {
+  return (
+    <div className="rounded-lg px-3 py-2 flex items-center justify-between gap-3 flex-wrap" style={{ background: "#F1EADA" }}>
+      <div className="min-w-0">
+        <div style={{ fontFamily: font.body, fontSize: 8.5, fontWeight: 800, letterSpacing: "0.16em", color: tokens.muted }}>VERIFICATION CODE</div>
+        <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 15, letterSpacing: "0.12em", color: tokens.navy }}>{code || "····-····-····"}</div>
+      </div>
+      <div className="text-right" style={{ fontFamily: font.body, fontSize: 11, fontWeight: 700, color: tokens.muted, lineHeight: 1.3 }}>Check it at<br /><span style={{ color: tokens.navy }}>petpassgo.com/verify</span></div>
+    </div>
+  );
+}
+
+function RabiesField({ rabies }) {
+  if (!rabies) return null;
+  const today = new Date().toISOString().slice(0, 10);
+  const expired = rabies.expires_on && rabies.expires_on < today;
+  const tag = expired ? ["EXPIRED", "#B91C1C", "#FDECEC"] : rabies.verified_at ? ["✓ VET VERIFIED", "#15803D", "#EAF6EE"] : ["OWNER-STATED", "#6B7585", "#EEF1F5"];
+  return (
+    <div className="min-w-0">
+      <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>RABIES</div>
+      <div className="ppg-pp-val" style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy }}>{rabies.expires_on ? `Until ${fmtDob(rabies.expires_on)}` : "On file"}</div>
+      <span className="inline-block rounded px-1.5 py-0.5 mt-0.5" style={{ background: tag[2], color: tag[1], fontFamily: font.body, fontWeight: 800, fontSize: 9, letterSpacing: "0.1em" }}>{tag[0]}</span>
+    </div>
+  );
+}
+
+function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPhotoTap, onFlip, rabies, code }) {
   const st = statusOf(pet.role);
   const age = ageLabel(pet.date_of_birth);
   const fields = [
@@ -177,18 +207,50 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
           </div>
           <div className="ppg-pp-fields pt-3 grid gap-x-4 gap-y-2.5 min-w-0" style={{ borderTop: "1px dashed #D9CDB2" }}>
             {fields.map(([k, v]) => <Field key={k} k={k} v={v} mono={k === "Microchip"} />)}
+            <RabiesField rabies={rabies} />
           </div>
         </div>
 
         <div className="flex-1" />
         <div className="mt-4"><Microprint /></div>
-        <div className="mt-1.5"><MrzStrip pet={pet} /></div>
+        <div className="mt-1.5">{pet.passport_issued_at ? <VerifyStrip no={pet.passport_no} code={code} /> : <MrzStrip pet={pet} />}</div>
       </div>
     </article>
   );
 }
 
-function Back({ pet, stamps, owner, qr, onFlip }) {
+function CheckinSheet({ pet, onClose }) {
+  const [state, setState] = useState({ busy: true });
+  useEffect(() => {
+    let live = true;
+    (async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        const r = await fetch("/api/checkin-link", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": data?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id }) });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j.url) throw new Error(j.error || "Couldn't make a check-in code.");
+        const img = await QRCode.toDataURL(j.url, { width: 520, margin: 1, errorCorrectionLevel: "M", color: { dark: "#14213D", light: "#ffffff" } });
+        if (live) setState({ url: j.url, img, exp: j.expiresAt });
+      } catch (e) { if (live) setState({ err: e.message }); }
+    })();
+    return () => { live = false; };
+  }, [pet.id]);
+  const until = state.exp ? new Date(state.exp).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) : "";
+  return (
+    <div role="dialog" aria-modal="true" aria-label="Check-in code" className="fixed inset-0 z-[1000] flex items-center justify-center p-4" style={{ background: "rgba(11,20,40,.75)" }} onClick={(e) => { e.stopPropagation(); if (e.target === e.currentTarget) onClose(); }}>
+      <div className="w-full rounded-3xl p-5 text-center" style={{ maxWidth: 380, background: "#fff" }} onClick={(e) => e.stopPropagation()}>
+        <div style={{ fontFamily: font.body, fontSize: 11.5, fontWeight: 800, letterSpacing: "0.16em", color: tokens.primary }}>SHOW AT CHECK-IN</div>
+        <div className="mt-1" style={{ fontFamily: font.display, fontSize: 22, fontWeight: 800, color: tokens.navy }}>{pet.name}&apos;s check-in code</div>
+        {state.img ? <img src={state.img} alt="Check-in QR code" className="mx-auto mt-3" style={{ width: 260, height: 260 }} /> : state.err ? <p className="mt-4" style={{ fontFamily: font.body, color: tokens.stamp }}>{state.err}</p> : <div className="mx-auto mt-3 rounded-2xl ppg-shimmer" style={{ width: 260, height: 260 }} />}
+        <p className="mt-3" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, lineHeight: 1.45 }}>The agent scans this to see {pet.name}&apos;s vaccines, documents and trip, live. {until ? `Works until ${until}.` : ""}</p>
+        {state.url ? <a href={state.url} target="_blank" rel="noopener noreferrer" className="inline-block mt-2" style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 700, color: tokens.navy, textDecoration: "underline" }}>Preview what they see</a> : null}
+        <button type="button" onClick={onClose} className="ppg-btn ppg-btn-secondary w-full mt-4">Done</button>
+      </div>
+    </div>
+  );
+}
+
+function Back({ pet, stamps, owner, qr, onFlip, onCheckin }) {
   const contact = [pet.emergency_contact_name, pet.emergency_contact_phone].filter(filled);
   const showContact = owner || pet.show_contact_on_public_id;
   const medical = (owner || pet.show_medical_on_public) ? [
@@ -223,6 +285,13 @@ function Back({ pet, stamps, owner, qr, onFlip }) {
           ) : null}
         </div>
       </div>
+      {onCheckin ? (
+        <div className="relative px-4 sm:px-6 pb-4 ppg-no-print">
+          <button type="button" onClick={(e) => { e.stopPropagation(); onCheckin(); }} className="w-full rounded-full flex items-center justify-center gap-2" style={{ minHeight: 50, background: tokens.gold, color: tokens.navy, border: "none", fontFamily: font.body, fontWeight: 800, fontSize: 16, cursor: "pointer" }}>
+            <Icon name="checkCircle" size={18} /> Show at airport check-in
+          </button>
+        </div>
+      ) : null}
       {stamps.length > 0 ? (
         <div className="relative px-4 sm:px-6 pb-4">
           <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.16em", color: tokens.gold }} className="mb-2">TRAVEL STAMPS</div>
@@ -255,12 +324,30 @@ export default function PetPassport({
   onPhotoTap = null,
 }) {
   const [flipped, setFlipped] = useState(false);
+  const [checkin, setCheckin] = useState(false);
+  const [rabies, setRabies] = useState(null);
+  const [code, setCode] = useState(pet.verify_code || "");
   const flip = () => setFlipped((f) => !f);
-  const front = <Front pet={pet} photo={photo} owner={owner} chipValue={chipValue} sheet={sheet} pending={pending} justIssued={justIssued} onPhotoTap={onPhotoTap} onFlip={sheet ? null : flip} />;
-  const back = <Back pet={pet} stamps={stamps} owner={owner} qr={qr} onFlip={sheet ? null : flip} />;
+  useEffect(() => {
+    if (!owner || sample || !pet?.id) return;
+    let live = true;
+    supabase.from("pet_health_records").select("name,expires_on,verified_at").eq("pet_id", pet.id).ilike("name", "%rabies%").order("expires_on", { ascending: false, nullsFirst: false }).limit(1)
+      .then(({ data }) => { if (live) setRabies(data?.[0] || null); });
+    if (pet.passport_issued_at && !pet.verify_code) {
+      supabase.auth.getSession().then(async ({ data }) => {
+        const r = await fetch("/api/passport-code", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": data?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id }) }).catch(() => null);
+        const j = r ? await r.json().catch(() => ({})) : {};
+        if (live && j.code) setCode(j.code);
+      });
+    }
+    return () => { live = false; };
+  }, [pet?.id, pet?.passport_issued_at, pet?.verify_code, owner, sample]);
+  const front = <Front pet={pet} photo={photo} owner={owner} chipValue={chipValue} sheet={sheet} pending={pending} justIssued={justIssued} onPhotoTap={onPhotoTap} onFlip={sheet ? null : flip} rabies={rabies} code={code} />;
+  const back = <Back pet={pet} stamps={stamps} owner={owner} qr={qr} onFlip={sheet ? null : flip} onCheckin={owner && !sheet && !sample ? () => setCheckin(true) : null} />;
 
   // Printed: both sides, one above the other.
   if (sheet) return <div className="grid gap-4 min-w-0">{front}{back}</div>;
+  const sheetEl = checkin ? <CheckinSheet pet={pet} onClose={() => setCheckin(false)} /> : null;
 
   return (
     <div className="grid gap-2 min-w-0">
@@ -271,6 +358,7 @@ export default function PetPassport({
         </div>
       </div>
       {sample ? null : <div className="text-center ppg-no-print" style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>Tap the passport to flip it</div>}
+      {sheetEl}
     </div>
   );
 }

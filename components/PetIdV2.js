@@ -113,6 +113,40 @@ const KIND_LOOK = {
   note: { emoji: "📝", color: "#0F766E", soft: "#E3F5F2" },
 };
 
+// Ask the vet clinic to confirm the vaccine records. Verified records show a
+// green check on the passport and on the airport check-in screen.
+function VetVerifyAsk({ pet }) {
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState("");
+  const [msg, setMsg] = useState("");
+  async function send(e) {
+    e.preventDefault();
+    setState("busy"); setMsg("");
+    const { data } = await supabase.auth.getSession();
+    const r = await fetch("/api/vet-verify/request", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": data?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id, vet_email: email }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { setState(""); setMsg(j.error || "Couldn't send. Try again."); return; }
+    setState("sent");
+  }
+  return (
+    <div className="rounded-2xl p-4 mt-3" style={{ order: 5, background: "#F3FBF6", border: "1px solid #B7E1C6" }}>
+      <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 16, color: tokens.navy }}>Get these records vet-verified</div>
+      {state === "sent" ? (
+        <p className="mt-1" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>Sent. When your vet confirms, the records get a green check on {pet.name}&apos;s passport and check-in screen.</p>
+      ) : (
+        <>
+          <p className="mt-1" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, lineHeight: 1.45 }}>We email your vet clinic a private link. They check the records against their files and confirm in about a minute. Verified records carry more weight at check-in.</p>
+          <form onSubmit={send} className="flex gap-2 mt-2 flex-wrap">
+            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your vet clinic's email" style={{ ...input, flex: "1 1 220px" }} />
+            <button disabled={state === "busy"} className="ppg-btn ppg-btn-primary">{state === "busy" ? "Sending…" : "Send to my vet"}</button>
+          </form>
+          {msg ? <p role="alert" className="mt-1" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.stamp }}>{msg}</p> : null}
+        </>
+      )}
+    </div>
+  );
+}
+
 export function HealthPassport({ pet, userId, refreshKey = 0, bare = false, onRows }) {
   const [rows, setRows] = useState([]); const [loading, setLoading] = useState(true); const [show, setShow] = useState(false);
   const [f, setF] = useState({ kind: "vaccine", name: "", date_given: "", expires_on: "", clinic: "", notes: "", show_to_finder: false });
@@ -136,8 +170,9 @@ export function HealthPassport({ pet, userId, refreshKey = 0, bare = false, onRo
       </form>}
       {loading ? <div style={{ fontFamily: font.body, color: tokens.muted }} className="mt-2">Loading…</div> : rows.length === 0 ? <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="mt-2">No vaccines, medicines or allergies yet. Add one, or scan a vet record below.</p> : <div className="mt-3 grid gap-2">{rows.map((r) => { const ex = expiryState(r.expires_on); const look = KIND_LOOK[r.kind] || KIND_LOOK.note; return <div key={r.id} className="rounded-2xl p-3 flex gap-3 items-start min-w-0" style={{ background: tokens.paper }}>
         <span className="flex items-center justify-center rounded-xl flex-shrink-0" style={{ width: 40, height: 40, background: look.soft, color: look.color, fontSize: 19 }} aria-hidden="true">{look.emoji}</span>
-        <div className="min-w-0 flex-1"><div className="flex items-start justify-between gap-2"><div className="min-w-0" style={{ fontFamily: font.body, fontWeight: 800, fontSize: 16, color: tokens.navy, overflowWrap: "anywhere" }}>{r.name}</div>{ex && <DueBadge tone={ex.tone}>{ex.text}</DueBadge>}</div><div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>{[KIND.find(([k]) => k === r.kind)?.[1], r.date_given ? `Given ${fmtDate(r.date_given)}` : "", r.clinic || ""].filter(Boolean).join(" · ")}</div>{r.notes ? <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink }}>{r.notes}</div> : null}<div className="flex gap-3 mt-1.5 items-center flex-wrap" style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 700 }}><span style={{ color: r.show_to_finder ? tokens.green : tokens.muted }}>{r.show_to_finder ? "Shown on Pet ID" : "Private"}</span><button onClick={() => toggle(r)} style={{ color: tokens.navy, textDecoration: "underline" }}>{r.show_to_finder ? "Make private" : "Show on Pet ID"}</button><button onClick={() => remove(r.id)} style={{ color: tokens.muted, textDecoration: "underline" }}>Remove</button></div></div></div>; })}</div>}
+        <div className="min-w-0 flex-1"><div className="flex items-start justify-between gap-2"><div className="min-w-0" style={{ fontFamily: font.body, fontWeight: 800, fontSize: 16, color: tokens.navy, overflowWrap: "anywhere" }}>{r.name}</div>{ex && <DueBadge tone={ex.tone}>{ex.text}</DueBadge>}</div>{(r.kind === "vaccine" || r.kind === "medication") ? (r.verified_at ? <div className="mt-0.5" style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 800, color: tokens.green }}>✓ Vet verified · {r.verified_by_name}, {r.verified_by_clinic}</div> : <div className="mt-0.5" style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 700, color: tokens.muted }}>Not verified yet</div>) : null}<div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>{[KIND.find(([k]) => k === r.kind)?.[1], r.date_given ? `Given ${fmtDate(r.date_given)}` : "", r.clinic || ""].filter(Boolean).join(" · ")}</div>{r.notes ? <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.ink }}>{r.notes}</div> : null}<div className="flex gap-3 mt-1.5 items-center flex-wrap" style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 700 }}><span style={{ color: r.show_to_finder ? tokens.green : tokens.muted }}>{r.show_to_finder ? "Shown on Pet ID" : "Private"}</span><button onClick={() => toggle(r)} style={{ color: tokens.navy, textDecoration: "underline" }}>{r.show_to_finder ? "Make private" : "Show on Pet ID"}</button><button onClick={() => remove(r.id)} style={{ color: tokens.muted, textDecoration: "underline" }}>Remove</button></div></div></div>; })}</div>}
       {bare ? <button onClick={() => setShow((v) => !v)} className="ppg-btn ppg-btn-secondary mt-3" style={{ order: 4, alignSelf: "flex-start" }}>{show ? "Cancel" : "+ Add a record"}</button> : null}
+      {rows.some((r) => (r.kind === "vaccine" || r.kind === "medication") && !r.verified_at) ? <VetVerifyAsk pet={pet} /> : null}
     </section>
   );
 }
