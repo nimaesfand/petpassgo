@@ -324,9 +324,10 @@ textarea {
 .ppg-pp-stampspot { left: 66px; top: 118px; }
 @media (min-width: 640px) { .ppg-pp-photo { width: 156px; height: 196px; } .ppg-pp-stampspot { left: 104px; top: 150px; } }
 /* The ISSUED stamp sits in the open space beside the name, never on the photo or text. */
-.ppg-pp-stampspot { left: auto; right: 10px; top: 14px; }
-.ppg-pp-info { padding-right: 96px; }
-@media (min-width: 640px) { .ppg-pp-stampspot { left: auto; right: 150px; top: 18px; } .ppg-pp-info { padding-right: 104px; } }
+.ppg-pp-stampspot { left: auto; right: 8px; top: 12px; transform: scale(.8); transform-origin: top right; }
+.ppg-pp-info { padding-right: 74px; }
+@media (max-width: 639px) { .ppg-pp-photo { width: 100px; height: 126px; } }
+@media (min-width: 640px) { .ppg-pp-stampspot { left: auto; right: 150px; top: 18px; transform: none; } .ppg-pp-info { padding-right: 104px; } }
 
 /* Printable QR tag sheet */
 @media print {
