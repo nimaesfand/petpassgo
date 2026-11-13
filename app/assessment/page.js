@@ -11,6 +11,7 @@ import { connectionReady, rulesRole, segmentsToStore } from "../../lib/segments"
 import { saveCheckoutTrip } from "../../lib/tripCheckout";
 import AirportField from "../../components/AirportField";
 import RequirementsPreview from "../../components/RequirementsPreview";
+import FreeAccountSheet from "../../components/FreeAccountSheet";
 import FlightLookup, { airportLabel, airlineFromFlight } from "../../components/FlightLookup";
 import { readTripIntent } from "../../lib/tripIntent";
 import { fmtTripDate } from "../../lib/tripAccess";
@@ -143,6 +144,8 @@ export default function PetPassGoQuiz() {
   const [buying, setBuying] = useState(false);
   const [consent, setConsent] = useState(false);
   const [verdictKey, setVerdictKey] = useState(null);
+  const [easyTrip, setEasyTrip] = useState(false);
+  const [freeOpen, setFreeOpen] = useState(false);
   const [tips, setTips] = useState(false);
   const [consentErr, setConsentErr] = useState("");
   const [airlineQuery, setAirlineQuery] = useState("");
@@ -197,7 +200,7 @@ export default function PetPassGoQuiz() {
           setAnswers(savedAnswers);
           setStep(6);
           const intent = localStorage.getItem("petpassgo_purchase_intent");
-          if (intent === "join" || intent === "pass") setAutoBuy(intent);
+          if (intent === "join" || intent === "pass" || intent === "free") setAutoBuy(intent);
           localStorage.removeItem("petpassgo_purchase_intent");
         } catch (e) {
           // ignore corrupted storage
@@ -224,6 +227,63 @@ export default function PetPassGoQuiz() {
     next();
   }
 
+  // Saves (or reuses) the unpaid trip row for these answers. Returns { trip } or { paid } or { error }.
+  async function saveTripFor(user) {
+    const baseTrip = {
+      user_id: user.id,
+      origin: answers.origin,
+      destination: answers.destination,
+      airline: answers.airline,
+      travel_date: answers.date || null,
+      flight_number: answers.flight_number || null,
+      flight_snapshot: answers.flight_snapshot || null,
+      animal_type: answers.animal,
+      role: rulesRole(answers.role, answers.esa),
+      status: answers.connecting ? "checking" : "ready",
+    };
+    const { data: pets } = await supabase.from("pets").select("id,animal_type").eq("user_id", user.id);
+    const linked = pickTripPet(pets, { animal_type: answers.animal });
+    if (linked) baseTrip.pet_id = linked.id;
+    const extras = {};
+    if (answers.round_trip && answers.return_date) {
+      extras.return_date = answers.return_date;
+      extras.return_flight_number = answers.return_flight_number || null;
+      extras.return_flight_snapshot = answers.return_flight_snapshot || null;
+    }
+    if (answers.role === "Service animal" && answers.psd) extras.service_kind = "psd";
+    if (answers.connecting) extras.connecting = true;
+    if (answers.pet_count === 2 && answers.role !== "Service animal") extras.pet_count = 2;
+    if (answers.connecting && answers.second_airline) extras.second_airline = answers.second_airline;
+    if (answers.pet_travel) extras.pet_travel = answers.pet_travel;
+    const segments = segmentsToStore(answers);
+    if (segments) extras.segments = segments;
+    const saved = await saveCheckoutTrip(supabase, { userId: user.id, baseTrip, extras, answers });
+    if (saved.paid) return { paid: true, trip: saved.trip };
+    if (saved.droppedSegments) alert("The connection city was not stored yet. Apply the database update, then plan the trip again. The first and second airline were saved.");
+    if (saved.droppedReturn) alert("Your trip was saved as a one-way trip. The return date can be added from your pass once the account update is in place.");
+    if (saved.error || !saved.trip) return { error: true };
+    return { trip: saved.trip };
+
+  }
+
+  // Easy trips: free with an account. The server re-checks the trip before unlocking it.
+  async function unlockFree() {
+    if (buying) return;
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) { trackEvent("free_trip_start", { content_type: "assessment" }); setFreeOpen(true); return; }
+    setBuying(true);
+    const saved = await saveTripFor(data.user);
+    if (saved.paid) { window.location.href = "/account?free_trip=1"; return; }
+    if (saved.error || !saved.trip) { setBuying(false); alert("Sorry, something went wrong saving your trip. Please try again."); return; }
+    const { data: s } = await supabase.auth.getSession();
+    const r = await fetch("/api/free-trip", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ trip_id: saved.trip.id }) });
+    const j = await r.json().catch(() => ({}));
+    if (r.ok && j.ok) { trackEvent("free_trip_unlocked", { content_type: "assessment" }); window.location.href = "/account?free_trip=1"; return; }
+    setBuying(false);
+    if (j.easy === false) { setEasyTrip(false); alert(j.error); return; }
+    alert(j.error || "Something went wrong. Please try again.");
+  }
+
   async function handlePurchase(plan = "pass", consentOverride = false) {
     if (buying) return;
     const { data } = await supabase.auth.getUser();
@@ -243,38 +303,8 @@ export default function PetPassGoQuiz() {
     }
 
     setBuying(true);
-    const baseTrip = {
-      user_id: data.user.id,
-      origin: answers.origin,
-      destination: answers.destination,
-      airline: answers.airline,
-      travel_date: answers.date || null,
-      flight_number: answers.flight_number || null,
-      flight_snapshot: answers.flight_snapshot || null,
-      animal_type: answers.animal,
-      role: rulesRole(answers.role, answers.esa),
-      status: answers.connecting ? "checking" : "ready",
-    };
-    const { data: pets } = await supabase.from("pets").select("id,animal_type").eq("user_id", data.user.id);
-    const linked = pickTripPet(pets, { animal_type: answers.animal });
-    if (linked) baseTrip.pet_id = linked.id;
-    const extras = {};
-    if (answers.round_trip && answers.return_date) {
-      extras.return_date = answers.return_date;
-      extras.return_flight_number = answers.return_flight_number || null;
-      extras.return_flight_snapshot = answers.return_flight_snapshot || null;
-    }
-    if (answers.role === "Service animal" && answers.psd) extras.service_kind = "psd";
-    if (answers.connecting) extras.connecting = true;
-    if (answers.pet_count === 2 && answers.role !== "Service animal") extras.pet_count = 2;
-    if (answers.connecting && answers.second_airline) extras.second_airline = answers.second_airline;
-    if (answers.pet_travel) extras.pet_travel = answers.pet_travel;
-    const segments = segmentsToStore(answers);
-    if (segments) extras.segments = segments;
-    const saved = await saveCheckoutTrip(supabase, { userId: data.user.id, baseTrip, extras, answers });
+    const saved = await saveTripFor(data.user);
     if (saved.paid) { setBuying(false); alert("This trip is already unlocked. Open My Trips to see it."); return; }
-    if (saved.droppedSegments) alert("The connection city was not stored yet. Apply the database update, then plan the trip again. The first and second airline were saved.");
-    if (saved.droppedReturn) alert("Your trip was saved as a one-way trip. The return date can be added from your pass once the account update is in place.");
     const trip = saved.trip;
     if (saved.error || !trip) { setBuying(false); alert("Sorry, something went wrong saving your trip. Please try again."); return; }
 
@@ -299,7 +329,9 @@ export default function PetPassGoQuiz() {
     if (!autoBuy || autoBuyRan.current || !answers.origin) return;
     autoBuyRan.current = true;
     supabase.auth.getSession().then(({ data }) => {
-      if (data?.session && takeWithdrawalConsent()) handlePurchase(autoBuy === "join" ? "member" : "pass", true);
+      if (!data?.session) return;
+      if (autoBuy === "free") { unlockFree(); return; }
+      if (takeWithdrawalConsent()) handlePurchase(autoBuy === "join" ? "member" : "pass", true);
     });
   }, [autoBuy, answers]);
 
@@ -527,11 +559,21 @@ export default function PetPassGoQuiz() {
 
           {step === 6 && (
             <>
-              <RequirementsPreview answers={answers} onVerdict={(v) => { setVerdictKey(v); if (v) trackPreviewOnce(v); }} />
+              <RequirementsPreview answers={answers} onVerdict={(v, e) => { setVerdictKey(v); setEasyTrip(!!e); if (v) trackPreviewOnce(e ? "easy" : v); }} />
               {verdictKey === "no" ? (
                 <div className="flex flex-col gap-2 mt-2">
                   <button type="button" onClick={() => setStep(4)} className="w-full rounded-full py-3.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>Try a different airline</button>
                   <button type="button" onClick={() => setStep(5)} className="w-full rounded-full py-3.5" style={{ background: "#fff", color: tokens.navy, fontFamily: font.body, fontWeight: 700, fontSize: 16, border: `1.5px solid ${tokens.line}`, cursor: "pointer" }}>Change cabin or hold</button>
+                </div>
+              ) : easyTrip ? (
+                <div className="rounded-2xl p-5 ppg-rise" style={{ border: `2px solid ${tokens.green}`, background: "#F3FBF6" }}>
+                  <div className="flex items-center justify-between gap-3">
+                    <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 21, color: tokens.navy, lineHeight: 1.15 }}>Your checklist is free</div>
+                    <div className="rounded-full px-3 py-1" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontSize: 13, fontWeight: 800, letterSpacing: ".04em" }}>$0</div>
+                  </div>
+                  <p className="mt-1.5 mb-4" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }}>Easy flights are always free on PetPassGo. Make a free account and we&apos;ll show you exactly how to do each step, with the airline&apos;s official page.</p>
+                  <button type="button" disabled={buying} onClick={unlockFree} className="w-full rounded-full py-3.5" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer", opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : "Get my free checklist"}</button>
+                  <p className="mt-2 text-center" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>No card needed.</p>
                 </div>
               ) : <>
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-3">Choose your pass</h2>
@@ -578,6 +620,7 @@ export default function PetPassGoQuiz() {
         </div>
       </div>
       </div>
+      <FreeAccountSheet open={freeOpen} onClose={() => setFreeOpen(false)} trip={answers} petWord={answers.role === "Service animal" ? "your service dog" : `your ${answers.animal === "Other" || !answers.animal ? "pet" : answers.animal.toLowerCase()}`} onReady={async () => { setFreeOpen(false); await unlockFree(); }} />
       <GuestEmailSheet open={!!guestPlan} showConsent={false} showMarketing={false} marketingOptIn={tips} title={guestPlan === "join" ? `Join + Travel Pass · ${usd(P.joinToday)}` : `Travel Pass · ${usd(P.pass)}`} plan={guestPlan} trip={answers} cancelPath="/assessment?checkout=canceled" onClose={() => setGuestPlan("")} />
     </div>
   );

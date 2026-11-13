@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { serviceClient } from "../../../lib/serverEmail";
-import { groupCards } from "../../../lib/passCards";
-import { legsFromTrip, requirementQueryTypes, rulesRole, segmentPlans, segmentsToStore } from "../../../lib/segments";
-import { requirementAirline } from "../../../lib/airlines";
+import { rulesRole, segmentsToStore } from "../../../lib/segments";
+import { loadTripPlan, isEasyTrip } from "../../../lib/easyTrip";
 
 export const dynamic = "force-dynamic";
 
@@ -19,15 +18,10 @@ export async function POST(req) {
     date: s(a?.date, 10), pet_travel: s(a?.pet_travel, 12), pet_count: a?.pet_count === 2 ? 2 : 1,
   };
   if (!answers.airline || /not sure/i.test(answers.airline) || !answers.origin || !answers.destination) return NextResponse.json({ count: 0, steps: [] });
-  const trip = { ...answers, animal_type: answers.animal, travel_date: answers.date, segments: segmentsToStore(answers) };
-  const role = rulesRole(answers.role, answers.esa);
-  const airlines = new Set(["Any"]);
-  for (const leg of legsFromTrip(trip)) { airlines.add(leg.airline); airlines.add(requirementAirline(leg.airline)); }
-  const { data, error } = await serviceClient().from("airline_requirements").select("*")
-    .in("airline", [...airlines].filter(Boolean)).in("animal_type", [answers.animal, "Any"]).in("role", [role, "Any"]).in("trip_type", requirementQueryTypes(trip));
-  if (error) return NextResponse.json({ count: 0, steps: [] });
-  const plans = segmentPlans(data || [], trip);
-  const open = plans.flatMap((p) => { const g = groupCards(p.cards, {}); return [...g.first, ...g.general]; });
+  const trip = { ...answers, role: rulesRole(answers.role, answers.esa), animal_type: answers.animal, travel_date: answers.date, segments: segmentsToStore(answers) };
+  const plan = await loadTripPlan(serviceClient(), trip);
+  if (!plan) return NextResponse.json({ count: 0, steps: [] });
+  const open = plan.open;
   const names = [...new Set(open.map((c) => c.shortTitle).filter(Boolean))];
-  return NextResponse.json({ count: open.length, steps: names.slice(0, 12), dot: open.some((c) => c.dot) }, { headers: { "Cache-Control": "private, max-age=60" } });
+  return NextResponse.json({ count: open.length, steps: names.slice(0, 12), dot: open.some((c) => c.dot), easy: isEasyTrip(trip, plan) }, { headers: { "Cache-Control": "private, max-age=60" } });
 }

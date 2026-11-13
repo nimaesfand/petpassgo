@@ -22,7 +22,7 @@ const B = font.body;
 
 export const metadata = {
   title: { absolute: "Travel with your pet | PetPassGo" },
-  description: "Know before you book. See what your pet needs for your trip, then get every step, fee and deadline with a $29.99 Travel Pass, and keep your pet's passport, ID and records in one place.",
+  description: "Know before you book. Easy flights are free: see every step your pet needs. Complicated trips get a $29.99 Travel Pass. Keep your pet's passport and vet-verified records in one place.",
 };
 
 const STRIP = [
@@ -49,8 +49,8 @@ const VAULT_BENEFITS = [
 ];
 
 const STEPS = [
-  { n: "1", title: "Check your trip", body: "Answer a few questions and see the fee, carrier size and steps for your airline. Free.", icon: "M4 6h16M4 12h10M4 18h7" },
-  { n: "2", title: "Get your Travel Pass", body: "Your step-by-step checklist built for your airline, route and pet.", icon: "M5 4h14v16H5zM8 9h8M8 13h8M8 17h5" },
+  { n: "1", title: "Check your trip", body: "Answer a few questions. We tell you right away if it's an easy flight.", icon: "M4 6h16M4 12h10M4 18h7" },
+  { n: "2", title: "Get your checklist", body: "Easy flights are free with an account. Complicated trips (borders, big dogs, service dogs, connections) get a Travel Pass.", icon: "M5 4h14v16H5zM8 9h8M8 13h8M8 17h5" },
   { n: "3", title: "Check it off and fly", body: "Follow the steps and keep your pet's ID and documents ready in your Pet Vault.", icon: "M5 13l4 4L19 7" },
 ];
 
@@ -59,7 +59,7 @@ const HOME_AIRLINE_GROUPS = homeAirlineGroups();
 const HOME_FAQ = [
   {
     q: FAQ[2].q,
-    a: "$29.99 for one trip, or $14.99 if you already have Pet Vault. You get the requirements for your airline, route, and animal, plus a checklist with deadlines and reminders. A step is shown only when we have the official page and the date we last checked it. Without Pet Vault, your Digital Pet ID and document vault stay open until 7 days after the trip ends. That is 7 days after the travel date on a one-way trip, or 7 days after the return date if you add a later return. One-way trips stay one date.",
+    a: "Easy flights are free: a pet in the cabin, inside the US, on one airline, with no health papers or forms. You just make a free account. Complicated trips, like Mexico or Canada, big dogs, service dogs, or two airlines, need a Travel Pass: $29.99 for one trip, or $14.99 if you already have Pet Vault. You get the requirements for your airline, route, and animal, plus a checklist with deadlines and reminders. A step is shown only when we have the official page and the date we last checked it. Without Pet Vault, your Digital Pet ID and document vault stay open until 7 days after the trip ends. That is 7 days after the travel date on a one-way trip, or 7 days after the return date if you add a later return. One-way trips stay one date.",
   },
   { q: FAQ[6].q, a: FAQ[6].a },
   {

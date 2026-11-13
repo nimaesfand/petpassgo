@@ -1035,7 +1035,7 @@ function BillingTab({ userId, email }) {
     const [{ data: m }, { data: buys }, { data: trips }] = await Promise.all([
       supabase.from("memberships").select("status,current_period_end").eq("user_id", userId).maybeSingle(),
       supabase.from("purchases").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(20),
-      supabase.from("trips").select("id,origin,destination,airline,travel_date,paid_at").eq("paid", true).order("paid_at", { ascending: false }).limit(20),
+      supabase.from("trips").select("id,origin,destination,airline,travel_date,paid_at").eq("paid", true).eq("free_trip", false).order("paid_at", { ascending: false }).limit(20),
     ]);
     setMemberRow(m || null); setIsMember(!!m && m.status === "active" && (!m.current_period_end || new Date(m.current_period_end) > new Date()));
     setPurchases(buys || []); if (!buys?.length) setLegacyTrips(trips || []);
@@ -1102,6 +1102,37 @@ function AccountMenu({ onLogout }) {
   );
 }
 
+// After a free easy-trip unlock: the checklist is below; Pet Vault is the next step.
+function FreeTripWelcome({ onClose }) {
+  const [member, setMember] = useState(null);
+  useEffect(() => { supabase.rpc("my_membership").then(({ data }) => setMember(!!data)); }, []);
+  return (
+    <div role="status" className="rounded-2xl mb-6 overflow-hidden ppg-rise" style={{ background: "#fff", border: `1px solid ${tokens.green}` }}>
+      <div className="p-4 flex items-start gap-3">
+        <span aria-hidden className="flex items-center justify-center rounded-full shrink-0" style={{ width: 36, height: 36, background: "#EAF6EE", color: tokens.green }}><Icon name="check" size={20} /></span>
+        <div className="flex-1 min-w-0" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>
+          <b style={{ color: tokens.navy }}>Your free checklist is ready.</b> It&apos;s right below. Tap each step for the how-to, and check it off when it&apos;s done.
+        </div>
+        <button type="button" aria-label="Dismiss" onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: tokens.muted, padding: 2 }}><Icon name="x" size={18} /></button>
+      </div>
+      {member === false ? (
+        <div className="px-4 pb-4">
+          <div className="rounded-xl p-4" style={{ background: tokens.navy, color: "#fff" }}>
+            <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 800, lineHeight: 1.2 }}>Keep your pet ready for every trip</div>
+            <ul className="mt-2 mb-3 flex flex-col gap-1.5" style={{ fontFamily: font.body, fontSize: 14.5, lineHeight: 1.4, color: "rgba(255,255,255,.9)" }}>
+              {["Vaccines confirmed by your vet, not just typed in", "A pet passport with a live check-in code for the airport", "Reminders before shots and papers expire", "Lost-pet QR tag and alerts"].map((t) => (
+                <li key={t} className="flex items-start gap-2"><span style={{ color: "#7FD3A0", marginTop: 1 }}><Icon name="check" size={15} /></span>{t}</li>
+              ))}
+            </ul>
+            <a href="/join" className="block text-center rounded-full py-3" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 15.5, textDecoration: "none" }}>Try Pet Vault · {P.member}/mo</a>
+            <div className="mt-1.5 text-center" style={{ fontFamily: font.body, fontSize: 12.5, color: "rgba(255,255,255,.7)" }}>Cancel anytime.</div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function CheckoutBanner() {
   const [msg, setMsg] = useState(null); const [sessionId, setSessionId] = useState(null);
   useEffect(() => {
@@ -1121,9 +1152,11 @@ function CheckoutBanner() {
       })();
     }
     else if (q === "canceled") { setMsg("Checkout canceled. You haven't been charged."); setTimeout(() => setMsg(null), 7000); }
+    if (u.get("free_trip")) { setMsg("free"); u.delete("free_trip"); const qs = u.toString(); window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : "")); }
     if (q) { u.delete("checkout"); u.delete("session_id"); const qs = u.toString(); window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : "")); }
   }, []);
   if (!msg) return null;
+  if (msg === "free") return <FreeTripWelcome onClose={() => setMsg(null)} />;
   return <><div role="status" className="rounded-2xl p-4 mb-6 flex items-start gap-3 ppg-rise" style={{ background: "#fff", border: `1px solid ${msg === "paid" ? tokens.green : tokens.line}`, fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}><span className="flex-1">{msg === "paid" ? <><b>You&apos;re all set.</b> Everything is unlocked below. If something still looks locked, give it a few seconds and refresh.</> : msg}</span><button type="button" aria-label="Dismiss" onClick={() => setMsg(null)} style={{ background: "none", border: "none", cursor: "pointer", color: tokens.muted, padding: 2 }}><Icon name="x" size={18} /></button></div>
   {sessionId && <FeedbackPrompt kind="purchase" refKey={sessionId} title="How did that feel?" blurb="A quick rating helps us make PetPassGo better." />}</>;
 }

@@ -39,13 +39,14 @@ export default function HomePricing() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 items-stretch">
       <article data-testid="home-price-pass" className="rounded-3xl p-6 sm:p-7 flex flex-col h-full" style={{ background: "#fff", color: tokens.navy }}>
-        <h3 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 28, lineHeight: 1.15 }} className="mb-4">One trip. Everything included.</h3>
+        <h3 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 28, lineHeight: 1.15 }} className="mb-2">Travel Pass</h3>
+        <p className="mb-4 rounded-xl px-3 py-2.5" style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.4, background: "#EAF6EE", color: tokens.navy }}><b style={{ color: tokens.green }}>Easy flight? It&apos;s free.</b> A small pet in the cabin, inside the US, on one airline. Just make an account. The pass is for complicated trips.</p>
         <div className="flex-1">
           <Checks items={PASS_INCLUDED} color={tokens.ink} />
         </div>
         <div className="flex items-baseline gap-x-2 gap-y-1 flex-wrap mt-6">
           <span data-testid="pass-price" style={{ fontFamily: font.display, fontSize: 48, fontWeight: 700, lineHeight: 1 }}>{P.pass}</span>
-          <span style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.3, color: tokens.muted }}>one trip</span>
+          <span style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.3, color: tokens.muted }}>complicated trip</span>
         </div>
         <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, fontWeight: 600 }} className="mt-2 mb-5">Includes Pet Vault until 7 days after your trip.</p>
         <PlanTripButton full />

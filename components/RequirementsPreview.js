@@ -45,14 +45,15 @@ export default function RequirementsPreview({ answers, onVerdict }) {
       });
     fetch("/api/trip-preview", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(answers) })
       .then((r) => r.json())
-      .then((d) => { if (alive) setPlan({ count: Number(d?.count) || 0, steps: Array.isArray(d?.steps) ? d.steps : [] }); })
-      .catch(() => { if (alive) setPlan({ count: null, steps: [] }); });
+      .then((d) => { if (alive) setPlan({ count: Number(d?.count) || 0, steps: Array.isArray(d?.steps) ? d.steps : [], easy: d?.easy === true }); })
+      .catch(() => { if (alive) setPlan({ count: null, steps: [], easy: false }); });
     return () => { alive = false; };
   }, [answers.airline, answers.second_airline, answers.connecting, answers.stop, answers.animal, answers.role, answers.esa, answers.origin, answers.destination, answers.pet_travel, answers.second_mode, answers.pet_count]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const ready = rows && plan;
   // Step names appear one by one so the plan visibly builds for this trip.
-  const peekLen = ready ? Math.min(plan.steps.length, PEEK) : 0;
+  const peek = plan?.easy ? 12 : PEEK;
+  const peekLen = ready ? Math.min(plan.steps.length, peek) : 0;
   useEffect(() => {
     if (!ready || shown >= peekLen) return;
     const t = setTimeout(() => setShown((n) => n + 1), 220);
@@ -65,13 +66,14 @@ export default function RequirementsPreview({ answers, onVerdict }) {
   const airline = answers.connecting && answers.second_airline && answers.second_airline !== answers.airline ? `${first} + ${answers.second_airline}` : first;
   const petWord = answers.role === "Service animal" ? "your service dog" : `your ${pet}`;
 
-  const verdict = ready ? tripVerdict({ rows, trip: { ...answers, petName: petWord }, fitWarnings: tripFitWarnings(answers), stepCount: plan.count }) : null;
+  const verdict = ready ? tripVerdict({ rows, trip: { ...answers, petName: petWord }, fitWarnings: tripFitWarnings(answers), stepCount: plan.count, easy: plan.easy }) : null;
   const vKey = verdict?.key || null;
-  useEffect(() => { onVerdict?.(vKey); }, [vKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  const easy = !!verdict?.easy;
+  useEffect(() => { onVerdict?.(vKey, easy); }, [vKey, easy]); // eslint-disable-line react-hooks/exhaustive-deps
   const blocked = vKey === "no";
   const facts = ready ? tripFacts(rows, answers) : null;
   const count = plan?.count;
-  const more = ready ? Math.max(count || 0, plan.steps.length) - Math.min(plan.steps.length, PEEK) : 0;
+  const more = ready ? Math.max(count || 0, plan.steps.length) - Math.min(plan.steps.length, peek) : 0;
 
   return (
     <>
@@ -114,18 +116,18 @@ export default function RequirementsPreview({ answers, onVerdict }) {
 
             {plan.steps.length ? (
               <>
-                <div className="mb-2" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.navy }}>Your steps</div>
+                <div className="mb-2" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.navy }}>{easy ? "All you need" : "Your steps"}</div>
                 <ul className="flex flex-col gap-1.5">
                   {plan.steps.slice(0, shown).map((name, i) => (
                     <li key={name} className="flex items-center gap-3 rounded-lg px-3 py-2.5 ppg-rise" style={{ background: tokens.sky }}>
                       <span className="shrink-0 rounded-full flex items-center justify-center" style={{ width: 24, height: 24, background: "#fff", border: `2px solid ${i === 0 ? tokens.primary : tokens.line}`, fontFamily: font.body, fontSize: 12, fontWeight: 800, color: tokens.navy }}>{i + 1}</span>
                       <span className="flex-1 min-w-0" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>{name}</span>
-                      <span aria-label="Details in your Travel Pass" style={{ color: tokens.muted }}><Icon name="lock" size={15} /></span>
+                      <span aria-label={easy ? "Details in your free checklist" : "Details in your Travel Pass"} style={{ color: tokens.muted }}><Icon name="lock" size={15} /></span>
                     </li>
                   ))}
                 </ul>
                 <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted, lineHeight: 1.45 }} className="mt-3">
-                  {more > 0 ? `+ ${more} more. ` : ""}Your Travel Pass shows how to do each one, when it's due, and the official source.
+                  {more > 0 ? `+ ${more} more. ` : ""}{easy ? "Your free checklist shows exactly how to do each one, with the airline's official page." : "Your Travel Pass shows how to do each one, when it's due, and the official source."}
                 </p>
               </>
             ) : null}

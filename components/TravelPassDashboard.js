@@ -175,7 +175,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
       {(() => {
         if (!results.length) return null;
         if (needsCheck) return <VerdictCard verdict={{ key: "check", title: "A flight still needs checking", text: "We don't have a verified requirement for every flight on this trip." }} />;
-        const v = tripVerdict({ rows: results, trip: { ...trip, petName: pet?.name || "your pet" }, fitWarnings: tripFitWarnings(trip), stepCount: progress.total - progress.done });
+        const v = tripVerdict({ rows: results, trip: { ...trip, petName: pet?.name || "your pet" }, fitWarnings: tripFitWarnings(trip), stepCount: progress.total - progress.done, easy: !!trip.free_trip });
         return v && v.key !== "go" ? <VerdictCard verdict={v} /> : null;
       })()}
       <div className="rounded-3xl p-5 sm:p-6 mb-4" style={{ background: tokens.navy }}>
