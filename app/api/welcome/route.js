@@ -13,7 +13,7 @@ export async function POST(req) {
     const got = await loadPaidGuestSession(sb, body?.session_id);
     if (!got) return NextResponse.json({ state: "invalid" }, { status: 404 });
     const { session, row } = got;
-    const out = { email: row.email, first_name: row.first_name || "", plan: row.plan };
+    const out = { email: row.email, first_name: row.first_name || "", plan: row.plan, amount_cents: session?.amount_total ?? null, currency: session?.currency || "usd" };
     if (row.claimed_at) return NextResponse.json({ ...out, state: "claimed" });
     const uid = await userIdByEmail(sb, row.email);
     if (uid) { await claimGuestCheckout(sb, row, uid, session); return NextResponse.json({ ...out, state: "exists" }); }

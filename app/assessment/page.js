@@ -15,6 +15,9 @@ import FlightLookup, { airportLabel, airlineFromFlight } from "../../components/
 import { readTripIntent } from "../../lib/tripIntent";
 import { fmtTripDate } from "../../lib/tripAccess";
 import { trackEvent, trackBeginCheckout, getAttribution } from "../../lib/analytics";
+
+let previewTracked = false;
+function trackPreviewOnce(verdict) { if (previewTracked) return; previewTracked = true; trackEvent("preview_viewed", { content_type: "assessment", content_name: "free_answer", verdict }); }
 import { GuestEmailSheet } from "../../components/GuestEmailStep";
 import SiteHeader from "../../components/SiteHeader";
 import Icon from "../../components/Icon";
@@ -520,7 +523,7 @@ export default function PetPassGoQuiz() {
 
           {step === 6 && (
             <>
-              <RequirementsPreview answers={answers} onVerdict={setVerdictKey} />
+              <RequirementsPreview answers={answers} onVerdict={(v) => { setVerdictKey(v); if (v) trackPreviewOnce(v); }} />
               {verdictKey === "no" ? (
                 <div className="flex flex-col gap-2 mt-2">
                   <button type="button" onClick={() => setStep(4)} className="w-full rounded-full py-3.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>Try a different airline</button>

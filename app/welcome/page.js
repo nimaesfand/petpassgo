@@ -8,6 +8,7 @@ import { tokens, font } from "../../lib/theme";
 import GuaranteeLine from "../../components/GuaranteeLine";
 import { WITHDRAWAL_CONFIRMED, clearWithdrawalConsent } from "../../lib/withdrawal";
 import MarketingOptIn from "../../components/MarketingOptIn";
+import { trackPurchaseOnce, trackEvent } from "../../lib/analytics";
 
 const card = { background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.06)" };
 const h = { fontFamily: font.display, fontSize: 26, fontWeight: 700, color: tokens.navy };
@@ -32,7 +33,7 @@ export default function WelcomePage() {
     setSessionId(sid);
     fetch("/api/welcome", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sid }) })
       .then((r) => r.json().catch(() => ({ state: "error" })))
-      .then((j) => { setInfo(j); if (j.state === "exists" || j.state === "claimed") clearSaved(); })
+      .then((j) => { setInfo(j); if (j.state === "exists" || j.state === "claimed") clearSaved(); if (sid && (j.state === "new" || j.state === "exists")) trackPurchaseOnce({ transactionId: sid, value: j.amount_cents != null ? j.amount_cents / 100 : undefined, currency: j.currency || "USD", kind: j.plan }); })
       .catch(() => setInfo({ state: "error" }));
   }, []);
 
@@ -43,6 +44,7 @@ export default function WelcomePage() {
     const j = await r.json().catch(() => ({}));
     if (j.state === "exists" || j.state === "claimed") { clearSaved(); setInfo((i) => ({ ...i, state: j.state })); setBusy(false); return; }
     if (!r.ok) { setErr(j.error || "Something went wrong. Please try again."); setBusy(false); return; }
+    trackEvent("sign_up", { content_name: "account" });
     const { error } = await supabase.auth.signInWithPassword({ email: j.email, password });
     clearSaved();
     if (error) { setInfo((i) => ({ ...i, state: "claimed" })); setBusy(false); return; }

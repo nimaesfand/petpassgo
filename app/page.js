@@ -114,6 +114,7 @@ const FOOTER_LINKS = [
   { href: "/business", label: "For Businesses — Advertise with PetPassGo" },
   { href: "/terms", label: "Terms" },
   { href: "/privacy", label: "Privacy" },
+  { href: "/privacy-choices", label: "Your privacy choices" },
 ];
 
 export default function PetPassGoLanding() {

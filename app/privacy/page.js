@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <LegalPage title="Privacy Policy" updated="October 28, 2026">
+    <LegalPage title="Privacy Policy" updated="November 13, 2026">
       <P>This policy explains what information PetPassGo, operated by PetPassGo ("we", "us"), collects, how we use it, and the choices you have. Questions: <Email />.</P>
 
       <H>1. Information we collect</H>
@@ -24,6 +24,7 @@ export default function PrivacyPage() {
         <li><strong>AI feature inputs:</strong> if you use the optional AI document check or chat, the documents and messages you submit to it.</li>
         <li><strong>Payment information:</strong> handled by Stripe. We receive payment status and limited details (for example, the last four card digits), not your full card number.</li>
         <li><strong>Checkout consent:</strong> if you agree to start your Travel Pass or Pet Vault access immediately, we store the time, your email, the plan, and the policy version. We email you a confirmation of that agreement.</li>
+        <li><strong>Advertising measurement:</strong> our website uses advertising pixels (currently the TikTok Pixel, and possibly the Meta Pixel and Google Analytics) to see which ads bring visitors and whether those visits lead to a free trip check, a sign-up or a purchase. These tools receive page visits, those actions, purchase amounts, and device and browser details, and may set cookies. They never receive your pet records, documents or trip details. You can turn this off at any time on <a href="/privacy-choices" style={{ color: "#14213D", textDecoration: "underline" }}>Your privacy choices</a>, and we honor Do Not Track and Global Privacy Control signals automatically.</li>
         <li><strong>Technical data:</strong> standard logs from our hosting providers (Vercel and Supabase), such as IP address, browser type and request times, used for security and reliability.</li>
       </UL>
 
@@ -35,7 +36,7 @@ export default function PrivacyPage() {
         <li>To run optional AI features you choose to use.</li>
         <li>To process payments, prevent fraud, secure the Service and fix problems.</li>
       </UL>
-      <P>We do not sell your personal information, and we do not use it for third-party advertising.</P>
+      <P>We do not sell your personal information for money. Using the advertising pixels described above may count as "sharing" for cross-context behavioral advertising under some state privacy laws. You can opt out on <a href="/privacy-choices" style={{ color: "#14213D", textDecoration: "underline" }}>Your privacy choices</a>.</P>
 
       <H>3. What is private and what is public</H>
       <UL>
@@ -74,7 +75,7 @@ export default function PrivacyPage() {
         <li><strong>Right to access:</strong> to get a copy of the specific personal information we hold about you.</li>
         <li><strong>Right to delete:</strong> to ask us to delete your personal information, subject to legal exceptions.</li>
         <li><strong>Right to correct:</strong> to ask us to correct inaccurate personal information.</li>
-        <li><strong>Right to opt out of sale or sharing:</strong> we do not sell your personal information and do not share it for cross-context behavioral advertising, so there is nothing to opt out of.</li>
+        <li><strong>Right to opt out of sale or sharing:</strong> we do not sell your personal information for money. Our advertising pixels may count as sharing for cross-context behavioral advertising. Opt out on <a href="/privacy-choices" style={{ color: "#14213D", textDecoration: "underline" }}>Your privacy choices</a>, or send a Global Privacy Control signal from your browser, and we will stop.</li>
         <li><strong>Right to limit use of sensitive personal information:</strong> we use your account login details only to provide the Service, as the CCPA permits.</li>
         <li><strong>Non-discrimination:</strong> we will not deny you service, charge you a different price, or give you a lower level of service for using these rights.</li>
       </UL>
