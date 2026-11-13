@@ -122,7 +122,7 @@ const STEPS = ["Who", "About", "Size", "Contact", "Photo"];
 
 export default function PassportWizard({ userId, onDone, onCancel, defaultOwner = "" }) {
   const [step, setStep] = useState(0);
-  const [f, setF] = useState({ name: "", animal_type: "Dog", role: "Pet", breed: "", sex: "", date_of_birth: "", color: "", weight_lb: "", carrier_length_in: "", carrier_width_in: "", carrier_height_in: "", handler_name: defaultOwner, emergency_contact_name: defaultOwner, emergency_contact_phone: "" });
+  const [f, setF] = useState({ name: "", animal_type: "Dog", role: "Pet", breed: "", sex: "", date_of_birth: "", color: "", weight_lb: "", carrier_length_in: "", carrier_width_in: "", carrier_height_in: "", handler_name: defaultOwner, emergency_contact_name: defaultOwner, emergency_contact_phone: "", trained: "" });
   const [photo, setPhoto] = useState(null);
   const [photoUrl, setPhotoUrl] = useState("");
   const [booth, setBooth] = useState(false);
@@ -173,6 +173,7 @@ export default function PassportWizard({ userId, onDone, onCancel, defaultOwner 
       handler_name: f.handler_name.trim() || null,
       emergency_contact_name: f.emergency_contact_name.trim() || null,
       emergency_contact_phone: f.emergency_contact_phone.trim() || null,
+      trained: f.trained === "" ? null : f.trained === "yes",
     }).select("id").single();
     if (error || !created) {
       setBusy(false);
@@ -197,6 +198,7 @@ export default function PassportWizard({ userId, onDone, onCancel, defaultOwner 
     f.date_of_birth && ["Born", fmtDob(f.date_of_birth)],
     f.sex && ["Sex", f.sex],
     f.color.trim() && ["Color", f.color.trim()],
+    f.trained && ["Trained", f.trained === "yes" ? "Yes" : "Not yet"],
     Number(f.weight_lb) > 0 && ["Weight", `${f.weight_lb} lb`],
     step > 3 && f.emergency_contact_phone && ["Contact", f.emergency_contact_name.trim() || "Added"],
   ].filter(Boolean);
@@ -251,6 +253,10 @@ export default function PassportWizard({ userId, onDone, onCancel, defaultOwner 
           <div>
             <span style={lab}>Sex</span>
             <div className="flex gap-2 mt-1.5">{["Male", "Female"].map((t) => <Chip key={t} on={f.sex === t} onClick={() => setF((x) => ({ ...x, sex: x.sex === t ? "" : t }))}>{t}</Chip>)}</div>
+          </div>
+          <div>
+            <span style={lab}>Is {name} trained? <span style={{ fontWeight: 500, color: tokens.muted }}>(house, leash or crate)</span></span>
+            <div className="flex gap-2 mt-1.5">{[["yes", "Yes"], ["no", "Not yet"]].map(([v, t]) => <Chip key={v} on={f.trained === v} onClick={() => setF((x) => ({ ...x, trained: x.trained === v ? "" : v }))}>{t}</Chip>)}</div>
           </div>
           <div>
             <span style={lab}>Color</span>

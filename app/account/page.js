@@ -364,7 +364,6 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
 
   const sections = [
     ["passport", "Passport", "passport"],
-    ["id", "Pet ID", "tag"],
     ["health", "Health", "health"],
     ["docs", "Docs", "file"],
     ["lost", "Lost", "alert"],
@@ -382,7 +381,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
     <div id={`pet-top-${pet.id}`} className="mb-8 grid grid-cols-1 gap-4 min-w-0">
       <PetHero pet={pet} photo={photoEl} photoBusy={uploadingPhoto} onPhoto={handlePhotoUpload} onGo={(k, field) => { setSection(k); setTimeout(() => { if (field) window.dispatchEvent(new CustomEvent("ppg-focus-field", { detail: { petId: pet.id, field } })); else document.getElementById(`pet-nav-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60); }} />
 
-      <div id={`pet-nav-${pet.id}`} className="ppg-pet-nav grid grid-cols-6 gap-1.5 sm:gap-2" style={{ scrollMarginTop: 8 }} role="tablist" aria-label={`${pet.name} sections`}>
+      <div id={`pet-nav-${pet.id}`} className="ppg-pet-nav grid grid-cols-5 gap-1.5 sm:gap-2" style={{ scrollMarginTop: 8 }} role="tablist" aria-label={`${pet.name} sections`}>
         {sections.map(([key, label, icon]) => {
           const on = section === key;
           const t = SECTION_THEME[key];
@@ -399,15 +398,11 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
       <div data-pet-section={section} className="grid grid-cols-1 gap-3 ppg-rise min-w-0" key={section}>
         {BANNERS[section] ? <SectionBanner k={section} title={BANNERS[section][0](pet.name)} text={BANNERS[section][1](pet.name)} /> : null}
 
-        {section === "passport" && (<>
+        {(section === "passport" || section === "id") && (<>
           <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="passport" />
-          <Fold icon="file" color={th("passport").color} soft={th("passport").soft} title={`Edit ${pet.name}'s details`} hint="Name, breed, birthday, weight, microchip">
+          <Fold icon="file" color={th("passport").color} soft={th("passport").soft} title={`Edit ${pet.name}'s details`} hint="Name, breed, birthday, weight, training, microchip">
             <PetBasicsCard pet={pet} userId={userId} onChanged={onPhotoUpdated} bare />
           </Fold>
-        </>)}
-
-        {section === "id" && (<>
-          <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="id" />
           <Fold icon="send" color={th("id").color} soft={th("id").soft} title="Care card for sitters" hint="A private link that expires">
             <ShareCard pet={pet} userId={userId} bare onDone={() => window.dispatchEvent(new CustomEvent("ppg-qr-done"))} />
           </Fold>
@@ -1197,7 +1192,7 @@ export default function AccountPage() {
   }
   // From Home: open one pet's passport, Pet ID, health records or lost-pet panel.
   function openPet(petId, kind) {
-    const section = { passport: "passport", id: "id", health: "health", lost: "lost" }[kind] || null;
+    const section = { passport: "passport", id: "passport", health: "health", lost: "lost" }[kind] || null;
     setBottomKey(section === "health" ? "health" : section === "passport" ? "passport" : null);
     if (section) {
       window.__ppgPetSection = { petId, section };

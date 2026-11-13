@@ -6,6 +6,8 @@ import Fold from "./Fold";
 import PetQr from "../../lib/PetQr";
 import { Wordmark } from "../Logo";
 import { savePetIdImage } from "../PetIdV2";
+import { savePassportImage, walletThumbBase64 } from "../../lib/passportImage";
+import { PUBLIC_ID_BASE } from "../../lib/PetQr";
 import { supabase } from "../../lib/supabaseClient";
 import { tokens, font } from "../../lib/theme";
 import { fmtDob, weightLabel, profileUrl, profileLabel, filled } from "../../lib/petProfile";
@@ -86,7 +88,7 @@ function CardFront({ pet, photo }) {
 
 // The Pet ID tab: the card itself first (tap to flip to the QR), quick actions,
 // then a live "what a stranger sees" preview with simple switches.
-export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRemove }) {
+export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRemove, toolsOnly = false }) {
   const [flipped, setFlipped] = useState(false);
   const [local, setLocal] = useState({});
   const [copied, setCopied] = useState(false);
@@ -117,13 +119,23 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
   }
   async function saveImage() {
     setBusy("png");
-    try { await savePetIdImage(pet); window.dispatchEvent(new CustomEvent("ppg-qr-done")); } finally { setBusy(""); }
+    try {
+      if (toolsOnly) await savePassportImage(pet, `${PUBLIC_ID_BASE}${pet.public_slug || pet.id}`);
+      else await savePetIdImage(pet);
+      window.dispatchEvent(new CustomEvent("ppg-qr-done"));
+    } finally { setBusy(""); }
+  }
+  async function share() {
+    const url = profileUrl(pet);
+    try { if (navigator.share) { await navigator.share({ title: `${pet.name || "Pet"}'s passport`, url }); return; } } catch { return; }
+    copy();
   }
   async function addWallet() {
     setBusy("wallet");
     try {
       const { data } = await supabase.auth.getSession();
-      const r = await fetch("/api/pet-wallet", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": data?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id }) });
+      const thumb = await walletThumbBase64().catch(() => "");
+      const r = await fetch("/api/pet-wallet", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": data?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id, thumb }) });
       if (!r.ok) { setWallet(false); return; }
       const blob = await r.blob();
       const a = document.createElement("a");
@@ -139,7 +151,7 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
   return (
     <div className="grid grid-cols-1 gap-4 min-w-0">
       {/* The card */}
-      <section className="w-full mx-auto" style={{ maxWidth: 460 }}>
+      {toolsOnly ? null : <section className="w-full mx-auto" style={{ maxWidth: 460 }}>
         <div className="flex items-center justify-between gap-3 mb-3">
           <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>Scan the QR and a finder can reach you.</div>
           <button type="button" onClick={() => setFlipped((f) => !f)} className="ppg-btn ppg-btn-secondary flex-shrink-0" style={{ borderColor: T.color, color: T.color }}>
@@ -158,9 +170,25 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
             </div>
           </div>
         </div>
-      </section>
+      </section>}
 
       {/* Actions */}
+      {toolsOnly ? (
+        <>
+          <button type="button" onClick={wallet ? addWallet : undefined} disabled={!wallet || !!busy} className="w-full rounded-2xl flex items-center justify-center gap-2.5" style={{ minHeight: 54, background: "#000", color: "#fff", border: "none", cursor: wallet ? "pointer" : "default", opacity: wallet ? 1 : 0.55, fontFamily: font.body, fontWeight: 700, fontSize: 16 }}>
+            <Icon name="smartphone" size={20} />
+            {busy === "wallet" ? "Preparing…" : wallet ? "Add to Apple Wallet" : "Add to Apple Wallet · coming soon"}
+          </button>
+          <div className="grid gap-2" style={{ gridTemplateColumns: "repeat(3, minmax(0,1fr))" }}>
+            <ActionTile icon="download" title="Save image" sub="Passport + QR" onClick={saveImage} busy={busy === "png" ? "Saving…" : ""} />
+            <ActionTile icon="send" title={copied ? "Link copied" : "Share"} sub="Send the link" onClick={share} />
+            <ActionTile icon="printer" title="Print" sub="Both sides" href={`/account/passport/print?pet=${pet.id}`} />
+            <ActionTile icon="external" title="Public page" sub="What a finder sees" href={profileUrl(pet)} />
+            <ActionTile icon="tag" title="QR tags" sub="Free to print" href={`/account/tags?pet=${pet.id}`} />
+            <ActionTile icon="link" title={copied ? "Copied!" : "Copy link"} sub="For texts and bios" onClick={copy} />
+          </div>
+        </>
+      ) : (
       <div className="grid gap-2" style={{ gridTemplateColumns: "repeat(2, minmax(0,1fr))" }}>
         <ActionTile icon="smartphone" title="Save image" sub="Card image with QR" onClick={saveImage} busy={busy === "png" ? "Saving…" : ""} />
         <ActionTile icon="link" title={copied ? "Copied!" : "Copy link"} sub="Share the profile" onClick={copy} />
@@ -168,6 +196,7 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
         <ActionTile icon="tag" title="Print QR tags" sub="Free to print · metal tags soon" href={`/account/tags?pet=${pet.id}`} />
         {wallet ? <ActionTile icon="bag" title="Apple Wallet" sub="Next to your cards" onClick={addWallet} busy={busy === "wallet" ? "Preparing…" : ""} /> : null}
       </div>
+      )}
 
       {/* Privacy: switches + live preview */}
       <Fold icon="lock" color={T.color} soft={T.soft} title="What people see when they scan" hint={`Name, photo, breed + ${visible.length} you chose`}>
@@ -214,7 +243,7 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
       </Fold>
 
       <div className="flex items-center justify-between gap-3 flex-wrap pt-1">
-        <p style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.muted }}>A digital pet ID, not a government ID.</p>
+        <p style={{ fontFamily: font.body, fontSize: 12.5, color: tokens.muted }}>A PetPassGo pet passport, not a government document.</p>
         {askRemove ? (
           <div role="dialog" aria-label="Remove pet" className="rounded-2xl p-4" style={{ border: `2px solid ${tokens.navy}`, background: "#fff" }}>
             <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-3">Remove {pet.name}'s profile? This can't be undone.</div>

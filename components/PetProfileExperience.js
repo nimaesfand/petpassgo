@@ -242,7 +242,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
     const want = { health: "medical", docs: "housing", about: "about" }[v];
     if (want) setTab(want);
   }, [v]);
-  const showPassport = !v || v === "passport";
+  const showPassport = !v || v === "passport" || v === "id";
   const showPanel = !v || v === "docs" || v === "about";
 
   async function save(patch) {
@@ -504,8 +504,8 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
         ))}
       </section>}
 
-      {owner && (!v || v === "id") ? (
-        <PetIdStudio pet={pet} userId={userId} photo={photo || <PetIllustration type={pet.animal_type} size={72} />} card={<DigitalIdCard pet={pet} photo={photo} />} onChanged={onChanged} onRemove={removePet} />
+      {owner && (!v || v === "id" || v === "passport") ? (
+        <PetIdStudio pet={pet} userId={userId} toolsOnly={v === "id" || v === "passport"} photo={photo || <PetIllustration type={pet.animal_type} size={72} />} card={<DigitalIdCard pet={pet} photo={photo} />} onChanged={onChanged} onRemove={removePet} />
       ) : null}
     </div>
   );

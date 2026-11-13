@@ -34,6 +34,7 @@ export default function PetBasicsCard({ pet, userId, onChanged, bare = false }) 
     microchip_number: pet.microchip_number || "",
     handler_name: pet.handler_name || "",
     role: pet.role || "Pet",
+    trained: pet.trained == null ? "" : pet.trained ? "yes" : "no",
   }));
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
@@ -51,6 +52,7 @@ export default function PetBasicsCard({ pet, userId, onChanged, bare = false }) 
       date_of_birth: form.date_of_birth || null,
       microchip_number: form.microchip_number.trim() || null,
       handler_name: form.handler_name.trim() || null,
+      trained: form.trained === "" ? null : form.trained === "yes",
     };
     const { error } = await supabase.from("pets").update(patch).eq("id", pet.id).eq("user_id", userId);
     setSaving(false);
@@ -67,6 +69,7 @@ export default function PetBasicsCard({ pet, userId, onChanged, bare = false }) 
     ["Color", pet.color],
     ["Microchip", pet.microchip_number],
     ["Owner", pet.handler_name],
+    ["Trained", pet.trained == null ? "" : pet.trained ? "Yes" : "Not yet"],
   ];
 
   return (
@@ -82,12 +85,13 @@ export default function PetBasicsCard({ pet, userId, onChanged, bare = false }) 
         <form onSubmit={save} className="grid gap-3">
           <label style={label}>Name<input required aria-label="Name" value={form.name} onChange={set("name")} style={input} /></label>
           <div className="grid sm:grid-cols-2 gap-3">
-            <label style={label}>Type<select aria-label="Type" value={form.animal_type} onChange={set("animal_type")} style={input}><option>Dog</option><option>Cat</option><option>Other</option></select></label>
+            <label style={label}>Species<select aria-label="Species" value={form.animal_type} onChange={set("animal_type")} style={input}><option>Dog</option><option>Cat</option><option>Other</option></select></label>
             <label style={label}>Breed<BreedInput aria-label="Breed" value={form.breed} onChange={set("breed")} animal={form.animal_type} placeholder="Start typing, e.g. Dachshund" style={input} /></label>
             <label style={label}>Date of birth<input type="date" aria-label="Date of birth" value={form.date_of_birth} onChange={set("date_of_birth")} style={input} /></label>
             <label style={label}>Weight (lb)<input type="number" step="0.1" min="0.1" aria-label="Weight in pounds" value={form.weight_lb} onChange={set("weight_lb")} style={input} /></label>
             <label style={label}>Sex<select aria-label="Sex" value={form.sex} onChange={set("sex")} style={input}><option value="">Select</option><option>Male</option><option>Female</option></select></label>
             <label style={label}>Color<input aria-label="Color" value={form.color} onChange={set("color")} style={input} /></label>
+            <label style={label}>Trained (house, leash or crate)<select aria-label="Trained" value={form.trained} onChange={set("trained")} style={input}><option value="">Not set</option><option value="yes">Yes</option><option value="no">Not yet</option></select></label>
           </div>
           <label style={label}>Microchip number<input aria-label="Microchip number" value={form.microchip_number} onChange={set("microchip_number")} autoComplete="off" style={input} /></label>
           <label style={label}>Owner name<input aria-label="Owner name" maxLength={80} value={form.handler_name} onChange={set("handler_name")} style={input} /></label>
