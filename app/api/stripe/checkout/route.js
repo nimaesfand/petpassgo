@@ -61,7 +61,7 @@ async function handle(req) {
     metadata: meta,
     success_url: `${base}/account?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${base}/account?checkout=canceled`,
-    allow_promotion_codes: false,
+    allow_promotion_codes: true,
   };
   if (effPlan === "pass" || effPlan === "member_pass") {
     Object.assign(params, {

@@ -66,7 +66,7 @@ async function handle(req) {
     custom_fields: NAME_FIELDS,
     success_url: `${base}/welcome?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${base}${cancelPath}`,
-    allow_promotion_codes: false,
+    allow_promotion_codes: true,
   };
   if (plan === "pass") {
     Object.assign(params, {
