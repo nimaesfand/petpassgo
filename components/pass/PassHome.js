@@ -3,6 +3,7 @@
 import Icon from "../Icon";
 import { tokens, font } from "../../lib/theme";
 import { fmt } from "../../lib/travelDates";
+import { dueChip } from "../../lib/passCards";
 
 // Travel Pass "Today" view: the trip at a glance, the one next step, and shortcuts.
 // Everything else lives one tap away so the phone screen isn't a long scroll.
@@ -49,9 +50,9 @@ export default function PassHome({ facts, progress, ready, needsCheck, nextStep,
       {nextStep ? (
         <div className="rounded-3xl p-4 sm:p-5" style={{ background: "#FFF7F2", border: `2px solid ${tokens.primary}` }}>
           <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 800, letterSpacing: ".1em", color: tokens.primary }}>NEXT UP</div>
-          <div className="mt-1" style={{ fontFamily: font.display, fontSize: 21, fontWeight: 800, color: tokens.navy, lineHeight: 1.2 }}>{nextStep.title || nextStep.shortTitle}</div>
-          <div className="mt-1" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.primary }}>{dueText(nextStep.dueDate, today)}</div>
-          {nextStep.what ? <p className="mt-2" style={{ fontFamily: font.body, fontSize: 15.5, lineHeight: 1.45, color: tokens.ink }}>{String(nextStep.what).split(/(?<=\.)\s/)[0]}</p> : null}
+          <div className="mt-1" style={{ fontFamily: font.display, fontSize: 21, fontWeight: 800, color: tokens.navy, lineHeight: 1.2 }}>{nextStep.shortTitle || nextStep.title}</div>
+          <div className="mt-1" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.primary }}>{nextStep.dueSuggested || nextStep.dueKind === "dayof" ? dueChip(nextStep.dueDate, today, { suggested: nextStep.dueSuggested, dayOf: nextStep.dueKind === "dayof" }).label : dueText(nextStep.dueDate, today)}</div>
+          {nextStep.what ? <p className="mt-2" style={{ fontFamily: font.body, fontSize: 15.5, lineHeight: 1.45, color: tokens.ink }}>{nextStep.what}</p> : null}
           <div className="flex flex-wrap gap-2 mt-3">
             <button type="button" onClick={() => (onOpenStep ? onOpenStep(nextStep) : onGo("checklist"))} className="ppg-btn ppg-btn-primary">{nextStep.dot ? "Fill out my DOT form" : "Show me how"}</button>
             <button type="button" onClick={() => onDone(nextStep)} className="ppg-btn ppg-btn-secondary">I already did this</button>

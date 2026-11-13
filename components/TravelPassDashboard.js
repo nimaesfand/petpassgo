@@ -91,7 +91,8 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
   const [health, setHealth] = useState(null);
   const pack = useTripExtras(trip?.id);
   const today = useTodayPT();
-  const plans = useMemo(() => segmentPlans(results, { ...trip, pet }), [results, trip, pet]);
+  const tripWithPet = useMemo(() => ({ ...trip, pet }), [trip, pet]);
+  const plans = useMemo(() => segmentPlans(results, tripWithPet), [results, tripWithPet]);
   const cards = useMemo(() => plans.flatMap((plan) => plan.cards), [plans]);
   const groups = useMemo(() => groupCards(cards, statusMap), [cards, statusMap]);
   const progress = passProgress(groups);
@@ -260,14 +261,14 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
               <button type="button" onClick={onSetRolePet} className="ppg-btn ppg-btn-primary">Switch this trip to the pet path</button>
             </div>
           )}
-          <StepsTools trip={trip} pet={pet} facts={facts} service={service} steps={openSteps} />
-          <TripFitCard answers={trip} className="mb-5" />
+          {tripFitWarnings(trip).some((w) => w.level === "stop") ? <TripFitCard answers={trip} className="mb-4" /> : null}
           {cards.length === 0 ? (
             <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 16, color: tokens.ink }}>No requirements found for this exact combination yet.</div>
           ) : (
-            <PassChecklist trip={trip} requirements={results} statusMap={statusMap} onSetDone={onSetDone} focusId={focusStep} onOpenRelief={() => { setSection("flight"); setTimeout(() => document.getElementById("pet-relief")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }} />
+            <PassChecklist trip={tripWithPet} requirements={results} statusMap={statusMap} onSetDone={onSetDone} focusId={focusStep} onOpenRelief={() => { setSection("flight"); setTimeout(() => document.getElementById("pet-relief")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }} />
           )}
-          <div className="mt-4"><RoundTripAddon trip={trip} onSave={onSaveReturn} /></div>
+          <div className="mt-6"><StepsTools trip={trip} pet={pet} facts={facts} service={service} steps={openSteps} /></div>
+          <div className="mt-2"><RoundTripAddon trip={trip} onSave={onSaveReturn} /></div>
           <details className="ppg-fold group rounded-2xl mt-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
             <summary className="flex items-center gap-3 px-4 py-3.5" style={{ cursor: "pointer", listStyle: "none" }}>
               <span className="flex items-center justify-center rounded-xl flex-shrink-0" style={{ width: 38, height: 38, background: tokens.sky, color: tokens.navy }}><Icon name="stethoscope" size={19} /></span>

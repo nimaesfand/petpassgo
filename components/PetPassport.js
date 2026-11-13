@@ -127,7 +127,7 @@ export default function PetPassport({
                 ) : null}
               </div>
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 ppg-pp-info">
               <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>NAME</div>
               <h2 className="ppg-pp-name" style={{ fontFamily: font.display, fontWeight: 800, lineHeight: 1, letterSpacing: "-0.02em", color: tokens.navy, overflowWrap: "anywhere" }}>{pet.name}</h2>
               <div className="mt-2.5 grid grid-cols-1 gap-y-1.5 sm:gap-y-2 min-w-0">

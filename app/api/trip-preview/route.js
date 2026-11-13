@@ -16,7 +16,7 @@ export async function POST(req) {
   const answers = {
     airline: s(a?.airline, 80), second_airline: s(a?.second_airline, 80), connecting: a?.connecting === true, stop: s(a?.stop), second_date: s(a?.second_date, 10), second_mode: s(a?.second_mode, 8),
     origin: s(a?.origin), destination: s(a?.destination), animal: s(a?.animal, 20) || "Dog", role: s(a?.role, 40) || "Pet", esa: a?.esa === true,
-    date: s(a?.date, 10), pet_travel: s(a?.pet_travel, 12),
+    date: s(a?.date, 10), pet_travel: s(a?.pet_travel, 12), pet_count: a?.pet_count === 2 ? 2 : 1,
   };
   if (!answers.airline || /not sure/i.test(answers.airline) || !answers.origin || !answers.destination) return NextResponse.json({ count: 0, steps: [] });
   const trip = { ...answers, animal_type: answers.animal, travel_date: answers.date, segments: segmentsToStore(answers) };

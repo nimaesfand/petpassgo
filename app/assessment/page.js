@@ -34,13 +34,17 @@ import { WITHDRAWAL_BLOCKED, takeWithdrawalConsent } from "../../lib/withdrawal"
 
 const TOTAL_STEPS = 7;
 
-function ProgressStub({ step }) {
-  const shown = Math.min(step + 1, TOTAL_STEPS);
-  const pct = shown >= TOTAL_STEPS ? 100 : Math.round((shown / TOTAL_STEPS) * 100);
+// Counts only the questions this person actually sees. A homepage shortcut that
+// already answered the first ones starts at "Step 1", not "Step 3".
+function ProgressStub({ step, start = 0 }) {
+  const s0 = step < start ? 0 : start;
+  const total = TOTAL_STEPS - 1 - s0;
+  const shown = Math.min(step - s0 + 1, total);
+  const pct = shown >= total ? 100 : Math.round((shown / total) * 100);
   return (
     <div className="mb-8">
       <div className="flex justify-between mb-2" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, color: tokens.ink }}>
-        <span>Step {shown} of {TOTAL_STEPS}</span>
+        <span>Step {shown} of {total}</span>
         <span>{pct}%</span>
       </div>
       <div className="w-full h-[6px] rounded-full overflow-hidden" style={{ background: tokens.line }}>
@@ -133,6 +137,7 @@ function AirlineChoices({ query, selected, onSelect, region }) {
 
 export default function PetPassGoQuiz() {
   const [step, setStep] = useState(0);
+  const [startStep, setStartStep] = useState(0);
   const [isMember, setIsMember] = useState(false);
   const [guestPlan, setGuestPlan] = useState(""); // signed-out buyer: email sheet open for "pass" | "join"
   const [buying, setBuying] = useState(false);
@@ -176,6 +181,7 @@ export default function PetPassGoQuiz() {
     second_mode: "",
     stop: "",
     pet_travel: "",
+    pet_count: 1,
   });
   const set = (k, v) => setAnswers((a) => ({ ...a, [k]: v }));
   const back = () => setStep((s) => Math.max(s - 1, 0));
@@ -202,7 +208,7 @@ export default function PetPassGoQuiz() {
       const intent = readTripIntent(window.location.search);
       if (intent.region) setRegionHint(intent.region);
       if (intent.pet) setAnswers((a) => ({ ...a, ...intent.answers }));
-      if (intent.step) setStep(intent.step);
+      if (intent.step) { setStep(intent.step); setStartStep(intent.step); }
     } finally {
       setBooted(true);
     }
@@ -260,6 +266,7 @@ export default function PetPassGoQuiz() {
     }
     if (answers.role === "Service animal" && answers.psd) extras.service_kind = "psd";
     if (answers.connecting) extras.connecting = true;
+    if (answers.pet_count === 2 && answers.role !== "Service animal") extras.pet_count = 2;
     if (answers.connecting && answers.second_airline) extras.second_airline = answers.second_airline;
     if (answers.pet_travel) extras.pet_travel = answers.pet_travel;
     const segments = segmentsToStore(answers);
@@ -317,7 +324,7 @@ export default function PetPassGoQuiz() {
           {!booted ? (
             <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }}>Loading your questions…</p>
           ) : (<>
-          {step < TOTAL_STEPS && <ProgressStub step={step} />}
+          {step < TOTAL_STEPS - 1 && <ProgressStub step={step} start={startStep} />}
 
           {step === 0 && (
             <>
@@ -458,13 +465,25 @@ export default function PetPassGoQuiz() {
 
           {step === 5 && (
             <>
-              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-5">
-                How does the trip fly?
+              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
+                A few flight details
               </h2>
+              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-5">Last question, then you'll see what this trip needs.</p>
+              <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Is it a direct flight?</div>
               <div className="grid grid-cols-2 gap-3">
-                <OptionCard label="Nonstop" sub="One flight" selected={answers.connecting === false} onClick={() => setAnswers((a) => ({ ...a, connecting: false, second_airline: "", stop: "", second_date: "", second_mode: "" }))} />
-                <OptionCard label="Connecting" sub="Two flights" selected={answers.connecting === true} onClick={() => setAnswers((a) => ({ ...a, connecting: true }))} />
+                <OptionCard label="Direct" sub="One flight" selected={answers.connecting === false} onClick={() => setAnswers((a) => ({ ...a, connecting: false, second_airline: "", stop: "", second_date: "", second_mode: "" }))} />
+                <OptionCard label="With a stop" sub="Two flights" selected={answers.connecting === true} onClick={() => setAnswers((a) => ({ ...a, connecting: true }))} />
               </div>
+              {answers.role !== "Service animal" && (
+                <div className="mt-6">
+                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">How many pets are flying with you?</div>
+                  <div className="flex gap-2">
+                    {[1, 2].map((n) => (
+                      <button key={n} type="button" onClick={() => set("pet_count", n)} className="rounded-full px-5 py-2.5" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, background: (answers.pet_count || 1) === n ? tokens.navy : "#fff", color: (answers.pet_count || 1) === n ? "#fff" : tokens.navy, border: `2px solid ${tokens.navy}`, cursor: "pointer" }}>{n === 1 ? "Just one" : "Two"}</button>
+                    ))}
+                  </div>
+                </div>
+              )}
               {answers.connecting === true && (
                 <div className="mt-5">
                   <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Where do you change planes?</div>
@@ -502,7 +521,7 @@ export default function PetPassGoQuiz() {
                   </div>
                 </div>
               )}
-              <NavRow onBack={back} onNext={next} nextDisabled={answers.connecting === null || (answers.role !== "Service animal" && !answers.pet_travel) || !connectionReady(answers)} nextLabel="Continue" />
+              <NavRow onBack={back} onNext={next} nextDisabled={answers.connecting === null || (answers.role !== "Service animal" && !answers.pet_travel) || !connectionReady(answers)} nextLabel="See my trip" />
             </>
           )}
 

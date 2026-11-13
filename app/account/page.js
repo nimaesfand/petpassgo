@@ -785,7 +785,9 @@ export function DashboardTab({ userId, onOpenTrips }) {
       const doneMap = {};
       (statusRows || []).forEach((s) => { if (s.completed) doneMap[s.requirement_id] = true; });
       const seen = new Set(list.map((a) => a.label.toLowerCase()));
-      const grouped = groupCards(buildPassCards(reqs || [], current), doneMap);
+      let petRow = null;
+      if (current.pet_id) { const { data: pr } = await supabase.from("pets").select("id,name,weight_lb,carrier_length_in,carrier_width_in,carrier_height_in").eq("id", current.pet_id).maybeSingle(); petRow = pr || null; }
+      const grouped = groupCards(segmentPlans(reqs || [], { ...current, pet: petRow }).flatMap((p) => p.cards), doneMap);
       doneN = grouped.done.length;
       setStepTotal(passProgress(grouped).total);
       for (const card of [...grouped.first, ...grouped.general]) {

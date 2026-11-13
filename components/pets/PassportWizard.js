@@ -49,25 +49,41 @@ export function MeasureGuide({ onClose, kind = "pet" }) {
       </div>
       {tab === "pet" ? (
         <>
-          <svg viewBox="0 0 320 190" width="100%" role="img" aria-label="How to measure your dog: length from nose to the base of the tail, height from the floor to the top of the head">
-            <rect x="0" y="0" width="320" height="190" rx="14" fill="#F3F5F9" />
-            <line x1="20" y1="168" x2="300" y2="168" stroke="#9AA4B2" strokeWidth="2" />
-            <g fill="#E9B872" stroke="#B87333" strokeWidth="2">
-              <rect x="88" y="78" width="140" height="52" rx="26" />
-              <rect x="98" y="118" width="16" height="50" rx="7" /><rect x="124" y="118" width="16" height="50" rx="7" />
-              <rect x="186" y="118" width="16" height="50" rx="7" /><rect x="210" y="118" width="16" height="50" rx="7" />
-              <path d="M226 92 C252 76 262 60 268 44" fill="none" strokeWidth="9" strokeLinecap="round" />
-              <ellipse cx="80" cy="70" rx="32" ry="26" />
-              <ellipse cx="50" cy="80" rx="20" ry="14" />
-            </g>
-            <ellipse cx="64" cy="54" rx="10" ry="20" fill="#B87333" transform="rotate(-25 64 54)" />
-            <circle cx="72" cy="64" r="3.5" fill="#14213D" /><circle cx="33" cy="78" r="5" fill="#14213D" />
-            <g stroke="#C2410C" strokeWidth="3" fill="#C2410C">
-              <line x1="30" y1="28" x2="226" y2="28" /><path d="M30 22 v12 M226 22 v12" />
-            </g>
-            <text x="128" y="20" textAnchor="middle" style={{ fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: 13, fill: "#C2410C" }}>LENGTH · nose to base of tail</text>
-            <g stroke="#0F766E" strokeWidth="3"><line x1="292" y1="44" x2="292" y2="168" /><path d="M286 44 h12 M286 168 h12" /></g>
-            <text x="282" y="110" textAnchor="end" style={{ fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: 13, fill: "#0F766E" }}>HEIGHT</text>
+          <svg viewBox="0 0 320 196" width="100%" role="img" aria-label="How to measure your dog: length from nose to the base of the tail, height from the floor to the top of the head">
+            <rect x="0" y="0" width="320" height="196" rx="16" fill="#F3F5F9" />
+            <ellipse cx="160" cy="176" rx="120" ry="6" fill="#E3E8EF" />
+            <line x1="18" y1="172" x2="302" y2="172" stroke="#C3CBD6" strokeWidth="2" strokeLinecap="round" />
+            {/* tail */}
+            <path d="M232 104 C252 98 262 84 264 66" fill="none" stroke="#D8964F" strokeWidth="10" strokeLinecap="round" />
+            {/* back legs */}
+            <path d="M200 120 L198 164 Q198 170 206 170 L214 170 Q220 170 218 164 L218 120 Z" fill="#E7A960" />
+            <path d="M222 118 L222 164 Q222 170 230 170 L236 170 Q242 170 240 164 L238 116 Z" fill="#D8964F" />
+            {/* body */}
+            <path d="M104 100 C104 84 122 78 146 79 L208 80 C230 81 242 94 240 110 C238 126 224 134 206 134 L132 134 C114 134 104 120 104 104 Z" fill="#F0B96C" />
+            <path d="M130 126 C150 136 196 136 214 128 C200 134 160 138 130 126 Z" fill="#FBE3BC" />
+            <ellipse cx="146" cy="116" rx="34" ry="14" fill="#FBE3BC" />
+            {/* front legs */}
+            <path d="M116 118 L114 164 Q114 170 122 170 L130 170 Q136 170 134 164 L134 118 Z" fill="#E7A960" />
+            <path d="M138 120 L138 164 Q138 170 146 170 L153 170 Q159 170 157 164 L156 120 Z" fill="#F0B96C" />
+            {/* collar */}
+            <path d="M98 92 Q108 104 122 98" fill="none" stroke="#C2410C" strokeWidth="7" strokeLinecap="round" />
+            <circle cx="111" cy="105" r="5" fill="#F2B84B" stroke="#B7791F" strokeWidth="1.5" />
+            {/* head */}
+            <circle cx="84" cy="66" r="30" fill="#F0B96C" />
+            <ellipse cx="56" cy="80" rx="24" ry="16" fill="#FBE3BC" />
+            <ellipse cx="34" cy="74" rx="7.5" ry="6" fill="#14213D" />
+            <path d="M44 88 Q52 94 60 89" fill="none" stroke="#14213D" strokeWidth="2.2" strokeLinecap="round" />
+            <ellipse cx="72" cy="80" rx="7" ry="4.5" fill="#F7A8A0" opacity=".7" />
+            <circle cx="76" cy="60" r="5.5" fill="#14213D" /><circle cx="78" cy="58" r="1.8" fill="#fff" />
+            {/* ear */}
+            <path d="M92 38 C114 38 120 64 110 90 C106 100 92 98 90 84 C88 70 86 52 92 38 Z" fill="#B8733A" />
+            {/* length */}
+            <g stroke="#C2410C" strokeWidth="3" strokeLinecap="round"><line x1="27" y1="24" x2="232" y2="24" /><line x1="27" y1="17" x2="27" y2="31" /><line x1="232" y1="17" x2="232" y2="31" /></g>
+            <text x="130" y="15" textAnchor="middle" style={{ fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: 12.5, fill: "#C2410C" }}>LENGTH · nose to base of tail</text>
+            {/* height */}
+            <g stroke="#0F766E" strokeWidth="3" strokeLinecap="round"><line x1="292" y1="36" x2="292" y2="170" /><line x1="285" y1="36" x2="299" y2="36" /><line x1="285" y1="170" x2="299" y2="170" /></g>
+            <line x1="84" y1="36" x2="284" y2="36" stroke="#0F766E" strokeWidth="1.5" strokeDasharray="4 4" />
+            <text x="308" y="103" textAnchor="middle" transform="rotate(-90 308 103)" style={{ fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: 12.5, fill: "#0F766E" }}>HEIGHT</text>
           </svg>
           <ul className="mt-2 space-y-1.5" style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.45, color: tokens.ink, paddingLeft: 18, listStyle: "disc" }}>
             <li><b>Length:</b> with your pet standing, measure from the tip of the nose to the base of the tail (not the tip).</li>
@@ -119,14 +135,14 @@ export default function PassportWizard({ userId, onDone, onCancel, defaultOwner 
   const okStep = [
     f.name.trim().length > 0,
     f.breed.trim() && f.date_of_birth,
-    Number(f.weight_lb) > 0,
+    true,
     f.emergency_contact_name.trim() && f.emergency_contact_phone.replace(/\D/g, "").length >= 7,
     !!photo,
   ];
   const need = [
     "Add a name to keep going.",
     "Breed and birthday go on the passport.",
-    "Add a weight. A good guess is fine.",
+    "",
     "Add a name and a phone number someone can call.",
     "Add a passport photo.",
   ];
@@ -205,8 +221,11 @@ export default function PassportWizard({ userId, onDone, onCancel, defaultOwner 
 
       {step === 0 && (
         <div className="flex flex-col gap-4">
-          <h3 style={{ fontFamily: font.display, fontSize: 24, fontWeight: 800, color: tokens.navy, lineHeight: 1.15 }}>Let&apos;s make a pet passport</h3>
-          <label style={lab}>Pet&apos;s name<input autoFocus value={f.name} onChange={set("name")} placeholder="e.g. Milo" className="rounded-xl px-4 py-3 outline-none mt-1.5" style={field} /></label>
+          <div>
+            <h3 style={{ fontFamily: font.display, fontSize: 26, fontWeight: 800, color: tokens.navy, lineHeight: 1.15 }}>Who&apos;s the lucky traveler?</h3>
+            <p className="mt-1" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted, lineHeight: 1.45 }}>Every adventure starts with a passport. This takes about two minutes.</p>
+          </div>
+          <label style={lab}>Their name<input autoFocus value={f.name} onChange={set("name")} placeholder="e.g. Milo" className="rounded-xl px-4 py-3 outline-none mt-1.5" style={field} /></label>
           <div>
             <span style={lab}>Type</span>
             <div className="flex flex-wrap gap-2 mt-1.5">{["Dog", "Cat", "Other"].map((t) => <Chip key={t} on={f.animal_type === t} onClick={() => setF((x) => ({ ...x, animal_type: t, role: t !== "Dog" && x.role === "Service animal" ? "Pet" : x.role }))}>{t}</Chip>)}</div>
@@ -243,7 +262,10 @@ export default function PassportWizard({ userId, onDone, onCancel, defaultOwner 
 
       {step === 2 && (
         <div className="flex flex-col gap-4">
-          <h3 style={{ fontFamily: font.display, fontSize: 24, fontWeight: 800, color: tokens.navy, lineHeight: 1.15 }}>How big is {name}?</h3>
+          <div>
+            <h3 style={{ fontFamily: font.display, fontSize: 24, fontWeight: 800, color: tokens.navy, lineHeight: 1.15 }}>How big is {name}?</h3>
+            <p className="mt-1" style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted, lineHeight: 1.45 }}>Airlines care about size. Don&apos;t know yet? Skip it and add it later.</p>
+          </div>
           <label style={lab}>Weight (pounds)<input type="number" inputMode="decimal" step="0.1" min="0.1" value={f.weight_lb} onChange={set("weight_lb")} placeholder="e.g. 18" className="rounded-xl px-4 py-3 outline-none mt-1.5" style={field} />
             <span className="block mt-1" style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 500, color: tokens.muted }}>Tip: weigh yourself holding {name}, then subtract your own weight.</span>
           </label>
@@ -290,7 +312,12 @@ export default function PassportWizard({ userId, onDone, onCancel, defaultOwner 
       <div className="flex items-center justify-between gap-3 mt-5">
         <button type="button" onClick={() => (step === 0 ? onCancel?.() : (setErr(""), setStep((s) => s - 1)))} style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.muted, background: "none", border: "none", cursor: "pointer", minHeight: 44 }}>{step === 0 ? "Cancel" : "← Back"}</button>
         {step < 4 ? (
-          <button type="button" onClick={next} className="ppg-btn ppg-btn-primary" style={{ opacity: okStep[step] ? 1 : 0.55 }}>Continue</button>
+          <div className="flex items-center gap-3">
+            {step === 2 && !(Number(f.weight_lb) > 0) && !f.carrier_length_in ? (
+              <button type="button" onClick={next} style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy, background: "none", border: "none", cursor: "pointer", textDecoration: "underline", minHeight: 44 }}>Skip for now</button>
+            ) : null}
+            <button type="button" onClick={next} className="ppg-btn ppg-btn-primary" style={{ opacity: okStep[step] && !(step === 2 && !(Number(f.weight_lb) > 0) && !f.carrier_length_in) ? 1 : 0.55 }}>Continue</button>
+          </div>
         ) : (
           <button type="button" disabled={busy} onClick={finish} className="ppg-btn ppg-btn-primary" style={{ opacity: photo ? 1 : 0.55 }}>{busy ? "Issuing…" : "Issue the passport"}</button>
         )}

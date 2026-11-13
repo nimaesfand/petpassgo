@@ -18,80 +18,68 @@ const CHIP = {
 
 function SectionLabel({ children, hint }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 mt-4 mb-2">
-      <h3 style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }}>{children}</h3>
-      {hint && <span style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>{hint}</span>}
-    </div>
-  );
-}
-
-function ProgressMark({ pct, complete }) {
-  const r = 22;
-  const c = 2 * Math.PI * r;
-  const shown = Math.max(0, Math.min(100, pct));
-  return (
-    <div className="rounded-2xl p-4 mb-3 flex items-center gap-4" style={{ background: complete ? "#EAF6EE" : "#fff", border: `1px solid ${complete ? tokens.green : tokens.line}` }}>
-      <svg width="56" height="56" viewBox="0 0 56 56" aria-label={complete ? "Travel Pass complete" : `${shown} percent complete`} className="flex-shrink-0">
-        <circle cx="28" cy="28" r={r} fill="none" stroke={tokens.line} strokeWidth="5" />
-        <circle cx="28" cy="28" r={r} fill="none" stroke={complete ? tokens.green : tokens.stamp} strokeWidth="5" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c - (c * shown) / 100} transform="rotate(-90 28 28)" />
-        <text x="28" y="33" textAnchor="middle" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 13, fill: tokens.navy }}>{shown}%</text>
-      </svg>
-      <div className="flex-1 min-w-0">
-        <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }}>{complete ? "Travel Pass complete" : `${shown}% complete`}</div>
-        <div className="w-full h-2 rounded-full mt-2 overflow-hidden" style={{ background: tokens.line }}>
-          <div className="h-full rounded-full" style={{ width: `${shown}%`, background: complete ? tokens.green : tokens.stamp }} />
-        </div>
-        <p style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.4, color: tokens.ink }} className="mt-2">{complete ? "Every step is checked. The list stays here." : "Checked steps stay on this pass."}</p>
-      </div>
+    <div className="flex items-baseline justify-between gap-3 mt-5 mb-2 px-1">
+      <h3 style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700, color: tokens.navy }}>{children}</h3>
+      {hint && <span style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>{hint}</span>}
     </div>
   );
 }
 
 function AskAirlineCard({ card }) {
   return (
-    <article className="rounded-2xl mb-2 px-3 py-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+    <article className="rounded-2xl mb-2 px-4 py-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
       <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, lineHeight: 1.3, color: tokens.navy }}>{card.shortTitle}</div>
       <p style={{ fontFamily: font.body, fontSize: 15, lineHeight: 1.4, color: tokens.ink, margin: "4px 0 0" }}>{ASK_AIRLINE}</p>
     </article>
   );
 }
 
+function CheckButton({ done, onClick, label }) {
+  return (
+    <button type="button" onClick={(e) => { e.stopPropagation(); onClick(); }} aria-label={done ? `Mark ${label} not done` : `Mark ${label} done`} className="flex-shrink-0 flex items-center justify-center rounded-full" style={{ width: 30, height: 30, border: `2px solid ${done ? tokens.green : tokens.line}`, background: done ? tokens.green : "#fff", color: "#fff", cursor: "pointer" }}>
+      {done ? <Icon name="check" size={17} /> : null}
+    </button>
+  );
+}
+
 function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRelief }) {
   const chip = dueChip(card.dueDate, today, { suggested: card.dueSuggested, dayOf: card.dueKind === "dayof" });
   const tone = CHIP[chip.tone] || CHIP.later;
-  const showChip = !card.fact || !!card.dueDate;
+  const showChip = !card.fact && !done;
+  const points = Array.isArray(card.points) ? card.points.filter(Boolean) : [];
   return (
     <article id={`step-${card.id}`} className="rounded-2xl mb-2 overflow-hidden" style={{ scrollMarginTop: 90, background: "#fff", border: `1px solid ${open ? tokens.primary : tokens.line}`, boxShadow: open ? "0 8px 24px rgba(20,33,61,0.08)" : "none" }}>
-      <button
-        type="button"
-        aria-expanded={open}
-        onClick={onOpen}
-        className="w-full flex items-center gap-2.5 px-3 py-3 text-left"
-        style={{ minHeight: 56, background: "transparent", border: "none", cursor: "pointer" }}
-      >
-        <span aria-hidden className="flex items-center justify-center flex-shrink-0 rounded-xl" style={{ width: 36, height: 36, background: tokens.sky, color: tokens.navy }}><Icon name={card.icon} size={20} /></span>
+      <div role="button" tabIndex={0} aria-expanded={open} onClick={onOpen} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } }} className="w-full flex items-center gap-3 px-4 py-3 text-left" style={{ minHeight: 60, cursor: "pointer" }}>
+        {card.fact ? (
+          <span aria-hidden className="flex items-center justify-center flex-shrink-0 rounded-full" style={{ width: 30, height: 30, background: tokens.sky, color: tokens.navy }}><Icon name={card.icon || "pin"} size={16} /></span>
+        ) : <CheckButton done={done} onClick={onMark} label={card.shortTitle} />}
         <span className="flex-1 min-w-0">
-          <span className="block" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, lineHeight: 1.25, color: tokens.navy }}>{card.shortTitle}</span>
-          {card.lastChecked ? <span className="block mt-0.5" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 600, lineHeight: 1.3, color: tokens.muted }}>{card.lastChecked}</span> : null}
+          <span className="block" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16.5, lineHeight: 1.25, color: done ? tokens.muted : tokens.navy, textDecoration: done ? "line-through" : "none" }}>{card.shortTitle}</span>
+          {card.fact && !open && card.what ? <span className="block mt-0.5 truncate" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>{card.what}</span> : null}
         </span>
-        {showChip && <span className="flex-shrink-0 rounded-full px-2 py-1" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, background: tone.background, color: tone.color }}>{chip.label}</span>}
-        <span className="flex-shrink-0 rounded-full px-2.5 py-1" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, background: done ? "#EAF6EE" : tokens.sky, color: done ? tokens.green : tokens.navy }}>{done ? "Done" : card.fact ? "Fact" : "To do"}</span>
-      </button>
+        {showChip && <span className="flex-shrink-0 rounded-full px-2.5 py-1" style={{ fontFamily: font.body, fontSize: 13.5, fontWeight: 700, background: tone.background, color: tone.color, whiteSpace: "nowrap" }}>{chip.label}</span>}
+        <span aria-hidden style={{ color: tokens.muted, transform: open ? "rotate(90deg)" : "none", transition: "transform .2s", fontSize: 20, lineHeight: 1 }}>›</span>
+      </div>
       {open && (
-        <div className="px-3 pb-3">
-          <div className="rounded-xl p-3 mb-2" style={{ background: tokens.paper }}>
-            <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, letterSpacing: "0.06em", color: tokens.muted }}>WHAT TO DO</div>
-            {card.dueNote && <p style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy, lineHeight: 1.4 }} className="mt-1">{card.dueNote}</p>}
-            <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }} className="mt-1"><LinkText text={card.what} /></p>
-          </div>
-          {card.why && (
-            <div className="rounded-xl p-3 mb-2" style={{ background: tokens.paper }}>
-              <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, letterSpacing: "0.06em", color: tokens.muted }}>WHY</div>
-              <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }} className="mt-1"><LinkText text={card.why} /></p>
-            </div>
+        <div className="px-4 pb-4">
+          <p style={{ fontFamily: font.body, fontSize: 16.5, fontWeight: 600, color: tokens.navy, lineHeight: 1.45, margin: 0 }}><LinkText text={card.what} /></p>
+          {points.length > 0 && (
+            <ul className="mt-2 flex flex-col gap-1.5">
+              {points.map((t, i) => (
+                <li key={i} className="flex gap-2" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }}>
+                  <span aria-hidden style={{ color: tokens.primary, fontWeight: 800 }}>•</span><span><LinkText text={t} /></span>
+                </li>
+              ))}
+            </ul>
           )}
+          {card.why ? <p className="mt-2" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45, margin: "8px 0 0" }}><LinkText text={card.why} /></p> : null}
+          {card.dueNote ? (
+            <div className="rounded-xl px-3 py-2.5 mt-3 flex gap-2 items-start" style={{ background: "#FFF7E6", color: "#7A4B00", fontFamily: font.body, fontSize: 15, fontWeight: 600, lineHeight: 1.4 }}>
+              <span aria-hidden className="mt-0.5"><Icon name="clock" size={16} /></span><span>{card.dueNote}</span>
+            </div>
+          ) : null}
           {card.relief && card.relief.covered.length > 0 && (
-            <div className="rounded-xl p-3 mb-2" style={{ background: tokens.paper }}>
+            <div className="rounded-xl p-3 mt-3" style={{ background: tokens.paper }}>
               {card.relief.covered.map((a) => (
                 <div key={a.code} className="mb-3 last:mb-0">
                   <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, color: tokens.navy }}>{a.code} · {a.city}</div>
@@ -102,7 +90,7 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRe
                       </li>
                     ))}
                   </ul>
-                  <a href={a.source} target="_blank" rel="noopener noreferrer" className="inline-block py-2" style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.primary, textDecoration: "underline" }}>{a.linkText || `Open ${a.code} animal relief areas`}</a>
+                  <a href={a.source} target="_blank" rel="noopener noreferrer" className="inline-block py-2" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.primary, textDecoration: "underline" }}>{a.linkText || `Open ${a.code} animal relief areas`}</a>
                 </div>
               ))}
               {onOpenRelief && (
@@ -112,23 +100,24 @@ function PassCard({ card, open, done, today, onOpen, onMark, showTrack, onOpenRe
           )}
           {card.submission_link && (
             isTel(card.submission_link) ? (
-              <a href={card.submission_link} className="rounded-full px-4 py-3 text-center block mb-2" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none", minHeight: 48 }}><Icon name="phone" size={18} /> Call {prettyPhone(card.submission_link)}</a>
+              <a href={card.submission_link} className="rounded-full px-4 py-3 text-center block mt-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none", minHeight: 48 }}><Icon name="phone" size={18} /> Call {prettyPhone(card.submission_link)}</a>
             ) : (
-              <a href={card.submission_link} target="_blank" rel="noopener noreferrer" className="rounded-full px-4 py-3 text-center block mb-2" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none", minHeight: 48 }}>{card.goLabel || "Open the official page"} <Icon name="external" size={16} /></a>
+              <a href={card.submission_link} target="_blank" rel="noopener noreferrer" className="rounded-full px-4 py-3 text-center block mt-3" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, textDecoration: "none", minHeight: 48 }}>{card.goLabel || "Open the official page"} <Icon name="external" size={16} /></a>
             )
           )}
-          {card.source_url && (
-            <a href={card.source_url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between gap-2 rounded-xl px-3 py-2.5 mb-2" style={{ minHeight: 48, background: tokens.sky, fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy, textDecoration: "none" }}>
-              <span className="min-w-0" style={{ wordBreak: "break-word" }}><Icon name="link" size={17} /> Official source: <span style={{ color: tokens.primary, textDecoration: "underline" }}>{card.sourceHost || "official page"}</span></span>
-              <Icon name="external" size={18} />
-            </a>
-          )}
-          {showTrack && card.dot && <div className="mb-2"><ServiceAnimalTrack trip={showTrack} embedded /></div>}
-          {!card.fact && (
-            <button type="button" onClick={onMark} className="w-full rounded-full py-3.5" style={{ background: done ? "#fff" : tokens.navy, color: done ? tokens.navy : "#fff", border: done ? `2px solid ${tokens.navy}` : "none", fontFamily: font.body, fontWeight: 700, fontSize: 16, cursor: "pointer" }}>
-              {done ? "Mark not done" : "Mark done"}
-            </button>
-          )}
+          {showTrack && card.dot && <div className="mt-3"><ServiceAnimalTrack trip={showTrack} embedded /></div>}
+          <div className="flex items-center gap-3 mt-3 flex-wrap">
+            {!card.fact && (
+              <button type="button" onClick={onMark} className="rounded-full px-5 py-3" style={{ background: done ? "#fff" : tokens.navy, color: done ? tokens.navy : "#fff", border: done ? `2px solid ${tokens.navy}` : "none", fontFamily: font.body, fontWeight: 700, fontSize: 15.5, cursor: "pointer" }}>
+                {done ? "Undo" : "Done"}
+              </button>
+            )}
+            {card.source_url && (
+              <a href={card.source_url} target="_blank" rel="noopener noreferrer" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.muted, textDecoration: "none" }}>
+                <Icon name="link" size={14} /> <span style={{ textDecoration: "underline" }}>{card.sourceHost || "Official source"}</span>{card.lastChecked ? ` · ${card.lastChecked.replace(/^Last checked/, "checked")}` : ""}
+              </a>
+            )}
+          </div>
         </div>
       )}
     </article>
@@ -209,30 +198,37 @@ export default function PassChecklist({ trip, requirements = [], statusMap = {},
     );
   };
 
+  const isDayOf = (c) => c.dueKind === "dayof";
+  const open = [...groups.first, ...groups.general];
+  const before = open.filter((c) => !isDayOf(c)).sort((a, b) => String(a.dueDate || "9999").localeCompare(String(b.dueDate || "9999")));
+  const travelDay = open.filter(isDayOf);
+
   return (
     <div>
-      <ProgressMark pct={progress.pct} complete={ready} />
       {nudge && (
-        <div className="rounded-2xl px-4 py-3 mb-3 flex items-center justify-between gap-3" style={{ background: "#EAF6EE", border: `1px solid ${tokens.green}` }}>
-          <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.green }}>{ready ? "Travel Pass complete" : "Checked off. It’s saved on this pass."}</span>
+        <div className="rounded-2xl px-4 py-3 mt-2 flex items-center justify-between gap-3" style={{ background: "#EAF6EE", border: `1px solid ${tokens.green}` }}>
+          <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15.5, color: tokens.green }}>{ready ? "All set!" : "Nice. Checked off."}</span>
           {nudge.id ? (
-            <button type="button" onClick={() => { setOpenId(nudge.id); setNudge(null); }} style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>Next: {nudge.title}</button>
+            <button type="button" onClick={() => { setOpenId(nudge.id); setNudge(null); }} style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15.5, color: tokens.navy, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>Next: {nudge.title}</button>
           ) : null}
         </div>
       )}
       {multi ? plans.map(legBody) : null}
-      {!multi && groups.first.length > 0 && <SectionLabel hint="Time-sensitive">Do these first</SectionLabel>}
-      {!multi && block(groups.first)}
-      {!multi && (groups.general.length > 0 || groups.know.length > 0) && <SectionLabel hint="The rest of this trip">General prep</SectionLabel>}
-      {!multi && block(groups.general)}
-      {!multi && groups.know.length > 0 && <SectionLabel hint="Kept for reference">Reference</SectionLabel>}
+      {!multi && before.length > 0 && <SectionLabel hint="In date order">Before you fly</SectionLabel>}
+      {!multi && block(before)}
+      {!multi && travelDay.length > 0 && <SectionLabel hint="At the airport">Travel day</SectionLabel>}
+      {!multi && block(travelDay)}
+      {!multi && groups.know.length > 0 && <SectionLabel hint="No action needed">Good to know</SectionLabel>}
       {!multi && block(groups.know)}
-      <SectionLabel hint={groups.done.length ? `${groups.done.length} checked` : "Nothing yet"}>Saved on this pass</SectionLabel>
-      <button type="button" onClick={() => setDoneOpen((v) => !v)} className="w-full rounded-2xl px-4 py-3 text-left flex items-center justify-between" style={{ background: "#fff", border: `1px solid ${tokens.line}`, cursor: "pointer", minHeight: 48 }}>
-        <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>Saved ({groups.done.length})</span>
-        <span style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>{savedOpen ? "Hide" : "Show"}</span>
-      </button>
-      {savedOpen && <div className="mt-2">{groups.done.length ? block(groups.done) : <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="px-1 py-2">Checked items stay here.</p>}</div>}
+      {groups.done.length > 0 && (
+        <>
+          <button type="button" onClick={() => setDoneOpen((v) => !v)} className="w-full mt-5 rounded-2xl px-4 py-3 text-left flex items-center justify-between" style={{ background: "#fff", border: `1px solid ${tokens.line}`, cursor: "pointer", minHeight: 48 }}>
+            <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>Done ({groups.done.length})</span>
+            <span style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>{savedOpen ? "Hide" : "Show"}</span>
+          </button>
+          {savedOpen && <div className="mt-2">{block(groups.done)}</div>}
+        </>
+      )}
     </div>
   );
 }

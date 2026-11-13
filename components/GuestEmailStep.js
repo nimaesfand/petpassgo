@@ -63,7 +63,7 @@ export default function GuestEmailStep({ plan, trip, cancelPath, onClose, showCo
         </>
       ) : (
         <form onSubmit={go} className="flex flex-col gap-3">
-          <input type="email" required autoFocus autoComplete="email" inputMode="email" placeholder="Your email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-4 py-3 outline-none" />
+          <input type="email" required autoFocus={finePointer()} autoComplete="email" inputMode="email" placeholder="Your email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, height: 52, lineHeight: "normal" }} className="rounded-xl px-4 outline-none" />
           {plan === "membership" ? <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink, margin: 0 }}>{MEMBERSHIP_TERMS}</p> : <GuaranteeLine />}
           {showMarketing ? <MarketingOptIn checked={tips} onChange={setTips} /> : null}
           {showConsent ? <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} /> : (err ? <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp, margin: 0 }}>{err}</p> : null)}
@@ -73,6 +73,13 @@ export default function GuestEmailStep({ plan, trip, cancelPath, onClose, showCo
       )}
     </div>
   );
+}
+
+// iPhone Safari draws the text cursor in the wrong place when a field inside a
+// bottom sheet focuses itself while the keyboard is opening. Only desktop
+// browsers get autofocus; on phones the person taps the field.
+function finePointer() {
+  try { return window.matchMedia("(pointer: fine)").matches; } catch { return false; }
 }
 
 // Bottom sheet wrapper (mobile-first).

@@ -48,7 +48,7 @@ export default function RequirementsPreview({ answers, onVerdict }) {
       .then((d) => { if (alive) setPlan({ count: Number(d?.count) || 0, steps: Array.isArray(d?.steps) ? d.steps : [] }); })
       .catch(() => { if (alive) setPlan({ count: null, steps: [] }); });
     return () => { alive = false; };
-  }, [answers.airline, answers.second_airline, answers.connecting, answers.stop, answers.animal, answers.role, answers.esa, answers.origin, answers.destination, answers.pet_travel, answers.second_mode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [answers.airline, answers.second_airline, answers.connecting, answers.stop, answers.animal, answers.role, answers.esa, answers.origin, answers.destination, answers.pet_travel, answers.second_mode, answers.pet_count]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const ready = rows && plan;
   // Step names appear one by one so the plan visibly builds for this trip.

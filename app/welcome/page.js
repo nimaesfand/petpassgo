@@ -5,7 +5,7 @@ import PasswordInput from "../../components/PasswordInput";
 import { supabase } from "../../lib/supabaseClient";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
-import GuaranteeLine from "../../components/GuaranteeLine";
+import Icon from "../../components/Icon";
 import { clearWithdrawalConsent } from "../../lib/withdrawal";
 import MarketingOptIn from "../../components/MarketingOptIn";
 import { trackPurchaseOnce, trackEvent } from "../../lib/analytics";
@@ -61,15 +61,16 @@ export default function WelcomePage() {
             <p style={p} className="text-center">Checking your payment…</p>
           ) : s === "new" ? (
             <>
-              <h1 style={h} className="mb-1">You're in{info.first_name ? `, ${info.first_name}` : ""}!</h1>
-              <p style={{ ...p, fontSize: 16, color: tokens.ink }} className="mb-3">Payment received. Create a password to open your {info.plan === "membership" ? "Pet Vault" : "Travel Pass"}.</p>
-              {(info.plan === "pass" || info.plan === "join") && <div className="mb-4"><GuaranteeLine /></div>}
+              <div aria-hidden className="ppg-rise mb-3 flex items-center justify-center rounded-full" style={{ width: 56, height: 56, background: "#EAF6EE", color: tokens.green }}><Icon name="check" size={30} /></div>
+              <h1 style={h} className="mb-1">Thank you{info.first_name ? `, ${info.first_name}` : ""}!</h1>
+              <p style={{ ...p, fontSize: 16, color: tokens.ink }} className="mb-2">Your {info.plan === "membership" ? "Pet Vault membership is" : info.plan === "join" ? "Pet Vault and Travel Pass are" : "Travel Pass is"} ready. We sent your receipt to <b>{info.email}</b>.</p>
+              <p style={{ ...p, fontSize: 16, color: tokens.ink }} className="mb-3">One last thing: pick a password so you can get back in anytime.</p>
               <form onSubmit={finish} className="flex flex-col gap-3">
                 <input type="email" value={info.email || ""} readOnly aria-label="Email" style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, background: "#F5F7FA", color: tokens.navy }} className="rounded-xl px-4 py-3 outline-none" />
                 <PasswordInput required aria-label="Password" minLength={6} autoFocus autoComplete="new-password" placeholder="Password (6+ characters)" value={password} onChange={(e) => setPassword(e.target.value)} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-4 py-3 outline-none" />
                 <MarketingOptIn checked={tips} onChange={setTips} />
                 {err && <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.stamp }}>{err}</div>}
-                <button type="submit" disabled={busy} style={btn} className="btn-primary rounded-full py-3.5 text-[16px] mt-1">{busy ? "Finishing…" : "Finish"}</button>
+                <button type="submit" disabled={busy} style={btn} className="btn-primary rounded-full py-3.5 text-[16px] mt-1">{busy ? "Opening…" : `Open my ${info.plan === "membership" ? "Pet Vault" : "Travel Pass"}`}</button>
               </form>
             </>
           ) : s === "exists" || s === "claimed" ? (

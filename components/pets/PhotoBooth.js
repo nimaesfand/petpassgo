@@ -6,7 +6,7 @@ import Icon from "../Icon";
 import { tokens, font } from "../../lib/theme";
 
 // The passport photo booth. A very particular (and slightly slow) clerk walks you
-// through it: bright light, face forward, crop into the oval, then a reluctant APPROVED.
+// through it: bright light, face forward, crop into the frame, then a reluctant APPROVED.
 
 const OUT_W = 800;
 const OUT_H = 1000;
@@ -14,7 +14,7 @@ const FRAME = 4 / 5; // width / height
 
 const LINES = {
   pick: (n) => `Next! …Oh. Passport photo for ${n}? Bright light, face forward, both ears in. No sunglasses. Yes, I say that every time.`,
-  loaded: () => "Hmm. Slide the photo until the face sits in the oval. Pinch or tap + to zoom. Take your time. I have all day. Literally.",
+  loaded: () => "Hmm. Drag the photo so the face fills the frame. Pinch or use the slider to zoom, and ↻ to turn it. Take your time. I have all day. Literally.",
   dark: () => "It's very dark in here. Is this a pet or a cave? Try one near a window, or use this one and I'll pretend I didn't see.",
   small: () => "This photo is tiny. It'll look blurry. A closer, sharper shot would be better.",
   inspect: () => "Hmm… let me take a look.",
@@ -143,14 +143,17 @@ export default function PhotoBooth({ pet, onSave, onClose }) {
   const [host, setHost] = useState(null);
   const [img, setImg] = useState(null);
   const [zoom, setZoom] = useState(1);
-  const [pos, setPos] = useState({ x: 0, y: 0 }); // offset of image centre from frame centre, in frame px
+  const [rot, setRot] = useState(0); // 0, 90, 180, 270
+  const [pos, setPos] = useState({ x: 0, y: 0 }); // image centre offset from the frame centre, in screen px
   const [line, setLine] = useState("pick");
   const [busy, setBusy] = useState(false);
   const [approved, setApproved] = useState(false);
+  const [moving, setMoving] = useState(false);
+  const stageRef = useRef(null);
   const frameRef = useRef(null);
   const drag = useRef(null);
   const pinch = useRef(null);
-  const [frameW, setFrameW] = useState(280);
+  const [stageW, setStageW] = useState(340);
 
   useEffect(() => {
     setHost(document.body);
@@ -163,25 +166,39 @@ export default function PhotoBooth({ pet, onSave, onClose }) {
   useEffect(() => () => { if (img?.url) URL.revokeObjectURL(img.url); }, [img]);
 
   useEffect(() => {
-    const el = frameRef.current;
+    const el = stageRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => setFrameW(el.clientWidth));
+    const ro = new ResizeObserver(() => setStageW(el.clientWidth));
     ro.observe(el);
     return () => ro.disconnect();
   }, [host, img]);
 
+  // The crop frame sits in the middle of a bigger stage, so the rest of the
+  // photo stays visible (dimmed) around it while you line things up.
+  const PAD = 22;
+  const frameW = Math.min(320, Math.max(200, stageW - PAD * 2));
   const frameH = frameW / FRAME;
-  // Base scale makes the image just cover the frame.
-  const base = img ? Math.max(frameW / img.img.naturalWidth, frameH / img.img.naturalHeight) : 1;
+  const stageH = frameH + PAD * 2;
+  const turned = rot % 180 !== 0;
+  const nw = img ? img.img.naturalWidth : 1;
+  const nh = img ? img.img.naturalHeight : 1;
+  // Zoom 1 = the photo just covers the frame. You can zoom out to fit it whole.
+  const base = img ? Math.max(frameW / (turned ? nh : nw), frameH / (turned ? nw : nh)) : 1;
   const scale = base * zoom;
-  const dispW = img ? img.img.naturalWidth * scale : 0;
-  const dispH = img ? img.img.naturalHeight * scale : 0;
+  const dispW = nw * scale;
+  const dispH = nh * scale;
+  const MIN_Z = 0.4;
+  const MAX_Z = 6;
 
-  function clamp(p, z = zoom) {
+  function clamp(p, z = zoom, r = rot) {
     if (!img) return p;
     const s = base * z;
-    const maxX = Math.max(0, (img.img.naturalWidth * s - frameW) / 2);
-    const maxY = Math.max(0, (img.img.naturalHeight * s - frameH) / 2);
+    const t = r % 180 !== 0;
+    const w = (t ? nh : nw) * s;
+    const h = (t ? nw : nh) * s;
+    // Keep at least a strip of the photo inside the frame, but otherwise move freely.
+    const maxX = w / 2 + frameW / 2 - 30;
+    const maxY = h / 2 + frameH / 2 - 30;
     return { x: Math.min(maxX, Math.max(-maxX, p.x)), y: Math.min(maxY, Math.max(-maxY, p.y)) };
   }
 
@@ -206,7 +223,8 @@ export default function PhotoBooth({ pet, onSave, onClose }) {
     try {
       const loaded = await loadImage(f);
       setImg(loaded);
-      setZoom(1.15);
+      setZoom(1);
+      setRot(0);
       setPos({ x: 0, y: 0 });
       setApproved(false);
       setLine(judge(loaded.img));
@@ -217,9 +235,10 @@ export default function PhotoBooth({ pet, onSave, onClose }) {
 
   const pointers = useRef(new Map());
   function onPointerDown(e) {
-    if (!img) return;
+    if (!img || busy) return;
     e.currentTarget.setPointerCapture?.(e.pointerId);
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    setMoving(true);
     if (pointers.current.size === 2) {
       const [a, b] = [...pointers.current.values()];
       pinch.current = { d: Math.hypot(a.x - b.x, a.y - b.y), z: zoom };
@@ -234,7 +253,7 @@ export default function PhotoBooth({ pet, onSave, onClose }) {
     if (pinch.current && pointers.current.size >= 2) {
       const [a, b] = [...pointers.current.values()];
       const d = Math.hypot(a.x - b.x, a.y - b.y);
-      const z = Math.min(4, Math.max(1, pinch.current.z * (d / pinch.current.d)));
+      const z = Math.min(MAX_Z, Math.max(MIN_Z, pinch.current.z * (d / pinch.current.d)));
       setZoom(z);
       setPos((p) => clamp(p, z));
       return;
@@ -247,33 +266,41 @@ export default function PhotoBooth({ pet, onSave, onClose }) {
   function onPointerUp(e) {
     pointers.current.delete(e.pointerId);
     if (pointers.current.size < 2) pinch.current = null;
-    if (pointers.current.size === 0) drag.current = null;
+    if (pointers.current.size === 0) { drag.current = null; setMoving(false); }
   }
-  function zoomBy(f) {
-    const z = Math.min(4, Math.max(1, zoom * f));
-    setZoom(z);
-    setPos((p) => clamp(p, z));
+  function zoomTo(z) {
+    const v = Math.min(MAX_Z, Math.max(MIN_Z, z));
+    setZoom(v);
+    setPos((p) => clamp(p, v));
   }
+  function zoomBy(f) { zoomTo(zoom * f); }
   function onWheel(e) {
     if (!img) return;
     zoomBy(e.deltaY < 0 ? 1.08 : 0.93);
   }
+  function rotate() {
+    const r = (rot + 90) % 360;
+    setRot(r);
+    setPos((p) => clamp({ x: -p.y, y: p.x }, zoom, r));
+  }
+  function reset() { setZoom(1); setRot(0); setPos({ x: 0, y: 0 }); }
 
   async function approve() {
     if (!img || busy) return;
     setBusy(true);
-    // Draw the visible frame at full resolution.
+    // Draw exactly what is inside the frame, at full resolution.
     const c = document.createElement("canvas");
     c.width = OUT_W; c.height = OUT_H;
     const g = c.getContext("2d");
     const k = OUT_W / frameW;
-    const w = dispW * k, h = dispH * k;
-    const x = OUT_W / 2 + pos.x * k - w / 2;
-    const y = OUT_H / 2 + pos.y * k - h / 2;
     g.fillStyle = "#fff";
     g.fillRect(0, 0, OUT_W, OUT_H);
     g.imageSmoothingQuality = "high";
-    g.drawImage(img.img, x, y, w, h);
+    g.save();
+    g.translate(OUT_W / 2 + pos.x * k, OUT_H / 2 + pos.y * k);
+    g.rotate((rot * Math.PI) / 180);
+    g.drawImage(img.img, (-dispW * k) / 2, (-dispH * k) / 2, dispW * k, dispH * k);
+    g.restore();
     const blob = await new Promise((r) => c.toBlob(r, "image/jpeg", 0.9));
     const wait = (ms) => new Promise((r) => setTimeout(r, ms));
     setLine("inspect");          // she squints at it…
@@ -308,40 +335,42 @@ export default function PhotoBooth({ pet, onSave, onClose }) {
         <div className="mx-auto grid gap-4" style={{ maxWidth: 440 }}>
           <Clerk text={LINES[line](pet.name)} mood={line === "inspect" ? "inspect" : (line === "good" || line === "saving") ? "happy" : "neutral"} />
 
-          <div ref={frameRef} className="relative mx-auto w-full overflow-hidden rounded-2xl select-none" style={{ maxWidth: 330, aspectRatio: "4 / 5", background: "#fff", touchAction: "none", cursor: img ? "grab" : "default", boxShadow: "0 20px 50px rgba(0,0,0,.4)", border: `4px solid ${approved ? tokens.green : "#fff"}`, transition: "border-color .3s" }}
-            onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
-            onWheel={onWheel} onDoubleClick={() => { setZoom(1.15); setPos({ x: 0, y: 0 }); }}>
-            {img ? (
-              <img src={img.url} alt="" draggable={false} style={{ position: "absolute", left: "50%", top: "50%", width: dispW, height: dispH, maxWidth: "none", transform: `translate(calc(-50% + ${pos.x}px), calc(-50% + ${pos.y}px))`, pointerEvents: "none" }} />
-            ) : (
-              <label className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center p-6" style={{ cursor: "pointer", background: "#F3F5F9" }}>
-                <span className="flex items-center justify-center rounded-full" style={{ width: 64, height: 64, background: tokens.primary, color: "#fff" }}><Icon name="camera" size={30} /></span>
-                <span style={{ fontFamily: font.body, fontWeight: 800, fontSize: 17, color: tokens.navy }}>Choose a photo</span>
-                <span style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>A bright, close face shot</span>
-                <input type="file" accept="image/*" className="ppg-hp" onChange={pick} />
-              </label>
-            )}
-            {/* Guide: dim outside the oval, plus a dashed outline */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 500" preserveAspectRatio="none" aria-hidden="true">
-              <defs><mask id="ppg-oval"><rect width="400" height="500" fill="#fff" /><ellipse cx="200" cy="225" rx="130" ry="165" fill="#000" /></mask></defs>
-              {img ? <rect width="400" height="500" fill="rgba(11,20,40,.45)" mask="url(#ppg-oval)" /> : null}
-              <ellipse cx="200" cy="225" rx="130" ry="165" fill="none" stroke={img ? "#fff" : tokens.line} strokeWidth="3" strokeDasharray="10 8" />
-            </svg>
-            {approved ? (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="ppg-pp-stamp" style={{ border: `5px solid ${tokens.green}`, color: tokens.green, background: "rgba(255,255,255,.85)", borderRadius: 14, padding: "6px 16px", fontFamily: font.display, fontWeight: 800, fontSize: 32, letterSpacing: ".08em", transform: "rotate(-12deg)" }}>APPROVED</div>
+          {img ? (
+            <div ref={stageRef} className="relative w-full overflow-hidden rounded-2xl select-none" style={{ height: stageH, background: "#0B1428", touchAction: "none", cursor: moving ? "grabbing" : "grab" }}
+              onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
+              onWheel={onWheel} onDoubleClick={reset}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={img.url} alt="" draggable={false} style={{ position: "absolute", left: "50%", top: "50%", width: dispW, height: dispH, maxWidth: "none", transform: `translate(-50%, -50%) translate(${pos.x}px, ${pos.y}px) rotate(${rot}deg)`, transition: moving ? "none" : "transform .18s ease-out", pointerEvents: "none" }} />
+              <div ref={frameRef} aria-hidden="true" className="absolute pointer-events-none rounded-xl" style={{ left: "50%", top: "50%", width: frameW, height: frameH, transform: "translate(-50%, -50%)", boxShadow: "0 0 0 2000px rgba(11,20,40,.62)", border: `3px solid ${approved ? tokens.green : "#fff"}`, transition: "border-color .3s" }}>
+                <div className="absolute inset-0" style={{ opacity: moving ? 1 : 0, transition: "opacity .2s", backgroundImage: "linear-gradient(rgba(255,255,255,.35) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.35) 1px, transparent 1px)", backgroundSize: `${frameW / 3}px ${frameH / 3}px`, backgroundPosition: "-1px -1px" }} />
+                {approved ? (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="ppg-pp-stamp" style={{ border: `5px solid ${tokens.green}`, color: tokens.green, background: "rgba(255,255,255,.85)", borderRadius: 14, padding: "6px 16px", fontFamily: font.display, fontWeight: 800, fontSize: 32, letterSpacing: ".08em", transform: "rotate(-12deg)" }}>APPROVED</div>
+                  </div>
+                ) : null}
               </div>
-            ) : null}
-          </div>
+            </div>
+          ) : (
+            <label ref={stageRef} className="relative mx-auto w-full flex flex-col items-center justify-center gap-2 text-center p-6 rounded-2xl" style={{ maxWidth: 330, aspectRatio: "4 / 5", cursor: "pointer", background: "#F3F5F9", boxShadow: "0 20px 50px rgba(0,0,0,.4)" }}>
+              <span className="flex items-center justify-center rounded-full" style={{ width: 64, height: 64, background: tokens.primary, color: "#fff" }}><Icon name="camera" size={30} /></span>
+              <span style={{ fontFamily: font.body, fontWeight: 800, fontSize: 17, color: tokens.navy }}>Choose a photo</span>
+              <span style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>A bright, close face shot</span>
+              <input type="file" accept="image/*" className="ppg-hp" onChange={pick} />
+            </label>
+          )}
 
           {img ? (
             <div className="grid gap-3">
               <div className="flex items-center gap-2" style={{ color: "#fff" }}>
-                <button type="button" onClick={() => zoomBy(0.85)} aria-label="Zoom out" className="flex items-center justify-center rounded-full" style={{ width: 48, height: 48, background: "rgba(255,255,255,.14)", color: "#fff", border: "none", fontSize: 26, fontWeight: 800, cursor: "pointer" }}>−</button>
-                <input type="range" min="1" max="4" step="0.01" value={zoom} onChange={(e) => { const z = Number(e.target.value); setZoom(z); setPos((p) => clamp(p, z)); }} className="flex-1" style={{ accentColor: tokens.gold, height: 28 }} aria-label="Zoom" />
-                <button type="button" onClick={() => zoomBy(1.18)} aria-label="Zoom in" className="flex items-center justify-center rounded-full" style={{ width: 48, height: 48, background: "rgba(255,255,255,.14)", color: "#fff", border: "none", fontSize: 26, fontWeight: 800, cursor: "pointer" }}>+</button>
+                <button type="button" onClick={rotate} aria-label="Rotate photo" className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: 46, height: 46, background: "rgba(255,255,255,.14)", color: "#fff", border: "none", fontSize: 22, fontWeight: 800, cursor: "pointer" }}>↻</button>
+                <button type="button" onClick={() => zoomBy(0.85)} aria-label="Zoom out" className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: 46, height: 46, background: "rgba(255,255,255,.14)", color: "#fff", border: "none", fontSize: 26, fontWeight: 800, cursor: "pointer" }}>−</button>
+                <input type="range" min={MIN_Z} max={MAX_Z} step="0.01" value={zoom} onChange={(e) => zoomTo(Number(e.target.value))} className="flex-1 min-w-0" style={{ accentColor: tokens.gold, height: 28 }} aria-label="Zoom" />
+                <button type="button" onClick={() => zoomBy(1.18)} aria-label="Zoom in" className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: 46, height: 46, background: "rgba(255,255,255,.14)", color: "#fff", border: "none", fontSize: 26, fontWeight: 800, cursor: "pointer" }}>+</button>
               </div>
-              <p className="text-center" style={{ fontFamily: font.body, fontSize: 14, color: "rgba(255,255,255,.8)", margin: 0 }}>Drag with one finger to move. Double-tap to re-center.</p>
+              <div className="flex items-center justify-center gap-3" style={{ fontFamily: font.body, fontSize: 14, color: "rgba(255,255,255,.8)" }}>
+                <span>Drag to move · pinch to zoom</span>
+                <button type="button" onClick={reset} style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: "#fff", background: "none", border: "none", textDecoration: "underline", cursor: "pointer" }}>Reset</button>
+              </div>
               <button type="button" onClick={approve} disabled={busy} className="ppg-btn ppg-btn-primary w-full" style={{ minHeight: 52, fontSize: 17 }}>{busy ? (approved ? "Saving…" : "Inspecting…") : "Submit to the clerk"}</button>
               <label className="ppg-btn w-full text-center" style={{ minHeight: 48, background: "rgba(255,255,255,.12)", color: "#fff", border: "1.5px solid rgba(255,255,255,.35)", cursor: "pointer" }}>
                 Use a different photo
