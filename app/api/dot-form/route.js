@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { allowRequest, clientIp } from "../../../lib/rateLimit";
 import { requireUser } from "../../../lib/paidUser";
 import { animalDescription, fillAirTransportationForm, fillReliefForm, isServiceTrip } from "../../../lib/dotForm";
+import { sendResendEmail } from "../../../lib/serverEmail";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -56,6 +57,29 @@ export async function POST(req) {
     };
     const bytes = kind === "relief" ? await fillReliefForm(values) : await fillAirTransportationForm(values);
     const filename = kind === "relief" ? "DOT-Service-Animal-Relief-Attestation-Form.pdf" : "DOT-Service-Animal-Air-Transportation-Form.pdf";
+    if (body.deliver === "email") {
+      if (!user.email) return NextResponse.json({ error: "Your account has no email address." }, { status: 400 });
+      const sent = await sendResendEmail({
+        to: user.email,
+        subject: kind === "relief" ? "Your DOT relief attestation form" : `Your DOT service animal form${values.animalName ? ` for ${values.animalName}` : ""}`,
+        text: [
+          "Here is your U.S. DOT form, filled in with the details you entered.",
+          "",
+          "Before you send it to your airline:",
+          "1. Read and check each attestation box yourself.",
+          "2. Sign and date it.",
+          "3. Send it the way your airline asks (your Travel Pass shows how).",
+          "",
+          "PetPassGo fills in your details only. We never check the boxes or sign for you.",
+          "",
+          "— PetPassGo",
+        ].join("\n"),
+        kind: "dot_form",
+        attachments: [{ filename, content: Buffer.from(bytes).toString("base64") }],
+      });
+      if (!sent.ok) return NextResponse.json({ error: "We couldn't email the form. Try downloading it instead." }, { status: 502 });
+      return NextResponse.json({ sent: true });
+    }
     return new NextResponse(Buffer.from(bytes), {
       headers: {
         "Content-Type": "application/pdf",

@@ -25,6 +25,30 @@ function SectionLabel({ children, hint }) {
   );
 }
 
+// The whole trip in a few lines, before any detail. Short trips say so plainly.
+const HEAVY = /HEALTH|VACCIN|FORM|SUBMISSION|PERMIT|IMPORT/;
+function AtAGlance({ steps, airline, petName, onOpen }) {
+  if (!steps.length) return null;
+  const easy = steps.length <= 5 && !steps.some((c) => c.dot || HEAVY.test(String(c.category || "").toUpperCase()));
+  return (
+    <section className="rounded-2xl p-4 mb-1" style={{ background: easy ? "#EAF6EE" : "#fff", border: `1px solid ${easy ? tokens.green : tokens.line}` }}>
+      <h3 style={{ fontFamily: font.display, fontSize: 21, fontWeight: 800, color: tokens.navy, lineHeight: 1.2 }}>{easy ? "This flight is easy" : `${steps.length} things to do before you fly`}</h3>
+      <p className="mt-1" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }}>{easy ? `All ${airline || "your airline"} needs from you:` : "In this order:"}</p>
+      <ol className="mt-2 flex flex-col gap-1.5">
+        {steps.map((c, i) => (
+          <li key={c.id}>
+            <button type="button" onClick={() => onOpen(c.id)} className="w-full text-left flex gap-2.5 items-start" style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: font.body, fontSize: 16, color: tokens.navy, lineHeight: 1.4 }}>
+              <span className="flex-shrink-0 flex items-center justify-center rounded-full" style={{ width: 24, height: 24, marginTop: 1, background: easy ? tokens.green : tokens.navy, color: "#fff", fontSize: 13, fontWeight: 800 }}>{i + 1}</span>
+              <span>{c.oneLine || c.shortTitle}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+      {easy && petName ? <p className="mt-3" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>That&apos;s it. Tap a step for the details, and check it off when it&apos;s done.</p> : null}
+    </section>
+  );
+}
+
 function AskAirlineCard({ card }) {
   return (
     <article className="rounded-2xl mb-2 px-4 py-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
@@ -203,8 +227,12 @@ export default function PassChecklist({ trip, requirements = [], statusMap = {},
   const before = open.filter((c) => !isDayOf(c)).sort((a, b) => String(a.dueDate || "9999").localeCompare(String(b.dueDate || "9999")));
   const travelDay = open.filter(isDayOf);
 
+  const glance = [...before, ...travelDay].filter((c) => !c.relief);
+  const openStep = (id) => { setOpenId(id); setTimeout(() => { try { document.getElementById(`step-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); } catch {} }, 80); };
+
   return (
     <div>
+      {!multi ? <AtAGlance steps={glance} airline={trip?.airline} petName={trip?.pet?.name} onOpen={openStep} /> : null}
       {nudge && (
         <div className="rounded-2xl px-4 py-3 mt-2 flex items-center justify-between gap-3" style={{ background: "#EAF6EE", border: `1px solid ${tokens.green}` }}>
           <span style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15.5, color: tokens.green }}>{ready ? "All set!" : "Nice. Checked off."}</span>

@@ -227,15 +227,15 @@ export default function PassportWizard({ userId, onDone, onCancel, defaultOwner 
           </div>
           <label style={lab}>Their name<input autoFocus value={f.name} onChange={set("name")} placeholder="e.g. Milo" className="rounded-xl px-4 py-3 outline-none mt-1.5" style={field} /></label>
           <div>
-            <span style={lab}>Type</span>
+            <span style={lab}>Species</span>
             <div className="flex flex-wrap gap-2 mt-1.5">{["Dog", "Cat", "Other"].map((t) => <Chip key={t} on={f.animal_type === t} onClick={() => setF((x) => ({ ...x, animal_type: t, role: t !== "Dog" && x.role === "Service animal" ? "Pet" : x.role }))}>{t}</Chip>)}</div>
           </div>
           <div>
-            <span style={lab}>{f.name.trim() ? `${f.name.trim()} is a…` : "This is a…"}</span>
+            <span style={lab}>Is {f.name.trim() || "your pet"} a service or support animal?</span>
             <div className="grid gap-2 mt-1.5">
-              <Tile on={f.role === "Pet"} onClick={() => setF((x) => ({ ...x, role: "Pet" }))} title="Pet" />
+              <Tile on={f.role === "Pet"} onClick={() => setF((x) => ({ ...x, role: "Pet" }))} title="No, just my pet" sub="Most pets. Airline pet rules apply." />
               {f.animal_type === "Dog" && <Tile on={f.role === "Service animal"} onClick={() => setF((x) => ({ ...x, role: "Service animal" }))} title="Service dog" sub="Trained to do tasks for a disability, including psychiatric service dogs" />}
-              <Tile on={f.role === "Emotional support animal"} onClick={() => setF((x) => ({ ...x, role: "Emotional support animal" }))} title="Emotional support animal" sub="Flies as a pet on US airlines" />
+              <Tile on={f.role === "Emotional support animal"} onClick={() => setF((x) => ({ ...x, role: "Emotional support animal" }))} title="Emotional support animal (ESA)" sub="Flies as a pet on US airlines" />
             </div>
           </div>
         </div>
