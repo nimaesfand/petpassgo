@@ -131,7 +131,7 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose }) {
         <>
           <div className="ppg-pp-fade mt-6 text-center" style={{ maxWidth: 340 }}>
             <h2 style={{ fontFamily: font.display, fontSize: 30, fontWeight: 800, color: "#fff", lineHeight: 1.1 }}>{pet.name} is official!</h2>
-            <p className="mt-2" style={{ fontFamily: font.body, fontSize: 15.5, color: "rgba(255,255,255,.8)" }}>{pet.name}&apos;s passport, Pet ID and QR code are ready. Show them at the counter or share them with a sitter.</p>
+            <p className="mt-2" style={{ fontFamily: font.body, fontSize: 15.5, color: "rgba(255,255,255,.8)" }}>{pet.name}&apos;s passport and QR code are ready. Show them at the counter, add them to your phone, or share them with a sitter.</p>
           </div>
           <div className="ppg-pp-fade mt-5 flex flex-col gap-2.5 w-full" style={{ maxWidth: 340, animationDelay: ".35s" }}>
             <button type="button" onClick={share} className="rounded-full" style={{ height: 52, background: tokens.primary, color: "#fff", fontFamily: font.body, fontSize: 16, fontWeight: 700, border: "none", cursor: "pointer" }}>{copied ? "Link copied" : `Share ${pet.name}'s passport`}</button>
