@@ -22,13 +22,13 @@ export default function BorderGuide({ g }) {
           <p style={{ fontFamily: B, fontSize: 19, lineHeight: 1.5, color: tokens.ink }} className="mt-4 max-w-[42rem]">{g.lead}</p>
           <div className="flex flex-wrap gap-3 mt-6">
             <a href={cta} className="inline-flex items-center justify-center rounded-full px-8 min-h-[54px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Check my {g.name} trip</a>
-            <a href="#steps" className="inline-flex items-center justify-center rounded-full px-6 min-h-[54px]" style={{ background: "#fff", color: tokens.navy, border: `1.5px solid ${tokens.line}`, fontFamily: B, fontWeight: 800, fontSize: 16, textDecoration: "none" }}>See every step</a>
+            <a href="#steps" className="hidden sm:inline-flex items-center justify-center rounded-full px-6 min-h-[54px]" style={{ background: "#fff", color: tokens.navy, border: `1.5px solid ${tokens.line}`, fontFamily: B, fontWeight: 800, fontSize: 16, textDecoration: "none" }}>See every step</a>
           </div>
-          <div className="grid sm:grid-cols-3 gap-3 mt-8">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 mt-6 sm:mt-8">
             {g.stats.map(([k, v]) => (
-              <div key={k} className="rounded-2xl px-4 py-3.5" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-                <div style={{ fontFamily: D, fontSize: 26, fontWeight: 800, color: tokens.navy, lineHeight: 1.1 }}>{v}</div>
-                <div className="mt-0.5" style={{ fontFamily: B, fontSize: 14.5, color: tokens.muted }}>{k}</div>
+              <div key={k} className="rounded-2xl px-3 py-3 sm:px-4 sm:py-3.5" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+                <div className="text-[20px] sm:text-[26px]" style={{ fontFamily: D, fontWeight: 800, color: tokens.navy, lineHeight: 1.1 }}>{v}</div>
+                <div className="mt-0.5 text-[12.5px] sm:text-[14.5px]" style={{ fontFamily: B, color: tokens.muted, lineHeight: 1.3 }}>{k}</div>
               </div>
             ))}
           </div>

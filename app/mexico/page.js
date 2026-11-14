@@ -17,7 +17,7 @@ const GUIDE = {
   title: "Take your dog to Mexico, and get them home again.",
   lead: "Two vet certificates, two 5-day windows, an inspection when you land, and a CDC form for the flight home. Here's all of it, in the order you'll need it.",
   checked: "November 13, 2026",
-  stats: [["vet certificates (one each way)", "2"], ["window for each certificate", "5 days"], ["minimum age to come home", "6 months"]],
+  stats: [["vet certificates, one each way", "2"], ["window for each one", "5 days"], ["old to come home", "6 mo+"]],
   traps: [
     { title: "Puppies can get in but not back.", body: "Dogs must be at least 6 months old on the day they return to the U.S. Check your return date before you book." },
     { title: "There are two different screwworm certificates.", body: "One from a U.S. vet to enter Mexico, and a separate one from a vet in Mexico to come home. Both must be done within 5 days of the flight." },

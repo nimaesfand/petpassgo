@@ -17,7 +17,7 @@ const GUIDE = {
   title: "Take your dog to Canada, and get them home again.",
   lead: "Canada mostly wants one thing: a proper rabies certificate. Coming home, the U.S. wants a CDC form. Here's exactly what each one needs.",
   checked: "November 13, 2026",
-  stats: [["document Canada checks for adult dogs", "1"], ["quarantine if your papers are right", "None"], ["minimum age to come home", "6 months"]],
+  stats: [["document for adult dogs", "1"], ["quarantine with the right papers", "None"], ["old to come home", "6 mo+"]],
   traps: [
     { title: "Not every rabies paper counts.", body: "It must be signed by a licensed vet, in English or French, identify your dog, give the vaccine type and date, and still be valid. A missing or expired one can mean a vaccination order at your cost, or your dog being sent back." },
     { title: "Puppies can get in but not back.", body: "Dogs must be at least 6 months old on the day they return to the U.S. Check your return date before you book." },
