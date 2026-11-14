@@ -32,7 +32,7 @@ const VET_STEPS = [
 
 const QR_STEPS = [
   { title: "Someone scans the tag", body: "Any phone camera works. No app needed." },
-  { title: "They see your pet's page", body: "Their photo, name and a button to message you. Your email and phone stay private." },
+  { title: "They see your pet's page", body: "Their photo, name and a button to message you. Your email stays private." },
   { title: "You get an email right away", body: "With their message and how to reach them. Mark your pet as lost and scans alert you too, with the area they came from." },
 ];
 
