@@ -124,7 +124,7 @@ export default function PetPassGoLanding() {
           </div>
           <div className="w-full max-w-[640px] mx-auto">
             <HomePassport />
-            <p className="mt-3 text-center" style={{ fontFamily: B, fontSize: 14, color: "#AFC0D6" }}>Meet Biscuit, our sample pup. Tap the passport to flip it.</p>
+            <p className="mt-3 text-center" style={{ fontFamily: B, fontSize: 14, color: "#AFC0D6" }}>Meet Biscuit. Tap the passport to flip it.</p>
           </div>
         </div>
       </section>
