@@ -44,6 +44,8 @@ export async function POST(req) {
     const trip = { ...base, airline: name, role, animal_type: base.animal, travel_date: base.date, pet_travel: "cabin", segments: null, connecting: false };
     const rows = all.filter((r) => r.airline === "Any" || r.airline === name || r.airline === ruleName);
     const own = rows.filter((r) => r.airline !== "Any");
+    // International: only a confident answer when we've checked this airline's international rules.
+    if (!domestic && !own.some((r) => r.trip_type === "international")) return { name, key: "check", title: "We haven't checked this airline's international pet rules", easy: false, fee: null, cargo: null };
     if (!own.length) return { name, key: "check", title: "We haven't checked this airline yet", easy: false, fee: null, cargo: holdInfo(name)?.state || null };
     const plan = planFromRows(rows, trip);
     const easy = isEasyTrip(trip, plan);

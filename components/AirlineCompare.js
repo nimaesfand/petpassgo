@@ -15,6 +15,13 @@ const LOOK = {
 };
 const CARGO = { yes: "Cargo option for big pets", no: "Cabin only", restricted: "Cabin only for most pets" };
 
+// "$125 each way ($35 between Hawaiian Islands)" -> "$125 each way"; long notes -> a short line.
+function shortFee(f) {
+  const x = String(f || "").replace(/\s*\(.*?\)\s*/g, " ").replace(/^(cabin pet fee|pet on board|in-cabin pet fee|international in-cabin pet fee|pet fare):\s*/i, "").trim();
+  if (!x) return "";
+  return x.length > 34 || !/\$|usd|cad/i.test(x) ? "Fee: confirm when booking" : x;
+}
+
 function city(label) { return findAirport(label)?.city || String(label || "").split(",")[0]; }
 
 export default function AirlineCompare({ answers, selected, onPick }) {
@@ -57,7 +64,7 @@ export default function AirlineCompare({ answers, selected, onPick }) {
               </div>
               <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5" style={{ fontFamily: font.body, fontSize: 14, color: tokens.ink }}>
                 {blocked ? <span>{a.title}</span> : <>
-                  {a.fee ? <span><b>{a.fee}</b></span> : null}
+                  {a.fee ? <span><b>{shortFee(a.fee)}</b></span> : null}
                   {a.carrier ? <span style={{ color: tokens.muted }}>{a.carrier}</span> : null}
                   {a.cargo && pet !== "service dog" ? <span style={{ color: tokens.muted }}>{CARGO[a.cargo]}</span> : null}
                   {!a.fee && !a.carrier && a.key === "check" ? <span style={{ color: tokens.muted }}>{a.title}</span> : null}
