@@ -1,5 +1,7 @@
 import { serviceClient } from "../../../lib/serverEmail";
-import { readCheckin } from "../../../lib/ppgSign";
+import { readCheckin, signCheckin } from "../../../lib/ppgSign";
+import { SITE_URL } from "../../../lib/site";
+import QRCode from "qrcode";
 import LiveSeal from "./LiveSeal";
 
 export const dynamic = "force-dynamic";
@@ -44,14 +46,14 @@ function Row({ title, detail, kind, extra }) {
   );
 }
 
-function Shell({ children }) {
+function Shell({ children, label = "PET CHECK-IN" }) {
   return (
     <div style={{ minHeight: "100vh", background: "#EEF2F7", fontFamily: "Inter, system-ui, sans-serif", padding: "20px 14px 40px" }}>
       <style>{`.ppg-live{background:linear-gradient(110deg,#14213D 0%,#1F3A6E 25%,#14213D 50%,#1F3A6E 75%,#14213D 100%);background-size:300% 100%;animation:ppgLive 6s linear infinite}@keyframes ppgLive{to{background-position:-300% 0}}.ppg-live-dot{width:12px;height:12px;border-radius:50%;background:#4ADE80;box-shadow:0 0 0 0 rgba(74,222,128,.7);animation:ppgPulse 1.6s infinite}@keyframes ppgPulse{70%{box-shadow:0 0 0 10px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}`}</style>
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <div style={{ fontWeight: 800, fontSize: 22, color: NAVY, letterSpacing: "-.03em" }}>PetPass<span style={{ color: "#C2410C" }}>Go</span></div>
-          <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: ".14em", color: MUTED }}>PET CHECK-IN</div>
+          <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: ".14em", color: MUTED }}>{label}</div>
         </div>
         {children}
       </div>
@@ -59,10 +61,12 @@ function Shell({ children }) {
   );
 }
 
-export default async function CheckPage({ params }) {
+export default async function CheckPage({ params, searchParams }) {
   const c = readCheckin(params.token);
+  const travel = searchParams?.travel === "1";
+  const label = travel ? "TRAVEL MODE" : "PET CHECK-IN";
   if (!c.ok) {
-    return <Shell><div style={{ background: "#fff", borderRadius: 20, padding: 24, textAlign: "center" }}><h1 style={{ fontSize: 22, fontWeight: 800, color: NAVY }}>{c.reason === "expired" ? "This check-in link has expired" : "This check-in link isn't valid"}</h1><p style={{ color: INK, marginTop: 8 }}>Ask the traveler to open a fresh check-in code from their PetPassGo passport. Codes last 30 minutes.</p></div></Shell>;
+    return <Shell label={label}><div style={{ background: "#fff", borderRadius: 20, padding: 24, textAlign: "center" }}><h1 style={{ fontSize: 22, fontWeight: 800, color: NAVY }}>{travel ? (c.reason === "expired" ? "Travel mode has closed" : "This link isn't valid") : (c.reason === "expired" ? "This check-in link has expired" : "This check-in link isn't valid")}</h1><p style={{ color: INK, marginTop: 8 }}>{travel ? "Open travel mode again from your pet's passport." : "Ask the traveler to open a fresh code from their PetPassGo passport. Codes last 30 minutes."}</p></div></Shell>;
   }
   const sb = serviceClient();
   const [{ data: pet }, { data: records }, { data: docs }, tripRes] = await Promise.all([
@@ -71,7 +75,7 @@ export default async function CheckPage({ params }) {
     sb.from("documents").select("id,document_type,file_url,issued_on,expires_on,uploaded_at").eq("pet_id", c.petId).order("uploaded_at", { ascending: false }),
     c.tripId ? sb.from("trips").select("*").eq("id", c.tripId).maybeSingle() : Promise.resolve({ data: null }),
   ]);
-  if (!pet) return <Shell><div style={{ background: "#fff", borderRadius: 20, padding: 24 }}>This pet profile is no longer available.</div></Shell>;
+  if (!pet) return <Shell label={label}><div style={{ background: "#fff", borderRadius: 20, padding: 24 }}>This pet profile is no longer available.</div></Shell>;
   const trip = tripRes?.data || null;
   let photo = null;
   const pp = storagePath(pet.photo_url);
@@ -94,9 +98,15 @@ export default async function CheckPage({ params }) {
   const checkedAt = new Date().toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit", timeZone: "America/Los_Angeles" });
   const open = (url, label) => url ? <a href={url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", marginTop: 6, fontWeight: 800, fontSize: 14.5, color: "#1D4ED8" }}>{label} ↗</a> : null;
 
+  let shareQr = null;
+  if (travel) {
+    const share = signCheckin({ petId: c.petId, tripId: c.tripId || "" });
+    shareQr = await QRCode.toString(`${SITE_URL}/check/${share.token}`, { type: "svg", margin: 1, errorCorrectionLevel: "M", color: { dark: NAVY, light: "#ffffff" } }).catch(() => null);
+  }
+
   return (
-    <Shell>
-      <LiveSeal expiresAt={c.expiresAt.toISOString()} />
+    <Shell label={label}>
+      <LiveSeal expiresAt={c.expiresAt.toISOString()} travel={travel} />
       <section style={{ background: "#fff", borderRadius: 20, marginTop: 12, padding: 18, boxShadow: "0 10px 30px rgba(20,33,61,.08)" }}>
         <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
           <div style={{ width: 92, height: 114, borderRadius: 14, overflow: "hidden", background: "#E8EEF7", border: `3px solid ${GOLD}`, flexShrink: 0 }}>
@@ -129,6 +139,16 @@ export default async function CheckPage({ params }) {
           {!service && (pet.carrier_length_in && pet.carrier_width_in && pet.carrier_height_in) ? <Row title="Carrier" kind="owner" detail={`${pet.carrier_length_in} × ${pet.carrier_width_in} × ${pet.carrier_height_in} in`} /> : null}
         </div>
       </section>
+
+      {shareQr ? (
+        <section style={{ background: "#fff", borderRadius: 20, marginTop: 12, padding: 18, display: "flex", gap: 16, alignItems: "center", boxShadow: "0 10px 30px rgba(20,33,61,.08)" }}>
+          <div style={{ width: 120, height: 120, flexShrink: 0 }} dangerouslySetInnerHTML={{ __html: shareQr.replace("<svg", '<svg width="120" height="120"') }} />
+          <div>
+            <div style={{ fontWeight: 800, fontSize: 16, color: NAVY }}>Someone needs a copy?</div>
+            <div style={{ fontSize: 14.5, color: INK, marginTop: 4, lineHeight: 1.45 }}>They can scan this with their phone camera to open this page. It works for 30 minutes.</div>
+          </div>
+        </section>
+      ) : null}
 
       <div style={{ marginTop: 12, fontSize: 13, color: MUTED, lineHeight: 1.5 }}>
         <b style={{ color: NAVY }}>Verified</b> means a veterinarian confirmed the record through PetPassGo. <b style={{ color: NAVY }}>Document on file</b> means the traveler uploaded it; open it to review. <b style={{ color: NAVY }}>Owner-stated</b> means the traveler entered it. Loaded {checkedAt} PT. PetPassGo is not a government agency and does not replace your airline&apos;s own checks.

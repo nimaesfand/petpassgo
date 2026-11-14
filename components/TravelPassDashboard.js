@@ -319,7 +319,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
         <div className="space-y-3">
           {pet?.id && trip?.user_id ? <PetDocumentsCard pet={pet} userId={trip.user_id} onChange={() => setDocsTick((n) => n + 1)} /> : null}
           <SoftCard title="Passport">
-            <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>Show it at the counter, or open the live check-in code from the passport for the agent to scan.</p>
+            <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>At the airport, open travel mode from the passport to show everything on one screen.</p>
             {pet?.passport_no && <p style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }} className="mt-2">Passport {pet.passport_no}</p>}
             {pet?.id && <div className="mt-3"><a href={`/id/${pet.id}`} className="ppg-btn ppg-btn-primary">Open the passport</a></div>}
           </SoftCard>

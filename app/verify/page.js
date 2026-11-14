@@ -30,7 +30,7 @@ export default async function VerifyPage({ searchParams }) {
               <div style={{ fontSize: 24, fontWeight: 800, color: NAVY, marginTop: 4 }}>{result.name}</div>
               <div style={{ color: INK, fontSize: 15.5 }}>{[result.animal_type, result.breed].filter(Boolean).join(" · ")}</div>
               <div style={{ color: INK, fontSize: 14.5, marginTop: 6, fontFamily: "ui-monospace, Menlo, monospace" }}>{result.passport_no} · issued {fmt(result.passport_issued_at)}</div>
-              <p style={{ color: MUTED, fontSize: 13.5, marginTop: 8, lineHeight: 1.45 }}>This confirms the passport was issued by PetPassGo and the code matches. Ask the traveler for their live check-in code to see vaccine and document status.</p>
+              <p style={{ color: MUTED, fontSize: 13.5, marginTop: 8, lineHeight: 1.45 }}>This confirms the passport was issued by PetPassGo and the code matches. Ask the traveler to open travel mode to see vaccine and document status.</p>
             </div>
           ) : result === false ? (
             <div style={{ marginTop: 16, background: "#FDECEC", border: "2px solid #B91C1C", borderRadius: 16, padding: 16, color: "#7F1D1D", fontWeight: 700 }}>No PetPassGo passport matches that number and code. Check both and try again.</div>

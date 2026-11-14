@@ -114,9 +114,9 @@ export default function PetPassGoLanding() {
         <div className={`${WRAP} grid lg:grid-cols-[minmax(0,1fr)_minmax(560px,640px)] gap-12 items-center`}>
           <div>
             <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.05, letterSpacing: "-0.01em" }} className="text-[36px] md:text-[52px] font-extrabold max-w-[14ch]">A passport made for your pet.</h2>
-            <p className="mt-5 max-w-[32rem]" style={{ fontFamily: B, color: "#D5DEEB", fontSize: 18, lineHeight: 1.55 }}>Their details, vaccines and microchip in one place. Your vet can confirm the records, and at the airport you show a check-in code the agent can scan.</p>
+            <p className="mt-5 max-w-[32rem]" style={{ fontFamily: B, color: "#D5DEEB", fontSize: 18, lineHeight: 1.55 }}>Their details, vaccines and microchip in one place. Your vet can confirm the records, and at the airport travel mode puts everything on one screen.</p>
             <ul className="mt-6 grid gap-3 max-w-[32rem]" style={{ listStyle: "none", padding: 0 }}>
-              {["Vaccines confirmed by your vet", "A live code to show at check-in", "Reminders before vaccines and papers expire", "A QR tag in case they ever get lost"].map((t) => (
+              {["Vaccines confirmed by your vet", "Travel mode: all their papers in one tap", "Reminders before vaccines and papers expire", "A QR tag in case they ever get lost"].map((t) => (
                 <li key={t} className="flex gap-3" style={{ fontFamily: B, fontSize: 16.5, color: "#fff" }}><span style={{ color: tokens.gold, fontWeight: 800 }}>✓</span>{t}</li>
               ))}
             </ul>

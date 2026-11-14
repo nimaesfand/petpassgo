@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import QRCode from "qrcode";
 import { supabase } from "../lib/supabaseClient";
 import { Wordmark } from "./Logo";
 import Icon from "./Icon";
@@ -219,35 +218,16 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
   );
 }
 
-function CheckinSheet({ pet, onClose }) {
-  const [state, setState] = useState({ busy: true });
-  useEffect(() => {
-    let live = true;
-    (async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        const r = await fetch("/api/checkin-link", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": data?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id }) });
-        const j = await r.json().catch(() => ({}));
-        if (!r.ok || !j.url) throw new Error(j.error || "Couldn't make a check-in code.");
-        const img = await QRCode.toDataURL(j.url, { width: 520, margin: 1, errorCorrectionLevel: "M", color: { dark: "#14213D", light: "#ffffff" } });
-        if (live) setState({ url: j.url, img, exp: j.expiresAt });
-      } catch (e) { if (live) setState({ err: e.message }); }
-    })();
-    return () => { live = false; };
-  }, [pet.id]);
-  const until = state.exp ? new Date(state.exp).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) : "";
-  return (
-    <div role="dialog" aria-modal="true" aria-label="Check-in code" className="fixed inset-0 z-[1000] flex items-center justify-center p-4" style={{ background: "rgba(11,20,40,.75)" }} onClick={(e) => { e.stopPropagation(); if (e.target === e.currentTarget) onClose(); }}>
-      <div className="w-full rounded-3xl p-5 text-center" style={{ maxWidth: 380, background: "#fff" }} onClick={(e) => e.stopPropagation()}>
-        <div style={{ fontFamily: font.body, fontSize: 11.5, fontWeight: 800, letterSpacing: "0.16em", color: tokens.primary }}>SHOW AT CHECK-IN</div>
-        <div className="mt-1" style={{ fontFamily: font.display, fontSize: 22, fontWeight: 800, color: tokens.navy }}>{pet.name}&apos;s check-in code</div>
-        {state.img ? <img src={state.img} alt="Check-in QR code" className="mx-auto mt-3" style={{ width: 260, height: 260 }} /> : state.err ? <p className="mt-4" style={{ fontFamily: font.body, color: tokens.stamp }}>{state.err}</p> : <div className="mx-auto mt-3 rounded-2xl ppg-shimmer" style={{ width: 260, height: 260 }} />}
-        <p className="mt-3" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, lineHeight: 1.45 }}>The agent scans this to see {pet.name}&apos;s vaccines, documents and trip, live. {until ? `Works until ${until}.` : ""}</p>
-        {state.url ? <a href={state.url} target="_blank" rel="noopener noreferrer" className="inline-block mt-2" style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 700, color: tokens.navy, textDecoration: "underline" }}>Preview what they see</a> : null}
-        <button type="button" onClick={onClose} className="ppg-btn ppg-btn-secondary w-full mt-4">Done</button>
-      </div>
-    </div>
-  );
+// Owner: open travel mode, a full-screen view of everything about the pet.
+async function openTravelMode(pet) {
+  const win = window.open("", "_blank");
+  try {
+    const { data } = await supabase.auth.getSession();
+    const r = await fetch("/api/checkin-link", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": data?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id, mode: "travel" }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.url) throw new Error(j.error || "Couldn't open travel mode.");
+    if (win) win.location.href = j.url; else window.location.href = j.url;
+  } catch (e) { if (win) win.close(); alert(e.message || "Couldn't open travel mode."); }
 }
 
 // Owner: download the print-ready QR tag sheet.
@@ -308,7 +288,7 @@ function Back({ pet, stamps, owner, qr, onFlip, onCheckin }) {
       {onCheckin ? (
         <div className="relative px-4 sm:px-6 pb-4 ppg-no-print">
           <button type="button" onClick={(e) => { e.stopPropagation(); onCheckin(); }} className="w-full rounded-full flex items-center justify-center gap-2" style={{ minHeight: 50, background: tokens.gold, color: tokens.navy, border: "none", fontFamily: font.body, fontWeight: 800, fontSize: 16, cursor: "pointer" }}>
-            <Icon name="checkCircle" size={18} /> Show at airport check-in
+            <Icon name="checkCircle" size={18} /> Travel mode
           </button>
         </div>
       ) : null}
@@ -344,7 +324,6 @@ export default function PetPassport({
   onPhotoTap = null,
 }) {
   const [flipped, setFlipped] = useState(false);
-  const [checkin, setCheckin] = useState(false);
   const [rabies, setRabies] = useState(null);
   const [code, setCode] = useState(pet.verify_code || "");
   const flip = () => setFlipped((f) => !f);
@@ -363,11 +342,10 @@ export default function PetPassport({
     return () => { live = false; };
   }, [pet?.id, pet?.passport_issued_at, pet?.verify_code, owner, sample]);
   const front = <Front pet={pet} photo={photo} owner={owner} chipValue={chipValue} sheet={sheet} pending={pending} justIssued={justIssued} onPhotoTap={onPhotoTap} onFlip={sheet ? null : flip} rabies={rabies} code={code} />;
-  const back = <Back pet={pet} stamps={stamps} owner={owner} qr={qr} onFlip={sheet ? null : flip} onCheckin={owner && !sheet && !sample ? () => setCheckin(true) : null} />;
+  const back = <Back pet={pet} stamps={stamps} owner={owner} qr={qr} onFlip={sheet ? null : flip} onCheckin={owner && !sheet && !sample ? () => openTravelMode(pet) : null} />;
 
   // Printed: both sides, one above the other.
   if (sheet) return <div className="grid gap-4 min-w-0">{front}{back}</div>;
-  const sheetEl = checkin ? <CheckinSheet pet={pet} onClose={() => setCheckin(false)} /> : null;
 
   return (
     <div className="grid gap-2 min-w-0">
@@ -378,7 +356,6 @@ export default function PetPassport({
         </div>
       </div>
       {sample ? null : <div className="text-center ppg-no-print" style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted }}>Tap the passport to flip it</div>}
-      {sheetEl}
     </div>
   );
 }

@@ -6,8 +6,9 @@ import { SITE_URL } from "../../../lib/site";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-// A check-in link the owner shows at the counter. It works for 30 minutes,
-// then the owner opens a fresh one. It never works for anyone else's pet.
+// Travel mode: the owner opens this on their own phone and shows it at the
+// airport. It lasts 12 hours. Without mode "travel" it's a 30-minute link to
+// hand to someone else. It never works for anyone else's pet.
 export async function POST(req) {
   const { user, sb } = await requireUser(req);
   if (!user || !sb) return NextResponse.json({ error: "Sign in first." }, { status: 401 });
@@ -20,6 +21,7 @@ export async function POST(req) {
   const today = new Date().toISOString().slice(0, 10);
   const { data: trips } = await sb.from("trips").select("id,pet_id,travel_date,return_date").eq("user_id", user.id).eq("paid", true).or(`travel_date.gte.${today},return_date.gte.${today}`).order("travel_date", { ascending: true }).limit(10);
   const trip = (trips || []).find((t) => t.pet_id === petId) || (trips || []).find((t) => !t.pet_id) || null;
-  const { token, expiresAt } = signCheckin({ petId, tripId: trip?.id || "" });
-  return NextResponse.json({ url: `${SITE_URL}/check/${token}`, expiresAt });
+  const travel = body.mode === "travel";
+  const { token, expiresAt } = signCheckin({ petId, tripId: trip?.id || "", minutes: travel ? 720 : 30 });
+  return NextResponse.json({ url: `${SITE_URL}/check/${token}${travel ? "?travel=1" : ""}`, expiresAt });
 }

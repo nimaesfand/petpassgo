@@ -1120,7 +1120,7 @@ function FreeTripWelcome({ onClose }) {
           <div className="rounded-xl p-4" style={{ background: tokens.navy, color: "#fff" }}>
             <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 800, lineHeight: 1.2 }}>Keep your pet ready for every trip</div>
             <ul className="mt-2 mb-3 flex flex-col gap-1.5" style={{ fontFamily: font.body, fontSize: 14.5, lineHeight: 1.4, color: "rgba(255,255,255,.9)" }}>
-              {["Vaccines confirmed by your vet, not just typed in", "A pet passport with a live check-in code for the airport", "Reminders before shots and papers expire", "Lost-pet QR tag and alerts"].map((t) => (
+              {["Vaccines confirmed by your vet, not just typed in", "A pet passport with travel mode for the airport", "Reminders before shots and papers expire", "Lost-pet QR tag and alerts"].map((t) => (
                 <li key={t} className="flex items-start gap-2"><span style={{ color: "#7FD3A0", marginTop: 1 }}><Icon name="check" size={15} /></span>{t}</li>
               ))}
             </ul>
