@@ -47,10 +47,10 @@ export default function TripHero() {
       <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(300px,0.95fr)] lg:gap-x-12 lg:gap-y-0 lg:items-stretch">
         <div className="order-1 lg:col-start-1 lg:row-start-1">
           <h1 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05, textWrap: "balance" }} className="text-[32px] sm:text-[48px] lg:text-[56px] font-bold">
-            Travel with your pet.
+            Check before you book.
           </h1>
           <p style={{ fontFamily: B, color: tokens.ink, fontSize: 18, lineHeight: 1.5 }} className="mt-4 max-w-[36rem]">
-            <b>Know before you book.</b> See exactly what your pet needs for your trip, then get every step, deadline and document in one place.
+            See which airlines take your pet, what it costs, and exactly what you need to fly. Then keep your pet&apos;s records and passport in one place.
           </p>
           <div className="mt-4 inline-flex flex-wrap items-center gap-2" style={{ fontFamily: B, fontSize: 15.5, fontWeight: 700 }}>
             <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5" style={{ background: "#EAF6EE", color: tokens.green }}><span aria-hidden>✓</span> Easy flights: free</span>
