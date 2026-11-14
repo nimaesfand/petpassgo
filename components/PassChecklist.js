@@ -224,10 +224,11 @@ export default function PassChecklist({ trip, requirements = [], statusMap = {},
 
   const isDayOf = (c) => c.dueKind === "dayof";
   const open = [...groups.first, ...groups.general];
-  const before = open.filter((c) => !isDayOf(c)).sort((a, b) => String(a.dueDate || "9999").localeCompare(String(b.dueDate || "9999")));
-  const travelDay = open.filter(isDayOf);
+  const before = open.filter((c) => !isDayOf(c) && !c.homeLeg).sort((a, b) => (b.urgent ? 1 : 0) - (a.urgent ? 1 : 0) || String(a.dueDate || "9999").localeCompare(String(b.dueDate || "9999")));
+  const travelDay = open.filter((c) => isDayOf(c) && !c.homeLeg);
+  const comingHome = open.filter((c) => c.homeLeg).sort((a, b) => String(a.dueDate || "9999").localeCompare(String(b.dueDate || "9999")));
 
-  const glance = [...before, ...travelDay].filter((c) => !c.relief);
+  const glance = [...before, ...travelDay, ...comingHome].filter((c) => !c.relief);
   const openStep = (id) => { setOpenId(id); setTimeout(() => { try { document.getElementById(`step-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); } catch {} }, 80); };
 
   return (
@@ -246,6 +247,8 @@ export default function PassChecklist({ trip, requirements = [], statusMap = {},
       {!multi && block(before)}
       {!multi && travelDay.length > 0 && <SectionLabel hint="At the airport">Travel day</SectionLabel>}
       {!multi && block(travelDay)}
+      {!multi && comingHome.length > 0 && <SectionLabel hint="For the flight back">Coming home</SectionLabel>}
+      {!multi && block(comingHome)}
       {!multi && groups.know.length > 0 && <SectionLabel hint="No action needed">Good to know</SectionLabel>}
       {!multi && block(groups.know)}
       {groups.done.length > 0 && (

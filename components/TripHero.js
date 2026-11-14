@@ -56,6 +56,9 @@ export default function TripHero() {
             <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5" style={{ background: "#EAF6EE", color: tokens.green }}><span aria-hidden>✓</span> Easy flights: free</span>
             <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5" style={{ background: "#fff", color: tokens.navy, border: `1px solid ${tokens.line}` }}>Complicated trips: {P.pass}</span>
           </div>
+          <p className="mt-3" style={{ fontFamily: B, fontSize: 15.5, color: tokens.ink }}>
+            Going across the border? <a href="/mexico" style={{ color: tokens.primary, fontWeight: 800 }}>Mexico with your dog</a> · <a href="/canada" style={{ color: tokens.primary, fontWeight: 800 }}>Canada with your dog</a>
+          </p>
         </div>
 
         <div className="order-2 relative min-h-[240px] sm:min-h-[320px] lg:h-full lg:min-h-[520px] lg:col-start-2 lg:row-start-1 lg:row-span-2 rounded-3xl overflow-hidden" style={{ boxShadow: "0 18px 40px rgba(20,33,61,0.12)" }}>
