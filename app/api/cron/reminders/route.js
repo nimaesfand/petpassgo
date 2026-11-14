@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { reminderSchedule, fmt, flightPhrase, daysUntil } from "../../../../lib/travelDates";
-import { sendResendEmail } from "../../../../lib/serverEmail";
+import { sendResendEmail, emailPetOwner } from "../../../../lib/serverEmail";
+import { vetRequestEmail } from "../../../../lib/vetVerifyEmail";
+import { hashToken, newToken } from "../../../../lib/ppgSign";
 import { SITE_URL } from "../../../../lib/site";
 
 export const dynamic = "force-dynamic";
@@ -74,5 +76,27 @@ export async function GET(req) {
     if (r.ok) { docSent++; await sb.from("document_reminders").update({ sent_at: new Date().toISOString() }).eq("document_id", doc.id).eq("kind", kind); }
     else await sb.from("document_reminders").delete().eq("document_id", doc.id).eq("kind", kind);
   }
-  return NextResponse.json({ sent, docSent });
+  // Vet requests: remind the vet once after 3 days, and tell the owner if the link ran out.
+  let vetReminded = 0, vetExpired = 0;
+  const nowIso = new Date().toISOString();
+  const { data: open } = await sb.from("vet_verifications").select("id,pet_id,user_id,vet_email,created_at,expires_at,reminded_at,owner_notified_at").is("used_at", null).gte("created_at", new Date(Date.now() - 30 * 864e5).toISOString());
+  for (const v of open || []) {
+    const expired = v.expires_at < nowIso;
+    if (!expired && !v.reminded_at && Date.now() - new Date(v.created_at).getTime() > 3 * 864e5) {
+      const { data: pet } = await sb.from("pets").select("name,animal_type,breed,handler_name").eq("id", v.pet_id).maybeSingle();
+      if (!pet) continue;
+      const token = newToken();
+      const { error: upErr } = await sb.from("vet_verifications").update({ token_hash: hashToken(token), reminded_at: nowIso }).eq("id", v.id).is("reminded_at", null);
+      if (upErr) continue;
+      const { data: u } = await sb.auth.admin.getUserById(v.user_id);
+      const mail = vetRequestEmail({ owner: pet.handler_name, pet, token, reminder: true });
+      const r = await sendResendEmail({ to: v.vet_email, replyTo: u?.user?.email || undefined, kind: "vet_verify_reminder", subject: mail.subject, text: mail.text });
+      if (r.ok) vetReminded++;
+    } else if (expired && !v.owner_notified_at) {
+      await sb.from("vet_verifications").update({ owner_notified_at: nowIso }).eq("id", v.id);
+      await emailPetOwner(v.pet_id, "PetPassGo: your vet didn't confirm {name}'s records", `We sent your vet clinic (${v.vet_email}) a link and a reminder, but they didn't confirm {name}'s records, and the link has now expired.\n\nYou can:\n- Call the clinic and ask them to look for an email from PetPassGo, then send it again from Pet Vault.\n- Try a different email for the clinic.\n- Ask the clinic to email you their records as a PDF, and upload it under Documents.\n\n${SITE_URL}/account`, "vet_verify_expired");
+      vetExpired++;
+    }
+  }
+  return NextResponse.json({ sent, docSent, vetReminded, vetExpired });
 }

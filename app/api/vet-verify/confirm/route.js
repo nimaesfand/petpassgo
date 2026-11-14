@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { serviceClient } from "../../../../lib/serverEmail";
+import { serviceClient, emailPetOwner } from "../../../../lib/serverEmail";
+import { SITE_URL } from "../../../../lib/site";
 import { allowRequest, clientIp } from "../../../../lib/rateLimit";
 import { hashToken } from "../../../../lib/ppgSign";
 
@@ -54,6 +55,15 @@ export async function POST(req) {
       .eq("pet_id", r.v.pet_id).in("id", ids);
     if (error) return NextResponse.json({ error: "Couldn't save. Try again." }, { status: 500 });
   }
-  await sb.from("vet_verifications").update({ used_at: now, vet_name: vetName, clinic, license: license || null, record_ids: ids }).eq("id", r.v.id);
+  await sb.from("vet_verifications").update({ used_at: now, vet_name: vetName, clinic, license: license || null, record_ids: ids, owner_notified_at: now }).eq("id", r.v.id);
+  // Tell the owner either way. A failed email doesn't undo the confirmation.
+  await emailPetOwner(
+    r.v.pet_id,
+    ids.length ? `PetPassGo: ${vetName} confirmed {name}'s records` : "PetPassGo: your vet didn't confirm {name}'s records",
+    ids.length
+      ? `Good news. ${vetName} at ${clinic} confirmed ${ids.length} of {name}'s record${ids.length === 1 ? "" : "s"}. They now show as vet verified on the passport and in travel mode.\n\nSee them: ${SITE_URL}/account`
+      : `${vetName} at ${clinic} opened your request but didn't confirm any of {name}'s records. That usually means a date or vaccine name doesn't match their files.\n\nCheck the records in Pet Vault, or ask the clinic to email you their records as a PDF and upload it under Documents.\n\n${SITE_URL}/account`,
+    "vet_verify_result"
+  );
   return NextResponse.json({ ok: true, confirmed: ids.length });
 }

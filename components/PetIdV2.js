@@ -119,6 +119,17 @@ function VetVerifyAsk({ pet }) {
   const [email, setEmail] = useState("");
   const [state, setState] = useState("");
   const [msg, setMsg] = useState("");
+  const [last, setLast] = useState(null);
+  const [again, setAgain] = useState(false);
+  useEffect(() => {
+    let live = true;
+    supabase.auth.getSession().then(async ({ data }) => {
+      const r = await fetch(`/api/vet-verify/request?pet_id=${pet.id}`, { headers: { "x-sb-token": data?.session?.access_token || "" } }).catch(() => null);
+      const j = r ? await r.json().catch(() => ({})) : {};
+      if (live && j.status && j.status !== "none") { setLast(j); if (j.vet_email) setEmail(j.vet_email); }
+    });
+    return () => { live = false; };
+  }, [pet.id, state]);
   async function send(e) {
     e.preventDefault();
     setState("busy"); setMsg("");
@@ -126,20 +137,32 @@ function VetVerifyAsk({ pet }) {
     const r = await fetch("/api/vet-verify/request", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": data?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id, vet_email: email }) });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) { setState(""); setMsg(j.error || "Couldn't send. Try again."); return; }
-    setState("sent");
+    setState("sent"); setAgain(false);
   }
+  const day = (v) => (v ? new Date(v).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "");
+  const p = { fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 };
+  let status = null;
+  if (last?.status === "waiting") status = <p className="mt-1" style={p}><b style={{ color: tokens.navy }}>Waiting on your vet.</b> Sent to {last.vet_email} on {day(last.sent_at)}.{last.reminded_at ? ` We reminded them on ${day(last.reminded_at)}.` : " If they don't reply in 3 days, we'll remind them."}</p>;
+  else if (last?.status === "done") status = <p className="mt-1" style={p}>{last.confirmed ? <><b style={{ color: tokens.green }}>✓ {last.vet_name} at {last.clinic}</b> confirmed {last.confirmed} record{last.confirmed === 1 ? "" : "s"}.</> : <><b style={{ color: tokens.navy }}>{last.vet_name} at {last.clinic}</b> didn&apos;t confirm any records. Check the dates match their files, or upload their records PDF under Documents.</>}</p>;
+  else if (last?.status === "expired") status = <p className="mt-1" style={p}><b style={{ color: tokens.navy }}>Your vet didn&apos;t reply.</b> Call the clinic, try another email, or ask them to email you their records PDF and upload it under Documents.</p>;
+  const showForm = !last || again || last.status === "expired";
   return (
     <div className="rounded-2xl p-4 mt-3" style={{ order: 5, background: "#F3FBF6", border: "1px solid #B7E1C6" }}>
       <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 16, color: tokens.navy }}>Get these records vet-verified</div>
       {state === "sent" ? (
-        <p className="mt-1" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>Sent. When your vet confirms, the records get a green check on {pet.name}&apos;s passport and check-in screen.</p>
+        <p className="mt-1" style={p}>Sent. We&apos;ll email you when your vet confirms. If they don&apos;t reply in 3 days, we remind them.</p>
       ) : (
         <>
-          <p className="mt-1" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, lineHeight: 1.45 }}>We email your vet clinic a private link. They check the records against their files and confirm in about a minute. Verified records carry more weight at check-in.</p>
-          <form onSubmit={send} className="flex gap-2 mt-2 flex-wrap">
-            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your vet clinic's email" style={{ ...input, flex: "1 1 220px" }} />
-            <button disabled={state === "busy"} className="ppg-btn ppg-btn-primary">{state === "busy" ? "Sending…" : "Send to my vet"}</button>
-          </form>
+          {status}
+          {!last ? <p className="mt-1" style={{ ...p, fontSize: 14.5 }}>We email your vet clinic a private link. They check the records against their files and confirm in about a minute. Verified records show your vet&apos;s name and clinic on the passport and in travel mode.</p> : null}
+          {showForm ? (
+            <form onSubmit={send} className="flex gap-2 mt-2 flex-wrap">
+              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your vet clinic's email" style={{ ...input, flex: "1 1 220px" }} />
+              <button disabled={state === "busy"} className="ppg-btn ppg-btn-primary">{state === "busy" ? "Sending…" : last ? "Send again" : "Send to my vet"}</button>
+            </form>
+          ) : (
+            <button type="button" onClick={() => setAgain(true)} className="mt-2" style={{ background: "none", border: "none", padding: 0, fontFamily: font.body, fontWeight: 800, fontSize: 14.5, color: tokens.navy, textDecoration: "underline", cursor: "pointer" }}>{last.status === "done" ? "Ask again (for new records)" : "Send again or use a different email"}</button>
+          )}
           {msg ? <p role="alert" className="mt-1" style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.stamp }}>{msg}</p> : null}
         </>
       )}
