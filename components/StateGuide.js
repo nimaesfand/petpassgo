@@ -36,7 +36,7 @@ export default function StateGuide({ s }) {
         <p className="mt-2" style={{ fontFamily: B, fontSize: 14, color: tokens.muted }}>Checked against the laws themselves on {GUIDES_CHECKED}. Not legal advice.</p>
 
         <div className="grid sm:grid-cols-3 gap-2 mt-6">
-          {[["Service dog / PSD", "Public places, housing and flights", "#EAF6EE", "#15803D"], ["ESA in housing", s.slug === "texas" ? "Federal rules only, changed in 2026" : "Protected by state law", "#EAF2FB", tokens.navy], ["ESA on a plane", "Flies as a pet", "#FEF3C7", "#92400E"]].map(([k, v, bg, fg]) => (
+          {[["Service dog / PSD", "Public places, housing and flights", "#EAF6EE", "#15803D"], ["ESA in housing", s.esaHousing || "Protected by state law", "#EAF2FB", tokens.navy], ["ESA on a plane", "Flies as a pet", "#FEF3C7", "#92400E"]].map(([k, v, bg, fg]) => (
             <div key={k} className="rounded-2xl px-4 py-3" style={{ background: bg }}>
               <div style={{ fontFamily: B, fontSize: 13, fontWeight: 800, letterSpacing: ".04em", color: fg }}>{k.toUpperCase()}</div>
               <div style={{ fontFamily: B, fontSize: 15.5, fontWeight: 700, color: tokens.navy }}>{v}</div>
