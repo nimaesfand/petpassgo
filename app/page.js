@@ -192,7 +192,7 @@ export default function PetPassGoLanding() {
 
       <section style={{ background: tokens.navyDeep }} className="py-16 lg:py-20">
         <div className={`${WRAP} flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6`}>
-          <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.05 }} className="text-[34px] md:text-[48px] font-extrabold max-w-[16ch]">Where are you two going?</h2>
+          <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.05 }} className="text-[34px] md:text-[48px] font-extrabold max-w-[16ch]">Where are you and your pet flying?</h2>
           <a href="/assessment" className="btn-primary inline-flex items-center justify-center rounded-full px-9 min-h-[58px] self-start lg:self-auto" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17.5, textDecoration: "none" }}>Plan my pet&apos;s trip</a>
         </div>
       </section>
