@@ -7,7 +7,7 @@ import { findAirport } from "../lib/airports";
 // "Haven't booked yet": every airline for this kind of route, side by side.
 // Picking one continues the trip check with that airline.
 const LOOK = {
-  easy: { label: "Easy · free", bg: "#EAF6EE", fg: "#15803D" },
+  easy: { label: "Simple · free", bg: "#EAF6EE", fg: "#15803D" },
   go: { label: "Can fly", bg: "#EAF2FB", fg: "#1D4E89" },
   action: { label: "Can fly, more steps", bg: "#FEF3C7", fg: "#92400E" },
   no: { label: "Not allowed", bg: "#FDECEC", fg: "#B91C1C" },

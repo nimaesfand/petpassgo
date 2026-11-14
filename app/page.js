@@ -2,13 +2,8 @@ import Image from "next/image";
 import { tokens, font } from "../lib/theme";
 import SiteHeader from "../components/SiteHeader";
 import { Wordmark } from "../components/Logo";
-import TrustBadges from "../components/TrustBadges";
-import TripHero from "../components/TripHero";
-import HomePricing from "../components/home/HomePricing";
-import PlanTripButton from "../components/home/PlanTripButton";
-import ScrollReveal from "../components/ScrollReveal";
 import WelcomeBack from "../components/home/WelcomeBack";
-import SampleAnswer from "../components/home/SampleAnswer";
+import HomePassport from "../components/home/HomePassport";
 import { FAQ } from "../lib/faq";
 import { AIRLINE_GUIDES } from "../lib/airlineGuides";
 import { PRICES as P } from "../lib/pricing";
@@ -17,20 +12,26 @@ const D = font.display;
 const B = font.body;
 
 export const metadata = {
-  title: { absolute: "Flying with your pet? Check before you book | PetPassGo" },
-  description: "Know before you book. Easy flights are free: see every step your pet needs. Complicated trips get a $29.99 Travel Pass. Keep your pet's passport and vet-verified records in one place.",
+  title: { absolute: "PetPassGo | Fly with your pet, ready" },
+  description: "PetPassGo tells you exactly what your pet needs to fly, and keeps their passport and vet-confirmed records ready for every trip. Checking your trip is free.",
 };
 
 const STEPS = [
-  { n: "1", title: "Check before you book", body: "Pick your route and pet. See which airlines take your pet, what it costs, and whether it's an easy flight.", icon: "M4 6h16M4 12h10M4 18h7" },
-  { n: "2", title: "Get your checklist", body: "Every step with real dates. Free for easy flights. Complicated trips get a Travel Pass.", icon: "M5 4h14v16H5zM8 9h8M8 13h8M8 17h5" },
-  { n: "3", title: "Keep it all in Pet Vault", body: "Vet-confirmed records and your pet's passport, ready to show at the airport, for every trip.", icon: "M5 13l4 4L19 7" },
+  { n: "1", title: "Tell us about the trip", body: "Where you're flying, and who's coming. If you haven't booked, we show which airlines take your pet and what they charge." },
+  { n: "2", title: "See what your pet needs", body: "A short checklist with real dates: the booking, the carrier, and any papers. Simple flights are free." },
+  { n: "3", title: "Keep it in their passport", body: "Records, vaccines and the microchip in one place, ready to show at the airport on every trip." },
+];
+
+const PRICE_CARDS = [
+  { title: "Simple flights", price: "Free", unit: "with an account", body: "A small pet in the cabin, inside the U.S., on one airline, with no health papers. You get the full checklist.", cta: "Check my flight", href: "/assessment" },
+  { title: "Flights that need paperwork", price: P.pass, unit: "per trip", body: "Mexico, Canada and Hawaii, service dogs, big dogs, cargo and two-airline trips. Every step with real dates, reminders and a papers check.", cta: "Plan my trip", href: "/assessment", dark: true },
+  { title: "Pet Vault", price: P.member, unit: "a month", body: `Your pet's passport, vet-confirmed records, reminders and lost-pet help, for every trip. Members pay ${P.memberPass} for a paid trip. Cancel anytime.`, cta: "Make their passport", href: "/join" },
 ];
 
 const HOME_FAQ = [
   {
     q: FAQ[2].q,
-    a: "Easy flights are free: a pet in the cabin, inside the US, on one airline, with no health papers or forms. You just make a free account. Complicated trips, like Mexico or Canada, big dogs, service dogs, or two airlines, need a Travel Pass: $29.99 for one trip, or $14.99 if you already have Pet Vault. You get the requirements for your airline, route, and animal, plus a checklist with deadlines and reminders. A step is shown only when we have the official page and the date we last checked it. Without Pet Vault, your Digital Pet ID and document vault stay open until 7 days after the trip ends. That is 7 days after the travel date on a one-way trip, or 7 days after the return date if you add a later return. One-way trips stay one date.",
+    a: "Simple flights are free: a small pet in the cabin, inside the U.S., on one airline, with no health papers. You just make a free account. Flights that need paperwork, like Mexico, Canada or Hawaii, big dogs, service dogs, or two airlines, need a Travel Pass: $29.99 for one trip, or $14.99 if you already have Pet Vault. You get the requirements for your airline, route, and animal, plus a checklist with deadlines and reminders. A step is shown only when we have the official page and the date we last checked it. Without Pet Vault, your Digital Pet ID and document vault stay open until 7 days after the trip ends. That is 7 days after the travel date on a one-way trip, or 7 days after the return date if you add a later return. One-way trips stay one date.",
   },
   { q: FAQ[6].q, a: FAQ[6].a },
   {
@@ -45,9 +46,6 @@ const HOME_FAQ = [
 
 const WRAP = "max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14";
 
-function Eyebrow({ children, color = tokens.stamp }) {
-  return <p style={{ fontFamily: B, color, fontSize: 15, fontWeight: 700, letterSpacing: "0.08em" }} className="mb-3">{children}</p>;
-}
 
 function H2({ children, light, id }) {
   return <h2 id={id} style={{ fontFamily: D, color: light ? "#fff" : tokens.navy, lineHeight: 1.12 }} className="text-[32px] md:text-[42px] font-bold">{children}</h2>;
@@ -85,53 +83,93 @@ export default function PetPassGoLanding() {
       `}</style>
 
       <SiteHeader />
-      <ScrollReveal />
 
       <main>
-      <section className={`${WRAP} pt-7 sm:pt-10 lg:pt-14 pb-8 lg:pb-12`}>
-        <WelcomeBack />
-        <TripHero />
+      <section className="relative overflow-hidden" style={{ background: tokens.navyDeep }}>
+        <Image src="/images/hero-golden-retriever.jpg" alt="A golden retriever in a travel harness at the airport" fill priority sizes="100vw" className="object-cover object-[70%_35%]" />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(11,21,41,.92) 0%, rgba(11,21,41,.62) 38%, rgba(11,21,41,.12) 72%)" }} aria-hidden="true" />
+        <div className="absolute inset-0 hidden lg:block" style={{ background: "linear-gradient(90deg, rgba(11,21,41,.78) 0%, rgba(11,21,41,.35) 45%, rgba(11,21,41,0) 70%)" }} aria-hidden="true" />
+        <div className={`relative ${WRAP} min-h-[86svh] lg:min-h-[640px] flex flex-col justify-end lg:justify-center pb-14 pt-32`}>
+          <h1 style={{ fontFamily: D, color: "#fff", lineHeight: .98, letterSpacing: "-0.02em" }} className="text-[54px] sm:text-[76px] lg:text-[92px] font-extrabold max-w-[11ch]">Bring them along.</h1>
+          <p style={{ fontFamily: B, color: "#E7EDF6", lineHeight: 1.5 }} className="mt-5 text-[18px] sm:text-[20px] max-w-[30rem]">PetPassGo tells you exactly what your pet needs to fly, and keeps their papers ready for every trip.</p>
+          <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-4">
+            <a href="/assessment" className="btn-primary inline-flex items-center justify-center rounded-full px-9 min-h-[58px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17.5, textDecoration: "none" }}>Plan my pet&apos;s trip</a>
+            <a href="#how" style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: "#fff", textDecoration: "underline", textUnderlineOffset: 4 }} className="text-center sm:text-left">See how it works</a>
+          </div>
+        </div>
       </section>
 
-      <section data-reveal className={`${WRAP} py-12 lg:py-16`}>
-        <Eyebrow>HOW IT WORKS</Eyebrow>
-        <H2>Three steps. Fly ready.</H2>
-        <div className="grid md:grid-cols-3 gap-4 mt-8">
-          {STEPS.map((s) => (
-            <div key={s.n} className="rounded-2xl p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-              <div className="flex items-center justify-between mb-5">
-                <span className="inline-flex items-center justify-center rounded-full" style={{ width: 52, height: 52, background: "#FDE8E2" }}>
-                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={tokens.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={s.icon} /></svg>
-                </span>
-                <span style={{ fontFamily: D, color: tokens.line, fontSize: 48, fontWeight: 800, lineHeight: 1 }}>{s.n}</span>
-              </div>
-              <h3 style={{ fontFamily: D, color: tokens.navy, fontSize: 22, fontWeight: 700, lineHeight: 1.25 }} className="mb-2">{s.title}</h3>
-              <p style={{ fontFamily: B, color: tokens.ink, fontSize: 16, lineHeight: 1.55 }}>{s.body}</p>
-            </div>
+      <div className={WRAP}><WelcomeBack /></div>
+
+      <section id="how" className={`${WRAP} py-16 lg:py-24`} style={{ scrollMarginTop: 64 }}>
+        <h2 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05, letterSpacing: "-0.01em" }} className="text-[36px] md:text-[52px] font-extrabold max-w-[16ch]">From &ldquo;can they come?&rdquo; to boarding.</h2>
+        <ol className="mt-10 grid md:grid-cols-3 gap-x-10 gap-y-8 relative" style={{ listStyle: "none", padding: 0 }}>
+          {STEPS.map((s, i) => (
+            <li key={s.n} className="relative pl-14 md:pl-0">
+              <span className="absolute left-0 top-0 md:static flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: tokens.navy, color: tokens.gold, fontFamily: D, fontWeight: 800, fontSize: 18 }}>{s.n}</span>
+              {i < STEPS.length - 1 ? <span aria-hidden="true" className="hidden md:block absolute" style={{ top: 20, left: 52, right: -28, height: 2, background: tokens.line }} /> : null}
+              <h3 className="md:mt-5" style={{ fontFamily: D, color: tokens.navy, fontSize: 24, fontWeight: 700, lineHeight: 1.2 }}>{s.title}</h3>
+              <p className="mt-2" style={{ fontFamily: B, color: tokens.ink, fontSize: 17, lineHeight: 1.55 }}>{s.body}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section style={{ background: tokens.navy }} className="py-16 lg:py-24 overflow-hidden">
+        <div className={`${WRAP} grid lg:grid-cols-[1fr_minmax(320px,440px)] gap-12 items-center`}>
+          <div>
+            <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.05, letterSpacing: "-0.01em" }} className="text-[36px] md:text-[52px] font-extrabold max-w-[14ch]">A passport made for your pet.</h2>
+            <p className="mt-5 max-w-[32rem]" style={{ fontFamily: B, color: "#D5DEEB", fontSize: 18, lineHeight: 1.55 }}>Their details, vaccines and microchip in one place. Your vet can confirm the records, and at the airport you can show a live check-in code the agent scans.</p>
+            <ul className="mt-6 grid gap-3 max-w-[32rem]" style={{ listStyle: "none", padding: 0 }}>
+              {["Vaccines confirmed by your vet", "A live code to show at check-in", "Reminders before shots and papers run out", "A QR tag that helps if they ever get lost"].map((t) => (
+                <li key={t} className="flex gap-3" style={{ fontFamily: B, fontSize: 16.5, color: "#fff" }}><span style={{ color: tokens.gold, fontWeight: 800 }}>✓</span>{t}</li>
+              ))}
+            </ul>
+            <a href="/join" className="mt-8 inline-flex items-center justify-center rounded-full px-8 min-h-[54px]" style={{ background: "#fff", color: tokens.navy, fontFamily: B, fontWeight: 800, fontSize: 16.5, textDecoration: "none" }}>Make your pet&apos;s passport</a>
+          </div>
+          <div className="w-full max-w-[440px] mx-auto">
+            <HomePassport />
+            <p className="mt-3 text-center" style={{ fontFamily: B, fontSize: 14, color: "#AFC0D6" }}>Meet Biscuit, our sample pup. Tap the passport to flip it.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className={`${WRAP} py-16 lg:py-24`}>
+        <h2 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[32px] md:text-[44px] font-extrabold">Heading to Mexico or Canada?</h2>
+        <p className="mt-3 max-w-[38rem]" style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }}>Crossing a border with a dog means certificates with tight dates, and a CDC form to get home. We work out every date from your flights.</p>
+        <div className="grid sm:grid-cols-2 gap-4 mt-8 max-w-[52rem]">
+          {[["/mexico", "Mexico with your dog", "Two vet certificates, an inspection on landing, and the trip home."], ["/canada", "Canada with your dog", "The rabies certificate Canada checks, and the CDC form home."]].map(([href, title, body]) => (
+            <a key={href} href={href} className="rounded-3xl p-6 block" style={{ background: "#fff", border: `1px solid ${tokens.line}`, textDecoration: "none" }}>
+              <div style={{ fontFamily: D, fontSize: 24, fontWeight: 800, color: tokens.navy }}>{title}</div>
+              <p className="mt-2" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>{body}</p>
+              <span className="inline-block mt-4" style={{ fontFamily: B, fontWeight: 800, fontSize: 15.5, color: tokens.primary }}>Read the guide</span>
+            </a>
           ))}
         </div>
       </section>
 
-      <section data-reveal className={`${WRAP} py-12 lg:py-16`}>
-        <SampleAnswer />
-      </section>
-
-      <section data-reveal id="pricing" style={{ background: tokens.navy }} className="py-12 lg:py-16">
+      <section id="pricing" style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-16 lg:py-24">
         <div className={WRAP}>
-          <Eyebrow color={tokens.gold}>PRICING</Eyebrow>
-          <H2 light>Pick your plan.</H2>
-          <div className="mt-8">
-            <HomePricing />
+          <h2 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[32px] md:text-[44px] font-extrabold">What it costs</h2>
+          <p className="mt-3 max-w-[38rem]" style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }}>Checking your trip is always free. You only pay when a flight needs paperwork.</p>
+          <div className="grid md:grid-cols-3 gap-4 mt-10">
+            {PRICE_CARDS.map((c) => (
+              <article key={c.title} className="rounded-3xl p-6 flex flex-col" style={{ background: c.dark ? tokens.navy : tokens.sky, color: c.dark ? "#fff" : tokens.navy }}>
+                <h3 style={{ fontFamily: D, fontSize: 22, fontWeight: 800, lineHeight: 1.2 }}>{c.title}</h3>
+                <div className="mt-3 flex items-baseline gap-2"><span style={{ fontFamily: D, fontSize: 44, fontWeight: 800, lineHeight: 1 }}>{c.price}</span><span style={{ fontFamily: B, fontSize: 15, color: c.dark ? "#C9D4E4" : tokens.muted }}>{c.unit}</span></div>
+                <p className="mt-4 flex-1" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.55, color: c.dark ? "#E7EDF6" : tokens.ink }}>{c.body}</p>
+                <a href={c.href} className="mt-6 inline-flex items-center justify-center rounded-full min-h-[50px] px-6" style={{ background: c.dark ? tokens.primary : "#fff", color: c.dark ? "#fff" : tokens.navy, border: c.dark ? "none" : `1.5px solid ${tokens.line}`, fontFamily: B, fontWeight: 800, fontSize: 15.5, textDecoration: "none" }}>{c.cta}</a>
+              </article>
+            ))}
           </div>
-          <TrustBadges className="mt-6" />
         </div>
       </section>
 
-      <section data-reveal className={`${WRAP} py-12 lg:py-16`}>
+      <section className={`${WRAP} py-16 lg:py-24`}>
         <div className="max-w-3xl">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-6">
-            <H2>Quick answers</H2>
-            <a href="/faq" style={{ fontFamily: B, color: tokens.navy, fontWeight: 700, fontSize: 16, textDecoration: "none" }} className="underline underline-offset-4">View all questions</a>
+            <H2>Questions</H2>
+            <a href="/faq" style={{ fontFamily: B, color: tokens.navy, fontWeight: 700, fontSize: 16, textDecoration: "none" }} className="underline underline-offset-4">All questions</a>
           </div>
           <div className="home-faq">
             {HOME_FAQ.map((f) => (
@@ -144,35 +182,18 @@ export default function PetPassGoLanding() {
               </details>
             ))}
           </div>
+          <p className="mt-10" style={{ fontFamily: B, fontSize: 15.5, lineHeight: 1.9, color: tokens.ink }}>
+            <b style={{ color: tokens.navy }}>Guides:</b>{" "}
+            {AIRLINE_GUIDES.map((a, i) => <span key={a.slug}>{i ? ", " : ""}<a href={`/airlines/${a.slug}`} style={{ color: tokens.navy }}>{a.name}</a></span>)}
+            {", "}<a href="/service-dog" style={{ color: tokens.navy }}>flying with a service dog</a>{", "}<a href="/guides" style={{ color: tokens.navy }}>service dog and ESA laws by state</a>
+          </p>
         </div>
       </section>
 
-      <section className={`${WRAP} pb-12`}>
-        <p style={{ fontFamily: B, fontSize: 15.5, lineHeight: 1.9, color: tokens.ink }}>
-          <b style={{ color: tokens.navy }}>Airline pet guides:</b>{" "}
-          {AIRLINE_GUIDES.map((a, i) => <span key={a.slug}>{i ? " · " : ""}<a href={`/airlines/${a.slug}`} style={{ color: tokens.navy }}>{a.name}</a></span>)}
-          {" "}· <a href="/mexico" style={{ color: tokens.primary, fontWeight: 700 }}>Mexico</a> · <a href="/canada" style={{ color: tokens.primary, fontWeight: 700 }}>Canada</a> · <a href="/service-dog" style={{ color: tokens.primary, fontWeight: 700 }}>Service dogs</a> · <a href="/guides" style={{ color: tokens.primary, fontWeight: 700 }}>Service dog &amp; ESA laws by state</a>
-        </p>
-      </section>
-
-      <section data-reveal className="relative overflow-hidden min-h-[520px] lg:min-h-[440px]" style={{ background: tokens.navyDeep }}>
-        <Image
-          src="/images/hero-golden-retriever.jpg"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover object-[78%_32%]"
-        />
-        <div className="absolute inset-0 lg:hidden" style={{ background: "linear-gradient(to top, rgba(11,21,41,0.96) 0%, rgba(11,21,41,0.9) 34%, rgba(11,21,41,0.28) 68%, rgba(11,21,41,0.12) 100%)" }} aria-hidden="true" />
-        <div className="absolute inset-0 hidden lg:block" style={{ background: "linear-gradient(90deg, rgba(11,21,41,0.94) 0%, rgba(11,21,41,0.84) 40%, rgba(11,21,41,0.22) 100%)" }} aria-hidden="true" />
-        <div className={`relative ${WRAP} py-16 lg:py-20 min-h-[520px] lg:min-h-[440px] flex flex-col justify-end lg:justify-center`}>
-          <div className="max-w-[36rem]">
-            <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.12 }} className="text-[32px] md:text-[44px] font-bold">Make travel easier for you and your pet.</h2>
-            <p style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: "#E7EDF6" }} className="mt-4 mb-7">
-              Get the steps for this trip, then keep your pet's ID and records in one place.
-            </p>
-            <PlanTripButton />
-          </div>
+      <section style={{ background: tokens.navyDeep }} className="py-16 lg:py-20">
+        <div className={`${WRAP} flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6`}>
+          <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.05 }} className="text-[34px] md:text-[48px] font-extrabold max-w-[16ch]">Where are you two going?</h2>
+          <a href="/assessment" className="btn-primary inline-flex items-center justify-center rounded-full px-9 min-h-[58px] self-start lg:self-auto" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17.5, textDecoration: "none" }}>Plan my pet&apos;s trip</a>
         </div>
       </section>
       </main>

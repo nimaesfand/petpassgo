@@ -592,7 +592,7 @@ export default function PetPassGoQuiz() {
                     <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 21, color: tokens.navy, lineHeight: 1.15 }}>Your checklist is free</div>
                     <div className="rounded-full px-3 py-1" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontSize: 13, fontWeight: 800, letterSpacing: ".04em" }}>$0</div>
                   </div>
-                  <p className="mt-1.5 mb-4" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }}>Easy flights are always free on PetPassGo. Make a free account and we&apos;ll show you exactly how to do each step, with the airline&apos;s official page.</p>
+                  <p className="mt-1.5 mb-4" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }}>Simple flights are always free on PetPassGo. Make a free account and we&apos;ll show you exactly how to do each step, with the airline&apos;s official page.</p>
                   <button type="button" disabled={buying} onClick={unlockFree} className="w-full rounded-full py-3.5" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer", opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : "Get my free checklist"}</button>
                   <p className="mt-2 text-center" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>No card needed.</p>
                 </div>
