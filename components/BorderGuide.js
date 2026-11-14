@@ -21,7 +21,7 @@ export default function BorderGuide({ g }) {
           <h1 style={{ fontFamily: D, fontWeight: 800, color: tokens.navy, lineHeight: 1.05, textWrap: "balance" }} className="text-[36px] sm:text-[52px] mt-2 max-w-[48rem]">{g.title}</h1>
           <p style={{ fontFamily: B, fontSize: 19, lineHeight: 1.5, color: tokens.ink }} className="mt-4 max-w-[42rem]">{g.lead}</p>
           <div className="flex flex-wrap gap-3 mt-6">
-            <a href={cta} className="inline-flex items-center justify-center rounded-full px-8 min-h-[54px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Check my {g.name} trip</a>
+            <a href={cta} className="inline-flex items-center justify-center rounded-full px-8 min-h-[54px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Get my dates and forms</a>
             <a href="#steps" className="hidden sm:inline-flex items-center justify-center rounded-full px-6 min-h-[54px]" style={{ background: "#fff", color: tokens.navy, border: `1.5px solid ${tokens.line}`, fontFamily: B, fontWeight: 800, fontSize: 16, textDecoration: "none" }}>See every step</a>
           </div>
           <div className="grid grid-cols-3 gap-2 sm:gap-3 mt-6 sm:mt-8">
@@ -84,12 +84,12 @@ export default function BorderGuide({ g }) {
         <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }}>
           <div className="max-w-[1100px] mx-auto px-4 sm:px-6 py-12 grid lg:grid-cols-[1.1fr_1fr] gap-8 items-center">
             <div>
-              <h2 style={{ fontFamily: D, fontWeight: 800, color: tokens.navy }} className="text-[28px] sm:text-[36px]">We work out every date for you</h2>
+              <h2 style={{ fontFamily: D, fontWeight: 800, color: tokens.navy }} className="text-[28px] sm:text-[36px]">The rules are the easy part. The timing isn&apos;t.</h2>
               <p className="mt-3" style={{ fontFamily: B, fontSize: 17, lineHeight: 1.55, color: tokens.ink }}>
-                Tell us your flights and your dog. Your Travel Pass turns these rules into a checklist with real dates: the day to see your vet, the 5-day windows, the CDC form before your flight home, and your airline&apos;s own steps. Reminders before each one.
+                Each certificate has to be signed within a short window before your flight, and the CDC form has its own deadline before you fly home. Miss one and your dog can be turned away. Your Travel Pass turns these rules into your own checklist, with the exact dates for your flights.
               </p>
               <ul className="mt-4 grid gap-2" style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                {["Dates from your flights there and back", "Checks your dog is old enough to come home", "Official source on every step", "Vet-confirmed records and a passport to show at the counter"].map((t) => (
+                {["Your vet visit dates, worked out from your flights", "Reminders before every deadline", "Your CDC form answers, ready to copy in", "Checks your dog is old enough to come home", "Everything in travel mode at the airport"].map((t) => (
                   <li key={t} className="flex gap-2" style={{ fontFamily: B, fontSize: 16, color: tokens.ink }}><span style={{ color: tokens.green, marginTop: 2 }}><Icon name="check" size={17} /></span>{t}</li>
                 ))}
               </ul>
@@ -98,7 +98,7 @@ export default function BorderGuide({ g }) {
               <div style={{ fontFamily: B, fontSize: 14, fontWeight: 800, letterSpacing: ".06em", color: tokens.muted }}>TRAVEL PASS · {g.name.toUpperCase()}</div>
               <div className="mt-1 flex items-baseline gap-2"><span style={{ fontFamily: D, fontSize: 44, fontWeight: 800, color: tokens.navy }}>{P.pass}</span><span style={{ fontFamily: B, color: tokens.muted }}>one trip, there and back</span></div>
               <p className="mt-1" style={{ fontFamily: B, fontSize: 15, color: tokens.ink }}>{P.memberPass} with Pet Vault. Checking your trip first is free.</p>
-              <a href={cta} className="mt-4 flex items-center justify-center rounded-full min-h-[54px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Check my {g.name} trip</a>
+              <a href={cta} className="mt-4 flex items-center justify-center rounded-full min-h-[54px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Get my dates and forms</a>
             </div>
           </div>
         </section>

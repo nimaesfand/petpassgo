@@ -95,7 +95,7 @@ const TILES = [
       <div className="grid gap-2">
         <div className="rounded-2xl p-4 text-center" style={{ border: `2px dashed ${tokens.primary}`, background: "#FFF7F2" }}>
           <div style={{ fontSize: 30 }} aria-hidden="true">📄📸</div>
-          <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 16, color: tokens.navy }} className="mt-1">Take a photo of your vet papers</div>
+          <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 16, color: tokens.navy }} className="mt-1">Take a photo of your vet records</div>
           <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>We read the vaccines and dates and add them for you. You check before saving.</div>
         </div>
         <Row emoji="🏥" title="Sample Vet Clinic" sub="Last visit Oct 2, 2026 · (555) 0199" />
