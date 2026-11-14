@@ -38,7 +38,7 @@ function ConfirmDialog({ title, confirmLabel, onCancel, onConfirm }) {
   );
 }
 
-export default function PetDocumentsCard({ pet, userId }) {
+export default function PetDocumentsCard({ pet, userId, onChange, title }) {
   const [docs, setDocs] = useState([]);
   const [form, setForm] = useState({ type: VAULT_DOC_TYPES[0], file: null, issuedOn: "", expiresOn: "", note: "" });
   const [busy, setBusy] = useState(false);
@@ -47,9 +47,10 @@ export default function PetDocumentsCard({ pet, userId }) {
   async function load() {
     const { data } = await supabase.from("documents").select("*").eq("pet_id", pet.id).order("uploaded_at", { ascending: false });
     setDocs(data || []);
+    onChange?.(data || []);
   }
 
-  useEffect(() => { load(); }, [pet.id]);
+  useEffect(() => { load(); }, [pet.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function uploadFile(file) {
     const path = `${userId}/${pet.id}/${Date.now()}-${file.name.replace(/[^\w.\-]+/g, "_")}`;

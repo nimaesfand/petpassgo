@@ -19,7 +19,7 @@ export function useTripPet(trip) {
   useEffect(() => {
     if (!trip) return;
     (async () => {
-      const q = supabase.from("pets").select("id,name,photo_url,animal_type,breed,weight_lb,passport_no,carrier_length_in,carrier_width_in,carrier_height_in,date_of_birth");
+      const q = supabase.from("pets").select("id,name,photo_url,animal_type,breed,weight_lb,passport_no,carrier_length_in,carrier_width_in,carrier_height_in,date_of_birth,microchip_number");
       const { data } = trip.pet_id ? await q.eq("id", trip.pet_id).limit(1) : await q.order("created_at").limit(1);
       setPet((data && data[0]) || null);
     })();

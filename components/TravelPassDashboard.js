@@ -21,6 +21,9 @@ import { useTodayPT } from "../lib/useTodayPT";
 import { supabase } from "../lib/supabaseClient";
 import { PET_RELIEF } from "../lib/petRelief";
 import PassChecklist from "./PassChecklist";
+import PaperCheck from "./PaperCheck";
+import PetDocumentsCard from "./PetDocumentsCard";
+import { paperCheck } from "../lib/paperCheck";
 import TripTimeline from "./TripTimeline";
 import VetGuidance from "./VetGuidance";
 import RoundTripAddon from "./RoundTripAddon";
@@ -89,12 +92,14 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
   const [focusStep, setFocusStep] = useState(null);
   const [docs, setDocs] = useState(null);
   const [health, setHealth] = useState(null);
+  const [docsTick, setDocsTick] = useState(0);
   const pack = useTripExtras(trip?.id);
   const today = useTodayPT();
   const tripWithPet = useMemo(() => ({ ...trip, pet }), [trip, pet]);
   const plans = useMemo(() => segmentPlans(results, tripWithPet), [results, tripWithPet]);
   const cards = useMemo(() => plans.flatMap((plan) => plan.cards), [plans]);
   const groups = useMemo(() => groupCards(cards, statusMap), [cards, statusMap]);
+  const papers = useMemo(() => (health && docs ? paperCheck({ trip, pet, health, docs, cards }) : []), [trip, pet, health, docs, cards]);
   const progress = passProgress(groups);
   const ready = passReady(progress, plans);
   const needsCheck = plans.some((plan) => !plan.resolved);
@@ -136,12 +141,12 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
 
   useEffect(() => {
     if (!trip?.id) return;
-    let q = supabase.from("documents").select("id,document_type,file_url,expires_on,pet_id,trip_id");
+    let q = supabase.from("documents").select("id,document_type,file_url,expires_on,issued_on,pet_id,trip_id");
     q = pet?.id ? q.or(`pet_id.eq.${pet.id},trip_id.eq.${trip.id}`) : q.eq("trip_id", trip.id);
     q.then(({ data }) => setDocs(data || []));
-    if (pet?.id) supabase.from("pet_health_records").select("id,kind,name,expires_on").eq("pet_id", pet.id).then(({ data }) => setHealth(data || []));
+    if (pet?.id) supabase.from("pet_health_records").select("id,kind,name,date_given,expires_on,verified_at,verified_by_name,verified_by_clinic").eq("pet_id", pet.id).then(({ data }) => setHealth(data || []));
     else setHealth([]);
-  }, [trip?.id, pet?.id]);
+  }, [trip?.id, pet?.id, docsTick]);
 
   async function openDoc(d) {
     const url = await getSignedUrl(d.file_url);
@@ -262,6 +267,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
             </div>
           )}
           {tripFitWarnings(trip).some((w) => w.level === "stop") ? <TripFitCard answers={trip} className="mb-4" /> : null}
+          <PaperCheck checks={papers} petName={pet?.name} onUpload={() => setSection("documents")} />
           {cards.length === 0 ? (
             <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 16, color: tokens.ink }}>No requirements found for this exact combination yet.</div>
           ) : (
@@ -307,10 +313,11 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
 
       {section === "documents" && (
         <div className="space-y-3">
-          <SoftCard title="Pet ID">
-            <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>The Pet ID page is the one a finder or gate agent can open. PetPassGo does not verify service-animal status.</p>
-            {pet?.passport_no && <p style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }} className="mt-2">PetPassGo ID {pet.passport_no}</p>}
-            {pet?.id && <div className="mt-3"><a href={`/id/${pet.id}`} className="ppg-btn ppg-btn-primary">View your Pet ID</a></div>}
+          {pet?.id && trip?.user_id ? <PetDocumentsCard pet={pet} userId={trip.user_id} onChange={() => setDocsTick((n) => n + 1)} /> : null}
+          <SoftCard title="Passport">
+            <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>Show it at the counter, or open the live check-in code from the passport for the agent to scan.</p>
+            {pet?.passport_no && <p style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }} className="mt-2">Passport {pet.passport_no}</p>}
+            {pet?.id && <div className="mt-3"><a href={`/id/${pet.id}`} className="ppg-btn ppg-btn-primary">Open the passport</a></div>}
           </SoftCard>
           <SoftCard title="Vaccination records">
             {(health || []).length === 0 && (docs || []).filter((d) => /vaccin|rabies|health/i.test(d.document_type || "")).length === 0 && (
