@@ -78,9 +78,9 @@ export default function PetPassGoLanding() {
 
       <main>
       <section className="relative overflow-hidden" style={{ background: tokens.navyDeep }}>
-        <div className="absolute inset-0 lg:left-auto lg:aspect-[16/9]">
-          <Image src="/images/hero-golden-retriever.jpg" alt="A golden retriever in a travel harness at the airport" fill priority sizes="(min-width: 1024px) 70vw, 100vw" className="object-cover object-[70%_35%] lg:object-center" />
-          <div className="absolute inset-y-0 left-0 hidden lg:block w-[45%]" style={{ background: "linear-gradient(90deg, rgba(11,21,41,1) 0%, rgba(11,21,41,.55) 55%, rgba(11,21,41,0) 100%)" }} aria-hidden="true" />
+        <div className="absolute inset-0 lg:left-auto lg:w-[58%] 2xl:w-[56%]">
+          <Image src="/images/hero-golden-retriever.jpg" alt="A golden retriever in a travel harness at the airport" fill priority sizes="(min-width: 1024px) 70vw, 100vw" className="object-cover object-[70%_35%] lg:object-[74%_22%]" />
+          <div className="absolute inset-y-0 left-0 hidden lg:block w-[38%]" style={{ background: "linear-gradient(90deg, rgba(11,21,41,1) 0%, rgba(11,21,41,.55) 55%, rgba(11,21,41,0) 100%)" }} aria-hidden="true" />
         </div>
         <div className="absolute inset-0 lg:hidden" style={{ background: "linear-gradient(to top, rgba(11,21,41,.92) 0%, rgba(11,21,41,.62) 38%, rgba(11,21,41,.12) 72%)" }} aria-hidden="true" />
         <div className="absolute inset-0 hidden lg:block xl:hidden" style={{ background: "linear-gradient(90deg, rgba(11,21,41,.7) 0%, rgba(11,21,41,.3) 40%, rgba(11,21,41,0) 60%)" }} aria-hidden="true" />
