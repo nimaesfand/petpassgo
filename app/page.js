@@ -22,6 +22,12 @@ const STEPS = [
   { n: "3", title: "Keep it in their passport", body: "Records, vaccines and the microchip in one place, ready to show at the airport on every trip." },
 ];
 
+const VET_STEPS = [
+  { title: "Send your vet a link", body: "From Pet Vault, enter your vet's email. They don't need an account." },
+  { title: "Your vet checks the records", body: "They see your pet's vaccines and confirm the ones that match their files." },
+  { title: "Records show as vet verified", body: "With your vet's name and clinic, on the passport and at airport check-in. If a record is edited later, the badge comes off." },
+];
+
 const PRICE_CARDS = [
   { title: "Free checklist", sub: "For simple flights", price: "Free", unit: "with an account", body: "A small pet in the cabin, inside the U.S., on one airline, with no health papers. You get every step for your flight.", cta: "Check my flight", href: "/assessment" },
   { title: "Travel Pass", sub: "For flights that need paperwork", price: P.pass, unit: `per trip, or ${P.memberPass} with Pet Vault`, body: "Mexico, Canada and Hawaii, service dogs, big dogs, cargo and two-airline trips. Every step with dates and reminders, and we check your pet's vaccines and certificates are valid for the trip.", cta: "Plan my trip", href: "/assessment", dark: true },
@@ -117,6 +123,41 @@ export default function PetPassGoLanding() {
             <HomePassport />
             <p className="mt-3 text-center" style={{ fontFamily: B, fontSize: 14, color: "#AFC0D6" }}>Meet Biscuit, our sample pup. Tap the passport to flip it.</p>
           </div>
+        </div>
+      </section>
+
+      <section className={`${WRAP} py-16 lg:py-24 grid lg:grid-cols-[1fr_minmax(320px,460px)] gap-12 items-center`}>
+        <div>
+          <h2 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05, letterSpacing: "-0.01em" }} className="text-[32px] md:text-[44px] font-extrabold max-w-[16ch]">Records your vet confirms.</h2>
+          <p className="mt-3 max-w-[34rem]" style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }}>Anyone can type in a vaccine date. A record your vet has confirmed is one an airline agent can trust.</p>
+          <ol className="mt-7 grid gap-5 max-w-[34rem]" style={{ listStyle: "none", padding: 0 }}>
+            {VET_STEPS.map((t, i) => (
+              <li key={t.title} className="flex gap-4">
+                <span className="flex-shrink-0 flex items-center justify-center rounded-full" style={{ width: 36, height: 36, background: tokens.navy, color: tokens.gold, fontFamily: D, fontWeight: 800 }}>{i + 1}</span>
+                <div>
+                  <h3 style={{ fontFamily: D, fontSize: 20, fontWeight: 700, color: tokens.navy, lineHeight: 1.2 }}>{t.title}</h3>
+                  <p className="mt-1" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>{t.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <div className="rounded-3xl p-5 sm:p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 24px 60px rgba(20,33,61,.12)" }} aria-label="Example of vet-verified records">
+          <div className="flex items-center justify-between">
+            <span style={{ fontFamily: D, fontSize: 19, fontWeight: 800, color: tokens.navy }}>Biscuit&apos;s vaccines</span>
+            <span style={{ fontFamily: B, fontSize: 13, color: tokens.muted }}>Example</span>
+          </div>
+          <ul className="mt-4 grid gap-2.5" style={{ listStyle: "none", padding: 0 }}>
+            {[["Rabies", "Valid until May 1, 2028", true], ["DHPP", "Valid until Dec 1, 2027", true], ["Bordetella", "Valid until Jun 3, 2027", false]].map(([n, d, ok]) => (
+              <li key={n} className="rounded-2xl px-4 py-3" style={{ background: tokens.sky }}>
+                <div className="flex items-center justify-between gap-3">
+                  <span style={{ fontFamily: B, fontWeight: 800, fontSize: 16.5, color: tokens.navy }}>{n}</span>
+                  <span className="rounded-full px-2.5 py-1 whitespace-nowrap" style={{ background: ok ? "#EAF6EE" : "#EEF2F6", color: ok ? "#15803D" : "#475569", fontFamily: B, fontSize: 12.5, fontWeight: 800 }}>{ok ? "✓ Vet verified" : "Entered by you"}</span>
+                </div>
+                <div className="mt-0.5" style={{ fontFamily: B, fontSize: 14, color: tokens.ink }}>{d}{ok ? " · Dr. Sample, Sample Vet Clinic" : ""}</div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
