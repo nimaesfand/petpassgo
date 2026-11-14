@@ -12,37 +12,23 @@ const D = font.display;
 const B = font.body;
 
 export const metadata = {
-  title: { absolute: "PetPassGo | Fly with your pet, ready" },
+  title: { absolute: "PetPassGo | Fly with your pet" },
   description: "PetPassGo tells you exactly what your pet needs to fly, and keeps their passport and vet-confirmed records ready for every trip. Checking your trip is free.",
 };
 
 const STEPS = [
-  { n: "1", title: "Tell us about the trip", body: "Where you're flying, and who's coming. If you haven't booked, we show which airlines take your pet and what they charge." },
-  { n: "2", title: "See what your pet needs", body: "A short checklist with real dates: the booking, the carrier, and any papers. Simple flights are free." },
+  { n: "1", title: "Tell us about the trip", body: "Where and when you're flying. Haven't booked yet? We show which airlines take your pet and what each one charges." },
+  { n: "2", title: "See what your pet needs", body: "A checklist of everything to do before you fly, with dates. Simple flights are free." },
   { n: "3", title: "Keep it in their passport", body: "Records, vaccines and the microchip in one place, ready to show at the airport on every trip." },
 ];
 
 const PRICE_CARDS = [
   { title: "Simple flights", price: "Free", unit: "with an account", body: "A small pet in the cabin, inside the U.S., on one airline, with no health papers. You get the full checklist.", cta: "Check my flight", href: "/assessment" },
   { title: "Flights that need paperwork", price: P.pass, unit: "per trip", body: "Mexico, Canada and Hawaii, service dogs, big dogs, cargo and two-airline trips. Every step with real dates, reminders and a papers check.", cta: "Plan my trip", href: "/assessment", dark: true },
-  { title: "Pet Vault", price: P.member, unit: "a month", body: `Your pet's passport, vet-confirmed records, reminders and lost-pet help, for every trip. Members pay ${P.memberPass} for a paid trip. Cancel anytime.`, cta: "Make their passport", href: "/join" },
+  { title: "Pet Vault", price: P.member, unit: "a month", body: `Your pet's passport, vet-confirmed records, reminders and lost-pet help, for every trip. Travel Passes are ${P.memberPass} for members. Cancel anytime.`, cta: "Make their passport", href: "/join" },
 ];
 
-const HOME_FAQ = [
-  {
-    q: FAQ[2].q,
-    a: "Simple flights are free: a small pet in the cabin, inside the U.S., on one airline, with no health papers. You just make a free account. Flights that need paperwork, like Mexico, Canada or Hawaii, big dogs, service dogs, or two airlines, need a Travel Pass: $29.99 for one trip, or $14.99 if you already have Pet Vault. You get the requirements for your airline, route, and animal, plus a checklist with deadlines and reminders. A step is shown only when we have the official page and the date we last checked it. Without Pet Vault, your Digital Pet ID and document vault stay open until 7 days after the trip ends. That is 7 days after the travel date on a one-way trip, or 7 days after the return date if you add a later return. One-way trips stay one date.",
-  },
-  { q: FAQ[6].q, a: FAQ[6].a },
-  {
-    q: "What if an airline requirement changes?",
-    a: "Airline rules change, and they aren't the same on every route. Your Travel Pass shows a step when we have the official page and the date we last checked it. If we don't have it, the pass says to check with your airline. Fees, forms, and carrier sizes are in the pass after you pay, not here.",
-  },
-  {
-    q: "Is this a subscription?",
-    a: `A Travel Pass is a one-time purchase for one trip. Pet Vault is ${P.member} a month. It renews each month until you cancel, and you can cancel online anytime in account Billing. No phone call. Members can add a Travel Pass for ${P.memberPass} per trip.`,
-  },
-];
+const HOME_FAQ = [FAQ[1], FAQ[3], FAQ[2], FAQ[4]];
 
 const WRAP = "max-w-[1240px] mx-auto px-4 sm:px-6 md:px-14";
 
@@ -102,7 +88,7 @@ export default function PetPassGoLanding() {
       <div className={WRAP}><WelcomeBack /></div>
 
       <section id="how" className={`${WRAP} py-16 lg:py-24`} style={{ scrollMarginTop: 64 }}>
-        <h2 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05, letterSpacing: "-0.01em" }} className="text-[36px] md:text-[52px] font-extrabold max-w-[16ch]">From &ldquo;can they come?&rdquo; to boarding.</h2>
+        <h2 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05, letterSpacing: "-0.01em" }} className="text-[36px] md:text-[52px] font-extrabold max-w-[16ch]">How it works</h2>
         <ol className="mt-10 grid md:grid-cols-3 gap-x-10 gap-y-8 relative" style={{ listStyle: "none", padding: 0 }}>
           {STEPS.map((s, i) => (
             <li key={s.n} className="relative pl-14 md:pl-0">

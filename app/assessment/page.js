@@ -370,7 +370,7 @@ export default function PetPassGoQuiz() {
                 This changes which requirements apply to your trip.
               </p>
               {answers.esa && (
-                <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }} className="mb-4">ESA is selected. Choose dog or cat. An emotional support animal flies as a pet.</p>
+                <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }} className="mb-4">Emotional support animals fly as pets. Choose dog or cat.</p>
               )}
               <div className="flex flex-col gap-3">
                 <OptionCard icon="dog" label="Dog" selected={answers.animal === "Dog"} onClick={() => set("animal", "Dog")} />
@@ -394,8 +394,8 @@ export default function PetPassGoQuiz() {
               {answers.role === "Service animal" && answers.animal && answers.animal !== "Dog" && (
                 <div className="rounded-xl p-4 mt-4" style={{ background: "#FFF7F2", border: `1px solid ${tokens.primary}` }}>
                   <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }}>U.S. airlines recognize dogs as service animals</div>
-                  <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink, lineHeight: 1.45 }} className="mt-1 mb-3">A cat or other animal flies as a pet. Switch to the pet path, or go back and choose Dog.</p>
-                  <button type="button" onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: false, psd: false }))} className="rounded-full px-5 py-3" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, border: "none", cursor: "pointer" }}>Switch to the pet path</button>
+                  <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink, lineHeight: 1.45 }} className="mt-1 mb-3">Only dogs can be service animals on U.S. flights. A cat or other animal flies as a pet.</p>
+                  <button type="button" onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: false, psd: false }))} className="rounded-full px-5 py-3" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, border: "none", cursor: "pointer" }}>Fly as a pet</button>
                 </div>
               )}
               <NavRow onBack={back} onNext={next} nextDisabled={!answers.role || (answers.role === "Service animal" && answers.animal !== "Dog")} />
@@ -592,7 +592,7 @@ export default function PetPassGoQuiz() {
                     <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 21, color: tokens.navy, lineHeight: 1.15 }}>Your checklist is free</div>
                     <div className="rounded-full px-3 py-1" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontSize: 13, fontWeight: 800, letterSpacing: ".04em" }}>$0</div>
                   </div>
-                  <p className="mt-1.5 mb-4" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }}>Simple flights are always free on PetPassGo. Make a free account and we&apos;ll show you exactly how to do each step, with the airline&apos;s official page.</p>
+                  <p className="mt-1.5 mb-4" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }}>Simple flights are free. Make an account and we&apos;ll show you how to do each step.</p>
                   <button type="button" disabled={buying} onClick={unlockFree} className="w-full rounded-full py-3.5" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer", opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : "Get my free checklist"}</button>
                   <p className="mt-2 text-center" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>No card needed.</p>
                 </div>
