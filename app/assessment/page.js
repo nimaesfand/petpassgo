@@ -483,7 +483,7 @@ export default function PetPassGoQuiz() {
           {step === 4 && (
             <>
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
-                {answers.booked === false ? "Which airline works best for your pet?" : "Which airline?"}
+                {answers.booked === false ? "Compare pet fees by airline" : "Which airline?"}
               </h2>
               {answers.booked === false && !showAllAirlines ? (
                 <>

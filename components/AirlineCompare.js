@@ -7,9 +7,9 @@ import { findAirport } from "../lib/airports";
 // "Haven't booked yet": every airline for this kind of route, side by side.
 // Picking one continues the trip check with that airline.
 const LOOK = {
-  easy: { label: "Simple · free", bg: "#EAF6EE", fg: "#15803D" },
+  easy: { label: "No extra steps", bg: "#EAF6EE", fg: "#15803D" },
   go: { label: "Can fly", bg: "#EAF2FB", fg: "#1D4E89" },
-  action: { label: "Can fly, more steps", bg: "#FEF3C7", fg: "#92400E" },
+  action: { label: "Extra steps", bg: "#FEF3C7", fg: "#92400E" },
   no: { label: "Not allowed", bg: "#FDECEC", fg: "#B91C1C" },
   check: { label: "Check with airline", bg: "#EEF2F6", fg: "#475569" },
 };
@@ -46,11 +46,11 @@ export default function AirlineCompare({ answers, selected, onPick }) {
   }
   if (!list.length) return <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>We couldn't compare airlines for this route. Pick one from the list below.</p>;
 
-  const pet = answers.animal === "Cat" ? "cat" : answers.role === "Service animal" ? "service dog" : "dog";
+  const pet = answers.role === "Service animal" ? "service dog" : answers.animal === "Cat" ? "cat" : answers.animal === "Dog" ? "dog" : "pet";
   return (
     <div>
       <p className="mb-3" style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted, lineHeight: 1.45 }}>
-        {city(answers.origin)} → {city(answers.destination)}, your {pet} in the cabin. Easiest and cheapest first. Tap one to see your steps.
+        What each airline charges to bring your {pet} in the cabin from {city(answers.origin)} to {city(answers.destination)}, and the carrier size they allow. Easiest and cheapest at the top. Pick one to get your checklist.
       </p>
       <div className="flex flex-col gap-2">
         {list.map((a, i) => {
