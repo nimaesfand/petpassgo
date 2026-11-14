@@ -11,6 +11,7 @@ import { connectionReady, rulesRole, segmentsToStore } from "../../lib/segments"
 import { saveCheckoutTrip } from "../../lib/tripCheckout";
 import AirportField from "../../components/AirportField";
 import RequirementsPreview from "../../components/RequirementsPreview";
+import AirlineCompare from "../../components/AirlineCompare";
 import FreeAccountSheet from "../../components/FreeAccountSheet";
 import FlightLookup, { airportLabel, airlineFromFlight } from "../../components/FlightLookup";
 import { readTripIntent } from "../../lib/tripIntent";
@@ -149,6 +150,7 @@ export default function PetPassGoQuiz() {
   const [tips, setTips] = useState(false);
   const [consentErr, setConsentErr] = useState("");
   const [airlineQuery, setAirlineQuery] = useState("");
+  const [showAllAirlines, setShowAllAirlines] = useState(false);
   const [autoBuy, setAutoBuy] = useState(""); // set when returning signed in from signup/login with a saved purchase
   const [booted, setBooted] = useState(false);
   const [regionHint, setRegionHint] = useState("");
@@ -185,6 +187,7 @@ export default function PetPassGoQuiz() {
     stop: "",
     pet_travel: "",
     pet_count: 1,
+    booked: null,
   });
   const set = (k, v) => setAnswers((a) => ({ ...a, [k]: v }));
   const back = () => setStep((s) => Math.max(s - 1, 0));
@@ -401,9 +404,15 @@ export default function PetPassGoQuiz() {
 
           {step === 2 && (
             <>
-              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-5">
-                Where are you flying from and to?
+              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-3">
+                Have you booked your flight?
               </h2>
+              <div className="grid grid-cols-2 gap-2 mb-5">
+                <OptionCard compact icon="check" label="Yes, I have my ticket" selected={answers.booked === true} onClick={() => set("booked", true)} />
+                <OptionCard compact icon="search" label="Not yet" sub="Compare airlines" selected={answers.booked === false} onClick={() => setAnswers((a) => ({ ...a, booked: false, flight_number: "", flight_snapshot: null }))} />
+              </div>
+              {answers.booked === null ? <NavRow onBack={back} onNext={next} nextDisabled /> : <>
+              {answers.booked ? (
               <FlightLookup
                 date={answers.date}
                 onNumberOnly={(num, d) => setAnswers((a) => ({ ...a, flight_number: num, date: d || a.date }))}
@@ -417,12 +426,14 @@ export default function PetPassGoQuiz() {
                   if (airline && date && routeAllowed(origin, destination)) setTimeout(() => setStep(5), 900);
                 }}
               />
-              <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.muted }} className="mb-2">Or type your cities</div>
+              ) : null}
+              <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.muted }} className="mb-2">{answers.booked ? "Or type your cities" : "Where are you flying?"}</div>
               <div className="flex flex-col gap-3" style={{ position: "relative", zIndex: 1 }}>
                 <AirportField key={`o-${answers.origin}`} label="Departing from (type a city)" value={answers.origin} onSelect={(v) => set("origin", v)} />
                 <AirportField key={`d-${answers.destination}`} label="Flying to (type a city)" value={answers.destination} onSelect={(v) => set("destination", v)} />
               </div>
               <NavRow onBack={back} onNext={next} nextDisabled={!answers.origin || !answers.destination} />
+              </>}
             </>
           )}
 
@@ -470,8 +481,15 @@ export default function PetPassGoQuiz() {
           {step === 4 && (
             <>
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
-                Which airline?
+                {answers.booked === false ? "Which airline works best for your pet?" : "Which airline?"}
               </h2>
+              {answers.booked === false && !showAllAirlines ? (
+                <>
+                  <AirlineCompare answers={answers} selected={answers.airline} onPick={(name) => { set("airline", name); trackEvent("airline_compare_pick", { content_type: "assessment", content_name: name }); setTimeout(() => setStep((s) => (s === 4 ? 5 : s)), 220); }} />
+                  <button type="button" onClick={() => setShowAllAirlines(true)} className="mt-3" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, color: tokens.navy, background: "none", border: "none", cursor: "pointer", textDecoration: "underline", padding: 0 }}>My airline isn't listed</button>
+                  <NavRow onBack={back} onNext={handleSeePlan} nextDisabled={!answers.airline} nextLabel="Continue" />
+                </>
+              ) : <>
               {answers.flight_snapshot && answers.airline ? (
                 <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-4">
                   Filled in from your flight number: {answers.airline}. Change it if that’s wrong.
@@ -492,6 +510,7 @@ export default function PetPassGoQuiz() {
                 region={tripTypeForRoute(answers.origin, answers.destination) === "domestic" ? "domestic" : (regionHint || "near")}
               />
               <NavRow onBack={back} onNext={handleSeePlan} nextDisabled={!answers.airline} nextLabel="Continue" />
+              </>}
             </>
           )}
 
