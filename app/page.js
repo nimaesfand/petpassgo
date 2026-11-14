@@ -95,7 +95,7 @@ export default function PetPassGoLanding() {
 
       <section data-reveal className={`${WRAP} py-12 lg:py-16`}>
         <Eyebrow>HOW IT WORKS</Eyebrow>
-        <H2>Check before you book. Fly ready.</H2>
+        <H2>Three steps. Fly ready.</H2>
         <div className="grid md:grid-cols-3 gap-4 mt-8">
           {STEPS.map((s) => (
             <div key={s.n} className="rounded-2xl p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
