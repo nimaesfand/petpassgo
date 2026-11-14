@@ -23,9 +23,9 @@ const STEPS = [
 ];
 
 const PRICE_CARDS = [
-  { title: "Simple flights", price: "Free", unit: "with an account", body: "A small pet in the cabin, inside the U.S., on one airline, with no health papers. You get the full checklist.", cta: "Check my flight", href: "/assessment" },
-  { title: "Flights that need paperwork", price: P.pass, unit: "per trip", body: "Mexico, Canada and Hawaii, service dogs, big dogs, cargo and two-airline trips. Every step with real dates, reminders and a papers check.", cta: "Plan my trip", href: "/assessment", dark: true },
-  { title: "Pet Vault", price: P.member, unit: "a month", body: `Your pet's passport, vet-confirmed records, reminders and lost-pet help, for every trip. Travel Passes are ${P.memberPass} for members. Cancel anytime.`, cta: "Make their passport", href: "/join" },
+  { title: "Free checklist", sub: "For simple flights", price: "Free", unit: "with an account", body: "A small pet in the cabin, inside the U.S., on one airline, with no health papers. You get every step for your flight.", cta: "Check my flight", href: "/assessment" },
+  { title: "Travel Pass", sub: "For flights that need paperwork", price: P.pass, unit: `per trip, or ${P.memberPass} with Pet Vault`, body: "Mexico, Canada and Hawaii, service dogs, big dogs, cargo and two-airline trips. Every step with dates and reminders, and we check your pet's vaccines and certificates are valid for the trip.", cta: "Plan my trip", href: "/assessment", dark: true },
+  { title: "Pet Vault", sub: "Your pet's passport and records", price: P.member, unit: "a month", body: `Your pet's passport, vet-confirmed records, reminders and lost-pet help, for every trip. Travel Passes are ${P.memberPass} for members. Cancel anytime.`, cta: "Make their passport", href: "/join" },
 ];
 
 const HOME_FAQ = [FAQ[1], FAQ[3], FAQ[2], FAQ[4]];
@@ -142,6 +142,7 @@ export default function PetPassGoLanding() {
             {PRICE_CARDS.map((c) => (
               <article key={c.title} className="rounded-3xl p-6 flex flex-col" style={{ background: c.dark ? tokens.navy : tokens.sky, color: c.dark ? "#fff" : tokens.navy }}>
                 <h3 style={{ fontFamily: D, fontSize: 22, fontWeight: 800, lineHeight: 1.2 }}>{c.title}</h3>
+                <p className="mt-0.5" style={{ fontFamily: B, fontSize: 15, color: c.dark ? "#C9D4E4" : tokens.muted }}>{c.sub}</p>
                 <div className="mt-3 flex items-baseline gap-2"><span style={{ fontFamily: D, fontSize: 44, fontWeight: 800, lineHeight: 1 }}>{c.price}</span><span style={{ fontFamily: B, fontSize: 15, color: c.dark ? "#C9D4E4" : tokens.muted }}>{c.unit}</span></div>
                 <p className="mt-4 flex-1" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.55, color: c.dark ? "#E7EDF6" : tokens.ink }}>{c.body}</p>
                 <a href={c.href} className="mt-6 inline-flex items-center justify-center rounded-full min-h-[50px] px-6" style={{ background: c.dark ? tokens.primary : "#fff", color: c.dark ? "#fff" : tokens.navy, border: c.dark ? "none" : `1.5px solid ${tokens.line}`, fontFamily: B, fontWeight: 800, fontSize: 15.5, textDecoration: "none" }}>{c.cta}</a>

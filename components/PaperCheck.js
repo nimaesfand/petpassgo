@@ -14,11 +14,11 @@ export default function PaperCheck({ checks, onUpload, petName }) {
   if (!checks?.length) return null;
   const problems = checks.filter((c) => c.status === "warn" || c.status === "missing").length;
   return (
-    <section className="rounded-2xl mb-4 overflow-hidden" style={{ background: "#fff", border: `1px solid ${problems ? "#F5C2A8" : tokens.line}` }} aria-label="Papers check">
+    <section className="rounded-2xl mb-4 overflow-hidden" style={{ background: "#fff", border: `1px solid ${problems ? "#F5C2A8" : tokens.line}` }} aria-label="Document check">
       <div className="px-4 pt-4 pb-2 flex items-start justify-between gap-3">
         <div>
-          <h3 style={{ fontFamily: font.display, fontSize: 19, fontWeight: 800, color: tokens.navy, lineHeight: 1.2 }}>Papers check</h3>
-          <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>{problems ? `${problems} thing${problems === 1 ? "" : "s"} to sort out for ${petName || "your pet"}'s papers.` : `${petName || "Your pet"}'s papers look right for this trip so far.`}</p>
+          <h3 style={{ fontFamily: font.display, fontSize: 19, fontWeight: 800, color: tokens.navy, lineHeight: 1.2 }}>Document check</h3>
+          <p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }}>{problems ? `${problems} thing${problems === 1 ? "" : "s"} to fix in ${petName || "your pet"}'s documents.` : `${petName || "Your pet"}'s documents look right for this trip so far.`}</p>
         </div>
         {onUpload ? <button type="button" onClick={onUpload} className="ppg-btn ppg-btn-secondary ppg-btn-compact flex-shrink-0">Add a document</button> : null}
       </div>
