@@ -1,4 +1,6 @@
 "use client";
+import { useState } from "react";
+import { supabase } from "../../lib/supabaseClient";
 
 import PetQr from "../../lib/PetQr";
 import { Wordmark } from "../Logo";
@@ -83,6 +85,18 @@ function WalletCard({ pet, photo }) {
 }
 
 export default function TagSheet({ pet, photoUrl }) {
+  const [busy, setBusy] = useState(false);
+  async function downloadPdf() {
+    setBusy(true);
+    try {
+      const { data: ses } = await supabase.auth.getSession();
+      const r = await fetch("/api/tag-pdf", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": ses?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id }) });
+      if (!r.ok) { const j = await r.json().catch(() => ({})); alert(j.error || "The tag sheet could not be made."); return; }
+      const url = URL.createObjectURL(await r.blob());
+      const a = document.createElement("a"); a.href = url; a.download = `${String(pet.name || "pet").replace(/[^a-z0-9]+/gi, "-")}-QR-tags.pdf`; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } finally { setBusy(false); }
+  }
   const photo = photoUrl
     ? <img src={photoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
     : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><PetIllustration type={pet.animal_type} size={36} /></div>;
@@ -99,7 +113,8 @@ export default function TagSheet({ pet, photoUrl }) {
           <li>Cut on the dashed lines. Cover collar tags with clear packing tape, or slip one into a clear tag holder (about $5 online).</li>
         </ol>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
-          <button type="button" onClick={() => window.print()} className="ppg-btn ppg-btn-primary">Print tag sheet</button>
+          <button type="button" onClick={downloadPdf} className="ppg-btn ppg-btn-primary">{busy ? "Preparing…" : "Download print-ready PDF"}</button>
+          <button type="button" onClick={() => window.print()} className="ppg-btn ppg-btn-secondary">Print this page</button>
           <a href="/account?tab=vault" className="ppg-btn ppg-btn-secondary">Back to {pet.name}</a>
         </div>
       </div>

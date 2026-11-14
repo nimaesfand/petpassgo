@@ -250,6 +250,18 @@ function CheckinSheet({ pet, onClose }) {
   );
 }
 
+// Owner: download the print-ready QR tag sheet.
+async function downloadTagPdf(pet) {
+  try {
+    const { data: s } = await supabase.auth.getSession();
+    const r = await fetch("/api/tag-pdf", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id }) });
+    if (!r.ok) { const j = await r.json().catch(() => ({})); alert(j.error || "The tag sheet could not be made."); return; }
+    const url = URL.createObjectURL(await r.blob());
+    const a = document.createElement("a"); a.href = url; a.download = `${String(pet.name || "pet").replace(/[^a-z0-9]+/gi, "-")}-QR-tags.pdf`; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch { alert("The tag sheet could not be made."); }
+}
+
 function Back({ pet, stamps, owner, qr, onFlip, onCheckin }) {
   const contact = [pet.emergency_contact_name, pet.emergency_contact_phone].filter(filled);
   const showContact = owner || pet.show_contact_on_public_id;
@@ -284,6 +296,14 @@ function Back({ pet, stamps, owner, qr, onFlip, onCheckin }) {
             </div>
           ) : null}
         </div>
+      </div>
+      <div className="relative px-4 sm:px-6 pb-3 ppg-no-print flex flex-wrap items-center justify-between gap-2" style={{ borderTop: "1px solid rgba(255,255,255,.12)", paddingTop: 10 }}>
+        <div style={{ fontFamily: font.body, fontSize: 13.5, color: "rgba(255,255,255,.85)", lineHeight: 1.4 }}>Print this code for their collar tag. You get a print-ready PDF in 3 tag sizes.</div>
+        {owner && pet.id && !String(pet.id).startsWith("sample") ? (
+          <button type="button" onClick={(e) => { e.stopPropagation(); downloadTagPdf(pet); }} className="rounded-full px-4 flex items-center gap-1.5" style={{ minHeight: 38, background: "rgba(255,255,255,.14)", color: "#fff", border: "1px solid rgba(255,255,255,.3)", fontFamily: font.body, fontWeight: 800, fontSize: 14, cursor: "pointer" }}>
+            <Icon name="download" size={15} /> Tag PDF
+          </button>
+        ) : null}
       </div>
       {onCheckin ? (
         <div className="relative px-4 sm:px-6 pb-4 ppg-no-print">

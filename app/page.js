@@ -72,7 +72,7 @@ export default function PetPassGoLanding() {
 
       <main>
       <section className="relative overflow-hidden" style={{ background: tokens.navyDeep }}>
-        <Image src="/images/hero-golden-retriever.jpg" alt="A golden retriever in a travel harness at the airport" fill priority sizes="100vw" className="object-cover object-[70%_35%]" />
+        <Image src="/images/hero-golden-retriever.jpg" alt="A golden retriever in a travel harness at the airport" fill priority sizes="100vw" className="object-cover object-[70%_35%] lg:object-[70%_12%]" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(11,21,41,.92) 0%, rgba(11,21,41,.62) 38%, rgba(11,21,41,.12) 72%)" }} aria-hidden="true" />
         <div className="absolute inset-0 hidden lg:block" style={{ background: "linear-gradient(90deg, rgba(11,21,41,.78) 0%, rgba(11,21,41,.35) 45%, rgba(11,21,41,0) 70%)" }} aria-hidden="true" />
         <div className={`relative ${WRAP} min-h-[86svh] lg:min-h-[640px] flex flex-col justify-end lg:justify-center pb-14 pt-32`}>
@@ -122,7 +122,7 @@ export default function PetPassGoLanding() {
 
       <section className={`${WRAP} py-16 lg:py-24`}>
         <h2 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[32px] md:text-[44px] font-extrabold">Heading to Mexico or Canada?</h2>
-        <p className="mt-3 max-w-[38rem]" style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }}>Crossing a border with a dog means certificates with tight dates, and a CDC form to get home. We work out every date from your flights.</p>
+        <p className="mt-3 max-w-[38rem]" style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }}>Crossing a border with a dog means vet certificates that must be signed a few days before you fly, and a CDC form to come home. We tell you the exact days for each one.</p>
         <div className="grid sm:grid-cols-2 gap-4 mt-8 max-w-[52rem]">
           {[["/mexico", "Mexico with your dog", "Two vet certificates, an inspection on landing, and the trip home."], ["/canada", "Canada with your dog", "The rabies certificate Canada checks, and the CDC form home."]].map(([href, title, body]) => (
             <a key={href} href={href} className="rounded-3xl p-6 block" style={{ background: "#fff", border: `1px solid ${tokens.line}`, textDecoration: "none" }}>
