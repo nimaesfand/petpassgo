@@ -24,13 +24,13 @@ const STEPS = [
 
 const VET_STEPS = [
   { title: "Send your vet a link", body: "From Pet Vault, enter your vet's email. They don't need an account." },
-  { title: "Your vet checks the records", body: "They see your pet's vaccines and confirm the ones that match their files." },
-  { title: "Records show as vet verified", body: "With your vet's name and clinic, on the passport and at airport check-in. If a record is edited later, the badge comes off." },
+  { title: "Your vet checks the records", body: "They check your pet's vaccines against their own files and confirm them." },
+  { title: "Records show as vet verified", body: "Your vet's name and clinic appear on the passport and at airport check-in, so agents can trust what they see." },
 ];
 
 const PRICE_CARDS = [
   { title: "Free checklist", sub: "For simple flights", price: "Free", unit: "with an account", body: "A small pet in the cabin, inside the U.S., on one airline, with no health papers. You get every step for your flight.", cta: "Check my flight", href: "/assessment" },
-  { title: "Travel Pass", sub: "For flights that need paperwork", price: P.pass, unit: `per trip, or ${P.memberPass} with Pet Vault`, body: "Mexico, Canada and Hawaii, service dogs, big dogs, cargo and two-airline trips. Every step with dates and reminders, and we check your pet's vaccines and certificates are valid for the trip.", cta: "Plan my trip", href: "/assessment", dark: true },
+  { title: "Travel Pass", sub: "For flights that need paperwork", price: P.pass, unit: `per trip, or ${P.memberPass} with Pet Vault`, body: "Mexico, Canada and Hawaii, service dogs, big dogs, cargo and two-airline trips. Every step with dates and reminders. We also check that your pet's vaccines and certificates are valid for your trip.", cta: "Plan my trip", href: "/assessment", dark: true },
   { title: "Pet Vault", sub: "Your pet's passport and records", price: P.member, unit: "a month", body: `Your pet's passport, vet-confirmed records, reminders and lost-pet help, for every trip. Travel Passes are ${P.memberPass} for members. Cancel anytime.`, cta: "Make their passport", href: "/join" },
 ];
 
@@ -114,9 +114,9 @@ export default function PetPassGoLanding() {
         <div className={`${WRAP} grid lg:grid-cols-[minmax(0,1fr)_minmax(560px,640px)] gap-12 items-center`}>
           <div>
             <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.05, letterSpacing: "-0.01em" }} className="text-[36px] md:text-[52px] font-extrabold max-w-[14ch]">A passport made for your pet.</h2>
-            <p className="mt-5 max-w-[32rem]" style={{ fontFamily: B, color: "#D5DEEB", fontSize: 18, lineHeight: 1.55 }}>Their details, vaccines and microchip in one place. Your vet can confirm the records, and at the airport you can show a live check-in code the agent scans.</p>
+            <p className="mt-5 max-w-[32rem]" style={{ fontFamily: B, color: "#D5DEEB", fontSize: 18, lineHeight: 1.55 }}>Their details, vaccines and microchip in one place. Your vet can confirm the records, and at the airport you show a check-in code the agent can scan.</p>
             <ul className="mt-6 grid gap-3 max-w-[32rem]" style={{ listStyle: "none", padding: 0 }}>
-              {["Vaccines confirmed by your vet", "A live code to show at check-in", "Reminders before shots and papers run out", "A QR tag that helps if they ever get lost"].map((t) => (
+              {["Vaccines confirmed by your vet", "A live code to show at check-in", "Reminders before vaccines and papers expire", "A QR tag in case they ever get lost"].map((t) => (
                 <li key={t} className="flex gap-3" style={{ fontFamily: B, fontSize: 16.5, color: "#fff" }}><span style={{ color: tokens.gold, fontWeight: 800 }}>✓</span>{t}</li>
               ))}
             </ul>
@@ -168,7 +168,7 @@ export default function PetPassGoLanding() {
         <h2 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[32px] md:text-[44px] font-extrabold">Heading to Mexico or Canada?</h2>
         <p className="mt-3 max-w-[38rem]" style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }}>Crossing a border with a dog means vet certificates that must be signed a few days before you fly, and a CDC form to come home. We tell you the exact days for each one.</p>
         <div className="grid sm:grid-cols-2 gap-4 mt-8 max-w-[52rem]">
-          {[["/mexico", "Mexico with your dog", "Two vet certificates, an inspection on landing, and the trip home."], ["/canada", "Canada with your dog", "The rabies certificate Canada checks, and the CDC form home."]].map(([href, title, body]) => (
+          {[["/mexico", "Mexico with your dog", "Two vet certificates, an inspection when you land, and what you need to come home."], ["/canada", "Canada with your dog", "The rabies certificate Canada asks for, and the CDC form to come home."]].map(([href, title, body]) => (
             <a key={href} href={href} className="rounded-3xl p-6 block" style={{ background: "#fff", border: `1px solid ${tokens.line}`, textDecoration: "none" }}>
               <div style={{ fontFamily: D, fontSize: 24, fontWeight: 800, color: tokens.navy }}>{title}</div>
               <p className="mt-2" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>{body}</p>
