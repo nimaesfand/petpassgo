@@ -17,9 +17,11 @@ export async function POST(req) {
   if (!/^[0-9a-f-]{36}$/i.test(petId)) return NextResponse.json({ error: "Missing pet." }, { status: 400 });
   const { data: pet } = await sb.from("pets").select("id").eq("id", petId).eq("user_id", user.id).maybeSingle();
   if (!pet) return NextResponse.json({ error: "Pet not found." }, { status: 404 });
-  // The trip: the next paid one for this pet (or for this account if the trip has no pet linked).
-  const today = new Date().toISOString().slice(0, 10);
-  const { data: trips } = await sb.from("trips").select("id,pet_id,travel_date,return_date").eq("user_id", user.id).eq("paid", true).or(`travel_date.gte.${today},return_date.gte.${today}`).order("travel_date", { ascending: true }).limit(10);
+  // The trip: the next paid or free trip for this pet (or for this account if
+  // the trip has no pet linked). "Today" starts a day early so U.S. evenings,
+  // which are already tomorrow in UTC, still find today's flight.
+  const today = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+  const { data: trips } = await sb.from("trips").select("id,pet_id,travel_date,return_date").eq("user_id", user.id).or("paid.eq.true,free_trip.eq.true").or(`travel_date.gte.${today},return_date.gte.${today}`).order("travel_date", { ascending: true }).limit(10);
   const trip = (trips || []).find((t) => t.pet_id === petId) || (trips || []).find((t) => !t.pet_id) || null;
   const travel = body.mode === "travel";
   const { token, expiresAt } = signCheckin({ petId, tripId: trip?.id || "", minutes: travel ? 720 : 30 });
