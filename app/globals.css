@@ -358,7 +358,8 @@ textarea {
 @media (min-width: 640px) { .ppg-pp-grid { column-gap: 24px; row-gap: 12px; } .ppg-pp-photocol { grid-row: span 2; } .ppg-pp-fields { grid-column: 2; grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 900px) { .ppg-pp-fields { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (max-width: 639px) {
-  .ppg-pp-stampspot2 { transform: scale(.7); transform-origin: top right; margin-bottom: -26px; margin-left: -26px; }
+  .ppg-pp-namerow { flex-direction: column; }
+  .ppg-pp-stampspot2 { transform: scale(1.18); transform-origin: top left; margin: 16px 0 16px 2px; }
   .ppg-pp-name.is-mid { font-size: 24px; }
   .ppg-pp-name.is-long { font-size: 20px; }
 }
