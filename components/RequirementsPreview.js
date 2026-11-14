@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import { tripTypeForRoute, destinationKeywordHit, findAirport } from "../lib/airports";
+import { tripTypeForRoute, findAirport } from "../lib/airports";
 import { tokens, font } from "../lib/theme";
 import Icon from "./Icon";
 import VerdictCard from "./VerdictCard";
 import { tripVerdict, tripFacts } from "../lib/verdict";
+import { matchesDestination } from "../lib/passCards";
 import TripFitCard from "./TripFitCard";
 import { tripFitWarnings } from "../lib/tripFit";
 
@@ -41,7 +42,7 @@ export default function RequirementsPreview({ answers, onVerdict }) {
       .then(({ data, error }) => {
         if (!alive) return;
         if (error || !Array.isArray(data)) { setRows([]); return; }
-        setRows(data.filter((r) => !r.destination_match || String(r.destination_match).split(",").some((k) => destinationKeywordHit(answers.destination, k.trim()))));
+        setRows(data.filter((r) => matchesDestination(r, answers)));
       });
     fetch("/api/trip-preview", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(answers) })
       .then((r) => r.json())
