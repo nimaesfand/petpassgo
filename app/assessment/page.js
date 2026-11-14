@@ -387,8 +387,8 @@ export default function PetPassGoQuiz() {
                 Who&apos;s flying with you?
               </h2>
               <div className="flex flex-col gap-3">
-                <OptionCard label="Pet" sub={`Your ${answers.animal === "Cat" ? "cat" : answers.animal === "Dog" ? "dog" : "pet"}, flying as a pet`} selected={answers.role === "Pet" && !answers.esa} onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: false, psd: false }))} />
-                <OptionCard label="Service dog" sub="Trained to do tasks for a disability. Includes psychiatric service dogs." selected={answers.role === "Service animal"} onClick={() => setAnswers((a) => ({ ...a, role: "Service animal", esa: false }))} />
+                <OptionCard label="Pet" sub="In the cabin or as cargo, under the airline's pet rules." selected={answers.role === "Pet" && !answers.esa} onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: false, psd: false }))} />
+                {(!answers.animal || answers.animal === "Dog") && <OptionCard label="Service dog" sub="Trained to do tasks for a disability. Includes psychiatric service dogs." selected={answers.role === "Service animal"} onClick={() => setAnswers((a) => ({ ...a, role: "Service animal", esa: false }))} />}
                 <OptionCard label="Emotional support animal" sub="US airlines treat ESAs as pets. We'll show you the pet rules." selected={answers.role === "Pet" && answers.esa} onClick={() => setAnswers((a) => ({ ...a, role: "Pet", esa: true, psd: false }))} />
               </div>
               {answers.role === "Service animal" && answers.animal && answers.animal !== "Dog" && (
