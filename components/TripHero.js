@@ -59,9 +59,10 @@ export default function TripHero() {
           <p className="mt-3" style={{ fontFamily: B, fontSize: 15.5, color: tokens.ink }}>
             Going across the border? <a href="/mexico" style={{ color: tokens.primary, fontWeight: 800 }}>Mexico with your dog</a> · <a href="/canada" style={{ color: tokens.primary, fontWeight: 800 }}>Canada with your dog</a>
           </p>
+          <a href="/assessment" className="sm:hidden mt-4 flex items-center justify-center rounded-full min-h-[54px] w-full" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Check my trip · free</a>
         </div>
 
-        <div className="order-2 relative min-h-[240px] sm:min-h-[320px] lg:h-full lg:min-h-[520px] lg:col-start-2 lg:row-start-1 lg:row-span-2 rounded-3xl overflow-hidden" style={{ boxShadow: "0 18px 40px rgba(20,33,61,0.12)" }}>
+        <div className="order-2 relative min-h-[170px] sm:min-h-[320px] lg:h-full lg:min-h-[520px] lg:col-start-2 lg:row-start-1 lg:row-span-2 rounded-3xl overflow-hidden" style={{ boxShadow: "0 18px 40px rgba(20,33,61,0.12)" }}>
           <Image
             src="/images/hero-golden-retriever.jpg"
             alt={HERO_ALT}
