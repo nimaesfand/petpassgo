@@ -7,7 +7,7 @@ import { findAirport } from "../lib/airports";
 // "Haven't booked yet": every airline for this kind of route, side by side.
 // Picking one continues the trip check with that airline.
 const LOOK = {
-  easy: { label: "Easy · free checklist", bg: "#EAF6EE", fg: "#15803D" },
+  easy: { label: "Easy · free", bg: "#EAF6EE", fg: "#15803D" },
   go: { label: "Can fly", bg: "#EAF2FB", fg: "#1D4E89" },
   action: { label: "Can fly, more steps", bg: "#FEF3C7", fg: "#92400E" },
   no: { label: "Not allowed", bg: "#FDECEC", fg: "#B91C1C" },
@@ -50,7 +50,7 @@ export default function AirlineCompare({ answers, selected, onPick }) {
   return (
     <div>
       <p className="mb-3" style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted, lineHeight: 1.45 }}>
-        {city(answers.origin)} → {city(answers.destination)}, your {pet} in the cabin. Best options first. Tap one to see your steps.
+        {city(answers.origin)} → {city(answers.destination)}, your {pet} in the cabin. Easiest and cheapest first. Tap one to see your steps.
       </p>
       <div className="flex flex-col gap-2">
         {list.map((a, i) => {

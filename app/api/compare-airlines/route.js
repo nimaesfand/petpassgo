@@ -55,6 +55,7 @@ export async function POST(req) {
     return { name, key: v.key, title: v.title, easy, steps: plan.open.length, fee: facts.fee, carrier: facts.carrier, cargo: holdInfo(name)?.state || null };
   });
   const rank = (x) => (x.key === "no" ? 4 : x.key === "check" ? 3 : x.easy ? 0 : x.key === "go" ? 1 : 2);
-  out.sort((x, y) => rank(x) - rank(y) || (x.steps || 99) - (y.steps || 99) || x.name.localeCompare(y.name));
+  const price = (x) => { const m = String(x.fee || "").match(/(\d+(?:\.\d+)?)/); return m ? Number(m[1]) : 9999; };
+  out.sort((x, y) => rank(x) - rank(y) || price(x) - price(y) || (x.steps || 99) - (y.steps || 99) || x.name.localeCompare(y.name));
   return NextResponse.json({ airlines: out, domestic }, { headers: { "Cache-Control": "private, max-age=120" } });
 }
