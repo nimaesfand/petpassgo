@@ -116,7 +116,7 @@ export default function PetPassGoLanding() {
       </section>
 
       <section style={{ background: tokens.navy }} className="py-16 lg:py-24 overflow-hidden">
-        <div className={`${WRAP} grid lg:grid-cols-[1fr_minmax(320px,440px)] gap-12 items-center`}>
+        <div className={`${WRAP} grid lg:grid-cols-[minmax(0,1fr)_minmax(560px,640px)] gap-12 items-center`}>
           <div>
             <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.05, letterSpacing: "-0.01em" }} className="text-[36px] md:text-[52px] font-extrabold max-w-[14ch]">A passport made for your pet.</h2>
             <p className="mt-5 max-w-[32rem]" style={{ fontFamily: B, color: "#D5DEEB", fontSize: 18, lineHeight: 1.55 }}>Their details, vaccines and microchip in one place. Your vet can confirm the records, and at the airport you can show a live check-in code the agent scans.</p>
@@ -127,7 +127,7 @@ export default function PetPassGoLanding() {
             </ul>
             <a href="/join" className="mt-8 inline-flex items-center justify-center rounded-full px-8 min-h-[54px]" style={{ background: "#fff", color: tokens.navy, fontFamily: B, fontWeight: 800, fontSize: 16.5, textDecoration: "none" }}>Make your pet&apos;s passport</a>
           </div>
-          <div className="w-full max-w-[440px] mx-auto">
+          <div className="w-full max-w-[640px] mx-auto">
             <HomePassport />
             <p className="mt-3 text-center" style={{ fontFamily: B, fontSize: 14, color: "#AFC0D6" }}>Meet Biscuit, our sample pup. Tap the passport to flip it.</p>
           </div>
