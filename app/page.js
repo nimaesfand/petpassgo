@@ -78,9 +78,12 @@ export default function PetPassGoLanding() {
 
       <main>
       <section className="relative overflow-hidden" style={{ background: tokens.navyDeep }}>
-        <Image src="/images/hero-golden-retriever.jpg" alt="A golden retriever in a travel harness at the airport" fill priority sizes="100vw" className="object-cover object-[70%_35%] lg:object-[70%_12%]" />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(11,21,41,.92) 0%, rgba(11,21,41,.62) 38%, rgba(11,21,41,.12) 72%)" }} aria-hidden="true" />
-        <div className="absolute inset-0 hidden lg:block" style={{ background: "linear-gradient(90deg, rgba(11,21,41,.78) 0%, rgba(11,21,41,.35) 45%, rgba(11,21,41,0) 70%)" }} aria-hidden="true" />
+        <div className="absolute inset-0 lg:left-auto lg:aspect-[16/9]">
+          <Image src="/images/hero-golden-retriever.jpg" alt="A golden retriever in a travel harness at the airport" fill priority sizes="(min-width: 1024px) 70vw, 100vw" className="object-cover object-[70%_35%] lg:object-center" />
+          <div className="absolute inset-y-0 left-0 hidden lg:block w-[45%]" style={{ background: "linear-gradient(90deg, rgba(11,21,41,1) 0%, rgba(11,21,41,.55) 55%, rgba(11,21,41,0) 100%)" }} aria-hidden="true" />
+        </div>
+        <div className="absolute inset-0 lg:hidden" style={{ background: "linear-gradient(to top, rgba(11,21,41,.92) 0%, rgba(11,21,41,.62) 38%, rgba(11,21,41,.12) 72%)" }} aria-hidden="true" />
+        <div className="absolute inset-0 hidden lg:block xl:hidden" style={{ background: "linear-gradient(90deg, rgba(11,21,41,.7) 0%, rgba(11,21,41,.3) 40%, rgba(11,21,41,0) 60%)" }} aria-hidden="true" />
         <div className={`relative ${WRAP} min-h-[86svh] lg:min-h-[640px] flex flex-col justify-end lg:justify-center pb-14 pt-32`}>
           <h1 style={{ fontFamily: D, color: "#fff", lineHeight: .98, letterSpacing: "-0.02em" }} className="text-[54px] sm:text-[76px] lg:text-[92px] font-extrabold max-w-[11ch]">Bring them along.</h1>
           <p style={{ fontFamily: B, color: "#E7EDF6", lineHeight: 1.5 }} className="mt-5 text-[18px] sm:text-[20px] max-w-[30rem]">PetPassGo tells you exactly what your pet needs to fly, and keeps their papers ready for every trip.</p>
