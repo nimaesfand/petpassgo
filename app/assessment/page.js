@@ -414,6 +414,8 @@ export default function PetPassGoQuiz() {
               {answers.booked === null ? <NavRow onBack={back} onNext={next} nextDisabled /> : <>
               {answers.booked ? (
               <FlightLookup
+                title="Enter your flight number"
+                sub="We fill in your airports and airline, and your pass shows live gate and status on travel day."
                 date={answers.date}
                 onNumberOnly={(num, d) => setAnswers((a) => ({ ...a, flight_number: num, date: d || a.date }))}
                 onFill={(f) => {

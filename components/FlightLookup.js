@@ -49,7 +49,7 @@ export function FlightSummary({ f }) {
   );
 }
 
-export default function FlightLookup({ date, onFill, onNumberOnly, mode = "outbound" }) {
+export default function FlightLookup({ date, onFill, onNumberOnly, mode = "outbound", title, sub }) {
   const [flight, setFlight] = useState("");
   const [day, setDay] = useState(date || "");
   const [busy, setBusy] = useState(false);
@@ -87,8 +87,8 @@ export default function FlightLookup({ date, onFill, onNumberOnly, mode = "outbo
   if (hidden) return null;
   return (
     <div className="rounded-xl p-4 mb-4" style={{ background: tokens.sky, border: `1px solid ${tokens.line}` }}>
-      <div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy, fontSize: 15 }}>{mode === "return" ? "Optional return flight" : "Have a flight number? Skip the typing"}</div>
-      <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mb-3">{mode === "return" ? "Add a return flight number only if you want. Pick the return date first — we never assume today." : "Enter the number and date. We fill in the airports and airline for you."}</p>
+      <div style={{ fontFamily: font.body, fontWeight: 700, color: tokens.navy, fontSize: 15 }}>{title || (mode === "return" ? "Optional return flight" : "Have a flight number? Skip the typing")}</div>
+      <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mb-3">{sub || (mode === "return" ? "Add a return flight number only if you want. Pick the return date first — we never assume today." : "Enter the number and date. We fill in the airports and airline for you.")}</p>
       <div className="flex flex-wrap gap-2">
         <input value={flight} onChange={(e) => setFlight(e.target.value)} placeholder="Flight # e.g. UA1234" aria-label="Flight number" style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16 }} className="rounded-xl px-3 py-2.5 outline-none flex-1 min-w-[150px]" />
         <label className="relative" style={{ display: "inline-block" }}><input type="date" value={day} onChange={(e) => setDay(e.target.value)} aria-label="Flight date" style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, minWidth: 150, minHeight: 46, background: "#fff", color: day ? tokens.navy : "transparent" }} className="rounded-xl px-3 py-2.5 outline-none" />{!day && <span aria-hidden="true" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontFamily: font.body, fontSize: 16, color: tokens.muted, pointerEvents: "none" }}>Flight date</span>}</label>
