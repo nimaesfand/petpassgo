@@ -17,8 +17,9 @@ const CARGO = { yes: "Cargo option for big pets", no: "Cabin only", restricted: 
 
 // "$125 each way ($35 between Hawaiian Islands)" -> "$125 each way"; long notes -> a short line.
 function shortFee(f) {
-  const x = String(f || "").replace(/\s*\(.*?\)\s*/g, " ").replace(/^(cabin pet fee|pet on board|in-cabin pet fee|international in-cabin pet fee|pet fare):\s*/i, "").trim();
+  let x = String(f || "").replace(/\s*\(.*?\)\s*/g, " ").replace(/^(cabin pet fee|pet on board|in-cabin pet fee|international in-cabin pet fee|pet fare):\s*/i, "").trim();
   if (!x) return "";
+  x = x.split(/\s*(?:,|;| — | - charged)\s*/)[0];
   return x.length > 34 || !/\$|usd|cad/i.test(x) ? "Fee: confirm when booking" : x;
 }
 
