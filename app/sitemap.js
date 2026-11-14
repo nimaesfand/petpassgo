@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { SITE_URL } from "../lib/site";
 import { AIRLINE_GUIDES } from "../lib/airlineGuides";
+import { STATES } from "../lib/stateGuides";
 import { getAllPosts } from "../lib/blog";
 
 const APP = path.join(process.cwd(), "app");
@@ -17,7 +18,7 @@ function entry(urlPath, now, changeFrequency, priority) {
 // Only routes that have a page.
 export default function sitemap() {
   const now = new Date();
-  const staticPaths = ["", "/assessment", "/airlines", "/blog", "/faq", "/contact", "/pet-vault", "/travel-pass", "/lost-flyer", "/mexico", "/canada", "/service-dog", "/terms", "/privacy", "/guarantee", "/business"];
+  const staticPaths = ["", "/assessment", "/airlines", "/blog", "/faq", "/contact", "/pet-vault", "/travel-pass", "/lost-flyer", "/mexico", "/canada", "/service-dog", "/guides", "/terms", "/privacy", "/guarantee", "/business"];
   const pages = staticPaths
     .filter((p) => pageExists(p.split("/").filter(Boolean)))
     .map((p) => entry(p, now, p === "/terms" || p === "/privacy" || p === "/guarantee" ? "yearly" : p === "/lost-flyer" ? "monthly" : "weekly", p === "" ? 1 : p === "/terms" || p === "/privacy" || p === "/guarantee" ? 0.3 : p === "/lost-flyer" ? 0.6 : 0.7));
@@ -27,5 +28,6 @@ export default function sitemap() {
   const posts = pageExists(["blog", "[slug]"])
     ? getAllPosts().map((p) => entry(`/blog/${p.slug}`, new Date(p.date || now), "monthly", 0.5))
     : [];
-  return [...pages, ...airlines, ...posts];
+  const states = STATES.map((st) => entry(`/guides/${st.slug}`, now, "monthly", 0.6));
+  return [...pages, ...airlines, ...posts, ...states];
 }

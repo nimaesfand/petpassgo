@@ -151,7 +151,7 @@ export default function PetPassGoLanding() {
         <p style={{ fontFamily: B, fontSize: 15.5, lineHeight: 1.9, color: tokens.ink }}>
           <b style={{ color: tokens.navy }}>Airline pet guides:</b>{" "}
           {AIRLINE_GUIDES.map((a, i) => <span key={a.slug}>{i ? " · " : ""}<a href={`/airlines/${a.slug}`} style={{ color: tokens.navy }}>{a.name}</a></span>)}
-          {" "}· <a href="/mexico" style={{ color: tokens.primary, fontWeight: 700 }}>Mexico</a> · <a href="/canada" style={{ color: tokens.primary, fontWeight: 700 }}>Canada</a> · <a href="/service-dog" style={{ color: tokens.primary, fontWeight: 700 }}>Service dogs</a>
+          {" "}· <a href="/mexico" style={{ color: tokens.primary, fontWeight: 700 }}>Mexico</a> · <a href="/canada" style={{ color: tokens.primary, fontWeight: 700 }}>Canada</a> · <a href="/service-dog" style={{ color: tokens.primary, fontWeight: 700 }}>Service dogs</a> · <a href="/guides" style={{ color: tokens.primary, fontWeight: 700 }}>Service dog &amp; ESA laws by state</a>
         </p>
       </section>
 
