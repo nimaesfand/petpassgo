@@ -22,6 +22,8 @@ import { supabase } from "../lib/supabaseClient";
 import { PET_RELIEF } from "../lib/petRelief";
 import PassChecklist from "./PassChecklist";
 import PaperCheck from "./PaperCheck";
+import CdcAnswerSheet, { needsCdcSheet } from "./CdcAnswerSheet";
+import HawaiiFormCard, { needsHawaiiForm } from "./HawaiiFormCard";
 import PetDocumentsCard from "./PetDocumentsCard";
 import { paperCheck } from "../lib/paperCheck";
 import TripTimeline from "./TripTimeline";
@@ -268,6 +270,8 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
           )}
           {tripFitWarnings(trip).some((w) => w.level === "stop") ? <TripFitCard answers={trip} className="mb-4" /> : null}
           <PaperCheck checks={papers} petName={pet?.name} onUpload={() => setSection("documents")} />
+          {needsCdcSheet(trip, cards) ? <CdcAnswerSheet trip={trip} pet={pet} /> : null}
+          {needsHawaiiForm(cards) ? <HawaiiFormCard trip={trip} pet={pet} /> : null}
           {cards.length === 0 ? (
             <div className="rounded-xl p-5 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}`, fontFamily: font.body, fontSize: 16, color: tokens.ink }}>No requirements found for this exact combination yet.</div>
           ) : (
