@@ -25,7 +25,7 @@ export default function TravelPassPage() {
         <p style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, letterSpacing: "0.08em", color: tokens.primary }}>TRAVEL PASS</p>
         <h1 style={{ fontFamily: font.display, fontWeight: 700, color: tokens.navy, lineHeight: 1.05 }} className="text-[36px] sm:text-[48px] mt-2">Your Travel Pass</h1>
         <p style={{ fontFamily: font.body, fontSize: 18, lineHeight: 1.5, color: tokens.ink }} className="mt-3 max-w-[40rem]">
-          One trip, ready before you fly. After you pay: a checklist with due dates, a check for whether your pet will fit, weather at both airports with a cargo heat and cold warning, vets and pet stores near arrival and departure, flight status, your documents, and Pet ID.
+          For trips that need paperwork: Mexico, Canada, Hawaii, service dogs, pets flying as cargo and trips that switch airlines. You get every step with its exact date, reminders, forms filled in where we can, a check that your pet's vaccines and certificates are valid for the trip, and travel mode for the airport. One price covers the round trip, for up to 2 pets.
         </p>
         <div className="flex gap-2 mt-5 pb-1 max-sm:overflow-x-auto max-sm:flex-nowrap sm:flex-wrap" role="list" aria-label="What’s in a Travel Pass" style={{ scrollbarWidth: "none" }}>
           {CHIPS.map((c) => (
@@ -45,8 +45,8 @@ export default function TravelPassPage() {
           />
           <div className="relative sm:absolute sm:left-5 sm:bottom-5 mt-3 sm:mt-0 w-full sm:w-auto sm:max-w-[300px] rounded-2xl p-4" style={{ background: "#fff", boxShadow: "0 16px 40px rgba(20,33,61,0.18)" }}>
             <SampleChip />
-            <div style={{ fontFamily: font.display, fontSize: 28, fontWeight: 700, color: tokens.navy, lineHeight: 1.1 }} className="mt-2">LAX to JFK</div>
-            <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mt-1">Apr 18</div>
+            <div style={{ fontFamily: font.display, fontSize: 28, fontWeight: 700, color: tokens.navy, lineHeight: 1.1 }} className="mt-2">LAX to Cancún</div>
+            <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mt-1">Dec 20 · back Jan 3</div>
             <span className="inline-flex mt-3 rounded-full px-3 py-1.5" style={{ background: "#EAF6EE", color: tokens.green, fontFamily: font.body, fontWeight: 700, fontSize: 15 }}>Ready for travel</span>
           </div>
         </div>
