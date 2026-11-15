@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { POST as compare } from "../compare-airlines/route";
 export const dynamic = "force-dynamic";
 // TEMPORARY preview-only. Remove after.
 const CASES = [
@@ -15,9 +16,9 @@ export async function GET(req) {
   const out = [];
   for (const c of CASES) {
     try {
-      const r = await fetch(base + "/api/compare-airlines", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(c.body) });
+      const r = await compare(new Request(base + "/api/compare-airlines", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(c.body) }));
       const j = await r.json();
-      out.push({ case: c.name, status: r.status, count: (j.airlines || []).length, checkedAt: j.checkedAt, first: (j.airlines || []).slice(0, 3).map((a) => ({ n: a.airline || a.name, fee: a.fee ?? a.feeText, easy: a.easy, ok: a.allowed ?? a.ok })) });
+      out.push({ case: c.name, status: r.status, count: (j.airlines || []).length, checkedAt: j.checkedAt, keys: Object.keys((j.airlines||[])[0]||{}), first: (j.airlines || []).slice(0, 2) });
     } catch (e) { out.push({ case: c.name, err: String(e) }); }
   }
   return NextResponse.json(out);
