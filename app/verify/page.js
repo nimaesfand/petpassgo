@@ -29,7 +29,7 @@ export default async function VerifyPage({ searchParams }) {
               <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: ".14em", color: GREEN }}>✓ VALID PETPASSGO PASSPORT</div>
               <div style={{ fontSize: 24, fontWeight: 800, color: NAVY, marginTop: 4 }}>{result.name}</div>
               <div style={{ color: INK, fontSize: 15.5 }}>{[result.animal_type, result.breed].filter(Boolean).join(" · ")}</div>
-              <div style={{ color: INK, fontSize: 14.5, marginTop: 6, fontFamily: "ui-monospace, Menlo, monospace" }}>{result.passport_no} · member since {fmt(result.passport_issued_at)}</div>
+              <div style={{ color: INK, fontSize: 14.5, marginTop: 6, fontFamily: "ui-monospace, Menlo, monospace" }}>{result.passport_no} · issued {fmt(result.passport_issued_at)}</div>
               <p style={{ color: MUTED, fontSize: 13.5, marginTop: 8, lineHeight: 1.45 }}>This confirms it is a real PetPassGo record and the code matches. It is not an official travel document. Ask the traveler to open travel mode to see vaccine and document status.</p>
             </div>
           ) : result === false ? (

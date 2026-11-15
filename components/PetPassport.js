@@ -25,21 +25,20 @@ function stampDate(v) {
   return fmtDob(v);
 }
 
-// The round "MEMBER" stamp. Shared with the passport-ready moment. It never says "issued":
-// a PetPassGo passport is our record, not an official document.
+// The round "ISSUED" stamp. Shared with the passport-ready moment.
 export function PassportStamp({ date, size = 118, className = "", style }) {
   const label = issuedLabel(date);
   return (
     <div
-      aria-label={label ? `PetPassGo member since ${label}` : "PetPassGo member"}
+      aria-label={label ? `Passport issued ${label}` : "Passport issued"}
       role="img"
       className={`ppg-stamp ${className}`}
       style={{ width: size, height: size, borderRadius: "50%", border: `3.5px solid ${tokens.primary}`, display: "flex", alignItems: "center", justifyContent: "center", color: tokens.primary, transform: "rotate(-13deg)", ...style }}
     >
       <div style={{ width: size - 16, height: size - 16, borderRadius: "50%", border: `1.5px dashed ${tokens.primary}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
         <div style={{ fontFamily: font.body, fontSize: Math.round(size * 0.075), fontWeight: 800, letterSpacing: "0.2em" }}>PETPASSGO</div>
-        <div style={{ fontFamily: font.display, fontSize: Math.round(size * 0.21), fontWeight: 800, letterSpacing: "0.05em", lineHeight: 1.05 }}>MEMBER</div>
-        {label ? <div style={{ fontFamily: MONO, fontSize: Math.round(size * 0.075), fontWeight: 700 }}>SINCE {label}</div> : null}
+        <div style={{ fontFamily: font.display, fontSize: Math.round(size * 0.21), fontWeight: 800, letterSpacing: "0.05em", lineHeight: 1.05 }}>ISSUED</div>
+        {label ? <div style={{ fontFamily: MONO, fontSize: Math.round(size * 0.08), fontWeight: 700 }}>{label}</div> : null}
       </div>
     </div>
   );
@@ -149,7 +148,7 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
     ["Color", pet.color],
     ["Microchip", owner && !sheet ? chipMask(chipValue) : chipValue],
     ["Owner", pet.handler_name],
-    ["Member since", pet.passport_issued_at ? fmtDob(String(pet.passport_issued_at).slice(0, 10)) : ""],
+    ["Issued", pet.passport_issued_at ? fmtDob(String(pet.passport_issued_at).slice(0, 10)) : ""],
   ];
   return (
     <article data-pet-passport className="ppg-passport ppg-sheen rounded-[22px] overflow-hidden min-w-0 max-w-full relative h-full flex flex-col" style={{ background: "#FBF7EE", boxShadow: "0 1px 0 #E6DCC6, 0 22px 50px rgba(20,33,61,0.18)" }}>
@@ -200,7 +199,7 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
               {pet.passport_issued_at ? (
                 <div className="ppg-pp-stampspot2 flex-shrink-0" style={{ mixBlendMode: "multiply", pointerEvents: "none" }}><PassportStamp date={pet.passport_issued_at} size={86} className={justIssued ? "ppg-pp-stamp" : ""} style={{ opacity: 0.9 }} /></div>
               ) : pending ? (
-                <div className="ppg-no-print flex-shrink-0" aria-label="Not active yet" role="img" style={{ width: 82, height: 82, borderRadius: "50%", border: "2.5px dashed #9AA4B2", display: "flex", alignItems: "center", justifyContent: "center", color: "#7B8595", transform: "rotate(-12deg)", textAlign: "center", fontFamily: font.display, fontSize: 12, fontWeight: 800, lineHeight: 1.05 }}>NOT YET<br />ACTIVE</div>
+                <div className="ppg-no-print flex-shrink-0" aria-label="Not issued yet" role="img" style={{ width: 82, height: 82, borderRadius: "50%", border: "2.5px dashed #9AA4B2", display: "flex", alignItems: "center", justifyContent: "center", color: "#7B8595", transform: "rotate(-12deg)", textAlign: "center", fontFamily: font.display, fontSize: 12, fontWeight: 800, lineHeight: 1.05 }}>NOT YET<br />ISSUED</div>
               ) : null}
             </div>
           </div>
