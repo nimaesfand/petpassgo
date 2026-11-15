@@ -47,6 +47,11 @@ export default function VetVerify({ token }) {
               <div className="mx-auto mb-3 flex items-center justify-center rounded-full" style={{ width: 60, height: 60, background: "#EAF6EE", color: tokens.green, fontSize: 30, fontWeight: 800 }}>✓</div>
               <h1 style={{ fontFamily: font.display, fontSize: 26, fontWeight: 800, color: tokens.navy }}>Thank you!</h1>
               <p className="mt-2" style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>{done ? `${done} record${done === 1 ? "" : "s"} now show as vet-confirmed on ${p?.name}'s passport.` : "Nothing was confirmed. The owner will see that the records weren't verified."}</p>
+              <div className="mt-5 rounded-2xl p-4 text-left" style={{ background: tokens.sky }}>
+                <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 16, color: tokens.navy }}>Want pet owners near you to find your clinic?</div>
+                <p className="mt-1" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }}>List your clinic on PetPassGo for free. Owners planning trips can pick you as their vet, and you show up when they need a health certificate.</p>
+                <a href="/business?ref=vet-verify" className="mt-3 inline-flex items-center rounded-full px-5 min-h-[44px]" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 800, fontSize: 15, textDecoration: "none" }}>Create a free listing</a>
+              </div>
             </div>
           ) : err && !data ? (
             <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.ink }}>{err}</p>
