@@ -25,7 +25,7 @@ function stampDate(v) {
   return fmtDob(v);
 }
 
-// The round "ISSUED" stamp. Shared with the passport-ready moment.
+// The round "ISSUED" stamp. Shared with the passport-issue moment.
 export function PassportStamp({ date, size = 118, className = "", style }) {
   const label = issuedLabel(date);
   return (
@@ -108,16 +108,16 @@ function Field({ k, v, wide = false, mono = false }) {
   );
 }
 
-// The record code anyone can check at petpassgo.com/verify, with a plain note that
-// this is a PetPassGo record, not an official travel document.
+// Replaces a fake machine-readable line: the real passport number and a signed
+// code anyone can check at petpassgo.com/verify.
 export function VerifyStrip({ no, code }) {
   return (
     <div className="rounded-lg px-3 py-2 flex items-center justify-between gap-3 flex-wrap" style={{ background: "#F1EADA" }}>
       <div className="min-w-0">
-        <div style={{ fontFamily: font.body, fontSize: 8.5, fontWeight: 800, letterSpacing: "0.16em", color: tokens.muted }}>RECORD CODE</div>
+        <div style={{ fontFamily: font.body, fontSize: 8.5, fontWeight: 800, letterSpacing: "0.16em", color: tokens.muted }}>VERIFICATION CODE</div>
         <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 15, letterSpacing: "0.12em", color: tokens.navy }}>{code || "····-····-····"}</div>
       </div>
-      <div className="text-right" style={{ fontFamily: font.body, fontSize: 10.5, fontWeight: 700, color: tokens.muted, lineHeight: 1.35, maxWidth: 230 }}>A PetPassGo record, not an official travel document. Check it at <span style={{ color: tokens.navy }}>petpassgo.com/verify</span></div>
+      <div className="text-right" style={{ fontFamily: font.body, fontSize: 11, fontWeight: 700, color: tokens.muted, lineHeight: 1.3 }}>Check it at<br /><span style={{ color: tokens.navy }}>petpassgo.com/verify</span></div>
     </div>
   );
 }
@@ -146,6 +146,7 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
     ["Born", [fmtDob(pet.date_of_birth), age && `(${age})`].filter(Boolean).join(" ")],
     ["Weight", pet.weight_lb ? `${pet.weight_lb} lb` : ""],
     ["Color", pet.color],
+    ["Trained", pet.trained == null ? "" : pet.trained ? "Yes" : "Not yet"],
     ["Microchip", owner && !sheet ? chipMask(chipValue) : chipValue],
     ["Owner", pet.handler_name],
     ["Issued", pet.passport_issued_at ? fmtDob(String(pet.passport_issued_at).slice(0, 10)) : ""],
@@ -160,7 +161,7 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
         <div className="flex items-center gap-3 flex-shrink-0">
           {pet.passport_no ? (
             <div className="text-right">
-              <div style={{ fontFamily: font.body, fontSize: 9, fontWeight: 800, letterSpacing: "0.16em", color: tokens.gold }}>PETPASSGO ID</div>
+              <div style={{ fontFamily: font.body, fontSize: 9, fontWeight: 800, letterSpacing: "0.16em", color: tokens.gold }}>PASSPORT NO.</div>
               <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 13.5, color: "#fff", whiteSpace: "nowrap", letterSpacing: "0.04em" }}>{pet.passport_no}</div>
             </div>
           ) : null}

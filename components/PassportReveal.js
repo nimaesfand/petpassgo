@@ -67,8 +67,8 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose }) {
 
   if (!host) return null;
   return createPortal(
-    <div role="dialog" aria-modal="true" aria-label={`${pet.name}'s passport is ready`} className="fixed inset-0 z-[1000] flex flex-col items-center justify-center px-5 py-8 overflow-y-auto overflow-x-hidden" style={{ background: "radial-gradient(120% 80% at 50% 30%, #1B2C52 0%, #0B1529 70%)" }}>
-      <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 800, letterSpacing: "0.2em", color: tokens.gold, minHeight: 16 }}><span key={stage < 2 ? "a" : stage < 3 ? "b" : "c"} className="ppg-pp-fade inline-block">{stage < 2 ? `PRINTING ${String(pet.name || "").toUpperCase()}'S PASSPORT…` : stage < 3 ? "CHECKING THE DETAILS…" : "PASSPORT READY"}</span></div>
+    <div role="dialog" aria-modal="true" aria-label={`${pet.name}'s passport is issued`} className="fixed inset-0 z-[1000] flex flex-col items-center justify-center px-5 py-8 overflow-y-auto overflow-x-hidden" style={{ background: "radial-gradient(120% 80% at 50% 30%, #1B2C52 0%, #0B1529 70%)" }}>
+      <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 800, letterSpacing: "0.2em", color: tokens.gold, minHeight: 16 }}><span key={stage < 2 ? "a" : stage < 3 ? "b" : "c"} className="ppg-pp-fade inline-block">{stage < 2 ? `PRINTING ${String(pet.name || "").toUpperCase()}'S PASSPORT…` : stage < 3 ? "CHECKING THE DETAILS…" : "PASSPORT ISSUED"}</span></div>
 
       <div className="ppg-pp-book ppg-pp-float relative mt-5" style={{ width: 340, maxWidth: "90vw" }}>
         <div className={`ppg-pp-page ppg-guilloche-light relative rounded-2xl overflow-hidden flex flex-col ${stage === 3 ? "is-thud" : ""}`} style={{ background: "#FBF7EE", boxShadow: "0 30px 60px rgba(0,0,0,.45)" }}>
@@ -97,13 +97,14 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose }) {
               pet.date_of_birth && ["BORN", fmtDob(pet.date_of_birth)],
               Number(pet.weight_lb) > 0 && ["WEIGHT", `${pet.weight_lb} lb`],
               pet.color && ["COLOR", pet.color],
+              pet.trained != null && ["TRAINED", pet.trained ? "Yes" : "Not yet"],
               pet.microchip_number && ["MICROCHIP", chipMask(pet.microchip_number)],
               pet.handler_name && ["OWNER", pet.handler_name],
-              pet.passport_no && ["PETPASSGO ID", pet.passport_no],
+              pet.passport_no && ["PASSPORT NO.", pet.passport_no],
             ].filter(Boolean).slice(0, 9).map(([k, v], i) => (
-              <div key={k} className={`min-w-0 ${k === "OWNER" || k === "PETPASSGO ID" ? "col-span-2" : ""}`} style={{ paddingTop: i < 3 ? 8 : 0, opacity: stage >= 2 ? 1 : 0, transform: stage >= 2 ? "none" : "translateY(6px)", transition: `opacity .45s ease ${i * 0.22}s, transform .45s ease ${i * 0.22}s` }}>
+              <div key={k} className={`min-w-0 ${k === "OWNER" || k === "PASSPORT NO." ? "col-span-2" : ""}`} style={{ paddingTop: i < 3 ? 8 : 0, opacity: stage >= 2 ? 1 : 0, transform: stage >= 2 ? "none" : "translateY(6px)", transition: `opacity .45s ease ${i * 0.22}s, transform .45s ease ${i * 0.22}s` }}>
                 {label(k)}
-                <div className="truncate" style={{ fontFamily: k === "PETPASSGO ID" || k === "MICROCHIP" ? "ui-monospace, Menlo, monospace" : font.body, fontSize: 13, fontWeight: 700, color: tokens.navy }}>{v}</div>
+                <div className="truncate" style={{ fontFamily: k === "PASSPORT NO." || k === "MICROCHIP" ? "ui-monospace, Menlo, monospace" : font.body, fontSize: 13, fontWeight: 700, color: tokens.navy }}>{v}</div>
               </div>
             ))}
           </div>
