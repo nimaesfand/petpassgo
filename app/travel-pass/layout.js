@@ -1,6 +1,6 @@
 export const metadata = {
   title: "Travel Pass",
-  description: "A Travel Pass is $29.99 for one trip. After you pay: checklist, fit check, weather at both airports, vets and pet stores, flight status, documents, and Pet ID. Includes Pet Vault until 7 days after the trip. Members add a pass for $14.99.",
+  description: "A Travel Pass is $29.99 per trip ($14.99 with Pet Vault) for flights that need paperwork: Mexico, Canada, Hawaii, service dogs and cargo. Exact dates, reminders, forms and travel mode.",
   alternates: { canonical: "/travel-pass" },
   openGraph: {
     title: "Travel Pass | PetPassGo",

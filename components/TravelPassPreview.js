@@ -16,9 +16,9 @@ const DEMO_STEPS = [
 ];
 
 const DEMO_REMINDERS = [
-  { icon: "calendar", title: "30 days before you fly", when: "Mar 19 · sample" },
-  { icon: "check", title: "A week before you fly", when: "Apr 11 · sample" },
-  { icon: "plane", title: "Flight day", when: "Apr 18 · sample" },
+  { icon: "calendar", title: "Book the vet visit", when: "Dec 8 · sample" },
+  { icon: "check", title: "Vet signs the health certificate", when: "Dec 16 · sample" },
+  { icon: "plane", title: "Flight day", when: "Dec 20 · sample" },
 ];
 
 function CheckMark({ on }) {
@@ -56,8 +56,8 @@ export default function TravelPassPreview() {
             </div>
           </div>
           <div className="sm:text-right">
-            <div style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: "#fff" }}>Apr 18</div>
-            <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.sky }}>LAX to JFK · Nonstop · 5h 15m</div>
+            <div style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: "#fff" }}>Dec 20</div>
+            <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.sky }}>LAX to Cancún · Nonstop · 4h 30m</div>
           </div>
         </div>
         <div className="mt-4">
@@ -77,19 +77,19 @@ export default function TravelPassPreview() {
       {section === "overview" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <SoftCard title="Flight status" action={<StatusChip>On schedule</StatusChip>}>
-            <RouteLine from="LAX" to="JFK" />
-            <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mt-3">Apr 18 · 9:10 AM sample · Nonstop · 5h 15m</p>
+            <RouteLine from="LAX" to="CUN" />
+            <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mt-3">Dec 20 · 9:10 AM sample · Nonstop · 4h 30m</p>
             <div className="mt-3"><TextButton onClick={() => setSection("flight")}>View full flight details</TextButton></div>
           </SoftCard>
           <SoftCard title="Weather at destination">
             <div className="flex items-center gap-3">
               <span style={{ color: tokens.navy }}><Icon name="cloudSun" size={36} /></span>
               <div>
-                <div style={{ fontFamily: font.display, fontSize: 32, fontWeight: 700, color: tokens.navy, lineHeight: 1 }}>68°</div>
-                <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>New York · Partly cloudy</div>
+                <div style={{ fontFamily: font.display, fontSize: 32, fontWeight: 700, color: tokens.navy, lineHeight: 1 }}>81°</div>
+                <div style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }}>Cancún · Sunny</div>
               </div>
             </div>
-            <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mt-3">High 72° · Low 54° · Wind 9 mph</p>
+            <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mt-3">High 84° · Low 72° · Wind 8 mph</p>
           </SoftCard>
           <SoftCard title="Vets and pet stores" action={null}>
             <div className="flex gap-4">
@@ -129,7 +129,7 @@ export default function TravelPassPreview() {
           </SoftCard>
           <SoftCard title="Your documents">
             <div className="grid grid-cols-2 gap-2">
-              {[["Pet ID", true], ["Vaccination records", true], ["DOT form", false], ["Travel Pass summary", true]].map(([label, on]) => (
+              {[["Pet ID", true], ["Vaccination records", true], ["Health certificate", false], ["Travel Pass summary", true]].map(([label, on]) => (
                 <div key={label} className="rounded-xl p-3" style={{ background: tokens.paper }}>
                   <CheckMark on={on} />
                   <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, color: tokens.navy }} className="mt-2">{label}</div>
@@ -142,7 +142,7 @@ export default function TravelPassPreview() {
 
       {section === "flight" && (
         <SoftCard title="Flight and weather">
-          <RouteLine from="LAX" to="JFK" />
+          <RouteLine from="LAX" to="CUN" />
           <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.ink }} className="mt-3">Live flight status, weather at both airports, and a cargo heat and cold check.</p>
         </SoftCard>
       )}
