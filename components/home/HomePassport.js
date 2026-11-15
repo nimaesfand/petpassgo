@@ -4,7 +4,9 @@ import PetPassport from "../PetPassport";
 // The real passport, with Benny, our service dog ambassador. Tap to flip.
 const BENNY = {
   id: "sample-benny", name: "Benny", animal_type: "Dog", role: "Service animal", breed: "Golden Retriever", sex: "Male", color: "Golden",
-  date_of_birth: "2021-04-12", weight_lb: 68, trained: "yes", handler_name: "Sample Owner", passport_no: "PPG-000-0001",
+  date_of_birth: "2021-04-12", weight_lb: 68, trained: true, handler_name: "Sample Owner", passport_no: "PPG-000-0001",
+  training: { levels: ["house", "leash", "obedience", "cgc", "public", "tasks"], trained_by: "program", trainer_name: "Sample Service Dog Program", trained_where: "San Diego, CA", tasks: ["mobility"], show_tasks: true },
+  service_attested_at: "2026-03-02T18:00:00Z",
   passport_issued_at: "2026-11-01T12:00:00Z", verify_code: "SAMP-LE7K-Q3XA",
   emergency_contact_name: "Sample Owner", emergency_contact_phone: "555-0100", show_contact_on_public_id: true,
 };

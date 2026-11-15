@@ -1,4 +1,5 @@
 import { serviceClient } from "../../../lib/serverEmail";
+import { trainingSummary, trainedByLine, tasksLine } from "../../../lib/training";
 import { readCheckin, signCheckin } from "../../../lib/ppgSign";
 import { SITE_URL } from "../../../lib/site";
 import QRCode from "qrcode";
@@ -27,6 +28,7 @@ function Badge({ kind }) {
     verified: ["VERIFIED", GREEN, "#EAF6EE"],
     doc: ["DOCUMENT ON FILE", "#1D4ED8", "#EAF1FF"],
     owner: ["OWNER-STATED", MUTED, "#F1F4F8"],
+    signed: ["SIGNED BY HANDLER", "#0F766E", "#E6F4F1"],
     missing: ["NOT ON FILE", "#B45309", "#FEF3C7"],
     expired: ["EXPIRED", "#B91C1C", "#FDECEC"],
   }[kind];
@@ -132,6 +134,8 @@ export default async function CheckPage({ params, searchParams }) {
         <div style={{ marginTop: 14 }}>
           <Row title="Rabies vaccine" kind={vaxKind(rabies)} detail={vaxDetail(rabies)} />
           {otherVax.map((r) => <Row key={r.id} title={r.name} kind={vaxKind(r)} detail={vaxDetail(r)} />)}
+          {service ? <Row title="Service dog statement" kind={pet.service_attested_at ? "signed" : "missing"} detail={pet.service_attested_at ? [`The handler signed a statement that ${pet.name} is trained to do tasks for a disability, on ${fmt(String(pet.service_attested_at).slice(0, 10))}.`, trainedByLine(pet.training) && `Trained by ${[trainedByLine(pet.training), pet.training?.trained_where].filter(Boolean).join(", ")}.`, pet.training?.show_tasks && pet.training?.tasks?.length ? `Tasks: ${tasksLine(pet.training.tasks)}.` : ""].filter(Boolean).join(" ") : "Not signed yet."} /> : null}
+          {trainingSummary(pet.training) ? <Row title="Training" kind="owner" detail={trainingSummary(pet.training)} /> : null}
           {service ? <Row title="DOT Service Animal form" kind={dot ? "doc" : "missing"} detail={dot ? `Uploaded ${fmt(String(dot.uploaded_at).slice(0, 10))}. Signed by the handler.` : "Not uploaded to the passport. Ask the traveler for their copy."} extra={open(dotUrl, "View the form")} /> : null}
           <Row title="Health certificate" kind={health ? (health.expires_on && health.expires_on < t ? "expired" : "doc") : "missing"} detail={health ? [health.issued_on ? `Issued ${fmt(health.issued_on)}` : "", health.expires_on ? `Valid until ${fmt(health.expires_on)}` : ""].filter(Boolean).join(" · ") || "On file" : "None on file. Many U.S. domestic trips don't need one; check your airline's rule."} extra={open(healthUrl, "View the certificate")} />
           <Row title="Microchip" kind={chip ? "owner" : "missing"} detail={chip ? `Ends in ${chip.slice(-4)}` : "No microchip number entered."} />

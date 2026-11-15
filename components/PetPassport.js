@@ -8,6 +8,7 @@ import PetQr from "../lib/PetQr";
 import { PetIllustration } from "./PetIdCard";
 import { tokens, font } from "../lib/theme";
 import { filled, fmtDob, mrzLines, issuedLabel, chipMask } from "../lib/petProfile";
+import { trainingSummary, trainedByLine, tasksLine } from "../lib/training";
 
 const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 
@@ -98,6 +99,25 @@ function HoloSeal({ size = 54 }) {
   );
 }
 
+// Service dog seal: teal with a gold ring. With a signed statement it shows the date.
+function ServiceSeal({ attestedAt }) {
+  const d = attestedAt ? new Date(attestedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }).toUpperCase() : "";
+  return (
+    <div className="inline-flex items-center gap-2 mt-2 rounded-xl pl-1.5 pr-3 py-1.5" style={{ background: "linear-gradient(135deg, #0F766E, #0B5751)", boxShadow: `inset 0 0 0 1.5px ${tokens.gold}, 0 3px 10px rgba(15,118,110,.3)` }}>
+      <span aria-hidden="true" className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: 30, height: 30, background: "#fff", boxShadow: `0 0 0 2px ${tokens.gold}` }}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F766E" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 2.5l7.5 3v5.6c0 4.6-3.1 8.6-7.5 10.4-4.4-1.8-7.5-5.8-7.5-10.4V5.5z" fill="#E6F4F1" />
+          <path d="M8.3 12.2l2.5 2.5 4.9-5" />
+        </svg>
+      </span>
+      <span className="min-w-0">
+        <span className="block" style={{ fontFamily: font.body, fontWeight: 800, fontSize: 11.5, letterSpacing: "0.16em", color: "#fff", lineHeight: 1.1 }}>SERVICE DOG</span>
+        <span className="block" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 9, letterSpacing: "0.1em", color: "#F7D98C", lineHeight: 1.3 }}>{d ? `HANDLER STATEMENT · ${d}` : "STATEMENT NOT SIGNED"}</span>
+      </span>
+    </div>
+  );
+}
+
 function Field({ k, v, wide = false, mono = false }) {
   if (!filled(v)) return null;
   return (
@@ -146,7 +166,8 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
     ["Born", [fmtDob(pet.date_of_birth), age && `(${age})`].filter(Boolean).join(" ")],
     ["Weight", pet.weight_lb ? `${pet.weight_lb} lb` : ""],
     ["Color", pet.color],
-    ["Trained", pet.trained == null ? "" : pet.trained ? "Yes" : "Not yet"],
+    ["Training", trainingSummary(pet.training) || (pet.trained == null ? "" : pet.trained ? "House trained" : "Not yet")],
+    ["Trained by", [trainedByLine(pet.training), pet.training?.trained_where].filter(Boolean).join(", ")],
     ["Microchip", owner && !sheet ? chipMask(chipValue) : chipValue],
     ["Owner", pet.handler_name],
     ["Issued", pet.passport_issued_at ? fmtDob(String(pet.passport_issued_at).slice(0, 10)) : ""],
@@ -195,7 +216,7 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
               <div className="min-w-0">
                 <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>NAME</div>
                 <h2 className={`ppg-pp-name ${String(pet.name || "").length > 9 ? "is-long" : String(pet.name || "").length > 5 ? "is-mid" : ""}`} style={{ fontFamily: font.display, fontWeight: 800, lineHeight: 1, letterSpacing: "-0.02em", color: tokens.navy, overflowWrap: "break-word" }}>{pet.name}</h2>
-                <span className="inline-block rounded-md px-2 py-0.5 mt-2" style={{ background: st.bg, color: st.fg, fontFamily: font.body, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.14em" }}>{st.label}</span>
+                {st === STATUS.service ? <ServiceSeal attestedAt={pet.service_attested_at} /> : <span className="inline-block rounded-md px-2 py-0.5 mt-2" style={{ background: st.bg, color: st.fg, fontFamily: font.body, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.14em" }}>{st.label}</span>}
               </div>
               {pet.passport_issued_at ? (
                 <div className="ppg-pp-stampspot2 flex-shrink-0" style={{ mixBlendMode: "multiply", pointerEvents: "none" }}><PassportStamp date={pet.passport_issued_at} size={86} className={justIssued ? "ppg-pp-stamp" : ""} style={{ opacity: 0.9 }} /></div>
@@ -205,7 +226,8 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
             </div>
           </div>
           <div className="ppg-pp-fields pt-3 grid gap-x-4 gap-y-2.5 min-w-0" style={{ borderTop: "1px dashed #D9CDB2" }}>
-            {fields.map(([k, v]) => <Field key={k} k={k} v={v} mono={k === "Microchip"} />)}
+            {fields.map(([k, v]) => <Field key={k} k={k} v={v} mono={k === "Microchip"} wide={(k === "Trained by" || k === "Training") && String(v).length > 22} />)}
+            {pet.service_attested_at && pet.training?.show_tasks && pet.training?.tasks?.length ? <Field k="Tasks" v={tasksLine(pet.training.tasks)} wide /> : null}
             <RabiesField rabies={rabies} />
           </div>
         </div>
