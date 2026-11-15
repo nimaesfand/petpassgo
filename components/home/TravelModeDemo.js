@@ -20,7 +20,7 @@ function Row({ title, detail, kind }) {
   );
 }
 
-// What travel mode looks like on a phone, with Biscuit.
+// What travel mode looks like on a phone, with Benny.
 function Screen() {
   const [now, setNow] = useState(null);
   useEffect(() => { setNow(new Date()); const t = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(t); }, []);
@@ -38,7 +38,7 @@ function Screen() {
             <div style={{ fontSize: 17, fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>{now ? now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" }) : " "}</div>
           </div>
         </div>
-        <div style={{ fontSize: 11, fontWeight: 700, opacity: .9 }}>Open for 12 hr</div>
+        <div style={{ fontSize: 11, fontWeight: 700, opacity: .9 }}>Open for 24 hr</div>
       </div>
       <div style={{ background: "#fff", borderRadius: 16, marginTop: 10, padding: 12 }}>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -46,9 +46,9 @@ function Screen() {
             <img src="/images/hero-golden-retriever.jpg" alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "62% 22%" }} />
           </div>
           <div>
-            <div style={{ fontSize: 21, fontWeight: 800, color: NAVY, lineHeight: 1.05 }}>Biscuit</div>
+            <div style={{ fontSize: 21, fontWeight: 800, color: NAVY, lineHeight: 1.05 }}>Benny</div>
             <div style={{ fontSize: 12, color: INK }}>Dog · Golden Retriever · Male</div>
-            <span style={{ display: "inline-block", marginTop: 5, background: GOLD, color: NAVY, fontSize: 9, fontWeight: 800, letterSpacing: ".12em", borderRadius: 5, padding: "3px 6px" }}>PET</span>
+            <span style={{ display: "inline-block", marginTop: 5, background: GOLD, color: NAVY, fontSize: 9, fontWeight: 800, letterSpacing: ".12em", borderRadius: 5, padding: "3px 6px" }}>SERVICE DOG</span>
             <div style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 11, color: NAVY, marginTop: 4 }}>PPG-000-0001</div>
           </div>
         </div>

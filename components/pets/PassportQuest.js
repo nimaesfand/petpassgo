@@ -118,7 +118,7 @@ export default function PassportQuest({ pet, userId, onChanged, onPhoto }) {
         <div className="flex items-center justify-center rounded-2xl flex-shrink-0" style={{ width: 48, height: 48, background: "rgba(255,255,255,0.18)" }}><Icon name="passport" size={26} /></div>
         <div className="flex-1 min-w-0">
           <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 21, lineHeight: 1.15 }}>
-            {missingKeys.length === 1 ? `One step from ${pet.name}'s passport` : `Get ${pet.name}'s passport issued`}
+            {missingKeys.length === 1 ? `One step from ${pet.name}'s passport` : `Finish ${pet.name}'s passport`}
           </div>
           <div style={{ fontFamily: font.body, fontSize: 14.5, opacity: 0.92 }}>{doneCount} of {PASSPORT_FIELDS.length} done. Finish and we stamp it, right here.</div>
           <div className="mt-2 rounded-full overflow-hidden" style={{ height: 8, background: "rgba(255,255,255,0.25)" }}>

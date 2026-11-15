@@ -69,7 +69,7 @@ export default function PetBasicsCard({ pet, userId, onChanged, bare = false }) 
     ["Color", pet.color],
     ["Microchip", pet.microchip_number],
     ["Owner", pet.handler_name],
-    ["Trained", pet.trained == null ? "" : pet.trained ? "Yes" : "Not yet"],
+    ["House trained", pet.trained == null ? "" : pet.trained ? "Yes" : "Not yet"],
   ];
 
   return (

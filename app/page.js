@@ -38,8 +38,8 @@ const QR_STEPS = [
 
 const PRICE_CARDS = [
   { title: "Free checklist", sub: "For simple flights", price: "Free", unit: "with an account", body: "Small pets in the cabin on U.S. flights with one airline. Your full checklist, free.", cta: "Check my flight", href: "/assessment", bordered: true },
-  { title: "Travel Pass", sub: "For flights that need paperwork", price: P.pass, unit: `per trip, or ${P.memberPass} with Pet Vault`, body: "Mexico, Canada and Hawaii, service dogs, pets flying as cargo, and trips that switch airlines. Your exact dates, reminders, forms filled in, and a check that your pet's vaccines and certificates are valid for the trip.", cta: "Plan my pet's trip", href: "/assessment", dark: true },
-  { title: "Pet Vault", sub: "Your pet's passport and records", price: P.member, unit: "a month", body: `Your pet's passport, vet-confirmed records, travel mode, reminders and lost pet alerts. Travel Passes are ${P.memberPass} for members. Cancel anytime.`, cta: "Make their passport", href: "/join", accent: true, tag: "Best value" },
+  { title: "Travel Pass", sub: "For flights that need paperwork", price: P.pass, unit: `per trip, or ${P.memberPass} with Pet Vault`, body: "Mexico, Canada and Hawaii, service dogs, pets flying as cargo, and trips that switch airlines. Your exact dates, reminders, forms filled in, and a check that your pet's vaccines and certificates are valid for the trip. One price covers the round trip, for up to 2 pets.", guarantee: true, cta: "Plan my pet's trip", href: "/assessment", dark: true },
+  { title: "Pet Vault", sub: "Your pet's passport and records", price: P.member, unit: "a month", body: `Your pet's passport, vet-confirmed records, travel mode, reminders and lost pet alerts. Travel Passes are ${P.memberPass} for members. Cancel anytime.`, cta: "Make their passport", href: "/join", accent: true, tag: "For frequent travelers" },
 ];
 
 const HOME_FAQ = [FAQ[1], FAQ[3], FAQ[2], FAQ[4]];
@@ -95,7 +95,7 @@ export default async function PetPassGoLanding() {
         <div className="absolute inset-0 hidden lg:block xl:hidden" style={{ background: "linear-gradient(90deg, rgba(11,21,41,.7) 0%, rgba(11,21,41,.3) 40%, rgba(11,21,41,0) 60%)" }} aria-hidden="true" />
         <div className={`relative ${WRAP} min-h-[86svh] lg:min-h-[640px] flex flex-col justify-end lg:justify-center pb-14 pt-32`}>
           <h1 style={{ fontFamily: D, color: "#fff", lineHeight: .98, letterSpacing: "-0.02em" }} className="text-[54px] sm:text-[76px] lg:text-[92px] font-extrabold max-w-[11ch]">Bring them along.</h1>
-          <p style={{ fontFamily: B, color: "#E7EDF6", lineHeight: 1.5 }} className="mt-5 text-[18px] sm:text-[20px] max-w-[30rem]">Everything you and your pet need to fly, and all their documents ready for every trip.</p>
+          <p style={{ fontFamily: B, color: "#E7EDF6", lineHeight: 1.5 }} className="mt-5 text-[18px] sm:text-[20px] max-w-[30rem]">Know what your pet needs before you book. Check your airline, destination and dates, and get a plan for your pet&apos;s flight, documents and deadlines.</p>
           <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-4">
             <a href="/assessment" className="btn-primary inline-flex items-center justify-center rounded-full px-9 min-h-[58px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17.5, textDecoration: "none" }}>Plan my pet&apos;s trip</a>
             <a href="#how" style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: "#fff", textDecoration: "underline", textUnderlineOffset: 4 }} className="text-center sm:text-left">See how it works</a>
@@ -119,6 +119,21 @@ export default async function PetPassGoLanding() {
         </ol>
       </section>
 
+      <section className={`${WRAP} pb-16 lg:pb-24`}>
+        <h2 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[32px] md:text-[44px] font-extrabold max-w-[20ch]">Flying somewhere that needs paperwork?</h2>
+        <p className="mt-3 max-w-[38rem]" style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }}>Crossing a border with a dog means vet certificates that must be signed before you fly, and a CDC form to come home. The timing is where most people get it wrong. We give you the exact dates for your flights and help you fill in each form.</p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
+          {[["/mexico", "Mexico", "Two vet certificates, an inspection when you land, and what you need to come home."], ["/canada", "Canada", "The rabies certificate Canada asks for, and the CDC form to come home."], ["/service-dog", "Service dogs", "The DOT form, what airlines can ask, and how to get ready for the airport."]].map(([href, title, body]) => (
+            <a key={href} href={href} className="rounded-3xl p-6 block" style={{ background: "#fff", border: `1px solid ${tokens.line}`, textDecoration: "none" }}>
+              <div style={{ fontFamily: D, fontSize: 24, fontWeight: 800, color: tokens.navy }}>{title}</div>
+              <p className="mt-2" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>{body}</p>
+              <span className="inline-block mt-4" style={{ fontFamily: B, fontWeight: 800, fontSize: 15.5, color: tokens.primary }}>Read the guide</span>
+            </a>
+          ))}
+        </div>
+        <p className="mt-5" style={{ fontFamily: B, fontSize: 15.5, color: tokens.muted }}>Also covered: Hawaii, pets flying as cargo, and trips that switch airlines. <a href="/assessment" style={{ color: tokens.navy, fontWeight: 800 }}>Check your trip</a></p>
+      </section>
+
       <section style={{ background: tokens.navy }} className="py-16 lg:py-24 overflow-hidden">
         <div className={`${WRAP} grid lg:grid-cols-[minmax(0,1fr)_minmax(560px,640px)] gap-12 items-center`}>
           <div>
@@ -136,7 +151,7 @@ export default async function PetPassGoLanding() {
           </div>
           <div className="w-full max-w-[640px] mx-auto">
             <HomePassport />
-            <p className="mt-3 text-center" style={{ fontFamily: B, fontSize: 14, color: "#AFC0D6" }}>Meet Biscuit. Tap the passport to flip it.</p>
+            <p className="mt-3 text-center" style={{ fontFamily: B, fontSize: 14, color: "#AFC0D6" }}>Meet Benny. Tap the passport to flip it.</p>
           </div>
         </div>
       </section>
@@ -148,14 +163,14 @@ export default async function PetPassGoLanding() {
               <div className="rounded-full flex items-center justify-center" style={{ width: 150, height: 150, background: "linear-gradient(145deg, #E9EEF5, #C9D3E0)", boxShadow: "0 14px 34px rgba(20,33,61,.18), inset 0 2px 0 #fff" }}>
                 <div className="rounded-full bg-white flex flex-col items-center justify-center" style={{ width: 126, height: 126 }}>
                   <div style={{ width: 70, height: 70 }} dangerouslySetInnerHTML={{ __html: tagQr.replace("<svg", '<svg width="70" height="70"') }} />
-                  <div style={{ fontFamily: B, fontSize: 9.5, fontWeight: 800, letterSpacing: ".12em", color: tokens.navy, marginTop: 5 }}>SCAN ME · BISCUIT</div>
+                  <div style={{ fontFamily: B, fontSize: 9.5, fontWeight: 800, letterSpacing: ".12em", color: tokens.navy, marginTop: 5 }}>SCAN ME · BENNY</div>
                 </div>
               </div>
               <span className="mt-2" style={{ fontFamily: B, fontSize: 13, color: tokens.muted }}>Their collar tag</span>
             </div>
             <div className="rounded-2xl p-4 w-full max-w-[290px]" style={{ background: "#fff", boxShadow: "0 18px 44px rgba(20,33,61,.12)", border: `1px solid ${tokens.line}` }}>
               <div style={{ fontFamily: B, fontSize: 12, color: tokens.muted }}>From PetPassGo · just now</div>
-              <div className="mt-1" style={{ fontFamily: B, fontSize: 15, fontWeight: 800, color: tokens.navy, lineHeight: 1.3 }}>Someone sent a message about Biscuit</div>
+              <div className="mt-1" style={{ fontFamily: B, fontSize: 15, fontWeight: 800, color: tokens.navy, lineHeight: 1.3 }}>Someone sent a message about Benny</div>
               <p className="mt-2 rounded-xl px-3 py-2" style={{ background: tokens.sky, fontFamily: B, fontSize: 14, color: tokens.ink, lineHeight: 1.45 }}>&ldquo;Found him by the park on Lake Ave. He&apos;s safe with me at the coffee shop.&rdquo;</p>
               <div className="mt-2" style={{ fontFamily: B, fontSize: 13, color: tokens.ink }}>Their contact: (555) 010-2233</div>
             </div>
@@ -181,7 +196,7 @@ export default async function PetPassGoLanding() {
       <section className={`${WRAP} py-16 lg:py-24 grid lg:grid-cols-[1fr_minmax(320px,460px)] gap-12 items-center`}>
         <div>
           <h2 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05, letterSpacing: "-0.01em" }} className="text-[32px] md:text-[44px] font-extrabold max-w-[16ch]">Records your vet confirms.</h2>
-          <p className="mt-3 max-w-[34rem]" style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }}>Anyone can type in a vaccine date. When your vet confirms it, you know your records are right, and so does anyone you show them to, like a border officer, boarding kennel or new vet.</p>
+          <p className="mt-3 max-w-[34rem]" style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }}>Anyone can type in a vaccine date. When your vet confirms it, you know your records are right and organized, ready when you need them. Official travel health certificates still come from your vet, and some trips also need USDA approval.</p>
           <ol className="mt-7 grid gap-5 max-w-[34rem]" style={{ listStyle: "none", padding: 0 }}>
             {VET_STEPS.map((t, i) => (
               <li key={t.title} className="flex gap-4">
@@ -202,7 +217,7 @@ export default async function PetPassGoLanding() {
                 <img src="/images/hero-golden-retriever.jpg" alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "62% 22%" }} />
               </div>
               <div className="min-w-0 flex-1">
-                <div style={{ fontFamily: D, fontSize: 20, fontWeight: 800, color: "#fff", lineHeight: 1.1 }}>Biscuit&apos;s vaccines</div>
+                <div style={{ fontFamily: D, fontSize: 20, fontWeight: 800, color: "#fff", lineHeight: 1.1 }}>Benny&apos;s vaccines</div>
                 <div style={{ fontFamily: B, fontSize: 13, color: "#C9D4E4" }}>Example</div>
               </div>
               <div className="flex-shrink-0 flex items-center justify-center text-center rounded-full" style={{ width: 62, height: 62, border: `2px dashed ${tokens.gold}`, color: tokens.gold, fontFamily: B, fontSize: 9.5, fontWeight: 800, letterSpacing: ".08em", lineHeight: 1.15, transform: "rotate(-10deg)" }}>VET<br />VERIFIED</div>
@@ -230,18 +245,18 @@ export default async function PetPassGoLanding() {
         </div>
       </section>
 
-      <section className={`${WRAP} py-16 lg:py-24`}>
-        <h2 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[32px] md:text-[44px] font-extrabold">Heading to Mexico or Canada?</h2>
-        <p className="mt-3 max-w-[38rem]" style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }}>Crossing a border with a dog means vet certificates that must be signed before you fly, and a CDC form to come home. The timing is where most people get it wrong. We give you the exact dates for your flights and help you fill in each form.</p>
-        <div className="grid sm:grid-cols-2 gap-4 mt-8 max-w-[52rem]">
-          {[["/mexico", "Mexico with your dog", "Two vet certificates, an inspection when you land, and what you need to come home."], ["/canada", "Canada with your dog", "The rabies certificate Canada asks for, and the CDC form to come home."]].map(([href, title, body]) => (
-            <a key={href} href={href} className="rounded-3xl p-6 block" style={{ background: "#fff", border: `1px solid ${tokens.line}`, textDecoration: "none" }}>
-              <div style={{ fontFamily: D, fontSize: 24, fontWeight: 800, color: tokens.navy }}>{title}</div>
-              <p className="mt-2" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>{body}</p>
-              <span className="inline-block mt-4" style={{ fontFamily: B, fontWeight: 800, fontSize: 15.5, color: tokens.primary }}>Read the guide</span>
-            </a>
+
+      <section className={`${WRAP} py-16 lg:py-20`}>
+        <h2 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[32px] md:text-[44px] font-extrabold max-w-[20ch]">Where our information comes from.</h2>
+        <div className="grid md:grid-cols-3 gap-6 mt-8">
+          {[["Official sources", "Every rule links to where it comes from: USDA, the CDC, the destination's government and each airline's own pet policy."], ["Dated and rechecked", "Each rule shows when we last checked it against the official page, and we keep rechecking them."], ["Backed by a guarantee", "If your pet is refused boarding because our information was wrong, we refund your Travel Pass."]].map(([t, b]) => (
+            <div key={t} className="rounded-3xl p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+              <h3 style={{ fontFamily: D, fontSize: 21, fontWeight: 800, color: tokens.navy }}>{t}</h3>
+              <p className="mt-2" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>{b}</p>
+            </div>
           ))}
         </div>
+        <p className="mt-5" style={{ fontFamily: B, fontSize: 14.5, color: tokens.muted, lineHeight: 1.5 }}>PetPassGo is a travel-prep tool, not a government agency. Official health certificates come from your vet, and airlines make the final call at the counter. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Flight-Ready Guarantee</a></p>
       </section>
 
       <section id="pricing" style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-16 lg:py-24">
@@ -258,6 +273,7 @@ export default async function PetPassGoLanding() {
                 <p className="mt-0.5" style={{ fontFamily: B, fontSize: 15, color: c.dark ? "#C9D4E4" : tokens.muted }}>{c.sub}</p>
                 <div className="mt-3 flex items-baseline gap-2"><span style={{ fontFamily: D, fontSize: 44, fontWeight: 800, lineHeight: 1 }}>{c.price}</span><span style={{ fontFamily: B, fontSize: 15, color: c.dark ? "#C9D4E4" : tokens.muted }}>{c.unit}</span></div>
                 <p className="mt-4 flex-1" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.55, color: c.dark ? "#E7EDF6" : tokens.ink }}>{c.body}</p>
+                {c.guarantee ? <a href="/guarantee" className="mt-4 flex items-start gap-2 rounded-2xl px-3 py-2.5" style={{ background: "rgba(255,255,255,.08)", color: "#E7EDF6", fontFamily: B, fontSize: 14, lineHeight: 1.4, textDecoration: "none" }}><span aria-hidden="true" style={{ color: tokens.gold, fontWeight: 900 }}>✓</span><span><b style={{ color: "#fff" }}>Flight-Ready Guarantee.</b> If your pet is refused boarding because our information was wrong, we refund your Travel Pass. <span style={{ textDecoration: "underline" }}>How it works</span></span></a> : null}
                 <a href={c.href} className="mt-6 inline-flex items-center justify-center rounded-full min-h-[50px] px-6" style={{ background: c.dark || c.accent ? tokens.primary : "#fff", color: c.dark || c.accent ? "#fff" : tokens.navy, border: c.dark || c.accent ? "none" : `1.5px solid ${tokens.line}`, fontFamily: B, fontWeight: 800, fontSize: 15.5, textDecoration: "none" }}>{c.cta}</a>
               </article>
             ))}

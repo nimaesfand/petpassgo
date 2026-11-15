@@ -55,10 +55,10 @@ function PassportArt() {
             <PetIllustration type="Dog" size={66} />
           </div>
           <div style={{ fontFamily: font.body, fontSize: 11.5, lineHeight: 1.5, color: tokens.ink }}>
-            <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 800, color: tokens.navy }}>Biscuit</div>
+            <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 800, color: tokens.navy }}>Benny</div>
             Golden Retriever<br />3 yrs · 22 lb<br />Microchip on file
           </div>
-          <div className="absolute flex items-center justify-center text-center rounded-full" style={{ right: 10, bottom: 8, width: 58, height: 58, border: `2.5px solid ${tokens.primary}`, color: tokens.primary, fontFamily: font.body, fontSize: 8, fontWeight: 800, letterSpacing: "0.08em", transform: "rotate(-14deg)" }}>ISSUED<br />✓</div>
+          <div className="absolute flex items-center justify-center text-center rounded-full" style={{ right: 10, bottom: 8, width: 58, height: 58, border: `2.5px solid ${tokens.primary}`, color: tokens.primary, fontFamily: font.body, fontSize: 8, fontWeight: 800, letterSpacing: "0.08em", transform: "rotate(-14deg)" }}>READY<br />✓</div>
         </div>
       </div>
     </div>
@@ -78,10 +78,10 @@ function PetIdArt() {
           {qr ? <img src={qr} alt="Sample Pet ID QR code" width={108} height={108} /> : <div className="ppg-shimmer rounded-md" style={{ width: 108, height: 108 }} />}
           <span className="absolute rounded-md flex items-center justify-center" style={{ left: 38, top: 38, width: 32, height: 32, background: "#fff" }}><Logo size={26} /></span>
         </div>
-        <div style={{ fontFamily: font.display, fontWeight: 800, color: tokens.navy }}>Biscuit</div>
+        <div style={{ fontFamily: font.display, fontWeight: 800, color: tokens.navy }}>Benny</div>
       </div>
       <div className="rounded-2xl p-3" style={{ width: 150, background: "#fff", boxShadow: "0 12px 26px rgba(20,33,61,.14)", fontFamily: font.body, fontSize: 12, lineHeight: 1.45, color: tokens.ink }}>
-        <div style={{ fontWeight: 800, color: tokens.navy, fontSize: 13 }}>Hi, I&apos;m Biscuit</div>
+        <div style={{ fontWeight: 800, color: tokens.navy, fontSize: 13 }}>Hi, I&apos;m Benny</div>
         My family is looking for me.
         <div className="mt-2.5 rounded-full py-1.5 text-center" style={{ background: tokens.primary, color: "#fff", fontWeight: 700 }}>Call my owner</div>
         <div className="mt-1.5 rounded-full py-1.5 text-center" style={{ border: `1.5px solid ${tokens.navy}`, color: tokens.navy, fontWeight: 700 }}>Share location</div>
@@ -122,7 +122,7 @@ export default function PetHub() {
           art={<PassportArt />}
           badge={<Chip dark>Sample pet</Chip>}
           title="My Pets"
-          body="Add each pet once. Fill in the details and their passport is issued, ready for every trip and vet visit."
+          body="Add each pet once. Fill in the details and their passport is ready for every trip and vet visit."
           bullets={["Profile, photo, weight and microchip", "Records and vaccine reminders in Pet Vault"]}
           cta="Add my pet"
           href="/pet-vault"

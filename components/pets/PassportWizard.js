@@ -198,7 +198,7 @@ export default function PassportWizard({ userId, onDone, onCancel, defaultOwner 
     f.date_of_birth && ["Born", fmtDob(f.date_of_birth)],
     f.sex && ["Sex", f.sex],
     f.color.trim() && ["Color", f.color.trim()],
-    f.trained && ["Trained", f.trained === "yes" ? "Yes" : "Not yet"],
+    f.trained && ["House trained", f.trained === "yes" ? "Yes" : "Not yet"],
     Number(f.weight_lb) > 0 && ["Weight", `${f.weight_lb} lb`],
     step > 3 && f.emergency_contact_phone && ["Contact", f.emergency_contact_name.trim() || "Added"],
   ].filter(Boolean);

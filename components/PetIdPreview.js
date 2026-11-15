@@ -103,7 +103,6 @@ export default function PetIdPreviewCard({ card, photo }) {
           {c.chipLast4 && <Row label="Microchip">•••• {c.chipLast4}</Row>}
           {showRabies && <Row label="Vaccines"><span style={{ color: rab.tone === "good" ? tokens.green : rab.tone === "bad" ? tokens.primary : tokens.muted }}>{rab.text}</span></Row>}
           {c.service && <Row label="Service animal">Yes, owner-declared</Row>}
-          {c.trained != null && <Row label="Trained">{c.trained ? "Yes, per owner" : "No"}</Row>}
           {c.handler && <Row label={c.service ? "Handler" : "Owner"} hidden={contactHidden}>{c.handler}</Row>}
           {(c.contactName || c.contactPhone) && (
             <Row label="Emergency" hidden={contactHidden}>

@@ -117,7 +117,7 @@ export function PetsStrip({ userId, onOpen }) {
                 <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 800, color: tokens.navy, lineHeight: 1.1 }}>{p.name}</div>
                 <div style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted }} className="truncate">{[p.breed || p.animal_type, p.weight_lb ? `${p.weight_lb} lb` : null].filter(Boolean).join(" · ")}</div>
                 {issued ? (
-                  <span className="inline-flex items-center gap-1.5 mt-1.5 rounded-full px-2.5 py-0.5" style={{ background: "#E5F4EE", color: tokens.green, fontFamily: font.body, fontSize: 12.5, fontWeight: 800 }}><Icon name="checkCircle" size={13} />Passport issued</span>
+                  <span className="inline-flex items-center gap-1.5 mt-1.5 rounded-full px-2.5 py-0.5" style={{ background: "#E5F4EE", color: tokens.green, fontFamily: font.body, fontSize: 12.5, fontWeight: 800 }}><Icon name="checkCircle" size={13} />Passport ready</span>
                 ) : missing.length ? (
                   <button type="button" onClick={() => onOpen(p.id, "passport")} className="inline-flex items-center gap-1.5 mt-1.5 rounded-full px-2.5 py-0.5" style={{ background: "#FFF4DB", color: "#8A5A00", fontFamily: font.body, fontSize: 12.5, fontWeight: 800, border: "none", cursor: "pointer" }}>
                     Add {missing.slice(0, 2).join(" & ").toLowerCase()}{missing.length > 2 ? ` +${missing.length - 2}` : ""} to issue passport →

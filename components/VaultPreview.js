@@ -13,7 +13,7 @@ import { Wordmark } from "./Logo";
 // A filled-in sample vault so visitors see what theirs will look like.
 // Everything here is clearly labeled Sample; no real pet data is shown.
 
-const SAMPLE_PET = { id: "sample", name: "Biscuit", animal_type: "Dog", breed: "Golden Retriever", date_of_birth: "2023-04-12", color: "Golden", handler_name: "Sample owner", passport_no: "PPG-4821-BSC", passport_issued_at: "2026-10-02T17:00:00Z" };
+const SAMPLE_PET = { id: "sample", name: "Benny", animal_type: "Dog", breed: "Golden Retriever", date_of_birth: "2023-04-12", color: "Golden", handler_name: "Sample owner", passport_no: "PPG-4821-BSC", passport_issued_at: "2026-10-02T17:00:00Z" };
 
 const DOCS = [
   { name: "Rabies vaccine", note: "Expires in 41 days", tone: "warn", icon: "health" },
@@ -48,7 +48,7 @@ export default function VaultPreview() {
           qr={qr ? <img src={qr} alt="Sample QR code" width={108} height={108} /> : <div className="ppg-shimmer rounded-md" style={{ width: 108, height: 108 }} />}
           chipValue="On file"
         />
-        <button type="button" onClick={() => setDemo(new Date().toISOString())} className="ppg-btn ppg-btn-secondary mt-3">See a passport get issued</button>
+        <button type="button" onClick={() => setDemo(new Date().toISOString())} className="ppg-btn ppg-btn-secondary mt-3">See a passport come together</button>
         {demo ? <PassportReveal pet={SAMPLE_PET} issuedAt={demo} onClose={() => setDemo(null)} /> : null}
       </div>
 

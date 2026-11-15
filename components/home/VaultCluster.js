@@ -8,7 +8,7 @@ import Icon from "../Icon";
 import { PetIllustration } from "../PetIdCard";
 import { Wordmark } from "../Logo";
 
-// Homepage Pet Vault: every tile opens a quick example with Biscuit, our sample pup,
+// Homepage Pet Vault: every tile opens a quick example with Benny, our sample pup,
 // so people see exactly what they get before signing up.
 
 function Badge({ tone, children }) {
@@ -43,7 +43,7 @@ function IdCard() {
           <div className="flex gap-3 mt-3 items-center">
             <div className="rounded-2xl overflow-hidden flex items-center justify-center" style={{ width: 76, height: 90, border: `3px solid ${tokens.gold}`, background: "#FDE7C3" }}><PetIllustration type="Dog" size={66} /></div>
             <div>
-              <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 26, lineHeight: 1 }}>Biscuit</div>
+              <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 26, lineHeight: 1 }}>Benny</div>
               <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, opacity: 0.9 }}>Dachshund · 18 lb</div>
               <div style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 12, marginTop: 6 }}>PPG-000-0001</div>
             </div>
@@ -66,7 +66,7 @@ function IdCard() {
 const TILES = [
   {
     key: "vax", icon: "health", label: "Vaccination records", tint: "#EAF6EE", ink: tokens.green,
-    title: "Biscuit's vaccines",
+    title: "Benny's vaccines",
     body: () => (
       <div className="grid gap-2">
         <Row emoji="💉" title="Rabies" sub="Given May 1, 2025 · Sample Vet Clinic" badge={<Badge tone="ok">Good to May 2028</Badge>} />
@@ -78,7 +78,7 @@ const TILES = [
   },
   {
     key: "health", icon: "file", label: "Health records", tint: tokens.sky, ink: tokens.navy,
-    title: "Biscuit's health",
+    title: "Benny's health",
     body: () => (
       <div className="grid gap-2">
         <Row emoji="⚠️" title="Allergies" sub="Chicken" />
@@ -107,7 +107,7 @@ const TILES = [
     title: "Reminders that actually help",
     body: () => (
       <div className="grid gap-2">
-        {[["now", "Biscuit's DHPP vaccine expires in 30 days. Book a vet visit."], ["8 weeks out", "Hawaii trip: start the rabies blood test now. Lab results take 6 to 8 weeks."], ["2 days out", "Pack Biscuit's health certificate and carrier. Check-in opens tomorrow."]].map(([when, text]) => (
+        {[["now", "Benny's DHPP vaccine expires in 30 days. Book a vet visit."], ["8 weeks out", "Hawaii trip: start the rabies blood test now. Lab results take 6 to 8 weeks."], ["2 days out", "Pack Benny's health certificate and carrier. Check-in opens tomorrow."]].map(([when, text]) => (
           <div key={when} className="rounded-2xl p-3 flex gap-3" style={{ background: "rgba(20,33,61,0.05)" }}>
             <span className="flex items-center justify-center rounded-lg flex-shrink-0" style={{ width: 34, height: 34, background: tokens.navy, color: tokens.gold, fontFamily: font.display, fontWeight: 800 }}>Go</span>
             <div className="min-w-0">
@@ -150,7 +150,7 @@ function Sheet({ tile, onClose }) {
 
 export default function VaultCluster() {
   const [open, setOpen] = useState(null);
-  const idTile = { key: "id", title: "Biscuit's Pet ID", body: () => (<div className="grid gap-3"><IdCard /><p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>Show it at the counter, put the QR on a collar tag, or share a link with a sitter.</p></div>) };
+  const idTile = { key: "id", title: "Benny's Pet ID", body: () => (<div className="grid gap-3"><IdCard /><p style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink }}>Show it at the counter, put the QR on a collar tag, or share a link with a sitter.</p></div>) };
   return (
     <div>
       <div className="grid grid-cols-2 gap-3">
@@ -170,7 +170,7 @@ export default function VaultCluster() {
         <div className="rounded-2xl overflow-hidden flex items-center justify-center flex-shrink-0" style={{ width: 70, height: 82, border: `3px solid ${tokens.gold}`, background: "#FDE7C3" }}><PetIllustration type="Dog" size={60} /></div>
         <div className="min-w-0 flex-1">
           <div style={{ fontFamily: font.body, fontSize: 11.5, fontWeight: 800, letterSpacing: ".14em", color: tokens.gold }}>PET ID · SAMPLE</div>
-          <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 24, color: "#fff", lineHeight: 1.1 }}>Biscuit</div>
+          <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 24, color: "#fff", lineHeight: 1.1 }}>Benny</div>
           <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.sky }}>Dachshund · tap to see the QR side</div>
         </div>
         <Icon name="passport" size={26} />

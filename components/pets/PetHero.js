@@ -73,7 +73,7 @@ export default function PetHero({ pet, photo, onGo, onPhoto, photoBusy }) {
               <h2 className="ppg-hero-name" style={{ fontFamily: font.display, fontWeight: 800, lineHeight: 1.02, letterSpacing: "-0.02em", overflowWrap: "anywhere" }}>{pet.name}</h2>
               {issued ? (
                 <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 12 }}>
-                  <Icon name="check" size={13} />Passport issued
+                  <Icon name="check" size={13} />Passport ready
                 </span>
               ) : null}
             </div>

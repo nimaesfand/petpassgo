@@ -151,7 +151,7 @@ export default async function CheckPage({ params, searchParams }) {
       ) : null}
 
       <div style={{ marginTop: 12, fontSize: 13, color: MUTED, lineHeight: 1.5 }}>
-        <b style={{ color: NAVY }}>Verified</b> means a veterinarian confirmed the record through PetPassGo. <b style={{ color: NAVY }}>Document on file</b> means the traveler uploaded it; open it to review. <b style={{ color: NAVY }}>Owner-stated</b> means the traveler entered it. Loaded {checkedAt} PT. PetPassGo is not a government agency and does not replace your airline&apos;s own checks.
+        <b style={{ color: NAVY }}>Verified</b> means a veterinarian confirmed the record through PetPassGo. <b style={{ color: NAVY }}>Document on file</b> means the traveler uploaded it; open it to review. <b style={{ color: NAVY }}>Owner-stated</b> means the traveler entered it. Loaded {checkedAt} PT. Verified means the record matches the clinic's files; it is not an official health certificate. PetPassGo is not a government agency and does not replace your airline&apos;s own checks.{travel ? " Closed? Open travel mode again anytime from the passport." : ""}
       </div>
     </Shell>
   );

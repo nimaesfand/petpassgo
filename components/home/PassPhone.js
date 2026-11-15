@@ -56,7 +56,7 @@ export default function PassPhone() {
                 <PetIllustration size={44} />
               </div>
               <div className="min-w-0">
-                <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 17, color: "#fff", lineHeight: 1.2 }}>Biscuit · LAX → JFK</div>
+                <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 17, color: "#fff", lineHeight: 1.2 }}>Benny · LAX → JFK</div>
                 <div style={{ fontFamily: font.body, fontSize: 13.5, color: "rgba(255,255,255,0.75)" }}>Delta · in cabin · Dec 18</div>
               </div>
             </div>
