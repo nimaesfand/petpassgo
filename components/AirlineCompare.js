@@ -85,7 +85,7 @@ export default function AirlineCompare({ answers, selected, onPick }) {
   return (
     <div>
       <p className="mb-3" style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted, lineHeight: 1.45 }}>
-        What each airline charges to bring your {pet} in the cabin from {city(answers.origin)} to {city(answers.destination)}, and the carrier size they allow. Easiest and cheapest at the top. Pick one to get your checklist.
+        What each airline charges to bring your {pet} in the cabin from {city(answers.origin)} to {city(answers.destination)}, and the carrier size they allow. Easiest and cheapest at the top. Not every airline flies this route, so check flights too. Pick one to get your checklist.
       </p>
       {meta.checkedAt ? <p className="mb-3 -mt-1 flex items-center gap-1.5" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.green, fontWeight: 700 }}><span aria-hidden="true">●</span>Rules checked against each airline&apos;s own pages, most recently {new Date(`${String(meta.checkedAt).slice(0, 10)}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p> : null}
       <div className="flex flex-col gap-2">

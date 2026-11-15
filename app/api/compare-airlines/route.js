@@ -39,6 +39,12 @@ export async function POST(req) {
   if (error) return NextResponse.json({ airlines: [] });
   const all = data || [];
 
+  // Hawaii trips have their own airline rules. Without any on file for an airline, don't say yes.
+  const HI = new Set(["HNL", "OGG", "KOA", "LIH", "ITO"]);
+  const code = (v) => (findAirport(v)?.code || String(v).toUpperCase());
+  const hawaii = HI.has(code(base.origin)) || HI.has(code(base.destination));
+  const hasHawaiiRule = (rows) => rows.some((r) => /hawaii/i.test(r.destination_match || ""));
+
   const out = uniq.map((name) => {
     const ruleName = requirementAirline(name);
     const trip = { ...base, airline: name, role, animal_type: base.animal, travel_date: base.date, pet_travel: "cabin", segments: null, connecting: false };
@@ -47,6 +53,7 @@ export async function POST(req) {
     // International: only a confident answer when we've checked this airline's international rules.
     if (!domestic && !own.some((r) => r.trip_type === "international")) return { name, key: "check", title: "We haven't checked this airline's international pet rules", easy: false, fee: null, cargo: null };
     if (!own.length) return { name, key: "check", title: "We haven't checked this airline yet", easy: false, fee: null, cargo: holdInfo(name)?.state || null };
+    if (hawaii && !hasHawaiiRule(own)) return { name, key: "check", title: "We haven't checked this airline's Hawaii pet rules", easy: false, fee: null, cargo: null };
     const plan = planFromRows(rows, trip);
     const easy = isEasyTrip(trip, plan);
     const shown = rows.filter((r) => matchesDestination(r, trip));
