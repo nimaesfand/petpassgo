@@ -15,7 +15,7 @@ const B = font.body;
 
 export const metadata = {
   title: { absolute: "PetPassGo | Fly with your pet" },
-  description: "Know what your pet needs before you book. Check your airline, destination and dates, and get a plan for your pet's flight, documents and deadlines. Checking your trip is free.",
+  description: "Can your pet fly with you? Find out what your airline, destination and pet need before you book. Checking your trip is free.",
 };
 
 const STEPS = [
@@ -39,7 +39,7 @@ const QR_STEPS = [
 const PRICE_CARDS = [
   { title: "Free checklist", sub: "For simple flights", price: "Free", unit: "with an account", body: "Small pets in the cabin on U.S. flights with one airline. Your full checklist, free.", cta: "Check my flight", href: "/assessment", bordered: true },
   { title: "Travel Pass", sub: "For flights that need paperwork", price: P.pass, unit: `per trip, or ${P.memberPass} with Pet Vault`, body: "Mexico, Canada and Hawaii, service dogs, pets flying as cargo, and trips that switch airlines. Your exact dates, reminders, forms filled in, and a check that your pet's vaccines and certificates are valid for the trip. One price covers the round trip, for up to 2 pets.", guarantee: true, cta: "Plan my pet's trip", href: "/assessment", dark: true },
-  { title: "Pet Vault", sub: "Your pet's passport and records", price: P.member, unit: "a month", body: `Your pet's passport, vet-confirmed records, travel mode, reminders and lost pet alerts. Travel Passes are ${P.memberPass} for members. Cancel anytime.`, cta: "Make their passport", href: "/join", accent: true, tag: "For frequent travelers" },
+  { title: "Pet Vault", sub: "Your pet's passport and records", price: P.member, unit: "a month", body: `Your pet's passport, vet-confirmed records, travel mode, reminders and lost pet alerts. Travel Passes are ${P.memberPass} for members. Cancel anytime.`, cta: "Make their passport", href: "/join", accent: true, tag: "Best for records and frequent travel" },
 ];
 
 const HOME_FAQ = [FAQ[1], FAQ[3], FAQ[2], FAQ[4]];
@@ -95,7 +95,7 @@ export default async function PetPassGoLanding() {
         <div className="absolute inset-0 hidden lg:block xl:hidden" style={{ background: "linear-gradient(90deg, rgba(11,21,41,.7) 0%, rgba(11,21,41,.3) 40%, rgba(11,21,41,0) 60%)" }} aria-hidden="true" />
         <div className={`relative ${WRAP} min-h-[86svh] lg:min-h-[640px] flex flex-col justify-end lg:justify-center pb-14 pt-32`}>
           <h1 style={{ fontFamily: D, color: "#fff", lineHeight: .98, letterSpacing: "-0.02em" }} className="text-[54px] sm:text-[76px] lg:text-[92px] font-extrabold max-w-[11ch]">Bring them along.</h1>
-          <p style={{ fontFamily: B, color: "#E7EDF6", lineHeight: 1.5 }} className="mt-5 text-[18px] sm:text-[20px] max-w-[30rem]">Know what your pet needs before you book. Check your airline, destination and dates, and get a plan for your pet&apos;s flight, documents and deadlines.</p>
+          <p style={{ fontFamily: B, color: "#E7EDF6", lineHeight: 1.5 }} className="mt-5 text-[18px] sm:text-[20px] max-w-[30rem]"><b style={{ color: "#fff", fontWeight: 800 }}>Can your pet fly with you?</b> Find out what your airline, destination and pet need before you book.</p>
           <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-4">
             <a href="/assessment" className="btn-primary inline-flex items-center justify-center rounded-full px-9 min-h-[58px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17.5, textDecoration: "none" }}>Plan my pet&apos;s trip</a>
             <a href="#how" style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: "#fff", textDecoration: "underline", textUnderlineOffset: 4 }} className="text-center sm:text-left">See how it works</a>
