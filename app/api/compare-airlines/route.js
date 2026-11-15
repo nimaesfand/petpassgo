@@ -57,5 +57,7 @@ export async function POST(req) {
   const rank = (x) => (x.key === "no" ? 4 : x.key === "check" ? 3 : x.easy ? 0 : x.key === "go" ? 1 : 2);
   const price = (x) => { const m = String(x.fee || "").match(/(\d+(?:\.\d+)?)/); return m ? Number(m[1]) : 9999; };
   out.sort((x, y) => rank(x) - rank(y) || price(x) - price(y) || (x.steps || 99) - (y.steps || 99) || x.name.localeCompare(y.name));
-  return NextResponse.json({ airlines: out, domestic }, { headers: { "Cache-Control": "private, max-age=120" } });
+  // The most recent date we checked any of these rules against the airlines' own pages.
+  const checkedAt = all.map((r) => r.verified_at).filter(Boolean).sort().pop() || null;
+  return NextResponse.json({ airlines: out, domestic, checkedAt, rulesChecked: all.length }, { headers: { "Cache-Control": "private, max-age=120" } });
 }
