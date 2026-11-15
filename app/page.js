@@ -15,7 +15,7 @@ const B = font.body;
 
 export const metadata = {
   title: { absolute: "PetPassGo | Fly with your pet" },
-  description: "Everything you and your pet need to fly, with their passport and vet-confirmed records ready for every trip. Checking your trip is free.",
+  description: "Know what your pet needs before you book. Check your airline, destination and dates, and get a plan for your pet's flight, documents and deadlines. Checking your trip is free.",
 };
 
 const STEPS = [
