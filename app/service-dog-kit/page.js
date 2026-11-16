@@ -48,7 +48,7 @@ export default function ServiceDogKitPage() {
       <TrackOnMount contentType="landing" contentName="Service dog kit" />
       <main>
         <section style={{ background: tokens.navy }} className="overflow-hidden">
-          <div className="max-w-[1180px] mx-auto px-4 sm:px-6 md:px-10 py-12 lg:py-20 grid lg:grid-cols-[minmax(0,1fr)_minmax(0,560px)] gap-10 items-center">
+          <div className="max-w-[1180px] mx-auto px-4 sm:px-6 md:px-10 py-12 lg:py-20 grid lg:grid-cols-[minmax(0,1fr)_minmax(540px,600px)] gap-10 items-center">
             <div>
               <span className="inline-flex items-center gap-2 rounded-full px-3 py-1.5" style={{ background: "rgba(15,118,110,.25)", color: "#9FE6DA", fontFamily: B, fontWeight: 800, fontSize: 14 }}>
                 <Icon name="shield" size={16} /> Service Dog Travel Kit
@@ -65,7 +65,7 @@ export default function ServiceDogKitPage() {
               </div>
               <p className="mt-4" style={{ fontFamily: B, fontSize: 14.5, color: "#AFC0D6" }}>Takes 30 seconds to see what your dog needs. Free to check.</p>
             </div>
-            <div className="w-full max-w-[560px] mx-auto">
+            <div className="w-full max-w-[600px] mx-auto">
               <HomePassport />
               <p className="mt-3 text-center" style={{ fontFamily: B, fontSize: 14, color: "#AFC0D6" }}>Benny&apos;s passport, with his signed service dog statement.</p>
             </div>

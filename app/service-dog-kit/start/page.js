@@ -64,7 +64,7 @@ function Button({ href, children, quiet = false }) {
 
 function Result({ animal, role, where, onBack }) {
   const place = where === "hawaii" ? "Hawaii" : where === "near" ? "Canada and Mexico" : "";
-  const extra = place ? <Check><b>{place} entry rules apply too</b>, even for service dogs. Your Travel Pass gives you the forms and the exact dates for your flights.</Check> : null;
+  const extra = place ? <Check><b>{place} entry rules apply too</b>{role === "service" ? ", even for service dogs" : ""}. Your Travel Pass gives you the forms and the exact dates for your flights.</Check> : null;
 
   if (animal === "dog" && role === "service") {
     return (
