@@ -27,7 +27,7 @@ export async function POST(req) {
 
     let pet = null;
     if (trip.pet_id) {
-      const { data } = await sb.from("pets").select("id,name,breed,animal_type,sex,weight_lb,handler_name,vet_name,vet_phone").eq("id", trip.pet_id).eq("user_id", user.id).maybeSingle();
+      const { data } = await sb.from("pets").select("id,name,breed,animal_type,sex,weight_lb,handler_name,vet_name,vet_phone,training").eq("id", trip.pet_id).eq("user_id", user.id).maybeSingle();
       pet = data;
     }
     let rabiesExp = "";
@@ -51,6 +51,7 @@ export async function POST(req) {
       vetName: pet?.vet_name || "",
       vetPhone: pet?.vet_phone || "",
       hours: Number.isFinite(hours) ? String(hours) : "",
+      trainer: clip(body.trainer, 80) || (pet?.training?.trained_by === "owner" ? clip(body.handler, 80) || clip(pet?.handler_name, 80) : clip(pet?.training?.trainer_name, 80)),
       flightDate: trip.travel_date,
       origin: trip.origin,
       destination: trip.destination,

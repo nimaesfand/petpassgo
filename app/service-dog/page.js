@@ -6,14 +6,15 @@ import { tokens, font } from "../../lib/theme";
 import { DOT_AIR_FORM_PAGE } from "../../lib/dotFormLinks";
 
 export const metadata = {
-  title: "Flying with a service dog: what you need",
-  description: "Your service dog flies in the cabin at no charge. Here's what U.S. airlines can ask for, the DOT form, and how PetPassGo fills it in for you.",
+  title: "Get your service dog ready to fly: what airlines check",
+  description: "Your service dog flies in the cabin at no charge. Here's what U.S. airlines can ask for, why you don't need a registration, and how to get the DOT form and your dog's records ready.",
   alternates: { canonical: "/service-dog" },
 };
 
 const D = font.display;
 const B = font.body;
-const CTA = "/assessment?pet=service";
+const CTA = "/service-dog-kit/start";
+const KIT = "/service-dog-kit";
 
 const NEED = [
   { icon: "award", title: "A dog trained to help you", body: "Your dog has to be individually trained to do work or tasks for a person with a disability. You can train the dog yourself, or a trainer can. Psychiatric service dogs count." },
@@ -23,7 +24,7 @@ const NEED = [
 ];
 
 const NOT = [
-  "A certificate, registration or ID card. U.S. airlines can't require one.",
+  "A certificate, registration or ID card. There's no official U.S. service dog registry, and airlines can't require one.",
   "A doctor's letter. Airlines can't ask for one for a service dog.",
   "A pet fee or a carrier. A trained service dog flies in the cabin at no charge.",
 ];
@@ -46,10 +47,10 @@ export default function ServiceDogPage() {
             Your service dog flies with you, in the cabin, at no charge.
           </h1>
           <p style={{ fontFamily: B, fontSize: 19, lineHeight: 1.5, color: tokens.ink }} className="mt-4 max-w-[40rem]">
-            Here's what U.S. airlines can actually ask for. Then let us fill in the official DOT form for your trip, ready to sign.
+            Here&apos;s what U.S. airlines can actually ask for, and how to have all of it ready in about 10 minutes.
           </p>
           <div className="flex flex-wrap gap-3 mt-6">
-            <a href={CTA} className="inline-flex items-center justify-center rounded-full px-8 min-h-[54px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Check my trip</a>
+            <a href={CTA} className="inline-flex items-center justify-center rounded-full px-8 min-h-[54px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Build my dog&apos;s kit</a>
             <a href="#what-you-need" className="inline-flex items-center justify-center rounded-full px-6 min-h-[54px]" style={{ background: "#fff", color: tokens.navy, border: `1.5px solid ${tokens.line}`, fontFamily: B, fontWeight: 800, fontSize: 16, textDecoration: "none" }}>What you need</a>
           </div>
         </section>
@@ -69,7 +70,7 @@ export default function ServiceDogPage() {
           </div>
 
           <div className="rounded-3xl p-5 sm:p-6 mt-4" style={{ background: "#FFF8EB", border: "1px solid #F5D9A4" }}>
-            <div style={{ fontFamily: B, fontWeight: 800, fontSize: 18, color: tokens.navy }}>What you don't need</div>
+            <div style={{ fontFamily: B, fontWeight: 800, fontSize: 18, color: tokens.navy }}>Do you need to register your service dog? No. You don&apos;t need:</div>
             <ul className="mt-2 grid gap-2" style={{ listStyle: "none", padding: 0, margin: 0 }}>
               {NOT.map((t) => (
                 <li key={t} className="flex gap-2" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>
@@ -77,6 +78,9 @@ export default function ServiceDogPage() {
                 </li>
               ))}
             </ul>
+            <p className="mt-3" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>
+              What helps instead is having the real paperwork ready. <a href={KIT} style={{ color: tokens.navy, fontWeight: 800 }}>See the Service Dog Travel Kit</a>.
+            </p>
           </div>
         </section>
 
@@ -106,7 +110,7 @@ export default function ServiceDogPage() {
           <p className="mt-4 max-w-[44rem]" style={{ fontFamily: B, fontSize: 14, lineHeight: 1.5, color: tokens.muted }}>
             The DOT form is an official U.S. government document. You sign it yourself, and knowingly false statements can lead to fines and other penalties. Source: <a href={DOT_AIR_FORM_PAGE} target="_blank" rel="noopener" style={{ color: tokens.navy }}>U.S. Department of Transportation</a>.
           </p>
-          <a href={CTA} className="inline-flex items-center justify-center rounded-full px-8 min-h-[54px] mt-6" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Check my trip</a>
+          <a href={CTA} className="inline-flex items-center justify-center rounded-full px-8 min-h-[54px] mt-6" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Take the 30-second check</a>
         </section>
       </main>
     </div>
