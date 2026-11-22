@@ -37,6 +37,7 @@ import PetDocumentsCard from "../../components/PetDocumentsCard";
 import { SECTION_THEME } from "../../lib/petSections";
 import PetProfileExperience from "../../components/PetProfileExperience";
 import PassportWizard from "../../components/pets/PassportWizard";
+import { KEEP_TOKEN_KEY } from "../../lib/passportDraft";
 import MarketingOptIn from "../../components/MarketingOptIn";
 import MarketingSettings from "../../components/MarketingSettings";
 import { buildPassCards, dueChip, groupCards, matchesDestination, passProgress } from "../../lib/passCards";
@@ -533,6 +534,20 @@ function PetProfileTab({ userId }) {
   const [limitHit, setLimitHit] = useState(false);
   const access = usePetAccess(userId);
   useEffect(() => { supabase.rpc("my_membership").then(({ data }) => setIsMember(!!data)); }, [userId]);
+  // A passport made before joining moves in once they're a member.
+  useEffect(() => {
+    if (!isMember) return;
+    let t = null;
+    try { t = localStorage.getItem(KEEP_TOKEN_KEY); } catch {}
+    if (!t) return;
+    (async () => {
+      const { data: s } = await supabase.auth.getSession();
+      const r = await fetch("/api/passport-draft/claim", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ t }) });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok || r.status === 404 || r.status === 409 || r.status === 410) { try { localStorage.removeItem(KEEP_TOKEN_KEY); } catch {} }
+      if (r.ok && j.pet_id) window.location.href = `/account?pet=${j.pet_id}`;
+    })();
+  }, [isMember]);
 
   const [loadError, setLoadError] = useState(false);
   const loadSeq = React.useRef(0);
