@@ -5,6 +5,9 @@ import SiteHeader from "../../../components/SiteHeader";
 import PetPassport from "../../../components/PetPassport";
 import BreedInput from "../../../components/BreedInput";
 import { BennySays, LockedPages } from "../../../components/passport/BennyGuide";
+import PassportReveal from "../../../components/PassportReveal";
+import { supabase } from "../../../lib/supabaseClient";
+import { usePetAccess } from "../../../lib/access";
 import { PRICES as P } from "../../../lib/pricing";
 import { tokens, font } from "../../../lib/theme";
 
@@ -48,11 +51,15 @@ async function shrink(file) {
 
 export default function CreatePassport() {
   const [step, setStep] = useState(0);
-  const [f, setF] = useState({ animal_type: "", name: "", breed: "", sex: "", month: "", year: "", handler_name: "", email: "" });
+  const [f, setF] = useState({ animal_type: "", role: "", name: "", breed: "", sex: "", month: "", year: "", handler_name: "", email: "" });
+  const [user, setUser] = useState(null); // signed in: { id, email }
+  const [reveal, setReveal] = useState(null); // { at, petId? }
+  const access = usePetAccess(user?.id);
   const [photo, setPhoto] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(null); // { token, at }
+  useEffect(() => { supabase.auth.getSession().then(({ data }) => { const u = data?.session?.user; if (u) setUser({ id: u.id, email: u.email || "" }); }); }, []);
   const camRef = useRef(null);
   const libRef = useRef(null);
   const loaded = useRef(false);
@@ -61,7 +68,7 @@ export default function CreatePassport() {
   useEffect(() => {
     try {
       const s = JSON.parse(localStorage.getItem(KEY) || "null");
-      if (s?.f) { const clean = Object.fromEntries(Object.entries(s.f).map(([k, v]) => [k, typeof v === "string" ? v : ""])); setF((x) => ({ ...x, ...clean })); if (s.photo) setPhoto(s.photo); if (s.done) setDone(s.done); setStep(s.done ? 99 : Math.min(s.step || 0, 6)); }
+      if (s?.f) { const clean = Object.fromEntries(Object.entries(s.f).map(([k, v]) => [k, typeof v === "string" ? v : ""])); setF((x) => ({ ...x, ...clean })); if (s.photo) setPhoto(s.photo); if (s.done) setDone(s.done); setStep(s.done ? 99 : Math.min(s.step || 0, 7)); }
     } catch {}
     loaded.current = true;
   }, []);
@@ -78,7 +85,7 @@ export default function CreatePassport() {
   const go = (n) => { setErr(""); setStep(n); };
 
   const pet = {
-    id: "sample-draft", name: f.name.trim() || "Your pet", animal_type: f.animal_type || "Dog", role: "Pet",
+    id: "sample-draft", name: f.name.trim() || "Your pet", animal_type: f.animal_type || "Dog", role: f.role || "Pet",
     breed: f.breed.trim(), sex: f.sex, date_of_birth: dob, handler_name: f.handler_name.trim(),
     passport_no: "PPG-PREVIEW", passport_issued_at: done?.at || null,
   };
@@ -88,30 +95,65 @@ export default function CreatePassport() {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
-    try { setPhoto(await shrink(file)); go(3); } catch { setErr("That photo didn't open. Try another one."); }
+    try { setPhoto(await shrink(file)); go(4); } catch { setErr("That photo didn't open. Try another one."); }
+  }
+
+  const draftData = () => ({ animal_type: pet.animal_type, role: pet.role, name: pet.name, breed: pet.breed, sex: pet.sex, date_of_birth: dob, handler_name: pet.handler_name });
+
+  // Members (and travelers with a paid trip) save straight to their account.
+  async function saveToAccount() {
+    const { data: created, error } = await supabase.from("pets").insert({
+      user_id: user.id, name: pet.name, animal_type: pet.animal_type, role: pet.role,
+      breed: pet.breed || null, sex: pet.sex || null, date_of_birth: dob || null,
+      handler_name: pet.handler_name || null, passport_issued_at: new Date().toISOString(),
+    }).select("id").single();
+    if (error || !created) return { limit: /PET_LIMIT/.test(error?.message || "") };
+    if (photo) {
+      try {
+        const blob = await (await fetch(photo)).blob();
+        const path = `${user.id}/${created.id}/profile-photo-${Date.now()}.jpg`;
+        const up = await supabase.storage.from("pet-documents").upload(path, blob, { contentType: "image/jpeg" });
+        if (!up.error) await supabase.from("pets").update({ photo_url: path }).eq("id", created.id).eq("user_id", user.id);
+      } catch {}
+    }
+    return { id: created.id };
   }
 
   async function finish(e) {
     e.preventDefault();
-    if (!/^\S+@\S+\.\S+$/.test(f.email.trim())) { setErr("Please check your email address."); return; }
+    const email = user?.email || f.email.trim();
+    if (!user && !/^\S+@\S+\.\S+$/.test(email)) { setErr("Please check your email address."); return; }
     setBusy(true); setErr("");
     try {
-      const r = await fetch("/api/passport-draft", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: f.email.trim(), photo, data: { animal_type: pet.animal_type, name: pet.name, breed: pet.breed, sex: pet.sex, date_of_birth: dob, handler_name: pet.handler_name } }) });
+      if (user && access.allowed) {
+        const r = await saveToAccount();
+        if (r.id) { try { localStorage.removeItem(KEY); } catch {} setReveal({ at: new Date().toISOString(), petId: r.id }); setBusy(false); return; }
+        if (!r.limit) throw new Error("We couldn't save the passport. Please try again.");
+      }
+      const r = await fetch("/api/passport-draft", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, photo, data: draftData() }) });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.error || "Something went wrong. Please try again.");
-      setDone({ token: j.token, at: new Date().toISOString() });
-      setStep(99);
+      const at = new Date().toISOString();
+      setDone({ token: j.token, at });
+      setReveal({ at });
     } catch (x) { setErr(x.message); }
     setBusy(false);
   }
 
+  function afterReveal() {
+    const id = reveal?.petId;
+    setReveal(null);
+    if (id) { window.location.href = `/account?pet=${id}`; return; }
+    setStep(99);
+  }
+
   function startOver() {
     try { localStorage.removeItem(KEY); } catch {}
-    setF({ animal_type: "", name: "", breed: "", sex: "", month: "", year: "", handler_name: "", email: "" });
+    setF({ animal_type: "", role: "", name: "", breed: "", sex: "", month: "", year: "", handler_name: "", email: "" });
     setPhoto(""); setDone(null); setStep(0);
   }
 
-  const total = 6;
+  const total = 7;
   const years = Array.from({ length: 26 }, (_, i) => String(new Date().getFullYear() - i));
   const errLine = err ? <p role="alert" className="mt-3" style={{ fontFamily: B, fontSize: 17, fontWeight: 700, color: tokens.primary }}>{err}</p> : null;
   const back = step > 0 && step < 99 ? <button type="button" onClick={() => go(step - 1)} style={{ fontFamily: B, fontWeight: 700, fontSize: 17, color: tokens.navy, background: "none", border: "none", cursor: "pointer", padding: "8px 0" }}>← Back</button> : null;
@@ -136,6 +178,22 @@ export default function CreatePassport() {
   );
   if (step === 2) q = (
     <>
+      <BennySays sub={f.animal_type === "Cat" ? "Either way, the passport keeps everything in one place." : "This sets the seal on the passport."}>What does {name} do for you?</BennySays>
+      <div className="mt-6 grid gap-3">
+        <Choice on={f.role === "Pet"} onClick={() => { set("role")("Pet"); go(3); }}>{name} is my pet</Choice>
+        {f.animal_type !== "Cat" ? <Choice on={f.role === "Service animal"} onClick={() => { set("role")("Service animal"); go(3); }} sub="Trained to do tasks for a disability, including psychiatric service dogs">Service dog</Choice> : null}
+        <Choice on={f.role === "Emotional support animal"} onClick={() => set("role")("Emotional support animal")} sub="Comfort and support at home">Emotional support animal</Choice>
+      </div>
+      {f.role === "Emotional support animal" ? (
+        <div className="mt-5 rounded-2xl p-4" style={{ background: "#FEF2F2", border: "1.5px solid #FECACA" }}>
+          <p style={{ fontFamily: B, fontSize: 17, lineHeight: 1.5, color: tokens.ink }}><b style={{ color: "#991B1B" }}>Good to know:</b> on U.S. flights, emotional support animals fly as pets. That means the airline&apos;s regular pet fee and pet rules, not free. {name}&apos;s passport still keeps everything in one place.</p>
+          <div className="mt-4"><BigButton onClick={() => go(3)}>Got it</BigButton></div>
+        </div>
+      ) : null}
+    </>
+  );
+  if (step === 3) q = (
+    <>
       <BennySays sub="A clear photo of their face works best. You can change it anytime.">What a lovely name! Do you have a favorite photo of {name}?</BennySays>
       <input ref={camRef} type="file" accept="image/*" capture="environment" onChange={pickPhoto} hidden />
       <input ref={libRef} type="file" accept="image/*" onChange={pickPhoto} hidden />
@@ -144,27 +202,27 @@ export default function CreatePassport() {
         <Choice onClick={() => camRef.current?.click()} sub="Use your phone's camera">Take a photo now</Choice>
       </div>
       {errLine}
-      <button type="button" onClick={() => go(3)} className="mt-4" style={{ fontFamily: B, fontWeight: 700, fontSize: 17, color: tokens.muted, background: "none", border: "none", textDecoration: "underline", cursor: "pointer" }}>Skip for now</button>
+      <button type="button" onClick={() => go(4)} className="mt-4" style={{ fontFamily: B, fontWeight: 700, fontSize: 17, color: tokens.muted, background: "none", border: "none", textDecoration: "underline", cursor: "pointer" }}>Skip for now</button>
     </>
   );
-  if (step === 3) q = (
-    <form onSubmit={(e) => { e.preventDefault(); go(4); }}>
+  if (step === 4) q = (
+    <form onSubmit={(e) => { e.preventDefault(); go(5); }}>
       <BennySays sub="Mixed or not sure? Just type what you think.">What kind of {kind} is {name}?</BennySays>
       <div className="mt-6"><BreedInput value={f.breed} onChange={(e) => set("breed")(e?.target ? e.target.value : String(e || ""))} animal={f.animal_type || "Dog"} style={big} placeholder="Like Dachshund or Mixed" aria-label="Breed" /></div>
       <div className="mt-5 flex flex-wrap gap-3"><BigButton type="submit">Next</BigButton></div>
     </form>
   );
-  if (step === 4) q = (
+  if (step === 5) q = (
     <>
       <BennySays>Is {name} a boy or a girl?</BennySays>
       <div className="mt-6 grid grid-cols-2 gap-3">
-        <Choice on={f.sex === "Male"} onClick={() => { set("sex")("Male"); go(5); }}>Boy</Choice>
-        <Choice on={f.sex === "Female"} onClick={() => { set("sex")("Female"); go(5); }}>Girl</Choice>
+        <Choice on={f.sex === "Male"} onClick={() => { set("sex")("Male"); go(6); }}>Boy</Choice>
+        <Choice on={f.sex === "Female"} onClick={() => { set("sex")("Female"); go(6); }}>Girl</Choice>
       </div>
     </>
   );
-  if (step === 5) q = (
-    <form onSubmit={(e) => { e.preventDefault(); go(6); }}>
+  if (step === 6) q = (
+    <form onSubmit={(e) => { e.preventDefault(); go(7); }}>
       <BennySays sub="A guess is perfectly fine.">When is {name}&apos;s birthday?</BennySays>
       <div className="mt-6 grid grid-cols-2 gap-3">
         <select value={f.month} onChange={(e) => set("month")(e.target.value)} aria-label="Birth month" style={big}>
@@ -178,29 +236,35 @@ export default function CreatePassport() {
       </div>
       <div className="mt-5 flex flex-wrap items-center gap-4">
         <BigButton type="submit">Next</BigButton>
-        <button type="button" onClick={() => { setF((x) => ({ ...x, month: "", year: "" })); go(6); }} style={{ fontFamily: B, fontWeight: 700, fontSize: 17, color: tokens.muted, background: "none", border: "none", textDecoration: "underline", cursor: "pointer" }}>I&apos;m not sure</button>
+        <button type="button" onClick={() => { setF((x) => ({ ...x, month: "", year: "" })); go(7); }} style={{ fontFamily: B, fontWeight: 700, fontSize: 17, color: tokens.muted, background: "none", border: "none", textDecoration: "underline", cursor: "pointer" }}>I&apos;m not sure</button>
       </div>
     </form>
   );
-  if (step === 6) q = (
+  if (step === 7) q = (
     <form onSubmit={finish}>
-      <BennySays sub={`We'll email you ${name}'s passport. No password needed.`}>Last step! Where should we send {name}&apos;s passport?</BennySays>
+      <BennySays sub={user ? "" : `We'll email you ${name}'s passport. No password needed.`}>{user ? `Last step! Ready to make ${name}'s passport?` : <>Last step! Where should we send {name}&apos;s passport?</>}</BennySays>
+      {user ? (
+        <p className="mt-6" style={{ fontFamily: B, fontSize: 17, color: tokens.ink }}>{access.allowed ? `It goes straight into your account.` : `We'll send it to ${user.email}.`}</p>
+      ) : (
+        <>
       <label className="block mt-6">
         <span style={{ fontFamily: B, fontSize: 17, fontWeight: 700, color: tokens.navy }}>Your first name</span>
         <input value={f.handler_name} onChange={(e) => set("handler_name")(e.target.value)} maxLength={60} autoComplete="given-name" className="mt-1.5" style={big} />
-      </label>
-      <label className="block mt-4">
+        </label>
+        <label className="block mt-4">
         <span style={{ fontFamily: B, fontSize: 17, fontWeight: 700, color: tokens.navy }}>Your email</span>
         <input type="email" value={f.email} onChange={(e) => set("email")(e.target.value)} maxLength={200} autoComplete="email" inputMode="email" className="mt-1.5" style={big} />
-      </label>
+        </label>
+        </>
+      )}
       {errLine}
       <div className="mt-5"><BigButton type="submit" disabled={busy}>{busy ? "Making the passport…" : `Make ${name}'s passport`}</BigButton></div>
-      <p className="mt-3" style={{ fontFamily: B, fontSize: 14.5, color: tokens.muted }}>We only use your email for {name}&apos;s passport and travel tips. <a href="/privacy" style={{ color: tokens.navy }}>Privacy</a></p>
+      {user ? null : <p className="mt-3" style={{ fontFamily: B, fontSize: 14.5, color: tokens.muted }}>We only use your email for {name}&apos;s passport and travel tips. <a href="/privacy" style={{ color: tokens.navy }}>Privacy</a></p>}
     </form>
   );
   if (step === 99 && done) q = (
     <>
-      <BennySays sub={`We also emailed it to ${f.email || "you"}.`}>{pet.name}&apos;s passport is ready!</BennySays>
+      <BennySays sub={`We also emailed it to ${user?.email || f.email || "you"}.`}>{pet.name}&apos;s passport is ready!</BennySays>
       <div className="mt-6 rounded-3xl p-5 sm:p-6" style={{ background: "#fff", border: `2px solid ${tokens.primary}`, boxShadow: "0 18px 44px rgba(194,65,12,.14)" }}>
         <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 800, color: tokens.navy, lineHeight: 1.2 }}>Keep {pet.name}&apos;s passport</div>
         <p className="mt-1" style={{ fontFamily: B, fontSize: 17, color: tokens.ink }}>Pet Vault, {P.member} a month. Cancel anytime. It unlocks the rest of the passport:</p>
@@ -214,6 +278,7 @@ export default function CreatePassport() {
 
   return (
     <div style={{ background: tokens.sky, minHeight: "100vh" }}>
+      {reveal ? <PassportReveal pet={{ ...pet, passport_issued_at: reveal.at }} photo={passportPhoto} issuedAt={reveal.at} onClose={afterReveal} preview={!reveal.petId} /> : null}
       <SiteHeader />
       <main className="max-w-[1180px] mx-auto px-4 sm:px-6 py-6 sm:py-10 grid xl:grid-cols-[minmax(380px,1fr)_minmax(540px,600px)] gap-6 xl:gap-10 items-start">
         <section className="order-2 xl:order-1 min-w-0" aria-live="polite">

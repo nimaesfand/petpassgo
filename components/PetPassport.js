@@ -5,7 +5,6 @@ import { supabase } from "../lib/supabaseClient";
 import { Wordmark } from "./Logo";
 import Icon from "./Icon";
 import PetQr from "../lib/PetQr";
-import { PetIllustration } from "./PetIdCard";
 import { tokens, font } from "../lib/theme";
 import { filled, fmtDob, mrzLines, issuedLabel, chipMask } from "../lib/petProfile";
 import { trainingSummary, trainedByLine, tasksLine } from "../lib/training";
@@ -67,8 +66,8 @@ function ageLabel(dob) {
 }
 
 const STATUS = {
-  service: { label: "SERVICE DOG", bg: "#0F766E", fg: "#fff" },
-  esa: { label: "SUPPORT ANIMAL", bg: "#6D28D9", fg: "#fff" },
+  service: { label: "SERVICE DOG", bg: "#1D4ED8", fg: "#fff" },
+  esa: { label: "EMOTIONAL SUPPORT", bg: "#B91C1C", fg: "#fff" },
   pet: { label: "PET", bg: "#F2B84B", fg: "#14213D" },
 };
 
@@ -99,21 +98,64 @@ function HoloSeal({ size = 54 }) {
   );
 }
 
-// Service dog seal: teal with a gold ring. With a signed statement it shows the date.
-function ServiceSeal({ attestedAt }) {
+// Role seals. Service dogs (including psychiatric service dogs) get blue; emotional
+// support animals get red, with a reminder that they fly as pets.
+const SEALS = {
+  service: { a: "#1D4ED8", b: "#1E3A8A", soft: "#E0E7FF", glow: "rgba(29,78,216,.3)", title: "SERVICE DOG" },
+  esa: { a: "#B91C1C", b: "#7F1D1D", soft: "#FEE2E2", glow: "rgba(185,28,28,.28)", title: "EMOTIONAL SUPPORT" },
+};
+function RoleSeal({ kind, attestedAt }) {
+  const c = SEALS[kind];
   const d = attestedAt ? new Date(attestedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }).toUpperCase() : "";
+  const sub = kind === "esa" ? "FLIES AS A PET" : d ? `HANDLER STATEMENT · ${d}` : "STATEMENT NOT SIGNED";
   return (
-    <div className="inline-flex items-center gap-2 mt-2 rounded-xl pl-1.5 pr-3 py-1.5" style={{ background: "linear-gradient(135deg, #0F766E, #0B5751)", boxShadow: `inset 0 0 0 1.5px ${tokens.gold}, 0 3px 10px rgba(15,118,110,.3)` }}>
+    <div className="inline-flex items-center gap-2 mt-2 rounded-xl pl-1.5 pr-3 py-1.5" style={{ background: `linear-gradient(135deg, ${c.a}, ${c.b})`, boxShadow: `inset 0 0 0 1.5px ${tokens.gold}, 0 3px 10px ${c.glow}` }}>
       <span aria-hidden="true" className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: 30, height: 30, background: "#fff", boxShadow: `0 0 0 2px ${tokens.gold}` }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F766E" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 2.5l7.5 3v5.6c0 4.6-3.1 8.6-7.5 10.4-4.4-1.8-7.5-5.8-7.5-10.4V5.5z" fill="#E6F4F1" />
-          <path d="M8.3 12.2l2.5 2.5 4.9-5" />
-        </svg>
+        {kind === "esa" ? (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill={c.soft} stroke={c.a} strokeWidth="2" strokeLinejoin="round"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z" /></svg>
+        ) : (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={c.a} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2.5l7.5 3v5.6c0 4.6-3.1 8.6-7.5 10.4-4.4-1.8-7.5-5.8-7.5-10.4V5.5z" fill={c.soft} />
+            <path d="M8.3 12.2l2.5 2.5 4.9-5" />
+          </svg>
+        )}
       </span>
       <span className="min-w-0">
-        <span className="block" style={{ fontFamily: font.body, fontWeight: 800, fontSize: 11.5, letterSpacing: "0.16em", color: "#fff", lineHeight: 1.1 }}>SERVICE DOG</span>
-        <span className="block" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 9, letterSpacing: "0.1em", color: "#F7D98C", lineHeight: 1.3 }}>{d ? `HANDLER STATEMENT · ${d}` : "STATEMENT NOT SIGNED"}</span>
+        <span className="block" style={{ fontFamily: font.body, fontWeight: 800, fontSize: 11.5, letterSpacing: "0.16em", color: "#fff", lineHeight: 1.1 }}>{c.title}</span>
+        <span className="block" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 9, letterSpacing: "0.1em", color: "#F7D98C", lineHeight: 1.3 }}>{sub}</span>
       </span>
+    </div>
+  );
+}
+
+// The empty photo spot: a fine line portrait, like a specimen passport, not a cartoon.
+export function PhotoSlot({ type = "Dog", label = "PHOTO" }) {
+  const ink = "rgba(20,33,61,.42)";
+  return (
+    <div className="relative w-full h-full flex flex-col items-center justify-center" style={{ background: "repeating-linear-gradient(135deg, #F3EEE2 0 6px, #EFE8D9 6px 7px)" }}>
+      <svg viewBox="0 0 100 110" style={{ width: "62%", height: "auto" }} fill="none" stroke={ink} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        {type === "Cat" ? (
+          <g>
+            <path d="M31 44 C31 30 69 30 69 44 L69 64 C69 80 60 88 50 88 C40 88 31 80 31 64 Z" />
+            <path d="M32 40 L28 19 L45 31" /><path d="M68 40 L72 19 L55 31" />
+            <path d="M39 55 C41 52 45 52 47 55" /><path d="M53 55 C55 52 59 52 61 55" />
+            <path d="M47 66 L50 69 L53 66 Z" fill={ink} />
+            <path d="M50 69 V73 M44 76 C47 78 53 78 56 76" />
+            <path d="M40 68 L24 65 M40 71 L25 73 M60 68 L76 65 M60 71 L75 73" />
+            <path d="M22 108 C26 96 38 91 50 91 C62 91 74 96 78 108" />
+          </g>
+        ) : (
+          <g>
+            <path d="M31 40 C31 23 69 23 69 40 L71 62 C71 80 60 89 50 89 C40 89 29 80 29 62 Z" />
+            <path d="M33 33 C21 29 14 43 17 62 C19 71 27 69 30 59" /><path d="M67 33 C79 29 86 43 83 62 C81 71 73 69 70 59" />
+            <circle cx="42" cy="52" r="2.2" fill={ink} stroke="none" /><circle cx="58" cy="52" r="2.2" fill={ink} stroke="none" />
+            <ellipse cx="50" cy="67" rx="5" ry="3.6" fill={ink} stroke="none" />
+            <path d="M50 70.5 V75 M44 78 C47 80.5 53 80.5 56 78" />
+            <path d="M22 108 C26 96 38 91 50 91 C62 91 74 96 78 108" />
+          </g>
+        )}
+      </svg>
+      <span style={{ fontFamily: font.body, fontSize: 9, fontWeight: 800, letterSpacing: "0.22em", color: "rgba(20,33,61,.5)", marginTop: 4 }}>{label}</span>
     </div>
   );
 }
@@ -198,7 +240,7 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
           {/* Photo column: main photo + ghost image, like a real data page */}
           <div className="ppg-pp-photocol flex flex-col items-center gap-2">
             <div className="ppg-pp-photo relative rounded-xl overflow-hidden" style={{ border: "3px solid #fff", outline: `1.5px solid ${tokens.gold}`, background: "#E8EEF7", boxShadow: "0 6px 16px rgba(20,33,61,0.14)" }}>
-              {photo || <div className="flex items-center justify-center h-full"><PetIllustration type={pet.animal_type} size={110} /></div>}
+              {photo || <PhotoSlot type={pet.animal_type} />}
               {onPhotoTap ? (
                 <button type="button" onClick={(e) => { e.stopPropagation(); onPhotoTap(); }} aria-label={photo ? "Retake passport photo" : "Add passport photo"} className="ppg-no-print absolute inset-0" style={{ background: "transparent", border: "none", cursor: "pointer" }}>
                   <span className="absolute flex items-center justify-center rounded-full" style={{ top: 6, right: 6, width: 28, height: 28, background: "#fff", color: tokens.navy, boxShadow: "0 2px 8px rgba(20,33,61,.3)" }}><Icon name="camera" size={14} /></span>
@@ -216,7 +258,7 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
               <div className="min-w-0">
                 <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>NAME</div>
                 <h2 className={`ppg-pp-name ${String(pet.name || "").length > 9 ? "is-long" : String(pet.name || "").length > 5 ? "is-mid" : ""}`} style={{ fontFamily: font.display, fontWeight: 800, lineHeight: 1, letterSpacing: "-0.02em", color: tokens.navy, overflowWrap: "break-word" }}>{pet.name}</h2>
-                {st === STATUS.service ? <ServiceSeal attestedAt={pet.service_attested_at} /> : <span className="inline-block rounded-md px-2 py-0.5 mt-2" style={{ background: st.bg, color: st.fg, fontFamily: font.body, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.14em" }}>{st.label}</span>}
+                {st === STATUS.service ? <RoleSeal kind="service" attestedAt={pet.service_attested_at} /> : st === STATUS.esa ? <RoleSeal kind="esa" /> : <span className="inline-block rounded-md px-2 py-0.5 mt-2" style={{ background: st.bg, color: st.fg, fontFamily: font.body, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.14em" }}>{st.label}</span>}
               </div>
               {pet.passport_issued_at ? (
                 <div className="ppg-pp-stampspot2 flex-shrink-0" style={{ mixBlendMode: "multiply", pointerEvents: "none" }}><PassportStamp date={pet.passport_issued_at} size={86} className={justIssued ? "ppg-pp-stamp" : ""} style={{ opacity: 0.9 }} /></div>

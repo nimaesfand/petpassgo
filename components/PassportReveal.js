@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Wordmark } from "./Logo";
-import { PetIllustration } from "./PetIdCard";
-import { PassportStamp, MrzStrip } from "./PetPassport";
+import { PassportStamp, MrzStrip, PhotoSlot } from "./PetPassport";
 import { chipMask } from "../lib/petProfile";
 import { tokens, font } from "../lib/theme";
 import { fmtDob, profileUrl } from "../lib/petProfile";
@@ -21,7 +20,7 @@ const BITS = Array.from({ length: 26 }, (_, i) => ({
   round: i % 3 === 0,
 }));
 
-export default function PassportReveal({ pet, photo, issuedAt, onClose }) {
+export default function PassportReveal({ pet, photo, issuedAt, onClose, preview = false }) {
   const [stage, setStage] = useState(0); // 0 closed book, 1 opens, 2 details, 3 stamp, 4 celebrate
   const [copied, setCopied] = useState(false);
   const [host, setHost] = useState(null);
@@ -80,13 +79,13 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose }) {
           <div className="px-4 pt-3 flex gap-3">
             <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
               <div className="rounded-xl overflow-hidden" style={{ width: 112, height: 140, border: "3px solid #fff", outline: `1.5px solid ${tokens.gold}`, background: "#E8EEF7", boxShadow: "0 6px 16px rgba(20,33,61,.14)" }}>
-                {photo || <div className="flex items-center justify-center h-full"><PetIllustration type={pet.animal_type} size={100} /></div>}
+                {photo || <PhotoSlot type={pet.animal_type} />}
               </div>
               <div aria-hidden="true" className="ppg-holo rounded-full" style={{ width: 26, height: 26 }} />
             </div>
             <div className="min-w-0 flex flex-col gap-1" style={{ paddingRight: 70 }}>
               <div>{label("NAME")}<div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 800, lineHeight: 1.05, color: tokens.navy, overflowWrap: "break-word" }}>{pet.name}</div></div>
-              <span className="self-start rounded-md px-2 py-0.5" style={{ background: /service/i.test(pet.role || "") ? "#0F766E" : /emotional|esa/i.test(pet.role || "") ? "#6D28D9" : tokens.gold, color: /service|emotional|esa/i.test(pet.role || "") ? "#fff" : tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 9.5, letterSpacing: "0.14em" }}>{/service/i.test(pet.role || "") ? "SERVICE DOG" : /emotional|esa/i.test(pet.role || "") ? "SUPPORT ANIMAL" : "PET"}</span>
+              <span className="self-start rounded-md px-2 py-0.5" style={{ background: /service/i.test(pet.role || "") ? "#1D4ED8" : /emotional|esa/i.test(pet.role || "") ? "#B91C1C" : tokens.gold, color: /service|emotional|esa/i.test(pet.role || "") ? "#fff" : tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 9.5, letterSpacing: "0.14em" }}>{/service/i.test(pet.role || "") ? "SERVICE DOG" : /emotional|esa/i.test(pet.role || "") ? "EMOTIONAL SUPPORT" : "PET"}</span>
               {pet.breed ? <div className="mt-1">{label("BREED")}<div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.navy, overflowWrap: "anywhere" }}>{pet.breed}</div></div> : null}
             </div>
           </div>
@@ -130,12 +129,18 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose }) {
       {stage >= 4 ? (
         <>
           <div className="ppg-pp-fade mt-6 text-center" style={{ maxWidth: 340 }}>
-            <h2 style={{ fontFamily: font.display, fontSize: 30, fontWeight: 800, color: "#fff", lineHeight: 1.1 }}>{pet.name} is official!</h2>
-            <p className="mt-2" style={{ fontFamily: font.body, fontSize: 15.5, color: "rgba(255,255,255,.8)" }}>{pet.name}&apos;s passport and QR code are ready. Show them at the counter, add them to your phone, or share them with a sitter.</p>
+            <h2 style={{ fontFamily: font.display, fontSize: 30, fontWeight: 800, color: "#fff", lineHeight: 1.1 }}>{pet.name}&apos;s passport is ready!</h2>
+            <p className="mt-2" style={{ fontFamily: font.body, fontSize: 15.5, color: "rgba(255,255,255,.8)" }}>{preview ? `Keep it to show it at the counter, add it to your phone, and share it with a sitter.` : `${pet.name}'s passport and QR code are ready. Show them at the counter, add them to your phone, or share them with a sitter.`}</p>
           </div>
           <div className="ppg-pp-fade mt-5 flex flex-col gap-2.5 w-full" style={{ maxWidth: 340, animationDelay: ".35s" }}>
-            <button type="button" onClick={share} className="rounded-full" style={{ height: 52, background: tokens.primary, color: "#fff", fontFamily: font.body, fontSize: 16, fontWeight: 700, border: "none", cursor: "pointer" }}>{copied ? "Link copied" : `Share ${pet.name}'s passport`}</button>
-            <button ref={closeRef} type="button" onClick={onClose} className="rounded-full" style={{ height: 48, background: "transparent", color: "#fff", fontFamily: font.body, fontSize: 15, fontWeight: 600, border: "2px solid rgba(255,255,255,.35)", cursor: "pointer" }}>View passport</button>
+            {preview ? (
+              <button ref={closeRef} type="button" onClick={onClose} className="rounded-full" style={{ height: 56, background: tokens.primary, color: "#fff", fontFamily: font.body, fontSize: 17, fontWeight: 800, border: "none", cursor: "pointer" }}>See {pet.name}&apos;s passport</button>
+            ) : (
+              <>
+                <button type="button" onClick={share} className="rounded-full" style={{ height: 52, background: tokens.primary, color: "#fff", fontFamily: font.body, fontSize: 16, fontWeight: 700, border: "none", cursor: "pointer" }}>{copied ? "Link copied" : `Share ${pet.name}'s passport`}</button>
+                <button ref={closeRef} type="button" onClick={onClose} className="rounded-full" style={{ height: 48, background: "transparent", color: "#fff", fontFamily: font.body, fontSize: 15, fontWeight: 600, border: "2px solid rgba(255,255,255,.35)", cursor: "pointer" }}>View passport</button>
+              </>
+            )}
           </div>
           <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
             {BITS.map((b, i) => (

@@ -26,9 +26,38 @@ const LOCKED = [
   ["Bring Me Home tag", "A QR tag that lets anyone who finds them reach you."],
 ];
 
+const EVERYTHING = [
+  "The passport, with its QR code and a phone wallet pass",
+  "Vet Verified records: your vet confirms each vaccine",
+  "Every document in one place: rabies and health certificates, with a document check",
+  "Gate Ready travel mode for the airport",
+  "Reminders before vaccines and documents expire",
+  "Bring Me Home: QR tag, lost-pet alerts and messages from whoever finds them",
+  "Training records and the signed service dog statement",
+  "Unlimited pets",
+  "Travel Passes for $14.99 instead of $29.99",
+];
+
+// Everything Pet Vault includes, folded away so the page stays simple.
+export function EverythingInVault() {
+  return (
+    <details className="mt-3 rounded-2xl px-4 py-3" style={{ background: tokens.sky, border: `1px solid ${tokens.line}` }}>
+      <summary style={{ fontFamily: font.body, fontWeight: 800, fontSize: 17, color: tokens.navy, cursor: "pointer" }}>See everything in Pet Vault</summary>
+      <ul className="mt-3 grid gap-2" style={{ listStyle: "none", padding: 0, margin: 0 }}>
+        {EVERYTHING.map((t) => (
+          <li key={t} className="flex gap-2.5" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>
+            <span aria-hidden="true" style={{ color: tokens.primary, fontWeight: 900 }}>✓</span>{t}
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
+}
+
 // The pages inside the passport that Pet Vault unlocks.
 export function LockedPages({ name }) {
   return (
+    <>
     <div className="grid gap-2.5">
       {LOCKED.map(([t, b]) => (
         <div key={t} className="rounded-2xl px-4 py-3.5 flex gap-3 items-start" style={{ background: "#FBF7EE", border: "1px solid #E6DCC6" }}>
@@ -42,5 +71,7 @@ export function LockedPages({ name }) {
         </div>
       ))}
     </div>
+    <EverythingInVault />
+    </>
   );
 }

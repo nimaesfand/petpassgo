@@ -95,7 +95,7 @@ export default async function CheckPage({ params, searchParams }) {
   const healthUrl = await signDoc(health);
   const dotUrl = await signDoc(dot);
   const service = /service/i.test(pet.role || "");
-  const status = service ? ["SERVICE DOG", "#0F766E", "#fff"] : /emotional|esa/i.test(pet.role || "") ? ["SUPPORT ANIMAL · FLIES AS A PET", "#6D28D9", "#fff"] : ["PET", GOLD, NAVY];
+  const status = service ? ["SERVICE DOG", "#1D4ED8", "#fff"] : /emotional|esa/i.test(pet.role || "") ? ["EMOTIONAL SUPPORT · FLIES AS A PET", "#B91C1C", "#fff"] : ["PET", GOLD, NAVY];
   const chip = String(pet.microchip_number || "").replace(/[^0-9A-Za-z]/g, "");
   const checkedAt = new Date().toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit", timeZone: "America/Los_Angeles" });
   const open = (url, label) => url ? <a href={url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", marginTop: 6, fontWeight: 800, fontSize: 14.5, color: "#1D4ED8" }}>{label} ↗</a> : null;

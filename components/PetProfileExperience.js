@@ -11,6 +11,7 @@ import PetPassport from "./PetPassport";
 import PassportReveal from "./PassportReveal";
 import PetBasicsCard from "./PetBasicsCard";
 import TrainingCard from "./pets/TrainingCard";
+import TripPromptCard from "./pets/TripPromptCard";
 import PetCareCard from "./PetCareCard";
 import PetDocumentsCard from "./PetDocumentsCard";
 import PetIdStudio from "./pets/PetIdStudio";
@@ -350,6 +351,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
         justIssued={justIssued}
         onPhotoTap={owner ? () => setBooth(true) : null}
       /> : null}
+      {showPassport && owner && v !== "id" && pet?.id ? <TripPromptCard pet={pet} /> : null}
       {showPassport && owner && v !== "id" && pet?.id ? <TrainingCard key={`${pet.id}-${pet.service_attested_at || ""}`} pet={pet} userId={userId} onChanged={onChanged} /> : null}
       {booth ? <PhotoBooth pet={pet} onClose={() => setBooth(false)} onSave={(f) => uploadPhoto({ target: { files: [f], value: "" } })} /> : null}
       {showPassport && owner && !pet.passport_issued_at && missing.length > 0 ? <PassportQuest pet={pet} userId={userId} onChanged={onChanged} onPhoto={uploadPhoto} /> : null}

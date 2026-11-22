@@ -36,7 +36,6 @@ import PetCareCard from "../../components/PetCareCard";
 import PetDocumentsCard from "../../components/PetDocumentsCard";
 import { SECTION_THEME } from "../../lib/petSections";
 import PetProfileExperience from "../../components/PetProfileExperience";
-import PassportWizard from "../../components/pets/PassportWizard";
 import { KEEP_TOKEN_KEY } from "../../lib/passportDraft";
 import MarketingOptIn from "../../components/MarketingOptIn";
 import MarketingSettings from "../../components/MarketingSettings";
@@ -653,20 +652,25 @@ function PetProfileTab({ userId }) {
           <button onClick={loadPets} className="ppg-btn ppg-btn-primary ml-2">Retry</button>
         </div>
       ) : pets.length === 0 && !showForm ? (
-        <PassportWizard userId={userId} onCancel={() => window.history.back()} onDone={() => { loadPets(); setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50); }} />
+        <div className="rounded-3xl p-6 sm:p-8 text-center" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+          <div className="mx-auto rounded-full overflow-hidden" style={{ width: 76, height: 76, border: `3px solid ${tokens.gold}` }}><img src="/images/hero-golden-retriever.jpg" alt="Benny, the PetPassGo guide" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "62% 22%" }} /></div>
+          <h2 className="mt-4" style={{ fontFamily: font.display, fontSize: 26, fontWeight: 800, color: tokens.navy }}>Let&apos;s make your pet&apos;s passport</h2>
+          <p className="mt-2 mx-auto max-w-[28rem]" style={{ fontFamily: font.body, fontSize: 17, color: tokens.muted }}>Benny walks you through it, one question at a time. It takes about a minute.</p>
+          <a href="/passport/create" className="mt-5 inline-flex items-center justify-center rounded-full px-8" style={{ minHeight: 56, background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 800, fontSize: 18, textDecoration: "none" }}>Make the passport</a>
+        </div>
       ) : (
         <>
           {pets.map((pet) => (
             <PetCard key={pet.id} pet={pet} userId={userId} onPhotoUpdated={loadPets} />
           ))}
           {!showForm && (isMember ? (
-            <button
-              onClick={() => setShowForm(true)}
+            <a
+              href="/passport/create"
               style={{ fontFamily: font.body, fontSize: 15, color: tokens.navy, fontWeight: 600 }}
-              className="mt-1 underline"
+              className="mt-1 underline inline-block"
             >
               + Add another pet
-            </button>
+            </a>
           ) : limitHit ? (
             access.member === false && access.allowed === false ? <WinBack area="pets" compact /> : <MemberUpsell />
           ) : (
@@ -681,13 +685,7 @@ function PetProfileTab({ userId }) {
         </>
       )}
 
-      {showForm && (
-        <PassportWizard
-          userId={userId}
-          onCancel={() => setShowForm(false)}
-          onDone={() => { setForm(blankPet); setShowForm(false); loadPets(); setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50); }}
-        />
-      )}
+
     </div>
   );
 }
