@@ -141,7 +141,7 @@ function Sheet({ tile, onClose }) {
           <button type="button" onClick={onClose} aria-label="Close" className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: 40, height: 40, background: tokens.sky, color: tokens.navy, border: "none", cursor: "pointer" }}><Icon name="x" size={18} /></button>
         </div>
         {tile.body()}
-        <a href="/join" className="mt-4 inline-flex w-full items-center justify-center rounded-full min-h-[50px]" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 800, fontSize: 16, textDecoration: "none" }}>Start your Pet Vault</a>
+        <a href="/passport/create" className="mt-4 inline-flex w-full items-center justify-center rounded-full min-h-[50px]" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 800, fontSize: 16, textDecoration: "none" }}>Make your pet&apos;s passport</a>
       </div>
     </div>,
     host

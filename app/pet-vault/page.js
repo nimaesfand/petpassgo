@@ -23,7 +23,7 @@ export default function PetVaultPage() {
           <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.sky }} className="mt-3 mb-6">
             Members can add a Travel Pass for {usd(P.memberPass)} per trip. {MEMBERSHIP_TERMS}
           </p>
-          <a href="/join" className="btn-primary inline-flex items-center justify-center rounded-full px-8 py-3.5 min-h-[52px]" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>{JOIN_CTA}</a>
+          <a href="/passport/create" className="btn-primary inline-flex items-center justify-center rounded-full px-8 py-3.5 min-h-[52px]" style={{ background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>Make your pet&apos;s passport</a>
         </div>
       </main>
     </div>

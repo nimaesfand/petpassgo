@@ -20,8 +20,22 @@ export default function JoinPage() {
   const [consent, setConsent] = useState(false);
   const [tips, setTips] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [petName, setPetName] = useState("");
+  // Pet Vault always starts the same way: make the passport first, then pay to keep it.
+  // People who already have a passport here (Travel Pass buyers, returning members) pay straight away.
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setMode(data?.session ? "ready" : "guest"));
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data?.session) { window.location.replace("/passport/create"); return; }
+      const [{ data: member }, { data: pets }] = await Promise.all([
+        supabase.rpc("my_membership"),
+        supabase.from("pets").select("name").order("created_at").limit(1),
+      ]);
+      if (member) { window.location.replace("/account"); return; }
+      if (!pets?.length) { window.location.replace("/passport/create"); return; }
+      setPetName(pets[0].name || "");
+      setMode("ready");
+    })();
   }, []);
   async function pay() {
     if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; }
@@ -44,7 +58,7 @@ export default function JoinPage() {
             </>
           ) : mode === "ready" ? (
             <>
-              <h1 style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-1">Join PetPassGo</h1>
+              <h1 style={{ fontFamily: font.display, fontSize: 24, fontWeight: 700, color: tokens.navy }} className="mb-1">{petName ? `Unlock ${petName}'s full passport` : "Join PetPassGo"}</h1>
               <p style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{VAULT_NAME} · {usd(P.member)}/mo</p>
               <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-2">{VAULT_SUB} Prices are in US dollars (USD).</p>
               <MarketingOptIn checked={tips} onChange={setTips} />

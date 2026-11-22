@@ -62,7 +62,7 @@ export default function HomePricing() {
           <span style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.3, color: tokens.muted }}>/mo</span>
         </div>
         <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, fontWeight: 600 }} className="mt-2 mb-5">Members can add a Travel Pass for {P.memberPass} per trip.</p>
-        <a href="/join" className="home-navy-btn mt-auto flex items-center justify-center rounded-full px-4 py-3.5 text-center min-h-[52px] w-full" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, lineHeight: 1.25, textDecoration: "none" }}>Create your Pet Vault</a>
+        <a href="/passport/create" className="home-navy-btn mt-auto flex items-center justify-center rounded-full px-4 py-3.5 text-center min-h-[52px] w-full" style={{ background: tokens.navy, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, lineHeight: 1.25, textDecoration: "none" }}>Make your pet&apos;s passport</a>
       </article>
     </div>
   );

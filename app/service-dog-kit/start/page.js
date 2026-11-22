@@ -85,7 +85,7 @@ function Result({ animal, role, where, onBack }) {
         </div>
         <div className="mt-6 flex flex-wrap gap-3">
           <Button href={tripLink("service", where)}>Plan my dog&apos;s trip</Button>
-          <Button href="/join" quiet>Start the passport</Button>
+          <Button href="/passport/create" quiet>Start the passport</Button>
         </div>
         <Back onBack={onBack} />
       </div>
@@ -104,7 +104,7 @@ function Result({ animal, role, where, onBack }) {
         </ul>
         <div className="mt-6 flex flex-wrap gap-3">
           <Button href={tripLink("dog", where)}>Compare airlines for my trip</Button>
-          <Button href="/join" quiet>Start the passport</Button>
+          <Button href="/passport/create" quiet>Start the passport</Button>
         </div>
         <Back onBack={onBack} />
       </div>

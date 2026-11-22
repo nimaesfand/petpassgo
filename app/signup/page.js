@@ -16,7 +16,7 @@ export default function SignupPage() {
           <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-6 text-center">{VAULT_SUB}</p>
           <a href="/assessment" className="btn-primary block text-center rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>{PLAN_CTA}</a>
           <p className="text-center mt-4">
-            <a href="/join" style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{JOIN_CTA}</a>
+            <a href="/passport/create" style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>Make your pet&apos;s passport</a>
           </p>
           <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }} className="text-center mt-6">
             Already have an account? <a href="/login" style={{ color: tokens.navy, fontWeight: 700 }}>{LOGIN_CTA}</a>

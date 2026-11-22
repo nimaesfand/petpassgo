@@ -111,7 +111,7 @@ export default function LostFlyer() {
           <div className="rounded-2xl p-5 mt-8" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
             <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-1">Want finders to reach you without sharing your number?</div>
             <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-3">Finder messages come to you, and you get a note when someone opens the poster. The Lost &amp; Found board shows a pet in one state and city only after you tap Report lost.</p>
-            <a href="/join" className="ppg-btn ppg-btn-primary">{JOIN_CTA}</a>
+            <a href="/passport/create" className="ppg-btn ppg-btn-primary">Make your pet&apos;s passport</a>
           </div>
         </div>
         <div className="min-w-0 max-w-full">
