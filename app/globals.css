@@ -59,6 +59,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, .ppg-choice:focus-wi
   .ppg-contact-fab.with-chat,
   .ppg-contact-fab.is-account.with-chat { bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
 }
+@media (max-width: 767px) {
+  .ppg-contact-fab:not(.is-docked) { width: 46px; height: 46px; }
+  .ppg-contact-fab.is-flow { display: none; }
+  body { padding-bottom: 64px; }
+}
 .ppg-fab-clear { padding-bottom: calc(9.5rem + env(safe-area-inset-bottom, 0px)); }
 .ppg-account-clear { padding-bottom: calc(15rem + env(safe-area-inset-bottom, 0px)); }
 @media (min-width: 768px) {

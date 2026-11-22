@@ -15,6 +15,8 @@ export default function ContactBubble() {
   const [slot, setSlot] = useState(null);
   const account = (path === "/account" || path.startsWith("/account/")) && !path.startsWith("/account/passport");
   const onPetPage = path === "/id" || path.startsWith("/id/");
+  // Step-by-step flows have their own buttons at the bottom; on phones the bubble would cover them.
+  const flow = /^\/(assessment|passport\/(create|keep)|service-dog-kit\/start)(\/|$)/.test(path);
 
   useEffect(() => {
     if (!account) { setSlot(null); return; }
@@ -43,7 +45,7 @@ export default function ContactBubble() {
     setOpen(true);
   }
 
-  const classes = ["ppg-contact-fab", "ppg-no-print", slot ? "is-docked" : "", !slot && account ? "is-account" : "", !slot && CHAT ? "with-chat" : ""].filter(Boolean).join(" ");
+  const classes = ["ppg-contact-fab", "ppg-no-print", slot ? "is-docked" : "", !slot && account ? "is-account" : "", !slot && CHAT ? "with-chat" : "", flow ? "is-flow" : ""].filter(Boolean).join(" ");
   const button = (
     <button
       type="button"

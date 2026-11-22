@@ -108,8 +108,9 @@ export default function ServiceDogKitPage() {
               ))}
             </div>
             <p className="mt-6" style={{ fontFamily: B, fontSize: 14.5, lineHeight: 1.5, color: tokens.muted }}>
-              Source: <a href={DOT_AIR_FORM_PAGE} target="_blank" rel="noopener" style={{ color: tokens.navy, fontWeight: 700 }}>U.S. Department of Transportation</a>. Prefer to fill in the form yourself? <a href="/service-dog/dot-form" style={{ color: tokens.navy, fontWeight: 700 }}>Here&apos;s how</a>. Airlines can also have their own steps, which your Travel Pass adds for your flight.
+              Source: <a href={DOT_AIR_FORM_PAGE} target="_blank" rel="noopener" style={{ color: tokens.navy, fontWeight: 700 }}>U.S. Department of Transportation</a>. Airlines can also have their own steps, which your Travel Pass adds for your flight.
             </p>
+              <div><a href="/service-dog/dot-form" className="inline-flex items-center justify-center rounded-full px-5 mt-3" style={{ minHeight: 46, background: "#fff", color: tokens.navy, border: `1.5px solid ${tokens.navy}`, fontWeight: 700, fontSize: 15.5, textDecoration: "none" }}>How to fill out the DOT form</a></div>
           </div>
         </section>
 

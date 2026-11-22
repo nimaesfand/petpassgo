@@ -151,6 +151,7 @@ export default function PetPassGoQuiz() {
   const [consentErr, setConsentErr] = useState("");
   const [airlineQuery, setAirlineQuery] = useState("");
   const [showAllAirlines, setShowAllAirlines] = useState(false);
+  const [freeReturn, setFreeReturn] = useState(false);
   const [autoBuy, setAutoBuy] = useState(""); // set when returning signed in from signup/login with a saved purchase
   const [booted, setBooted] = useState(false);
   const [regionHint, setRegionHint] = useState("");
@@ -160,8 +161,10 @@ export default function PetPassGoQuiz() {
     const q = new URLSearchParams(window.location.search).get("plan");
     trackEvent("start_assessment", { content_type: "assessment", plan_intent: q || undefined });
   }, []);
+  const [signedIn, setSignedIn] = useState(false);
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
+      if (data?.session) setSignedIn(true);
       if (data?.session) supabase.rpc("my_membership").then(({ data: m }) => { if (m) setIsMember(true); });
     });
   }, []);
@@ -273,7 +276,7 @@ export default function PetPassGoQuiz() {
   async function unlockFree() {
     if (buying) return;
     const { data } = await supabase.auth.getUser();
-    if (!data.user) { trackEvent("free_trip_start", { content_type: "assessment" }); setFreeOpen(true); return; }
+    if (!data.user) { trackEvent("free_trip_start", { content_type: "assessment" }); setFreeReturn(autoBuy === "free"); setFreeOpen(true); return; }
     setBuying(true);
     const saved = await saveTripFor(data.user);
     if (saved.paid) { window.location.href = "/account?free_trip=1"; return; }
@@ -521,7 +524,7 @@ export default function PetPassGoQuiz() {
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">
                 A few flight details
               </h2>
-              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-5">Last question, then you'll see what this trip needs.</p>
+              <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-5">Almost done. Then you'll see what this trip needs.</p>
               <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-2">Is it a direct flight?</div>
               <div className="grid grid-cols-2 gap-3">
                 <OptionCard label="Direct" sub="One flight" selected={answers.connecting === false} onClick={() => setAnswers((a) => ({ ...a, connecting: false, second_airline: "", stop: "", second_date: "", second_mode: "" }))} />
@@ -581,7 +584,7 @@ export default function PetPassGoQuiz() {
           {step === 6 && (
             <>
               <RequirementsPreview answers={answers} onVerdict={(v, e) => { setVerdictKey(v); setEasyTrip(!!e); if (v) trackPreviewOnce(e ? "easy" : v); }} />
-              {verdictKey === "no" ? (
+              {!verdictKey ? null : verdictKey === "no" ? (
                 <div className="flex flex-col gap-2 mt-2">
                   <button type="button" onClick={() => setStep(4)} className="w-full rounded-full py-3.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>Try a different airline</button>
                   <button type="button" onClick={() => setStep(5)} className="w-full rounded-full py-3.5" style={{ background: "#fff", color: tokens.navy, fontFamily: font.body, fontWeight: 700, fontSize: 16, border: `1.5px solid ${tokens.line}`, cursor: "pointer" }}>Change cabin or hold</button>
@@ -592,12 +595,13 @@ export default function PetPassGoQuiz() {
                     <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 21, color: tokens.navy, lineHeight: 1.15 }}>Your checklist is free</div>
                     <div className="rounded-full px-3 py-1" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontSize: 13, fontWeight: 800, letterSpacing: ".04em" }}>$0</div>
                   </div>
-                  <p className="mt-1.5 mb-4" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }}>Simple flights are free. Make an account and we&apos;ll show you how to do each step.</p>
+                  <p className="mt-1.5 mb-4" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }}>{signedIn ? "Simple flights are free. We'll save it to your account with how to do each step." : <>Simple flights are free. Make an account and we&apos;ll show you how to do each step.</>}</p>
                   <button type="button" disabled={buying} onClick={unlockFree} className="w-full rounded-full py-3.5" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer", opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : "Get my free checklist"}</button>
                   <p className="mt-2 text-center" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>No card needed.</p>
                 </div>
               ) : <>
-              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-3">Choose your pass</h2>
+              <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">This trip needs paperwork</h2>
+              <p className="mb-3" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }}>Your Travel Pass walks you through every step above, in order, with due dates.</p>
               <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setConsentErr(""); }} error={consentErr} />
               {isMember ? (
                 <button disabled={buying} onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5 mt-2" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : `Unlock my Travel Pass · ${usd(P.memberPass)}`}</button>
@@ -641,7 +645,7 @@ export default function PetPassGoQuiz() {
         </div>
       </div>
       </div>
-      <FreeAccountSheet open={freeOpen} onClose={() => setFreeOpen(false)} trip={answers} petWord={answers.role === "Service animal" ? "your service dog" : `your ${answers.animal === "Other" || !answers.animal ? "pet" : answers.animal.toLowerCase()}`} onReady={async () => { setFreeOpen(false); await unlockFree(); }} />
+      <FreeAccountSheet returning={freeReturn} open={freeOpen} onClose={() => setFreeOpen(false)} trip={answers} petWord={answers.role === "Service animal" ? "your service dog" : `your ${answers.animal === "Other" || !answers.animal ? "pet" : answers.animal.toLowerCase()}`} onReady={async () => { setFreeOpen(false); await unlockFree(); }} />
       <GuestEmailSheet open={!!guestPlan} showConsent={false} showMarketing={false} marketingOptIn={tips} title={guestPlan === "join" ? `Join + Travel Pass · ${usd(P.joinToday)}` : `Travel Pass · ${usd(P.pass)}`} plan={guestPlan} trip={answers} cancelPath="/assessment?checkout=canceled" onClose={() => setGuestPlan("")} />
     </div>
   );

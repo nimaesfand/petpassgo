@@ -53,7 +53,7 @@ export default function DotFormGuide() {
         </p>
         <div className="flex flex-wrap gap-3 mt-6">
           <a href={DOT_AIR_FORM_PAGE} target="_blank" rel="noopener" className="inline-flex items-center justify-center rounded-full px-7 min-h-[54px]" style={{ background: tokens.navy, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 16.5, textDecoration: "none" }}>Get the free form from DOT</a>
-          <a href="#filled-in" className="inline-flex items-center justify-center rounded-full px-7 min-h-[54px]" style={{ background: "#fff", color: tokens.navy, border: `1.5px solid ${tokens.line}`, fontFamily: B, fontWeight: 800, fontSize: 16.5, textDecoration: "none" }}>Have it filled in for you</a>
+          <a href="/passport/create" className="inline-flex items-center justify-center rounded-full px-7 min-h-[54px]" style={{ background: "#fff", color: tokens.navy, border: `1.5px solid ${tokens.line}`, fontFamily: B, fontWeight: 800, fontSize: 16.5, textDecoration: "none" }}>Have it filled in for you</a>
         </div>
 
         <h2 className="mt-12" style={{ fontFamily: D, fontWeight: 800, fontSize: 30, color: tokens.navy }}>When your airline can ask for it</h2>

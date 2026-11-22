@@ -102,15 +102,15 @@ export default function RequirementsPreview({ answers, onVerdict }) {
           </div>
 
           <div className="px-5 pt-4 pb-5">
-            <div className="grid grid-cols-3 gap-2 mb-4">
+            <div className="grid grid-cols-2 gap-2 mb-4">
               {[
                 ["Pet fee", facts?.fee || "In your pass"],
-                ["Carrier", facts?.carrier || "In your pass"],
                 ["Steps", Number.isFinite(count) ? String(count) : "In your pass"],
+                ["Carrier", facts?.carrier || "In your pass"],
               ].map(([k, v]) => (
-                <div key={k} className="rounded-xl px-2.5 py-2.5 min-w-0" style={{ background: tokens.sky }}>
+                <div key={k} className={`rounded-xl px-2.5 py-2.5 min-w-0${k === "Carrier" ? " col-span-2" : ""}`} style={{ background: tokens.sky }}>
                   <div style={{ fontFamily: font.body, fontSize: 11, fontWeight: 800, letterSpacing: ".06em", color: tokens.muted }}>{k.toUpperCase()}</div>
-                  <div className="mt-0.5" style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 800, color: tokens.navy, lineHeight: 1.25, overflowWrap: "anywhere" }}>{v}</div>
+                  <div className="mt-0.5" style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 800, color: tokens.navy, lineHeight: 1.25, overflowWrap: "break-word", hyphens: "auto" }}>{v}</div>
                 </div>
               ))}
             </div>

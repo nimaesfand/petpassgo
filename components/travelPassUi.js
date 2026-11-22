@@ -71,5 +71,5 @@ export const PASS_TAB_LIST = [
   ["checklist", "Steps"],
   ["flight", "Flight"],
   ["documents", "Docs"],
-  ["destination", "Destination"],
+  ["destination", "Arrival"],
 ];

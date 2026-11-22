@@ -108,8 +108,9 @@ export default function ServiceDogPage() {
             Since 2021, U.S. airlines treat emotional support animals as pets, so the pet rules and fees apply. If your dog is trained to perform a task for your disability, including psychiatric tasks, it's a service dog. If it isn't, it flies as a pet, and we'll show you exactly how.
           </p>
           <p className="mt-4 max-w-[44rem]" style={{ fontFamily: B, fontSize: 14, lineHeight: 1.5, color: tokens.muted }}>
-            The DOT form is an official U.S. government document. You sign it yourself, and knowingly false statements can lead to fines and other penalties. Source: <a href={DOT_AIR_FORM_PAGE} target="_blank" rel="noopener" style={{ color: tokens.navy }}>U.S. Department of Transportation</a>. <a href="/service-dog/dot-form" style={{ color: tokens.navy, fontWeight: 700 }}>How to fill out the DOT form, section by section</a>.
+            The DOT form is an official U.S. government document. You sign it yourself, and knowingly false statements can lead to fines and other penalties. Source: <a href={DOT_AIR_FORM_PAGE} target="_blank" rel="noopener" style={{ color: tokens.navy }}>U.S. Department of Transportation</a>.
           </p>
+            <div><a href="/service-dog/dot-form" className="inline-flex items-center justify-center rounded-full px-5 mt-3" style={{ minHeight: 46, background: "#fff", color: tokens.navy, border: `1.5px solid ${tokens.navy}`, fontWeight: 700, fontSize: 15.5, textDecoration: "none" }}>How to fill out the DOT form</a></div>
           <a href={CTA} className="inline-flex items-center justify-center rounded-full px-8 min-h-[54px] mt-6" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Take the 30-second check</a>
         </section>
       </main>

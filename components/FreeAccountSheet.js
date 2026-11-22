@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PasswordInput from "./PasswordInput";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
@@ -9,8 +9,10 @@ import { trackEvent } from "../lib/analytics";
 // Free account for an easy trip. No card. Once signed in, onReady() unlocks the trip.
 // If the project asks people to confirm their email, the trip waits in this browser
 // and the confirmation link brings them back to finish.
-export default function FreeAccountSheet({ open, onClose, onReady, trip, petWord = "your pet" }) {
+export default function FreeAccountSheet({ open, onClose, onReady, trip, petWord = "your pet", returning = false }) {
   const [mode, setMode] = useState("signup");
+  const [sent, setSent] = useState(false);
+  useEffect(() => { if (open && returning) { setMode("login"); setMsg("Your email is confirmed. Log in to get your free checklist."); } }, [open, returning]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -38,7 +40,7 @@ export default function FreeAccountSheet({ open, onClose, onReady, trip, petWord
         return;
       }
       trackEvent("sign_up", { content_name: "free_trip" });
-      if (!data.session) { setBusy(false); setMsg("Check your email for a link to confirm your account. It brings you right back to your trip."); return; }
+      if (!data.session) { setBusy(false); setSent(true); setMsg("Check your email for a link to confirm your account. It brings you right back to your trip."); return; }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) { setBusy(false); setMsg(error.message); return; }
@@ -64,14 +66,14 @@ export default function FreeAccountSheet({ open, onClose, onReady, trip, petWord
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" aria-label="Email" autoComplete="email" style={input} required />
           <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === "signup" ? "Create a password (8+ characters)" : "Password"} aria-label="Password" autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={mode === "signup" ? 8 : undefined} style={input} required />
           {msg && <div className="rounded-xl px-3 py-2.5" style={{ background: "#FFF8EC", fontFamily: font.body, fontSize: 14.5, color: "#7A4F00" }}>{msg}</div>}
-          <button type="submit" disabled={busy} className="rounded-full py-3.5 mt-1" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer", opacity: busy ? 0.7 : 1 }}>
+          {sent ? null : <button type="submit" disabled={busy} className="rounded-full py-3.5 mt-1" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer", opacity: busy ? 0.7 : 1 }}>
             {busy ? "One moment…" : mode === "signup" ? "Create free account" : "Log in"}
-          </button>
+          </button>}
         </form>
         <div className="mt-4 text-center" style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>
           {mode === "signup"
-            ? <>Already have an account? <button type="button" onClick={() => { setMode("login"); setMsg(""); }} style={{ color: tokens.primary, fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>Log in</button></>
-            : <>New here? <button type="button" onClick={() => { setMode("signup"); setMsg(""); }} style={{ color: tokens.primary, fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>Create a free account</button> · <a href="/login" style={{ color: tokens.navy }}>Forgot password?</a></>}
+            ? <>Already have an account? <button type="button" onClick={() => { setMode("login"); setMsg(""); setSent(false); }} style={{ color: tokens.primary, fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>Log in</button></>
+            : <>New here? <button type="button" onClick={() => { setMode("signup"); setMsg(""); setSent(false); }} style={{ color: tokens.primary, fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>Create a free account</button> · <a href="/login" style={{ color: tokens.navy }}>Forgot password?</a></>}
         </div>
         {mode === "signup" && <p className="mt-3" style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted, lineHeight: 1.5 }}>By creating an account you agree to the <a href="/terms" style={{ color: tokens.navy }}>Terms</a> and <a href="/privacy" style={{ color: tokens.navy }}>Privacy Policy</a>.</p>}
       </div>
