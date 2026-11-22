@@ -91,6 +91,44 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-22: Plan: passport cleanup, pricing cards, tap-to-open documents: review
+Read against the current code on main and the live homepage (www.petpassgo.com). Direction is good. A few items should change before building. Nima decides.
+
+**1. Hiding training from /check — concern.**
+/check (and travel mode) is what a gate agent sees. Airlines can ask whether a service dog is trained to do tasks; they should not need the trainer's name, city, or the task list. Hiding everything by default goes too far. Always show a short line for service dogs, like "Service dog, handler statement signed." Keep trainer, location, tasks, and training levels off unless the owner turns on sharing. The DOT form stays the real document and should stay visible and tappable. Taking the date off the public passport is fine.
+
+There is already a "Show these tasks on the passport" toggle (`show_tasks` in TrainingCard). Don't add a second overlapping switch; fold it into one control. Grouping Training / Trained by / Tasks into one block on the owner's passport is a good cleanup.
+
+**2. Tap-to-open documents — agree, with privacy limits.**
+This is the right way to hand a phone to an agent, better than today's "View the certificate ↗" new tab. The page is already noindex, and files are already served with 30-minute signed URLs from the private `pet-documents` bucket. Before building:
+
+- Travel mode lasts 24 hours (not 12). Anyone who has the link or the unlocked phone can open every file for that whole window. When the owner opens travel mode, say so in one line: anyone who can see this screen can open the files.
+- Signed URLs expire in 30 minutes, so a file opened later in a long travel-mode session can break. Mint a fresh short-lived URL when the row is tapped, after checking the token is still valid. Don't put every file URL into the first page load.
+- Add `Disallow: /check` to robots.txt (today only the meta tag blocks indexing). Use a strict referrer policy on that page.
+- "Other documents" should not dump every leftover file. Import permits and vet letters often have an address or phone. Current upload types are Rabies, Other vaccines, Health certificate, Airline form, Microchip record, and Other — there is no "import permit" or "vet letter" type yet. Only list extra files the owner has marked okay to show at the gate, or stick to the travel docs (health certificate, DOT form, rabies, vaccines).
+- iOS: don't rely on a PDF in an iframe; Safari often shows a blank page. Photos can open full screen with a big Close button. For PDFs, use a native open or a real PDF viewer, and always keep an "Open file" fallback. This has to be tested on an iPhone.
+
+**3. Seal under the photo — concern.**
+Agree with removing the small rainbow hologram (the HoloSeal under the photo, and the same 26px circle on the PassportReveal). Regular pets should stay clean.
+
+Do not move the current blue/red RoleSeal (shield, gold ring, gradient, "SERVICE DOG" / "HANDLER STATEMENT · DATE") into that photo column. That's exactly where a real passport puts a security hologram, and it will look more official, not less. Owner rule: never certified, approved, registered, or official, and no official-looking certificate. Use a plain text chip under the photo, such as "Service dog · handler statement signed" (no date, no shield, no gold ring). ESA can stay "Emotional support · flies as a pet." Keep the PetPassGo ISSUED stamp as it is; it's already branded.
+
+**4. "Make your pet's passport free. Pay only to keep it." — agree, if the 7 days are in the box.**
+This matches how /passport/create works: no card to make the draft, they enter an email, the passport is issued, and it's held for 7 days (`DRAFT_DAYS`). If they don't start Pet Vault at $6.99/mo, the draft expires and they have to make it again. Members already in Vault skip the draft and save straight to the account. The pricing box must say the 7-day hold and the $6.99/mo price, or "pay only to keep it" sounds like a free passport forever. "No card needed" belongs on the Free checklist card only, which is correct.
+
+Live "What it costs" is rendered from `PRICE_CARDS` in `app/page.js`. `components/HomePricing.js` does not exist; `components/home/HomePricing.js` is unused. Don't treat that file as live.
+
+**5. Lost-pet wording — agree, with one honesty tweak.**
+"Your contact info stays private" is better, and matches the default (private messages; showing a phone is opt-in). "With roughly where the scan happened" is more accurate than "the area they came from." Scan location is real: only while the pet is marked lost, a coarse city/region/country from Vercel's IP headers, no IP or precise location stored, at most one email an hour, records deleted when marked reunited. The privacy policy already says this. The city can be wrong (VPN, mobile carrier). Say "approximate city" on the homepage, and add one line on the "Publish lost poster" form so the owner sees it before they turn alerts on. That form does not mention scan alerts today.
+
+**6. Sample "Passport issued" reveal — agree, but it's on /pet-vault, not the homepage.**
+The "Share Benny's passport" button is on /pet-vault (`VaultPreview` opens `PassportReveal` without `preview`). The homepage uses `HomePassport` (tap to flip only). Fix the reveal on /pet-vault: mark it a sample, buttons "Make your pet's passport" and "Close," and cut the heavy gold-bits effect so the stamp stays smooth. The real create-passport reveal should keep its current "See [name]'s passport" path (`preview={!reveal.petId}`).
+
+**7. Twilio texts — don't block this plan.**
+Email alerts for lost-poster views already work (one per hour, with the approximate area). Ship that clearly first. U.S. application-to-person texts need A2P 10DLC (brand and campaign registration, about 1–3 weeks, the fees Claude listed, plus the owner's phone and consent). I wouldn't start that until the rest of this is live and email is clearly useful. Push can wait too.
+
+Ready for Nima to decide.
+
 ### 2026-11-22: DOT form guide, member auto-fill, checklist ending, Benny on sample passport: test results
 Tested on the live site, logged out unless noted, at phone width (390–400px, Chrome device mode) and desktop (1280px). Screenshots are on Sisqo's computer under `/workspace/petpassgo-review/2026-11-22-dot/`; ask Nima if you need any of them.
 
