@@ -21,7 +21,7 @@ const TEAL = "#0F766E";
 const KIT = [
   ["An ID card", "A pet passport you can print or keep on your phone, with a number anyone can check"],
   ["A certificate", "Your signed handler statement: who trained your dog, and what they're trained to do"],
-  ["A registration number", "The DOT Service Animal form, filled in for your flight and ready to sign"],
+  ["A registration number", "The DOT Service Animal form, filled in for every trip and ready to sign"],
   [null, "Vaccines confirmed by your own vet"],
   [null, "Travel mode: everything about your dog on one screen at the airport"],
   [null, "Your airline's own steps and deadlines for your flight, with reminders"],
@@ -29,7 +29,7 @@ const KIT = [
 
 const CHECKS = [
   { icon: "award", title: "A dog trained for your disability", body: "Trained to do work or tasks for you. You can train the dog yourself. Your signed statement in the passport records how.", got: "Your handler statement" },
-  { icon: "file", title: "The DOT Service Animal form", body: "The U.S. government form airlines can ask for, about your dog's training, health and behavior. Some airlines want it 48 hours ahead.", got: "We fill it in for you" },
+  { icon: "file", title: "The DOT Service Animal form", body: "The free U.S. government form airlines can ask for once per trip, about your dog's training, health and behavior. Some airlines want it 48 hours ahead.", got: "Filled in for every trip" },
   { icon: "clock", title: "The relief form, for flights of 8+ hours", body: "How your dog will relieve itself on a long flight, or that it won't need to.", got: "Added when your flight needs it" },
   { icon: "health", title: "Healthy, vaccinated and well behaved", body: "Rabies vaccine on file, on a leash or harness, and fitting at your feet or on your lap.", got: "Vet-confirmed records" },
 ];
@@ -108,7 +108,7 @@ export default function ServiceDogKitPage() {
               ))}
             </div>
             <p className="mt-6" style={{ fontFamily: B, fontSize: 14.5, lineHeight: 1.5, color: tokens.muted }}>
-              Source: <a href={DOT_AIR_FORM_PAGE} target="_blank" rel="noopener" style={{ color: tokens.navy, fontWeight: 700 }}>U.S. Department of Transportation</a>. Airlines can also have their own steps, which your Travel Pass adds for your flight.
+              Source: <a href={DOT_AIR_FORM_PAGE} target="_blank" rel="noopener" style={{ color: tokens.navy, fontWeight: 700 }}>U.S. Department of Transportation</a>. Prefer to fill in the form yourself? <a href="/service-dog/dot-form" style={{ color: tokens.navy, fontWeight: 700 }}>Here&apos;s how</a>. Airlines can also have their own steps, which your Travel Pass adds for your flight.
             </p>
           </div>
         </section>

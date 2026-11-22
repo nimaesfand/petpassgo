@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { tokens, font } from "../../lib/theme";
 import { pingSaved } from "../SavedToast";
@@ -39,6 +39,33 @@ export default function TrainingCard({ pet, userId, onChanged }) {
   const [busy, setBusy] = useState(false);
 
   const name = pet.name || "your dog";
+  const [member, setMember] = useState(null);
+  const [dotBusy, setDotBusy] = useState("");
+  const [dotMsg, setDotMsg] = useState("");
+  useEffect(() => { supabase.rpc("my_membership").then(({ data }) => setMember(!!data)); }, []);
+
+  async function getDot(deliver) {
+    setDotBusy(deliver); setDotMsg("");
+    try {
+      const { data } = await supabase.auth.getSession();
+      const r = await fetch("/api/dot-form", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": data?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id, kind: "air", deliver }) });
+      if (deliver === "email") {
+        const j = await r.json().catch(() => ({}));
+        setDotMsg(r.ok ? "Sent. Check your email." : j.error || "Couldn't send it. Try downloading instead.");
+      } else if (r.ok) {
+        const blob = await r.blob();
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob); a.download = `DOT-Service-Animal-Form-${(pet.name || "dog").replace(/[^A-Za-z0-9]+/g, "-")}.pdf`;
+        document.body.appendChild(a); a.click(); a.remove();
+        setDotMsg("Downloaded. Check each box yourself, then sign and date it.");
+      } else {
+        const j = await r.json().catch(() => ({}));
+        setDotMsg(j.error || "Couldn't make the form. Try again.");
+      }
+    } catch { setDotMsg("Couldn't make the form. Try again."); }
+    setDotBusy("");
+  }
+  const toDocs = () => window.dispatchEvent(new CustomEvent("ppg-pet-section", { detail: { petId: pet.id, section: "docs" } }));
   const toggle = (list, set, k) => set(list.includes(k) ? list.filter((x) => x !== k) : [...list, k]);
   const options = levelsFor(pet.animal_type, isService || signing ? "Service animal" : pet.role);
 
@@ -108,6 +135,22 @@ export default function TrainingCard({ pet, userId, onChanged }) {
             <>
               <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 800, color: "#0F5E58" }}>✓ Service dog statement signed {fmt(pet.service_attested_at)}</div>
               {t.tasks?.length ? <p style={hint}><b style={{ color: tokens.navy }}>Tasks:</b> {tasksLine(t.tasks)}{t.show_tasks ? " (shown on the passport)" : " (kept private)"}</p> : null}
+              <div className="rounded-2xl p-4 grid gap-2" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+                <div style={{ fontFamily: font.display, fontSize: 17, fontWeight: 800, color: tokens.navy }}>{name}&apos;s DOT Service Animal form</div>
+                {member ? (
+                  <>
+                    <p style={hint}>Filled in from {name}&apos;s passport for every trip. You check each box, then sign and date it. Airlines can ask for it once per trip, up to 48 hours before you fly.</p>
+                    <div className="flex flex-wrap gap-3 mt-1">
+                      <button type="button" disabled={!!dotBusy} onClick={() => getDot("download")} className="ppg-btn ppg-btn-primary">{dotBusy === "download" ? "Making it…" : "Download the form"}</button>
+                      <button type="button" disabled={!!dotBusy} onClick={() => getDot("email")} className="ppg-btn ppg-btn-secondary">{dotBusy === "email" ? "Sending…" : "Email it to me"}</button>
+                    </div>
+                    {dotMsg ? <p role="status" style={{ ...hint, color: tokens.navy, fontWeight: 700 }}>{dotMsg}</p> : null}
+                    <p style={hint}>Signed it? <button type="button" onClick={toDocs} style={{ color: tokens.navy, fontWeight: 700, background: "none", border: "none", padding: 0, textDecoration: "underline", cursor: "pointer", font: "inherit" }}>Add a photo of it to Docs</button> so it shows in Gate Ready at the airport.</p>
+                  </>
+                ) : member === false ? (
+                  <p style={hint}>With Pet Vault, we fill this form in from {name}&apos;s passport for every trip. <a href="/join" style={{ color: tokens.navy, fontWeight: 700 }}>Unlock it</a>, or <a href="/service-dog/dot-form" style={{ color: tokens.navy, fontWeight: 700 }}>fill in the blank form yourself</a>.</p>
+                ) : null}
+              </div>
               <div className="flex flex-wrap gap-3">
                 <button type="button" onClick={() => { setSigning(true); setTasks(t.tasks || []); }} className="ppg-btn ppg-btn-secondary">Sign again with changes</button>
                 <button type="button" onClick={withdraw} style={{ fontFamily: font.body, fontWeight: 700, color: tokens.muted, background: "none", border: "none", textDecoration: "underline", cursor: "pointer" }}>Withdraw statement</button>

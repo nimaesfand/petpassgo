@@ -1118,7 +1118,11 @@ function AccountMenu({ onLogout }) {
 // After a free easy-trip unlock: the checklist is below; Pet Vault is the next step.
 function FreeTripWelcome({ onClose }) {
   const [member, setMember] = useState(null);
-  useEffect(() => { supabase.rpc("my_membership").then(({ data }) => setMember(!!data)); }, []);
+  const [petName, setPetName] = useState("");
+  useEffect(() => {
+    supabase.rpc("my_membership").then(({ data }) => setMember(!!data));
+    supabase.from("pets").select("name").order("created_at").limit(1).then(({ data }) => setPetName(data?.[0]?.name || ""));
+  }, []);
   return (
     <div role="status" className="rounded-2xl mb-6 overflow-hidden ppg-rise" style={{ background: "#fff", border: `1px solid ${tokens.green}` }}>
       <div className="p-4 flex items-start gap-3">
@@ -1130,15 +1134,13 @@ function FreeTripWelcome({ onClose }) {
       </div>
       {member === false ? (
         <div className="px-4 pb-4">
-          <div className="rounded-xl p-4" style={{ background: tokens.navy, color: "#fff" }}>
-            <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 800, lineHeight: 1.2 }}>Keep your pet ready for every trip</div>
-            <ul className="mt-2 mb-3 flex flex-col gap-1.5" style={{ fontFamily: font.body, fontSize: 14.5, lineHeight: 1.4, color: "rgba(255,255,255,.9)" }}>
-              {["Vaccines confirmed by your vet, not just typed in", "A pet passport with travel mode for the airport", "Reminders before shots and papers expire", "Lost-pet QR tag and alerts"].map((t) => (
-                <li key={t} className="flex items-start gap-2"><span style={{ color: "#7FD3A0", marginTop: 1 }}><Icon name="check" size={15} /></span>{t}</li>
-              ))}
-            </ul>
-            <a href="/join" className="block text-center rounded-full py-3" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 15.5, textDecoration: "none" }}>Try Pet Vault · {P.member}/mo</a>
-            <div className="mt-1.5 text-center" style={{ fontFamily: font.body, fontSize: 12.5, color: "rgba(255,255,255,.7)" }}>Cancel anytime.</div>
+          <div className="rounded-xl p-4 flex gap-3 items-start" style={{ background: tokens.navy, color: "#fff" }}>
+            <div className="flex-shrink-0 rounded-full overflow-hidden" style={{ width: 52, height: 52, border: `2.5px solid ${tokens.gold}` }}><img src="/images/hero-golden-retriever.jpg" alt="Benny, the PetPassGo guide" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "62% 22%" }} /></div>
+            <div className="min-w-0 flex-1">
+              <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 800, lineHeight: 1.25 }}>{petName ? `Want this saved in ${petName}'s passport?` : "Want this checklist saved in your pet's passport?"}</div>
+              <p className="mt-1.5" style={{ fontFamily: font.body, fontSize: 14.5, lineHeight: 1.45, color: "rgba(255,255,255,.9)" }}>With a reminder before the flight, and everything on one screen at the gate. Pet Vault, {P.member} a month. Cancel anytime.</p>
+              <a href={petName ? "/join" : "/passport/create"} className="mt-3 block text-center rounded-full py-3" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 15.5, textDecoration: "none" }}>{petName ? `Unlock ${petName}'s full passport` : "Make your pet's passport"}</a>
+            </div>
           </div>
         </div>
       ) : null}

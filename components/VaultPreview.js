@@ -27,6 +27,8 @@ function toneColor(t) {
   return tokens.muted;
 }
 
+const BENNY_PHOTO = <img src="/images/hero-golden-retriever.jpg" alt="Benny" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "62% 22%" }} />;
+
 export default function VaultPreview() {
   const [qr, setQr] = useState("");
   const [lost, setLost] = useState(false);
@@ -44,12 +46,13 @@ export default function VaultPreview() {
         <div className="absolute z-10" style={{ left: 14, top: -10 }}><SampleChip /></div>
         <PetPassport
           pet={SAMPLE_PET}
+          photo={BENNY_PHOTO}
           sample
           qr={qr ? <img src={qr} alt="Sample QR code" width={108} height={108} /> : <div className="ppg-shimmer rounded-md" style={{ width: 108, height: 108 }} />}
           chipValue="On file"
         />
         <button type="button" onClick={() => setDemo(new Date().toISOString())} className="ppg-btn ppg-btn-secondary mt-3">See a passport come together</button>
-        {demo ? <PassportReveal pet={SAMPLE_PET} issuedAt={demo} onClose={() => setDemo(null)} /> : null}
+        {demo ? <PassportReveal pet={SAMPLE_PET} photo={BENNY_PHOTO} issuedAt={demo} onClose={() => setDemo(null)} /> : null}
       </div>
 
       <div className="rounded-2xl p-4 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>

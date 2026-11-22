@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { allowRequest, clientIp } from "../../../lib/rateLimit";
 import { requireUser } from "../../../lib/paidUser";
 import { animalDescription, fillAirTransportationForm, fillReliefForm, isServiceTrip } from "../../../lib/dotForm";
-import { sendResendEmail } from "../../../lib/serverEmail";
+import { sendResendEmail, serviceClient } from "../../../lib/serverEmail";
+import { isMember } from "../../../lib/stripeServer";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -20,13 +21,27 @@ export async function POST(req) {
 
     const body = await req.json().catch(() => ({}));
     const tripId = String(body.trip_id || "");
-    if (!/^[0-9a-f-]{36}$/i.test(tripId)) return NextResponse.json({ error: "Missing trip." }, { status: 400 });
-    const { data: trip } = await sb.from("trips").select("id,paid,role,animal_type,origin,destination,travel_date,pet_id").eq("id", tripId).eq("user_id", user.id).maybeSingle();
-    if (!trip?.paid) return NextResponse.json({ error: "The DOT form is on a paid Travel Pass." }, { status: 403 });
-    if (!isServiceTrip(trip)) return NextResponse.json({ error: "The DOT form is for a service-dog Travel Pass." }, { status: 403 });
-
+    const petId = String(body.pet_id || "");
+    let trip = null;
     let pet = null;
-    if (trip.pet_id) {
+    if (/^[0-9a-f-]{36}$/i.test(tripId)) {
+      const { data } = await sb.from("trips").select("id,paid,role,animal_type,origin,destination,travel_date,pet_id").eq("id", tripId).eq("user_id", user.id).maybeSingle();
+      trip = data;
+      if (!trip?.paid) return NextResponse.json({ error: "The DOT form is on a paid Travel Pass." }, { status: 403 });
+      if (!isServiceTrip(trip)) return NextResponse.json({ error: "The DOT form is for a service-dog Travel Pass." }, { status: 403 });
+    } else if (/^[0-9a-f-]{36}$/i.test(petId)) {
+      // Pet Vault members with a signed service dog statement: filled in from the passport, any trip.
+      const { data } = await sb.from("pets").select("id,name,breed,animal_type,sex,weight_lb,handler_name,vet_name,vet_phone,training,role,service_attested_at").eq("id", petId).eq("user_id", user.id).maybeSingle();
+      if (!data) return NextResponse.json({ error: "Pet not found." }, { status: 404 });
+      if (!data.service_attested_at || data.animal_type !== "Dog") return NextResponse.json({ error: "Sign the service dog statement in the passport first." }, { status: 403 });
+      if (!(await isMember(serviceClient(), user.id))) return NextResponse.json({ error: "The filled-in DOT form is part of Pet Vault.", need: "vault" }, { status: 402 });
+      pet = data;
+      trip = { travel_date: /^\d{4}-\d{2}-\d{2}$/.test(body.flight_date || "") ? body.flight_date : "", origin: clip(body.origin, 8).toUpperCase(), destination: clip(body.destination, 8).toUpperCase() };
+    } else {
+      return NextResponse.json({ error: "Missing trip." }, { status: 400 });
+    }
+
+    if (!pet && trip.pet_id) {
       const { data } = await sb.from("pets").select("id,name,breed,animal_type,sex,weight_lb,handler_name,vet_name,vet_phone,training").eq("id", trip.pet_id).eq("user_id", user.id).maybeSingle();
       pet = data;
     }
@@ -69,7 +84,7 @@ export async function POST(req) {
           "Before you send it to your airline:",
           "1. Read and check each attestation box yourself.",
           "2. Sign and date it.",
-          "3. Send it the way your airline asks (your Travel Pass shows how).",
+          "3. Send it to your airline the way it asks: online up to 48 hours before, or at the gate if you booked within 48 hours. Your Travel Pass shows your airline's exact steps.",
           "",
           "PetPassGo fills in your details only. We never check the boxes or sign for you.",
           "",
