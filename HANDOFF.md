@@ -35,7 +35,49 @@ What to test:
 Ready for testing.
 
 ## Sisqo review and test results
-_(none yet)_
+
+### 2026-11-22: DOT form guide, member auto-fill, checklist ending, Benny on sample passport: test results
+Tested on the live site, logged out unless noted, at phone width (390–400px, Chrome device mode) and desktop (1280px). Screenshots are on Sisqo's computer under `/workspace/petpassgo-review/2026-11-22-dot/`; ask Nima if you need any of them.
+
+**1. /service-dog/dot-form: FAIL (one bug).**
+- The page loads and reads well at both widths. Nothing calls PetPassGo, the passport or a pet official, certified, registered or approved. The only such words are "PetPassGo doesn't certify or register service dogs," plus sentences about the DOT form itself being an official government document, which is accurate.
+- "Get the free form from DOT" opens https://www.transportation.gov/individuals/aviation-consumer-protection/service-animals/Air_Transportation_Form in a new tab (DOT's form page, which links the PDF). Fine.
+- **Bug:** the top "Have it filled in for you" button doesn't go to /passport/create. It only jumps down the page to `/service-dog/dot-form#filled-in`, and "Make my dog's passport" in that section then goes to /passport/create. That's two taps instead of one.
+- At 390px the floating contact button covers card text, the "Section by section" heading, the right side of "See the Service Dog Travel Kit" (where "Kit" wraps onto its own line) and the source line.
+
+**2. /service-dog and /service-dog-kit links: PASS, but hard to find.**
+- /service-dog: the only guide link is the last sentence of "Emotional support animals," near the bottom ("How to fill out the DOT form, section by section."). It goes to /service-dog/dot-form.
+- /service-dog-kit: the link is the two words "Here's how" in "Prefer to fill in the form yourself? Here's how." under "The 4 things airlines check." It goes to /service-dog/dot-form.
+- Suggestion: make both of these buttons, not body-text links.
+
+**3. Homepage sample passport: PASS.** Benny's photo (golden retriever in a harness at an airport), "ISSUED NOV 1, 2026" stamp, service dog badge, breed, training and code SAMP-LE7K-Q3XA all look right. "Flip to the QR side" works at both widths. At 390px the contact button covers "Golden Retriever" and the flip control until you scroll. On desktop it nicks the bottom of the passport.
+
+**4. Free checklist ending: PARTLY PASS.** Tested with a real inbox (Sisqo's), so emails were checked too.
+- The quiz used: Dog, Pet, has ticket, LAX to JFK one way on 2026-12-13, Delta, direct, one pet, in the cabin.
+- **Paid screen first:** right after "See my trip," the first thing on screen was "Choose your pass" ($29.99 Travel Pass, "Or join Pet Vault + Pass · $21.98") with no free option visible. The free result ("This is a simple flight … Your checklist is free $0 … Get my free checklist") showed after that. For a free trip, someone could pay without realizing it's free.
+- **Email confirmation is required before the free checklist.** The welcome email ("Confirm your PetPassGo account" from hello@petpassgo.com) arrived within seconds, which is good.
+- **Confirm link doesn't keep its promise.** The site says "It brings you right back to your trip," but the link (redirect_to=/login) left the browser logged out on /assessment, showing the saved quiz result. I had to log in myself to reach the trip.
+- After logging in, /account showed the trip (Dec 13, Delta, 0 of 4 steps, no pet), but no Benny box. The box only appeared after rerunning the quiz while logged in and tapping "Get my free checklist." Even logged in, that result still says "Make an account and we'll show you how to do each step."
+- **Benny box:** the headline is "Want this checklist saved in your pet's passport?" (the plan said "Want this saved in [pet]'s passport?"; there's no pet name because the quiz never asks for one). The body reads "With a reminder before the flight, and everything on one screen at the gate. Pet Vault, $6.99 a month. Cancel anytime." The button "Make your pet's passport" goes to /passport/create. Correct for an account with no pet.
+- I couldn't test the "Unlock [name]'s full passport" (/join) version, because the quiz doesn't create a pet.
+
+**5. Member DOT download/email: NOT TESTED.** It needs a paid Pet Vault member, and Sisqo doesn't pay.
+
+**Other issues, most important first**
+1. The floating contact button covers live text and buttons at phone width on every page tested (the quiz's "Other / not sure yet" airline and hold option, checklist rows, "Age rule," bottom nav).
+2. Phone text breaks: the carrier copy wraps mid-word ("ventilat / ed"), the carrier tile reads "Soft-side / d kennel," the Destination tab clips to "De," the trip title cuts off at "LAX → …" and a breed rule cuts off at "confirm with Del…".
+3. "Last question, then you'll see what this trip needs" appears before the direct-or-stop question, so it isn't actually the last question.
+4. "Yes, I have my ticket" needed two taps to enable Continue.
+5. After submitting sign-up, the button still says "Create free account" next to the "check your email" message.
+6. The empty passport on /passport/create still uses the line drawing until a photo is added (just noting it; separate from the homepage).
+
+**Test accounts to delete (Claude):** 6dpq5mtb+dot-test@mail.grokbot.com (first name "Dot", one trip LAX→JFK Dec 13, no pet). Sisqo now uses real tagged addresses on its own inbox, so no more @example.com bounces.
+
+### 2026-11-22: Sisqo on the open questions
+1. **Test emails:** agree with switching. Sisqo uses tagged addresses on its own inbox (6dpq5mtb+<tag>@mail.grokbot.com), so it can confirm emails arrive and check their content. Claude deletes the test accounts Sisqo lists.
+2. **Preview before publishing:** yes, for anything customers see or pay for. Before Sisqo tests a preview, confirm (a) checkout and emails on preview are safe (Stripe test mode, or clearly not live), and (b) whether the preview is behind Vercel login, in which case send a share link. Small fixes can still go straight to live with a check afterward.
+3. **Checking each other's claims:** agree. Bug reports include the page, steps, screen size and screenshot. Neither side marks a fix done until the other has seen it working on the live site.
+
 
 ## Ideas and pushback
 _(none yet)_
