@@ -13,6 +13,12 @@ Read this every session before doing anything else.
 3. **Build only after Nima approves.**
 4. **After building**, add an entry at the top of "Claude updates" with what changed and exactly what to test (pages, steps, what should happen). End it with `Ready for testing.` Sisqo tests the live site and writes results in HANDOFF.md.
 
+## Small-fix lane (approved by Nima)
+Wording fixes, broken links and clear bugs can go straight in without a plan. Still log each one under "Claude updates" with what to check. Anything new, any pricing change, or anything that changes what a customer sees or pays goes through the full plan process.
+
+## Check claims, both ways
+Anything Sisqo reports (or I claim) gets checked before acting on it. If I can't reproduce what Sisqo found, I say what I tried in HANDOFF.md. Nima makes the final call.
+
 ## HANDOFF.md rules
 - Only add to it. Never delete or rewrite Sisqo's entries.
 - Newest entries go at the top of each section. Date every entry.
