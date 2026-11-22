@@ -61,7 +61,7 @@ export default function CreatePassport() {
   useEffect(() => {
     try {
       const s = JSON.parse(localStorage.getItem(KEY) || "null");
-      if (s?.f) { setF((x) => ({ ...x, ...s.f })); if (s.photo) setPhoto(s.photo); if (s.done) setDone(s.done); setStep(s.done ? 99 : Math.min(s.step || 0, 6)); }
+      if (s?.f) { const clean = Object.fromEntries(Object.entries(s.f).map(([k, v]) => [k, typeof v === "string" ? v : ""])); setF((x) => ({ ...x, ...clean })); if (s.photo) setPhoto(s.photo); if (s.done) setDone(s.done); setStep(s.done ? 99 : Math.min(s.step || 0, 6)); }
     } catch {}
     loaded.current = true;
   }, []);
@@ -150,7 +150,7 @@ export default function CreatePassport() {
   if (step === 3) q = (
     <form onSubmit={(e) => { e.preventDefault(); go(4); }}>
       <BennySays sub="Mixed or not sure? Just type what you think.">What kind of {kind} is {name}?</BennySays>
-      <div className="mt-6"><BreedInput value={f.breed} onChange={set("breed")} animal={f.animal_type || "Dog"} style={big} placeholder="Like Dachshund or Mixed" aria-label="Breed" /></div>
+      <div className="mt-6"><BreedInput value={f.breed} onChange={(e) => set("breed")(e?.target ? e.target.value : String(e || ""))} animal={f.animal_type || "Dog"} style={big} placeholder="Like Dachshund or Mixed" aria-label="Breed" /></div>
       <div className="mt-5 flex flex-wrap gap-3"><BigButton type="submit">Next</BigButton></div>
     </form>
   );
