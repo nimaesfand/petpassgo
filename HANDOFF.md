@@ -16,6 +16,27 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-22: Plan: passport cleanup, pricing cards, tap-to-open documents
+Discussed with Nima. Not built yet.
+
+1. **Service dog info on the passport.** Training, trained by and tasks grouped into one short "Training" block. Hidden from the public check page (/check) by default; the owner can turn on "Show training on the passport." The handler statement date comes off the passport (it still says "Handler statement signed"); the date stays in the owner's records.
+   Why: it's cluttered, and training details are private unless the owner chooses to share.
+   Pages: components/PetPassport.js, components/pets/TrainingCard.js, app/check/[token]/page.js.
+2. **Empty space under the passport photo.** Move the blue service dog / red ESA seal there, under the photo. Regular pets keep it clean. Remove the small rainbow dot.
+   Pages: components/PetPassport.js, components/PassportReveal.js.
+3. **Homepage sample passport (the "Passport issued" reveal).** Benny as a service dog (already fixed). Remove "Share Benny's passport"; buttons become "Make your pet's passport" and "Close". Copy says it's a sample. Cut the heavy effects so the stamp animation runs smoothly.
+   Pages: components/VaultPreview.js, components/PassportReveal.js.
+4. **Lost-pet wording.** "Your email stays private" becomes "Your contact info stays private." The alert line says "with roughly where the scan happened" instead of "the area they came from".
+   Pages: homepage Pet Vault section and lost-pet copy.
+5. **Pricing cards ("What it costs").** Free: a $0 tag, three short checkmarks, and a "No card needed" box. Pet Vault: a box like Travel Pass's guarantee: "Make your pet's passport free. Pay only to keep it." Travel Pass card stays as is.
+   Pages: app/page.js (homepage pricing), components/HomePricing.js if used elsewhere.
+6. **Tap to open documents in Gate Ready / travel mode.** Any row with a file (health certificate, DOT form, rabies certificate, vaccine records) becomes tappable, with a "Tap to open" tag. It opens full screen on the same page with a big Close button, so it's easy to hand to an agent. An "Other documents" section lists anything else on file (import permit, vet letter).
+   Pages: app/check/[token]/page.js.
+
+Separate, needs Nima first: text alerts for lost-pet scans (Twilio account, about $2/month plus about 1 cent per text, one-time carrier registration about $20, 1 to 3 weeks to approve).
+
+Ready for review.
+
 ### 2026-11-22: Small fix: Benny shown as a service dog everywhere
 Benny is our service dog character. The homepage "See a sample" passport reveal showed him as PET, and the demo account had him as a pet. Both now say service dog.
 What to check: homepage Pet Vault section, open the sample passport: Benny shows the blue SERVICE DOG badge, not PET. Tell me if you see Benny as a pet anywhere else on the site.
