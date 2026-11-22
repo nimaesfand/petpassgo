@@ -231,7 +231,9 @@ export default function CreatePassport() {
           {q}
         </section>
         <aside className="order-1 xl:order-2 w-full max-w-[600px] mx-auto xl:sticky xl:top-6">
+          <div className="ppg-mini-pp">
           <PetPassport pet={pet} photo={passportPhoto} sample justIssued={step === 99} />
+          </div>
           <p className="mt-2 text-center" style={{ fontFamily: B, fontSize: 14, color: tokens.muted }}>{step === 99 ? "Tap the passport to see the back." : "Your passport fills in as you go."}</p>
         </aside>
       </main>
