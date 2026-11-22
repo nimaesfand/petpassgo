@@ -29,7 +29,7 @@ const LOCKED = [
 // The pages inside the passport that Pet Vault unlocks.
 export function LockedPages({ name }) {
   return (
-    <div className="grid sm:grid-cols-2 gap-3">
+    <div className="grid gap-2.5">
       {LOCKED.map(([t, b]) => (
         <div key={t} className="rounded-2xl px-4 py-3.5 flex gap-3 items-start" style={{ background: "#FBF7EE", border: "1px solid #E6DCC6" }}>
           <span aria-hidden="true" className="flex-shrink-0 flex items-center justify-center rounded-full" style={{ width: 34, height: 34, background: tokens.navy, color: tokens.gold }}>

@@ -215,7 +215,7 @@ export default function CreatePassport() {
   return (
     <div style={{ background: tokens.sky, minHeight: "100vh" }}>
       <SiteHeader />
-      <main className="max-w-[1180px] mx-auto px-4 sm:px-6 py-6 sm:py-10 grid lg:grid-cols-[minmax(0,1fr)_minmax(520px,600px)] gap-6 lg:gap-12 items-start">
+      <main className="max-w-[1180px] mx-auto px-4 sm:px-6 py-6 sm:py-10 grid lg:grid-cols-[minmax(380px,1fr)_minmax(460px,560px)] gap-6 lg:gap-10 items-start">
         <section className="order-2 lg:order-1 min-w-0" aria-live="polite">
           {step > 0 && step < 99 ? (
             <div className="flex items-center justify-between mb-4">
