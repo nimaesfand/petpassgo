@@ -22,7 +22,7 @@ export const NAV_LINKS = [
 const GUEST_MAIN = [
   { href: "/travel-pass", label: "Travel Pass", icon: "plane", sub: "Everything for one trip" },
   { href: "/pet-vault", label: "Pet Vault", icon: "shield", sub: "Records, reminders, lost-pet help" },
-  { href: "/pet-vault#pet-id", label: "Pet Passport", icon: "tag", sub: "Their passport, with a QR that helps them get home" },
+  { href: "/passport/create", label: "Pet Passport", icon: "tag", sub: "Make your pet\u2019s passport free, in a minute" },
   ...(DISCOVER ? [{ href: "/discover", label: "Discover", icon: "pin", sub: "Pet-friendly places" }] : []),
   { href: "/airlines", label: "Airlines", icon: "file", sub: "Pet rules by airline" },
 ];

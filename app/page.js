@@ -39,7 +39,7 @@ const QR_STEPS = [
 const PRICE_CARDS = [
   { title: "Free checklist", sub: "For simple flights", price: "Free", unit: "with an account", body: "Small pets in the cabin on U.S. flights with one airline. Your full checklist, free.", cta: "Check my flight", href: "/assessment", bordered: true },
   { title: "Travel Pass", sub: "For flights that need paperwork", price: P.pass, unit: `per trip, or ${P.memberPass} with Pet Vault`, body: "Mexico, Canada and Hawaii, service dogs, pets flying as cargo, and trips that switch airlines. Your exact dates, reminders, forms filled in, and a check that your pet's vaccines and certificates are valid for the trip. One price covers the round trip, for up to 2 pets.", guarantee: true, cta: "Plan my pet's trip", href: "/assessment", dark: true },
-  { title: "Pet Vault", sub: "Your pet's passport and records", price: P.member, unit: "a month", body: `Your pet's passport, vet-confirmed records, travel mode, reminders and lost pet alerts. Travel Passes are ${P.memberPass} for members. Cancel anytime.`, cta: "Make their passport", href: "/join", accent: true, tag: "Best for records and frequent travel" },
+  { title: "Pet Vault", sub: "Your pet's passport and records", price: P.member, unit: "a month", body: `Your pet's passport, vet-confirmed records, travel mode, reminders and lost pet alerts. Travel Passes are ${P.memberPass} for members. Cancel anytime.`, cta: "Make their passport", href: "/passport/create", accent: true, tag: "Best for records and frequent travel" },
 ];
 
 const HOME_FAQ = [FAQ[1], FAQ[3], FAQ[2], FAQ[4]];
@@ -145,7 +145,7 @@ export default async function PetPassGoLanding() {
               ))}
             </ul>
             <div className="flex flex-wrap items-center gap-x-5">
-              <a href="/join" className="mt-6 inline-flex items-center justify-center rounded-full px-8 min-h-[54px]" style={{ background: "#fff", color: tokens.navy, fontFamily: B, fontWeight: 800, fontSize: 16.5, textDecoration: "none" }}>Make your pet&apos;s passport</a>
+              <a href="/passport/create" className="mt-6 inline-flex items-center justify-center rounded-full px-8 min-h-[54px]" style={{ background: "#fff", color: tokens.navy, fontFamily: B, fontWeight: 800, fontSize: 16.5, textDecoration: "none" }}>Make your pet&apos;s passport, free</a>
               <TravelModeDemo />
             </div>
           </div>
