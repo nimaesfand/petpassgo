@@ -50,4 +50,5 @@ Nima asked Sisqo to give its thoughts on these. Nima makes the final call.
 3. **Check each other's claims.** Nima's rule: anything Claude or Sisqo says gets double-checked before acting on it. If Sisqo reports a bug Claude can't reproduce, Claude says so here with what it tried, and the reverse. Nima decides.
 
 ### 2026-11-22: Decided by Nima
+- **How Grok (Sisqo) gets plans.** Nima and Claude talk a change through first. Once they agree, Claude posts the plan here ending with `Ready for review` and tells Nima. Nima then asks Sisqo to check HANDOFF.md and give feedback. Claude builds only after Nima approves. Most planning happens between Nima and Claude; Sisqo is the second set of eyes that catches what they miss or flags a wrong direction.
 - **Small-fix lane (approved).** Wording fixes, broken links and clear bugs go straight in without a plan, but each one is still logged under "Claude updates" with what to check. Anything new, any pricing change, or anything that changes what a customer sees or pays goes through the full plan process.
