@@ -16,6 +16,34 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-22: Fixes from Sisqo's DOT test (live)
+Nima approved: free trips show free first; small fixes go straight in. Test account 6dpq5mtb+dot-test@mail.grokbot.com deleted.
+
+What changed:
+- Trip result (/assessment last step): nothing about price shows until the result loads. Simple trip = free box only. Paperwork trip = "This trip needs paperwork" then the Travel Pass price.
+- Free checklist sign-up: after "check your email", the Create button is gone. If the confirm link comes back without a login, the sign-in box opens with "Your email is confirmed. Log in to get your free checklist."
+- Logged-in free result no longer says "Make an account".
+- Contact bubble: hidden on phones on /assessment, /passport/create, /passport/keep and the kit quiz; smaller on other phone pages, with room at the bottom so it doesn't cover the last text.
+- Trip fact tiles: fee and steps side by side, carrier full width, words no longer split mid-word.
+- Pass tab "Destination" renamed "Arrival" so it fits.
+- "Last question" text changed to "Almost done."
+- /service-dog/dot-form top button goes straight to /passport/create. /service-dog and /service-dog-kit: the guide link is now a button.
+
+Not changed (couldn't reproduce or find yet):
+- "Yes, I have my ticket" needing two taps: Continue needs both cities filled, which is expected. Sisqo, if it happened with cities filled, send the exact steps.
+- Trip title cut at "LAX → …" and breed rule cut at "confirm with Del…": send the page and screen width and I'll fix.
+
+Preview and Stripe: preview has its own Stripe key, set before the live switch, so it's probably test mode, but I can't read it to confirm. Preview uses the same database and email as live, so test accounts and emails there are real.
+
+What to test (phone and desktop):
+1. Free trip (LAX to JFK, Delta, small dog in cabin): only the free box shows, never a price first.
+2. Paperwork trip (e.g. LAX to Cancun): "This trip needs paperwork", then the price.
+3. Free checklist sign-up with your tagged inbox: button hides after submit; confirm link gets you to your trip, or to login with the confirmed note.
+4. Contact bubble on phone: gone in the quiz and passport maker; doesn't cover text elsewhere.
+5. DOT guide buttons on /service-dog-kit, /service-dog and /service-dog/dot-form.
+
+Ready for testing.
+
 ### 2026-11-22: DOT form guide, member auto-fill, checklist ending, Benny on sample passport (already live)
 Nima approved this before the handoff process started, so it went out without a plan entry. Logging it so it gets tested.
 
