@@ -91,6 +91,30 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-22: Fixes from Sisqo's DOT test + Benny as service dog: test results
+Tested live (www.petpassgo.com), logged out unless noted, at phone width (~390px, Chrome device mode) and desktop (1280px). Screenshots on Sisqo's computer under `/workspace/petpassgo-review/2026-11-22-fixes/`. No payment made.
+
+**1. Free trip (LAX→JFK, Delta, one way, 2026-12-13, one dog, cabin): PASS.** Result opens with only the green "This is a simple flight" box; no "Choose your pass" or price above it. "$0 Your checklist is free" sits below the trip card. Step 6 now reads "Almost done. Then you'll see what this trip needs." Title wraps cleanly at 390px ("Los Angeles → / New York / Delta"), no "LAX → …" or "Del…". Carrier copy and fee/steps/carrier tiles no longer split mid-word. This result has no Pass tab, so the "Arrival" rename wasn't visible here.
+- "Yes, I have my ticket": one tap works, with or without cities filled. The earlier two-tap report was a missed tap: the card shifts when a choice changes, so a quick second tap can land on the wrong spot. Not a bug; closing it.
+
+**2. Paperwork trip (LAX→CUN, Delta, cabin): PASS.** "Yes, your dog can fly this trip", then the trip card (Los Angeles → Cancún, Delta), then "This trip needs paperwork", then Travel Pass $29.99 and "Or join Pet Vault + Pass · $21.98".
+
+**3. Free checklist sign-up: FAIL (trip lost).**
+- PASS: after submit the "Create free account" button is gone; banner says "Check your email… It brings you right back to your trip." Confirm email arrived from hello@petpassgo.com.
+- FAIL: the confirm link (redirect_to=https://www.petpassgo.com/login) landed on `/login#`, logged out, with the plain "Welcome back / Log in to see your pet's profile and trips." The "Your email is confirmed. Log in to get your free checklist." note did not show. The header showed an orange "F" avatar while the form was logged out (inconsistent state).
+- FAIL: after logging in, /account showed "Good afternoon, Fix", no pet, and **no trip, no free checklist, no Benny box**. Travel tab: "No trip yet". Opening /assessment restarted at Step 1 of 6. So the LAX→JFK trip from before sign-up was not saved to the account. (In the earlier DOT test the trip did save; this looks like a regression from the change.) The promise "brings you right back to your trip" isn't kept.
+- Also: the contact bubble overlaps the lower shortcut cards on /account at 390px.
+
+**4. Contact bubble on phone: PASS.** Hidden on /assessment, /passport/create, /passport/keep and /service-dog-kit/start. Shown and smaller (46×46 vs 56×56 desktop) on homepage, /service-dog, /service-dog/dot-form, /service-dog-kit; at the bottom it no longer covers the last line. Mid-page it still floats over content (e.g. lower edge of Benny's passport), and on /account it covers shortcut cards.
+
+**5. DOT guide buttons: PASS.** /service-dog/dot-form "Have it filled in for you" goes straight to /passport/create in one tap. /service-dog and /service-dog-kit have a pill button "How to fill out the DOT form" to /service-dog/dot-form.
+
+**6. Benny as service dog: PASS.** Homepage flip passport shows the blue SERVICE DOG badge. Also SERVICE DOG on /service-dog-kit; no PET badge found anywhere.
+
+**For Claude, most important first:** (1) pre-sign-up trip not saved after confirm + login, and the confirmed note not showing; (2) "F" avatar showing while logged out on /login; (3) contact bubble over /account shortcut cards on phones.
+
+**Test accounts to delete (Claude):** 6dpq5mtb+fix-test@mail.grokbot.com (first name "Fix", no pet, no trip).
+
 ### 2026-11-22: Plan: passport cleanup, pricing cards, tap-to-open documents: review
 Read against the current code on main and the live homepage (www.petpassgo.com). Direction is good. A few items should change before building. Nima decides.
 
