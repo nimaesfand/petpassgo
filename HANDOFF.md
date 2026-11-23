@@ -16,6 +16,29 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-22: Built: training pick-lists + Sisqo's small fixes (live)
+Nima approved with Sisqo's changes. "Other task" is a checkbox only (they describe it on the airline's form). Test account 6dpq5mtb+build-test@mail.grokbot.com deleted.
+
+What changed:
+1. **Tasks**: 30 specific tasks in 6 groups (Psychiatric, Medical alert, Mobility, Hearing and vision, Autism support, Other), including Sisqo's adds (allergen detection, migraine alert, interrupting PTSD or self-harm behavior, counterbalance). Old saved task groups still count as their group.
+2. **Who trained them**: "I trained them", "A professional trainer" (no name field), or "A service dog program" with a dropdown of the 18 programs (current official names) plus "Another program". No ADI.
+3. **Where**: dropdown of states, DC, Puerto Rico, Canada, Mexico, "Outside North America".
+4. **Public (passport for others, /check)**, only when the owner shares: "Owner says a service dog program trained them" (never the program name), "Trained by: a professional trainer" or "the owner", the state, and task groups only. The owner sees the program name and every task.
+5. **Old typed answers**: kept in the record, shown to the owner only, with a yellow note: "You typed ... before. Only you see that. Pick from the lists above to show it on the passport." Past signed statements are untouched.
+6. **Statement API**: accepts all task keys (no cutoff at 7), requires a program pick when "A service dog program" is chosen, and no longer needs a typed trainer name. The sign button stays off until a task and (if needed) a program are picked.
+7. **DOT form trainer fields**: owner = handler's name; professional trainer = "Professional trainer" (or their old typed name); program = the program's official name; "Another program" = "Service dog program".
+8. **Training levels**: hint added: "This is what you tell us: PetPassGo doesn't test or certify training." CGC label is now "AKC Canine Good Citizen title".
+9. **Small fixes**: /check invalid-link text now says shared codes last 24 hours or until the owner stops sharing. /pet-vault static sample shows "Handler statement signed". Trip header on phones puts the pet name and route on two lines. Pass tabs wrap instead of scrolling, so "Arrival" fits. On phones the contact bubble fades out when it would sit on a button or link, and comes back when it's clear.
+
+What to test:
+1. Phone: homepage, scroll past "Plan my pet's trip": the bubble should fade out while it overlaps the button.
+2. /pet-vault sample: "Handler statement signed" before and after the reveal.
+3. /check/not-a-real-token: new wording.
+4. Training card and statement need a signed-in account with a dog (free account works for the card): pick tasks, program, state; sign; check the passport shows group names only to others. If you can't, skip and say so.
+5. Trip page at 390px (any trip): pet name and route on separate lines, all 5 tabs visible.
+
+Ready for testing.
+
 ### 2026-11-22: Plan: training, trainer and tasks become pick-lists (no free text)
 Discussed with Nima. Not built yet.
 
