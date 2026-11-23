@@ -279,12 +279,12 @@ export default function PetPassGoQuiz() {
     if (!data.user) { trackEvent("free_trip_start", { content_type: "assessment" }); setFreeReturn(autoBuy === "free"); setFreeOpen(true); return; }
     setBuying(true);
     const saved = await saveTripFor(data.user);
-    if (saved.paid) { window.location.href = "/account?free_trip=1"; return; }
+    if (saved.paid) { if (data.user.user_metadata?.pending_trip) await supabase.auth.updateUser({ data: { pending_trip: null } }).catch(() => {}); window.location.href = "/account?free_trip=1"; return; }
     if (saved.error || !saved.trip) { setBuying(false); alert("Sorry, something went wrong saving your trip. Please try again."); return; }
     const { data: s } = await supabase.auth.getSession();
     const r = await fetch("/api/free-trip", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ trip_id: saved.trip.id }) });
     const j = await r.json().catch(() => ({}));
-    if (r.ok && j.ok) { trackEvent("free_trip_unlocked", { content_type: "assessment" }); window.location.href = "/account?free_trip=1"; return; }
+    if (r.ok && j.ok) { trackEvent("free_trip_unlocked", { content_type: "assessment" }); if (data.user.user_metadata?.pending_trip) await supabase.auth.updateUser({ data: { pending_trip: null } }).catch(() => {}); window.location.href = "/account?free_trip=1"; return; }
     setBuying(false);
     if (j.easy === false) { setEasyTrip(false); alert(j.error); return; }
     alert(j.error || "Something went wrong. Please try again.");

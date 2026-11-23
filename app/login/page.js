@@ -15,7 +15,23 @@ export default function LoginPage() {
   const [status, setStatus] = useState("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [mode, setMode] = useState("login");
+  const [checking, setChecking] = useState(true);
+  const [confirmed, setConfirmed] = useState(false);
   useEffect(() => { const e = new URLSearchParams(window.location.search).get("email"); if (e) setEmail(e); }, []);
+  // Already signed in (for example straight from the email confirmation link): carry on, don't show the form.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    if (q.get("confirmed")) setConfirmed(true);
+    if (/type=recovery/.test(window.location.hash)) { setChecking(false); return; }
+    let done = false, recovery = false;
+    const go = () => setTimeout(() => { if (!done && !recovery) { done = true; resumeAfterAuth(); } }, 400);
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") { recovery = true; setChecking(false); return; }
+      if (session && event === "SIGNED_IN") go();
+    });
+    supabase.auth.getSession().then(({ data }) => { if (data?.session) go(); else setTimeout(() => { if (!done) setChecking(false); }, 700); });
+    return () => sub?.subscription?.unsubscribe();
+  }, []);
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") setMode("reset");
@@ -79,7 +95,7 @@ export default function LoginPage() {
           </h1>
           {mode === "login" ? (
             <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-6 text-center">
-              Log in to see your pet's profile and trips.
+              {checking ? "One moment…" : confirmed ? "Your email is confirmed. Log in to pick up where you left off." : "Log in to see your pet's profile and trips."}
             </p>
           ) : <div className="mb-6" />}
 

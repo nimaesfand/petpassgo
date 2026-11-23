@@ -98,6 +98,29 @@ function HoloSeal({ size = 54 }) {
   );
 }
 
+// Training, as one short block. Trainer and tasks show only to the owner, or when the
+// owner turned on "Show training details".
+function trainingText(pet, owner) {
+  const t = pet.training || {};
+  const base = trainingSummary(t) || (pet.trained == null ? "" : pet.trained ? "House trained" : "Not yet");
+  if (!owner && !t.show_tasks) return base;
+  const by = [trainedByLine(t), t.trained_where].filter(Boolean).join(", ");
+  const tasks = pet.service_attested_at && t.tasks?.length ? `Tasks: ${tasksLine(t.tasks)}` : "";
+  return [base, by && `Trained by ${by}`, tasks].filter(Boolean).join(". ");
+}
+
+// Plain role label under the photo. Deliberately simple: no shield, ring or date.
+function RoleLabel({ kind, signed }) {
+  const c = SEALS[kind];
+  const sub = kind === "esa" ? "Flies as a pet" : signed ? "Handler statement signed" : "Statement not signed yet";
+  return (
+    <div className="w-full rounded-lg px-2 py-1.5 text-center" style={{ background: c.soft, border: `1.5px solid ${c.a}` }}>
+      <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.12em", color: c.a, lineHeight: 1.15 }}>{c.title}</div>
+      <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 9.5, color: c.b, lineHeight: 1.25, marginTop: 1 }}>{sub}</div>
+    </div>
+  );
+}
+
 // Role seals. Service dogs (including psychiatric service dogs) get blue; emotional
 // support animals get red, with a reminder that they fly as pets.
 const SEALS = {
@@ -208,8 +231,7 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
     ["Born", [fmtDob(pet.date_of_birth), age && `(${age})`].filter(Boolean).join(" ")],
     ["Weight", pet.weight_lb ? `${pet.weight_lb} lb` : ""],
     ["Color", pet.color],
-    ["Training", trainingSummary(pet.training) || (pet.trained == null ? "" : pet.trained ? "House trained" : "Not yet")],
-    ["Trained by", [trainedByLine(pet.training), pet.training?.trained_where].filter(Boolean).join(", ")],
+    ["Training", trainingText(pet, owner && !sheet)],
     ["Microchip", owner && !sheet ? chipMask(chipValue) : chipValue],
     ["Owner", pet.handler_name],
     ["Issued", pet.passport_issued_at ? fmtDob(String(pet.passport_issued_at).slice(0, 10)) : ""],
@@ -247,10 +269,7 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
                 </button>
               ) : null}
             </div>
-            <div className="flex items-center gap-2">
-              {photo ? <div aria-hidden="true" className="ppg-pp-ghost rounded-md overflow-hidden" style={{ width: 34, height: 42, opacity: 0.22, filter: "grayscale(1) contrast(1.2)", mixBlendMode: "multiply" }}>{photo}</div> : null}
-              <HoloSeal size={40} />
-            </div>
+            {st === STATUS.service || st === STATUS.esa ? <RoleLabel kind={st === STATUS.service ? "service" : "esa"} signed={!!pet.service_attested_at} /> : null}
           </div>
 
           <div className="min-w-0">
@@ -258,7 +277,7 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
               <div className="min-w-0">
                 <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>NAME</div>
                 <h2 className={`ppg-pp-name ${String(pet.name || "").length > 9 ? "is-long" : String(pet.name || "").length > 5 ? "is-mid" : ""}`} style={{ fontFamily: font.display, fontWeight: 800, lineHeight: 1, letterSpacing: "-0.02em", color: tokens.navy, overflowWrap: "break-word" }}>{pet.name}</h2>
-                {st === STATUS.service ? <RoleSeal kind="service" attestedAt={pet.service_attested_at} /> : st === STATUS.esa ? <RoleSeal kind="esa" /> : <span className="inline-block rounded-md px-2 py-0.5 mt-2" style={{ background: st.bg, color: st.fg, fontFamily: font.body, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.14em" }}>{st.label}</span>}
+                {st === STATUS.service || st === STATUS.esa ? null : <span className="inline-block rounded-md px-2 py-0.5 mt-2" style={{ background: st.bg, color: st.fg, fontFamily: font.body, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.14em" }}>{st.label}</span>}
               </div>
               {pet.passport_issued_at ? (
                 <div className="ppg-pp-stampspot2 flex-shrink-0" style={{ mixBlendMode: "multiply", pointerEvents: "none" }}><PassportStamp date={pet.passport_issued_at} size={86} className={justIssued ? "ppg-pp-stamp" : ""} style={{ opacity: 0.9 }} /></div>
@@ -268,8 +287,7 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
             </div>
           </div>
           <div className="ppg-pp-fields pt-3 grid gap-x-4 gap-y-2.5 min-w-0" style={{ borderTop: "1px dashed #D9CDB2" }}>
-            {fields.map(([k, v]) => <Field key={k} k={k} v={v} mono={k === "Microchip"} wide={(k === "Trained by" || k === "Training") && String(v).length > 22} />)}
-            {pet.service_attested_at && pet.training?.show_tasks && pet.training?.tasks?.length ? <Field k="Tasks" v={tasksLine(pet.training.tasks)} wide /> : null}
+            {fields.map(([k, v]) => <Field key={k} k={k} v={v} mono={k === "Microchip"} wide={k === "Training" && String(v).length > 22} />)}
             <RabiesField rabies={rabies} />
           </div>
         </div>

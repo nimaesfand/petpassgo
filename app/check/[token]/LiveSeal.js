@@ -16,7 +16,7 @@ export default function LiveSeal({ expiresAt, travel = false }) {
           <div style={{ fontSize: 22, fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>{time}</div>
         </div>
       </div>
-      <div className="text-right" style={{ fontSize: 13, fontWeight: 700, opacity: 0.9 }}>{left <= 0 ? (travel ? "Closed" : "Link expired") : travel ? `Open for ${left >= 60 ? `${Math.floor(left / 60)} hr` : `${left} min`}` : `Link expires in ${left} min`}</div>
+      <div className="text-right" style={{ fontSize: 13, fontWeight: 700, opacity: 0.9 }}>{left <= 0 ? (travel ? "Closed" : "Link expired") : travel ? "Open for your trip" : `Link expires in ${left} min`}</div>
     </div>
   );
 }

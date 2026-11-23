@@ -52,7 +52,7 @@ export default function VaultPreview() {
           chipValue="On file"
         />
         <button type="button" onClick={() => setDemo(new Date().toISOString())} className="ppg-btn ppg-btn-secondary mt-3">See a passport come together</button>
-        {demo ? <PassportReveal pet={SAMPLE_PET} photo={BENNY_PHOTO} issuedAt={demo} onClose={() => setDemo(null)} /> : null}
+        {demo ? <PassportReveal sample pet={SAMPLE_PET} photo={BENNY_PHOTO} issuedAt={demo} onClose={() => setDemo(null)} /> : null}
       </div>
 
       <div className="rounded-2xl p-4 mb-3" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>

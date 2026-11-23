@@ -197,6 +197,7 @@ export default function LostPanel({ pet, userId, onChanged }) {
             Post to the {form.city.trim() || "local"} Lost &amp; found board
           </label>
         )}
+        <p style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted, lineHeight: 1.45 }}>While {pet?.name || "your pet"} is marked lost, we email you each time someone scans the tag or opens the poster, with the approximate city (it can be off). Your contact info stays private.</p>
         {err && <div role="alert" style={{ fontFamily: font.body, color: "#B42318", fontSize: 14 }}>{err}</div>}
         <div className="flex gap-2 items-center">
           <button disabled={busy} className="ppg-btn ppg-btn-primary flex-1">{busy ? "Publishing…" : "Publish lost poster"}</button>

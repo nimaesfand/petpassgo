@@ -134,7 +134,11 @@ export default function TrainingCard({ pet, userId, onChanged }) {
           {pet.service_attested_at ? (
             <>
               <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 800, color: "#0F5E58" }}>✓ Service dog statement signed {fmt(pet.service_attested_at)}</div>
-              {t.tasks?.length ? <p style={hint}><b style={{ color: tokens.navy }}>Tasks:</b> {tasksLine(t.tasks)}{t.show_tasks ? " (shown on the passport)" : " (kept private)"}</p> : null}
+              {t.tasks?.length ? <p style={hint}><b style={{ color: tokens.navy }}>Tasks:</b> {tasksLine(t.tasks)}</p> : null}
+              <label className="flex items-start gap-2" style={{ ...hint, color: tokens.ink }}>
+                <input type="checkbox" checked={showTasks} onChange={async (e) => { const v = e.target.checked; setShowTasks(v); const { error } = await supabase.from("pets").update({ training: { ...t, show_tasks: v } }).eq("id", pet.id); if (error) setShowTasks(!v); else { pingSaved(); onChanged?.(); } }} style={{ width: 18, height: 18, marginTop: 2 }} />
+                <span>Show training details (who trained {name} and the tasks) on the passport and at the gate. When it&apos;s off, they only see &quot;Service dog, handler statement signed.&quot;</span>
+              </label>
               <div className="rounded-2xl p-4 grid gap-2" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
                 <div style={{ fontFamily: font.display, fontSize: 17, fontWeight: 800, color: tokens.navy }}>{name}&apos;s DOT Service Animal form</div>
                 {member ? (
@@ -171,7 +175,7 @@ export default function TrainingCard({ pet, userId, onChanged }) {
                 <div className="flex flex-wrap gap-2">{SERVICE_TASKS.map(([k, l]) => <Chip key={k} on={tasks.includes(k)} onClick={() => toggle(tasks, setTasks, k)}>{l}</Chip>)}</div>
                 <label className="flex items-center gap-2" style={{ ...hint, color: tokens.ink }}>
                   <input type="checkbox" checked={showTasks} onChange={(e) => setShowTasks(e.target.checked)} style={{ width: 18, height: 18 }} />
-                  Show these tasks on the passport (off keeps them private)
+                  Show training details on the passport and at the gate (off keeps them private)
                 </label>
               </div>
               {!by ? <p role="alert" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>Pick who trained {name} above first.</p> : null}

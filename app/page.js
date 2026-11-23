@@ -32,14 +32,14 @@ const VET_STEPS = [
 
 const QR_STEPS = [
   { title: "Someone scans the tag", body: "Any phone camera works. No app needed." },
-  { title: "They see your pet's page", body: "Their photo, name and a button to message you. Your email stays private." },
-  { title: "You get an email right away", body: "With their message and how to reach them. Mark your pet as lost and scans alert you too, with the area they came from." },
+  { title: "They see your pet's page", body: "Their photo, name and a button to message you. Your contact info stays private." },
+  { title: "You get an email right away", body: "With their message and how to reach them. Mark your pet as lost and scans alert you too, with the approximate city they came from." },
 ];
 
 const PRICE_CARDS = [
-  { title: "Free checklist", sub: "For simple flights", price: "Free", unit: "with an account", body: "Small pets in the cabin on U.S. flights with one airline. Your full checklist, free.", cta: "Check my flight", href: "/assessment", bordered: true },
+  { title: "Free checklist", sub: "For simple flights", price: "$0", unit: "with a free account", body: "Small pets in the cabin on U.S. flights with one airline.", checks: ["Every step for your flight, in order", "Your airline's pet fee and carrier size", "Saved to your account for travel day"], note: { strong: "No card needed.", text: "Check your flight in about 2 minutes." }, cta: "Check my flight", href: "/assessment", bordered: true },
   { title: "Travel Pass", sub: "For flights that need paperwork", price: P.pass, unit: `per trip, or ${P.memberPass} with Pet Vault`, body: "Mexico, Canada and Hawaii, service dogs, pets flying as cargo, and trips that switch airlines. Your exact dates, reminders, forms filled in, and a check that your pet's vaccines and certificates are valid for the trip. One price covers the round trip, for up to 2 pets.", guarantee: true, cta: "Plan my pet's trip", href: "/assessment", dark: true },
-  { title: "Pet Vault", sub: "Your pet's passport and records", price: P.member, unit: "a month", body: `Your pet's passport, vet-confirmed records, travel mode, reminders and lost pet alerts. Travel Passes are ${P.memberPass} for members. Cancel anytime.`, cta: "Make their passport", href: "/passport/create", accent: true, tag: "Best for records and frequent travel" },
+  { title: "Pet Vault", sub: "Your pet's passport and records", price: P.member, unit: "a month", body: `Your pet's passport, vet-confirmed records, travel mode, reminders and lost pet alerts. Travel Passes are ${P.memberPass} for members. Cancel anytime.`, note: { strong: "Make the passport free.", text: `We hold it for 7 days. Keep it for ${P.member} a month.` }, cta: "Make their passport", href: "/passport/create", accent: true, tag: "Best for records and frequent travel" },
 ];
 
 const HOME_FAQ = [FAQ[1], FAQ[3], FAQ[2], FAQ[4]];
@@ -272,8 +272,11 @@ export default async function PetPassGoLanding() {
                 </div>
                 <p className="mt-0.5" style={{ fontFamily: B, fontSize: 15, color: c.dark ? "#C9D4E4" : tokens.muted }}>{c.sub}</p>
                 <div className="mt-3 flex items-baseline gap-2"><span style={{ fontFamily: D, fontSize: 44, fontWeight: 800, lineHeight: 1 }}>{c.price}</span><span style={{ fontFamily: B, fontSize: 15, color: c.dark ? "#C9D4E4" : tokens.muted }}>{c.unit}</span></div>
-                <p className="mt-4 flex-1" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.55, color: c.dark ? "#E7EDF6" : tokens.ink }}>{c.body}</p>
+                <p className={`mt-4 ${c.checks ? "" : "flex-1"}`} style={{ fontFamily: B, fontSize: 16, lineHeight: 1.55, color: c.dark ? "#E7EDF6" : tokens.ink }}>{c.body}</p>
+                {c.checks ? <ul className="mt-3 flex flex-col gap-2">{c.checks.map((t) => <li key={t} className="flex items-start gap-2" style={{ fontFamily: B, fontSize: 15.5, lineHeight: 1.4, color: tokens.ink }}><span aria-hidden="true" className="flex-shrink-0 flex items-center justify-center rounded-full" style={{ width: 20, height: 20, marginTop: 1, background: tokens.green, color: "#fff", fontSize: 12, fontWeight: 900 }}>✓</span>{t}</li>)}</ul> : null}
+                {c.note ? <div className="mt-4 flex items-start gap-2 rounded-2xl px-3 py-2.5" style={{ background: c.accent ? "#FFF4EC" : "#E7F6EC", color: tokens.ink, fontFamily: B, fontSize: 14, lineHeight: 1.4 }}><span aria-hidden="true" style={{ color: c.accent ? tokens.primary : tokens.green, fontWeight: 900 }}>✓</span><span><b style={{ color: tokens.navy }}>{c.note.strong}</b> {c.note.text}</span></div> : null}
                 {c.guarantee ? <a href="/guarantee" className="mt-4 flex items-start gap-2 rounded-2xl px-3 py-2.5" style={{ background: "rgba(255,255,255,.08)", color: "#E7EDF6", fontFamily: B, fontSize: 14, lineHeight: 1.4, textDecoration: "none" }}><span aria-hidden="true" style={{ color: tokens.gold, fontWeight: 900 }}>✓</span><span><b style={{ color: "#fff" }}>Flight-Ready Guarantee.</b> If your pet is refused boarding because our information was wrong, we refund your Travel Pass. <span style={{ textDecoration: "underline" }}>How it works</span></span></a> : null}
+                {c.checks ? <div className="flex-1" /> : null}
                 <a href={c.href} className="mt-6 inline-flex items-center justify-center rounded-full min-h-[50px] px-6" style={{ background: c.dark || c.accent ? tokens.primary : "#fff", color: c.dark || c.accent ? "#fff" : tokens.navy, border: c.dark || c.accent ? "none" : `1.5px solid ${tokens.line}`, fontFamily: B, fontWeight: 800, fontSize: 15.5, textDecoration: "none" }}>{c.cta}</a>
               </article>
             ))}

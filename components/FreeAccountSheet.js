@@ -33,7 +33,7 @@ export default function FreeAccountSheet({ open, onClose, onReady, trip, petWord
     setBusy(true); setMsg("");
     remember();
     if (mode === "signup") {
-      const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { first_name: name.trim().split(" ")[0] || undefined }, emailRedirectTo: `${window.location.origin}/login` } });
+      const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { first_name: name.trim().split(" ")[0] || undefined, pending_trip: trip || undefined }, emailRedirectTo: `${window.location.origin}/login?confirmed=1` } });
       if (error) {
         setBusy(false);
         if (/registered|exists/i.test(error.message)) { setMode("login"); setMsg("That email already has an account. Log in instead."); } else setMsg(error.message);

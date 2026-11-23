@@ -4,9 +4,12 @@ import { readCheckin, signCheckin } from "../../../lib/ppgSign";
 import { SITE_URL } from "../../../lib/site";
 import QRCode from "qrcode";
 import LiveSeal from "./LiveSeal";
+import DocTap from "./DocTap";
+import StopSharing from "./StopSharing";
+import { GATE_DOC } from "../../../lib/gateDocs";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Pet check-in | PetPassGo", robots: { index: false, follow: false } };
+export const metadata = { title: "Pet check-in | PetPassGo", robots: { index: false, follow: false }, referrer: "no-referrer" };
 
 const BUCKET = "pet-documents";
 const NAVY = "#14213D", GOLD = "#F2B84B", GREEN = "#15803D", INK = "#2B3443", MUTED = "#6B7585", LINE = "#DCE3EC";
@@ -35,15 +38,20 @@ function Badge({ kind }) {
   return <span style={{ display: "inline-block", fontSize: 10.5, fontWeight: 800, letterSpacing: ".1em", color: look[1], background: look[2], borderRadius: 6, padding: "3px 7px", whiteSpace: "nowrap" }}>{look[0]}</span>;
 }
 
-function Row({ title, detail, kind, extra }) {
-  return (
-    <div style={{ padding: "12px 0", borderTop: `1px solid ${LINE}` }}>
+function Row({ title, detail, kind, extra, doc, token }) {
+  const inner = (
+    <>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
         <div style={{ fontWeight: 800, fontSize: 16, color: NAVY }}>{title}</div>
         <Badge kind={kind} />
       </div>
       {detail ? <div style={{ fontSize: 14.5, color: INK, marginTop: 2, lineHeight: 1.4 }}>{detail}</div> : null}
       {extra}
+    </>
+  );
+  return (
+    <div style={{ padding: "12px 0", borderTop: `1px solid ${LINE}` }}>
+      {doc && token ? <DocTap token={token} doc={doc} title={title}>{inner}</DocTap> : inner}
     </div>
   );
 }
@@ -78,11 +86,12 @@ export default async function CheckPage({ params, searchParams }) {
     c.tripId ? sb.from("trips").select("*").eq("id", c.tripId).maybeSingle() : Promise.resolve({ data: null }),
   ]);
   if (!pet) return <Shell label={label}><div style={{ background: "#fff", borderRadius: 20, padding: 24 }}>This pet profile is no longer available.</div></Shell>;
+  if (c.share && (pet.checkin_epoch || 0) !== c.epoch) return <Shell label={label}><div style={{ background: "#fff", borderRadius: 20, padding: 24, textAlign: "center" }}><h1 style={{ fontSize: 22, fontWeight: 800, color: NAVY }}>The owner stopped sharing this page</h1><p style={{ marginTop: 8, color: INK }}>Ask them for a new link if you still need it.</p></div></Shell>;
+  const token = params.token;
   const trip = tripRes?.data || null;
   let photo = null;
   const pp = storagePath(pet.photo_url);
   if (pp) { const { data } = await sb.storage.from(BUCKET).createSignedUrl(pp, 1800); photo = data?.signedUrl || null; }
-  const signDoc = async (d) => { const p = storagePath(d?.file_url); if (!p) return null; const { data } = await sb.storage.from(BUCKET).createSignedUrl(p, 1800); return data?.signedUrl || null; };
 
   const t = today();
   const rabies = (records || []).find((r) => /rabies/i.test(r.name || ""));
@@ -92,17 +101,18 @@ export default async function CheckPage({ params, searchParams }) {
   const findDoc = (re) => (docs || []).find((d) => re.test(d.document_type || ""));
   const health = findDoc(/health certificate|cvi|7001/i);
   const dot = findDoc(/dot|service animal/i);
-  const healthUrl = await signDoc(health);
-  const dotUrl = await signDoc(dot);
+  const rabiesDoc = findDoc(/rabies/i);
+  const shown = new Set([health?.id, dot?.id, rabiesDoc?.id].filter(Boolean));
+  const otherDocs = (docs || []).filter((d) => !shown.has(d.id) && GATE_DOC.test(d.document_type || "") && d.file_url);
+  const showTraining = pet.training?.show_tasks === true;
   const service = /service/i.test(pet.role || "");
   const status = service ? ["SERVICE DOG", "#1D4ED8", "#fff"] : /emotional|esa/i.test(pet.role || "") ? ["EMOTIONAL SUPPORT · FLIES AS A PET", "#B91C1C", "#fff"] : ["PET", GOLD, NAVY];
   const chip = String(pet.microchip_number || "").replace(/[^0-9A-Za-z]/g, "");
   const checkedAt = new Date().toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit", timeZone: "America/Los_Angeles" });
-  const open = (url, label) => url ? <a href={url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", marginTop: 6, fontWeight: 800, fontSize: 14.5, color: "#1D4ED8" }}>{label} ↗</a> : null;
 
   let shareQr = null;
   if (travel) {
-    const share = signCheckin({ petId: c.petId, tripId: c.tripId || "" });
+    const share = signCheckin({ petId: c.petId, tripId: c.tripId || "", minutes: 1440, share: true, epoch: pet.checkin_epoch || 0 });
     shareQr = await QRCode.toString(`${SITE_URL}/check/${share.token}`, { type: "svg", margin: 1, errorCorrectionLevel: "M", color: { dark: NAVY, light: "#ffffff" } }).catch(() => null);
   }
 
@@ -132,24 +142,28 @@ export default async function CheckPage({ params, searchParams }) {
         ) : null}
 
         <div style={{ marginTop: 14 }}>
-          <Row title="Rabies vaccine" kind={vaxKind(rabies)} detail={vaxDetail(rabies)} />
+          <Row title="Rabies vaccine" kind={vaxKind(rabies)} detail={vaxDetail(rabies)} doc={rabiesDoc?.file_url ? rabiesDoc.id : null} token={token} />
           {otherVax.map((r) => <Row key={r.id} title={r.name} kind={vaxKind(r)} detail={vaxDetail(r)} />)}
-          {service ? <Row title="Service dog statement" kind={pet.service_attested_at ? "signed" : "missing"} detail={pet.service_attested_at ? [`The handler signed a statement that ${pet.name} is trained to do tasks for a disability, on ${fmt(String(pet.service_attested_at).slice(0, 10))}.`, trainedByLine(pet.training) && `Trained by ${[trainedByLine(pet.training), pet.training?.trained_where].filter(Boolean).join(", ")}.`, pet.training?.show_tasks && pet.training?.tasks?.length ? `Tasks: ${tasksLine(pet.training.tasks)}.` : ""].filter(Boolean).join(" ") : "Not signed yet."} /> : null}
-          {trainingSummary(pet.training) ? <Row title="Training" kind="owner" detail={trainingSummary(pet.training)} /> : null}
-          {service ? <Row title="DOT Service Animal form" kind={dot ? "doc" : "missing"} detail={dot ? `Uploaded ${fmt(String(dot.uploaded_at).slice(0, 10))}. Signed by the handler.` : "Not uploaded to the passport. Ask the traveler for their copy."} extra={open(dotUrl, "View the form")} /> : null}
-          <Row title="Health certificate" kind={health ? (health.expires_on && health.expires_on < t ? "expired" : "doc") : "missing"} detail={health ? [health.issued_on ? `Issued ${fmt(health.issued_on)}` : "", health.expires_on ? `Valid until ${fmt(health.expires_on)}` : ""].filter(Boolean).join(" · ") || "On file" : "None on file. Many U.S. domestic trips don't need one; check your airline's rule."} extra={open(healthUrl, "View the certificate")} />
+          {service ? <Row title="Service dog" kind={pet.service_attested_at ? "signed" : "missing"} detail={pet.service_attested_at ? ["Service dog, handler statement signed.", showTraining && trainedByLine(pet.training) && `Trained by ${[trainedByLine(pet.training), pet.training?.trained_where].filter(Boolean).join(", ")}.`, showTraining && pet.training?.tasks?.length ? `Tasks: ${tasksLine(pet.training.tasks)}.` : ""].filter(Boolean).join(" ") : "Handler statement not signed yet."} /> : null}
+          {showTraining && trainingSummary(pet.training) ? <Row title="Training" kind="owner" detail={trainingSummary(pet.training)} /> : null}
+          {service ? <Row title="DOT Service Animal form" kind={dot ? "doc" : "missing"} detail={dot ? `Uploaded ${fmt(String(dot.uploaded_at).slice(0, 10))}. Signed by the handler.` : "Not uploaded to the passport. Ask the traveler for their copy."} doc={dot?.file_url ? dot.id : null} token={token} /> : null}
+          <Row title="Health certificate" kind={health ? (health.expires_on && health.expires_on < t ? "expired" : "doc") : "missing"} detail={health ? [health.issued_on ? `Issued ${fmt(health.issued_on)}` : "", health.expires_on ? `Valid until ${fmt(health.expires_on)}` : ""].filter(Boolean).join(" · ") || "On file" : "None on file. Many U.S. domestic trips don't need one; check your airline's rule."} doc={health?.file_url ? health.id : null} token={token} />
+          {otherDocs.map((d) => <Row key={d.id} title={d.document_type || "Document"} kind={d.expires_on && d.expires_on < t ? "expired" : "doc"} detail={[d.issued_on ? `Issued ${fmt(d.issued_on)}` : "", d.expires_on ? `Valid until ${fmt(d.expires_on)}` : ""].filter(Boolean).join(" · ") || "On file"} doc={d.id} token={token} />)}
           <Row title="Microchip" kind={chip ? "owner" : "missing"} detail={chip ? `Ends in ${chip.slice(-4)}` : "No microchip number entered."} />
           <Row title="Weight" kind={pet.weight_lb ? "owner" : "missing"} detail={pet.weight_lb ? `${pet.weight_lb} lb` : "Not entered."} />
           {!service && (pet.carrier_length_in && pet.carrier_width_in && pet.carrier_height_in) ? <Row title="Carrier" kind="owner" detail={`${pet.carrier_length_in} × ${pet.carrier_width_in} × ${pet.carrier_height_in} in`} /> : null}
         </div>
       </section>
 
+      {travel ? <div style={{ marginTop: 10, fontSize: 13.5, color: MUTED, lineHeight: 1.45 }}>Anyone who can see this screen can open these files. Close it when you&apos;re done.</div> : null}
+
       {shareQr ? (
         <section style={{ background: "#fff", borderRadius: 20, marginTop: 12, padding: 18, display: "flex", gap: 16, alignItems: "center", boxShadow: "0 10px 30px rgba(20,33,61,.08)" }}>
           <div style={{ width: 120, height: 120, flexShrink: 0 }} dangerouslySetInnerHTML={{ __html: shareQr.replace("<svg", '<svg width="120" height="120"') }} />
           <div>
             <div style={{ fontWeight: 800, fontSize: 16, color: NAVY }}>Someone needs a copy?</div>
-            <div style={{ fontSize: 14.5, color: INK, marginTop: 4, lineHeight: 1.45 }}>They can scan this with their phone camera to open this page. It works for 30 minutes.</div>
+            <div style={{ fontSize: 14.5, color: INK, marginTop: 4, lineHeight: 1.45 }}>They can scan this with their phone camera to open this page. Their link works for 24 hours.</div>
+            <StopSharing petId={pet.id} />
           </div>
         </section>
       ) : null}

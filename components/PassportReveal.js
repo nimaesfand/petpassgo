@@ -20,7 +20,7 @@ const BITS = Array.from({ length: 26 }, (_, i) => ({
   round: i % 3 === 0,
 }));
 
-export default function PassportReveal({ pet, photo, issuedAt, onClose, preview = false }) {
+export default function PassportReveal({ pet, photo, issuedAt, onClose, preview = false, sample = false }) {
   const [stage, setStage] = useState(0); // 0 closed book, 1 opens, 2 details, 3 stamp, 4 celebrate
   const [copied, setCopied] = useState(false);
   const [host, setHost] = useState(null);
@@ -38,7 +38,9 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose, preview 
     if (reduced) { setStage(4); return undefined; }
     // A calm sequence: the closed book floats in, opens, the details fill in
     // one by one, the stamp lands, then the celebration.
-    const t = [setTimeout(() => setStage(1), 1700), setTimeout(() => setStage(2), 3300), setTimeout(() => setStage(3), 5600), setTimeout(() => setStage(4), 6500)];
+    const t = sample
+      ? [setTimeout(() => setStage(1), 900), setTimeout(() => setStage(2), 1900), setTimeout(() => setStage(3), 3300), setTimeout(() => setStage(4), 4000)]
+      : [setTimeout(() => setStage(1), 1700), setTimeout(() => setStage(2), 3300), setTimeout(() => setStage(3), 5600), setTimeout(() => setStage(4), 6500)];
     return () => t.forEach(clearTimeout);
   }, []);
 
@@ -81,7 +83,11 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose, preview 
               <div className="rounded-xl overflow-hidden" style={{ width: 112, height: 140, border: "3px solid #fff", outline: `1.5px solid ${tokens.gold}`, background: "#E8EEF7", boxShadow: "0 6px 16px rgba(20,33,61,.14)" }}>
                 {photo || <PhotoSlot type={pet.animal_type} />}
               </div>
-              <div aria-hidden="true" className="ppg-holo rounded-full" style={{ width: 26, height: 26 }} />
+              {/service|emotional|esa/i.test(pet.role || "") ? (() => { const svc = /service/i.test(pet.role || ""); return (
+                <div className="rounded-md px-1.5 py-1 text-center" style={{ width: 112, background: svc ? "#E0E7FF" : "#FEE2E2", border: `1.5px solid ${svc ? "#1D4ED8" : "#B91C1C"}` }}>
+                  <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 9, letterSpacing: "0.1em", color: svc ? "#1D4ED8" : "#B91C1C", lineHeight: 1.15 }}>{svc ? "SERVICE DOG" : "EMOTIONAL SUPPORT"}</div>
+                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 8.5, color: svc ? "#1E3A8A" : "#7F1D1D", lineHeight: 1.2 }}>{svc ? (pet.service_attested_at || sample ? "Handler statement signed" : "Statement not signed yet") : "Flies as a pet"}</div>
+                </div>); })() : null}
             </div>
             <div className="min-w-0 flex flex-col gap-1" style={{ paddingRight: 70 }}>
               <div>{label("NAME")}<div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 800, lineHeight: 1.05, color: tokens.navy, overflowWrap: "break-word" }}>{pet.name}</div></div>
@@ -129,11 +135,16 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose, preview 
       {stage >= 4 ? (
         <>
           <div className="ppg-pp-fade mt-6 text-center" style={{ maxWidth: 340 }}>
-            <h2 style={{ fontFamily: font.display, fontSize: 30, fontWeight: 800, color: "#fff", lineHeight: 1.1 }}>{pet.name}&apos;s passport is ready!</h2>
-            <p className="mt-2" style={{ fontFamily: font.body, fontSize: 15.5, color: "rgba(255,255,255,.8)" }}>{preview ? `Keep it to show it at the counter, add it to your phone, and share it with a sitter.` : `${pet.name}'s passport and QR code are ready. Show them at the counter, add them to your phone, or share them with a sitter.`}</p>
+            <h2 style={{ fontFamily: font.display, fontSize: 30, fontWeight: 800, color: "#fff", lineHeight: 1.1 }}>{sample ? "This is a sample passport" : <>{pet.name}&apos;s passport is ready!</>}</h2>
+            <p className="mt-2" style={{ fontFamily: font.body, fontSize: 15.5, color: "rgba(255,255,255,.8)" }}>{sample ? "Make your pet's own passport free in a few minutes. Benny walks you through it." : preview ? `Keep it to show it at the counter, add it to your phone, and share it with a sitter.` : `${pet.name}'s passport and QR code are ready. Show them at the counter, add them to your phone, or share them with a sitter.`}</p>
           </div>
           <div className="ppg-pp-fade mt-5 flex flex-col gap-2.5 w-full" style={{ maxWidth: 340, animationDelay: ".35s" }}>
-            {preview ? (
+            {sample ? (
+              <>
+                <a href="/passport/create" className="rounded-full flex items-center justify-center" style={{ height: 54, background: tokens.primary, color: "#fff", fontFamily: font.body, fontSize: 17, fontWeight: 800, textDecoration: "none" }}>Make your pet&apos;s passport</a>
+                <button ref={closeRef} type="button" onClick={onClose} className="rounded-full" style={{ height: 48, background: "transparent", color: "#fff", fontFamily: font.body, fontSize: 15, fontWeight: 600, border: "2px solid rgba(255,255,255,.35)", cursor: "pointer" }}>Close</button>
+              </>
+            ) : preview ? (
               <button ref={closeRef} type="button" onClick={onClose} className="rounded-full" style={{ height: 56, background: tokens.primary, color: "#fff", fontFamily: font.body, fontSize: 17, fontWeight: 800, border: "none", cursor: "pointer" }}>See {pet.name}&apos;s passport</button>
             ) : (
               <>
@@ -142,11 +153,11 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose, preview 
               </>
             )}
           </div>
-          <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+          {sample ? null : <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
             {BITS.map((b, i) => (
               <span key={i} className="ppg-pp-bit" style={{ left: `${b.left}%`, width: b.size, height: b.round ? b.size : b.size * 0.45, background: b.color, borderRadius: b.round ? "50%" : 2, animationDelay: `${b.delay}s` }} />
             ))}
-          </div>
+          </div>}
         </>
       ) : null}
     </div>,
