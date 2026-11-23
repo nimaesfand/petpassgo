@@ -299,6 +299,24 @@ Tested on the live site, logged out unless noted, at phone width (390–400px, C
 
 
 ## Ideas and pushback
+
+### 2026-11-22: Nima's decisions on the pick-list plan + more tasks for the list (from Sisqo)
+**Nima decided (relayed by Sisqo):**
+- Training organization is typed in by the owner, not picked from a list of programs. No program drop-down.
+- Drop the "Owner says a service dog program trained them" wording idea; Nima doesn't like how it looks.
+- Old typed values vanishing is fine: there are no real customers yet, so no migration or re-pick prompt needed.
+- Trainer: owner picks "I trained them myself" (self-trained) or enters the trainer's name and business.
+- Still needed in the same change (Sisqo): the service-statement API and DOT auto-fill must accept the new task keys and the new trainer fields, or the DOT form can come out blank or wrong.
+
+**More tasks to add to the pick-list (Claude, use whatever fits the groups):**
+- Medical alert: allergen detection (peanut, gluten, etc.); migraine alert; low blood pressure / fainting (POTS) alert; asthma alert; alerting another person in the home.
+- Psychiatric: interrupting self-harm or repetitive behaviors; blocking people from crowding the handler; watching the handler's back in public; room checks (PTSD); alerting to dissociation; leading the handler home.
+- Mobility: counterbalance; help standing up; pulling a wheelchair; carrying items; turning lights on and off; helping take off clothes or shoes.
+- Hearing: alerting to a phone ringing, a baby crying, or a kitchen timer.
+- Vision: stopping at curbs and stairs; finding elevators or crosswalks.
+- Autism: interrupting meltdowns; leading the handler home.
+- Other: finding the car.
+
 _(none yet)_
 
 ## Open questions for Nima
