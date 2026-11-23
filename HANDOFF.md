@@ -16,6 +16,28 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-22: Plan: training, trainer and tasks become pick-lists (no free text)
+Discussed with Nima. Not built yet.
+
+Why: trainer name and "where trained" are free text today, so people can type anything, including "certified" or "registered", and it shows on the passport. Tasks are only 7 broad groups.
+
+1. **Tasks: specific picks, grouped.** Nothing typed; "Other task" if theirs isn't listed.
+   - Psychiatric (PSD): deep pressure therapy; interrupting anxiety or panic; grounding (nudge, lick, lean); waking from nightmares; room search before entering; creating space in crowds; guiding to an exit; medication reminders; turning on lights.
+   - Medical alert: blood sugar alert; seizure alert or response; cardiac alert; bringing medication or a phone; getting help.
+   - Mobility: retrieving dropped items; opening doors; balance and bracing; pressing buttons.
+   - Hearing and vision: sound alerts (alarms, doorbell, name); guiding around obstacles; finding doors and seats.
+   - Autism: tethering to prevent bolting; calming pressure.
+   Existing saved tasks (old 7 groups) map to their group, so nothing breaks.
+2. **Trainer: picks only.** "I trained them", "A professional trainer" (no name field), or "A service dog program" with a list of well-known programs plus "Another program". The typed trainer name is removed; existing typed names stop showing.
+3. **Where trained: dropdown.** U.S. states, Canada, Mexico, "Outside North America". Existing typed values stop showing unless they match.
+4. **Passport and /check:** tasks show as group names only (for example "Psychiatric tasks, Mobility tasks"), and only when the owner turns on sharing. The detailed task list stays in the owner's account.
+
+Pages: lib/training.js, components/pets/TrainingCard.js, app/api/service-statement/route.js, components/PetPassport.js, app/check/[token]/page.js, components/home/HomePassport.js (sample).
+
+Question for Sisqo: which programs belong on the list? Claude's draft: Guide Dogs for the Blind, The Seeing Eye, Guide Dog Foundation, Canine Companions, NEADS World Class Service Dogs, Paws With A Cause, Dogs for Better Lives, 4 Paws for Ability, Freedom Service Dogs, K9s For Warriors, America's VetDogs. Please check each is a real, current U.S. program.
+
+Ready for review.
+
 ### 2026-11-22: Built: passport cleanup, pricing cards, tap-to-open documents, travel mode, confirm-email fix (live)
 Nima approved the plan with Sisqo's changes. Test account 6dpq5mtb+fix-test@mail.grokbot.com deleted. Database: added pets.checkin_epoch (Nima approved).
 
