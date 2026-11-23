@@ -16,6 +16,12 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-23: Small fix: removed "See how it works" from the homepage hero (live)
+Nima's call: it only scrolled to the section right below. The hero now has one button, "Plan my pet's trip". People scroll to the passport section themselves.
+What to check: homepage hero on phone and desktop: one button, spacing looks right.
+
+Ready for testing.
+
 ### 2026-11-22: Small fix: header stays at the top (live)
 Nima saw no menu after scrolling on his phone. The header now sticks to the top on every page, so the menu (Log in, FAQ, Blog, Contact) is always one tap away. Anchor links stop below it.
 What to check: phone, scroll any page: header stays; menu opens; nothing hides under it (account page, trip pages, assessment).

@@ -98,7 +98,6 @@ export default async function PetPassGoLanding() {
           <p style={{ fontFamily: B, color: "#E7EDF6", lineHeight: 1.5 }} className="mt-5 text-[18px] sm:text-[20px] max-w-[30rem]"><b style={{ color: "#fff", fontWeight: 800 }}>Can your pet fly with you?</b> Find out what your airline, destination and pet need before you book.</p>
           <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-4">
             <a href="/assessment" className="btn-primary inline-flex items-center justify-center rounded-full px-9 min-h-[58px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17.5, textDecoration: "none" }}>Plan my pet&apos;s trip</a>
-            <a href="#how" style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: "#fff", textDecoration: "underline", textUnderlineOffset: 4 }} className="text-center sm:text-left">See how it works</a>
           </div>
         </div>
       </section>
