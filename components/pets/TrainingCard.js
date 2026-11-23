@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { tokens, font } from "../../lib/theme";
 import { pingSaved } from "../SavedToast";
-import { levelsFor, TRAINED_BY, TASK_GROUPS, PROGRAMS, PLACES, placeLabel, legacyTrainer, legacyPlace, statementText, tasksLine } from "../../lib/training";
+import { levelsFor, TRAINED_BY, TASK_GROUPS, PLACES, placeLabel, cleanTrainerText, statementText, tasksLine } from "../../lib/training";
 
 const input = { fontFamily: font.body, fontSize: 16, border: `2px solid ${tokens.line}`, borderRadius: 12, padding: "11px 13px", width: "100%", background: "#fff", color: tokens.ink };
 const lab = { fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy };
@@ -25,10 +25,13 @@ export default function TrainingCard({ pet, userId, onChanged }) {
   const isDog = pet.animal_type === "Dog";
   const isService = /service/i.test(pet.role || "");
   const [levels, setLevels] = useState(Array.isArray(t.levels) ? t.levels : pet.trained ? ["house"] : []);
-  const [by, setBy] = useState(t.trained_by || "");
-  const [program, setProgram] = useState(t.program || "");
+  const [by, setBy] = useState(t.trained_by === "program" ? "trainer" : t.trained_by || "");
+  const [who, setWho] = useState(t.trainer_name || "");
+  const [biz, setBiz] = useState(t.trainer_business || "");
   const [where, setWhere] = useState(placeLabel(t.trained_where) ? t.trained_where : "");
-  const oldWho = legacyTrainer(t), oldWhere = legacyPlace(t);
+  const whoCheck = cleanTrainerText(who), bizCheck = cleanTrainerText(biz);
+  const trainerErr = by === "trainer" ? (whoCheck.error || bizCheck.error || "") : "";
+  const trainerMissing = by === "trainer" && !who.trim() && !biz.trim();
   const [saving, setSaving] = useState(false);
 
   const [signing, setSigning] = useState(false);
@@ -73,8 +76,8 @@ export default function TrainingCard({ pet, userId, onChanged }) {
   async function saveTraining() {
     setSaving(true);
     const keepTasks = pet.service_attested_at ? Array.from(new Set([...levels, "tasks"])) : levels;
-    // Picks only. Anything typed before the pick-lists stays unless they pick something new.
-    const training = { ...t, levels: keepTasks, trained_by: by || null, program: by === "program" ? program || null : null, trainer_name: by && by !== "owner" && !(by === "program" && program) ? t.trainer_name || null : null, trained_where: where || t.trained_where || null };
+    if (trainerErr) { alert(trainerErr); return; }
+    const training = { ...t, levels: keepTasks, trained_by: by || null, program: null, trainer_name: by === "trainer" ? whoCheck.value || null : null, trainer_business: by === "trainer" ? bizCheck.value || null : null, trained_where: where || null };
     const { error } = await supabase.from("pets").update({ training, trained: keepTasks.length ? true : pet.trained }).eq("id", pet.id).eq("user_id", userId);
     setSaving(false);
     if (error) { alert("Couldn't save training. Please try again."); return; }
@@ -93,7 +96,7 @@ export default function TrainingCard({ pet, userId, onChanged }) {
     e.preventDefault();
     setErr(""); setBusy(true);
     try {
-      await call({ signed_name: signed, agree, tasks, show_tasks: showTasks, trained_by: by, program, trained_where: where });
+      await call({ signed_name: signed, agree, tasks, show_tasks: showTasks, trained_by: by, trainer_name: who, trainer_business: biz, trained_where: where });
       setSigning(false); pingSaved(); onChanged?.();
     } catch (x) { setErr(x.message); }
     setBusy(false);
@@ -119,14 +122,16 @@ export default function TrainingCard({ pet, userId, onChanged }) {
         <span style={lab}>Who trained {name}?</span>
         <div className="flex flex-wrap gap-2">{TRAINED_BY.map(([k, l]) => <Chip key={k} on={by === k} onClick={() => setBy(by === k ? "" : k)}>{l}</Chip>)}</div>
       </div>
-      {by === "program" ? (
-        <label className="grid gap-1.5"><span style={lab}>Which program?</span>
-          <select value={program} onChange={(e) => setProgram(e.target.value)} style={input}>
-            <option value="">Pick a program</option>
-            {PROGRAMS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
-          </select>
-          <span style={hint}>Only you see the program&apos;s name. Others see &quot;a service dog program&quot;. We use the name to fill in your DOT form.</span>
-        </label>
+      {by === "trainer" ? (
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="grid gap-1.5"><span style={lab}>Trainer&apos;s name</span>
+            <input value={who} onChange={(e) => setWho(e.target.value)} maxLength={80} style={input} placeholder="e.g. Jordan Lee" />
+          </label>
+          <label className="grid gap-1.5"><span style={lab}>Business or program</span>
+            <input value={biz} onChange={(e) => setBiz(e.target.value)} maxLength={80} style={input} placeholder="e.g. Paws Forward Training" />
+          </label>
+          {trainerErr ? <p role="alert" className="sm:col-span-2" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>{trainerErr}</p> : null}
+        </div>
       ) : null}
       {by ? (
         <label className="grid gap-1.5"><span style={lab}>Where they trained</span>
@@ -135,9 +140,6 @@ export default function TrainingCard({ pet, userId, onChanged }) {
             {PLACES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
           </select>
         </label>
-      ) : null}
-      {(oldWho && !(by === "program" && program)) || (oldWhere && !where) ? (
-        <p style={{ ...hint, background: "#FFF8E6", borderRadius: 10, padding: "8px 10px" }}>You typed {[oldWho && `"${oldWho}"`, oldWhere && `"${oldWhere}"`].filter(Boolean).join(" and ")} before. Only you see that. Pick from the lists above to show it on the passport.</p>
       ) : null}
       <button type="button" disabled={saving} onClick={saveTraining} className="ppg-btn ppg-btn-primary" style={{ justifySelf: "start" }}>{saving ? "Saving…" : "Save training"}</button>
 
@@ -196,7 +198,7 @@ export default function TrainingCard({ pet, userId, onChanged }) {
                   Show training details on the passport and at the gate (off keeps them private)
                 </label>
               </div>
-              {!by ? <p role="alert" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>Pick who trained {name} above first.</p> : by === "program" && !program ? <p role="alert" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>Pick the program above first.</p> : null}
+              {!by ? <p role="alert" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>Pick who trained {name} above first.</p> : trainerMissing ? <p role="alert" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>Add the trainer&apos;s name or business above first.</p> : null}
               <div className="rounded-xl p-3" style={{ background: "#fff", border: `1px solid ${tokens.line}`, maxHeight: 220, overflowY: "auto" }}>
                 <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 800, letterSpacing: "0.12em", color: tokens.muted }}>STATEMENT</div>
                 <p className="mt-1" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, lineHeight: 1.55, whiteSpace: "pre-line" }}>{statementText({ petName: pet.name, signedName: signed.trim() || "[your full name]" })}</p>
@@ -210,7 +212,7 @@ export default function TrainingCard({ pet, userId, onChanged }) {
               </label>
               {err ? <p role="alert" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>{err}</p> : null}
               <div className="flex flex-wrap gap-3 items-center">
-                <button type="submit" disabled={busy || !agree || !by || (by === "program" && !program) || !tasks.length} className="ppg-btn ppg-btn-primary">{busy ? "Signing…" : "Sign statement"}</button>
+                <button type="submit" disabled={busy || !agree || !by || trainerMissing || !!trainerErr || !tasks.length} className="ppg-btn ppg-btn-primary">{busy ? "Signing…" : "Sign statement"}</button>
                 <button type="button" onClick={() => setSigning(false)} style={{ fontFamily: font.body, fontWeight: 700, color: tokens.muted, background: "none", border: "none", cursor: "pointer" }}>Cancel</button>
               </div>
             </form>

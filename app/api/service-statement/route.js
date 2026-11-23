@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "../../../lib/paidUser";
 import { serviceClient } from "../../../lib/serverEmail";
-import { ALL_TASK_KEYS, TRAINED_BY, PROGRAMS, PLACES, programLabel, legacyTrainer, STATEMENT_VERSION, statementText } from "../../../lib/training";
+import { ALL_TASK_KEYS, TRAINED_BY, PLACES, cleanTrainerText, STATEMENT_VERSION, statementText } from "../../../lib/training";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -31,14 +31,14 @@ export async function POST(req) {
   const okTask = new Set(ALL_TASK_KEYS);
   const tasks = Array.from(new Set((Array.isArray(b.tasks) ? b.tasks : []).filter((t) => okTask.has(t)))).slice(0, ALL_TASK_KEYS.length);
   if (!tasks.length) return NextResponse.json({ error: "Pick at least one kind of task." }, { status: 400 });
-  const trainedBy = TRAINED_BY.some(([k]) => k === b.trained_by) ? b.trained_by : null;
+  const trainedBy = TRAINED_BY.some(([k]) => k === b.trained_by) ? b.trained_by : b.trained_by === "program" ? "trainer" : null;
   if (!trainedBy) return NextResponse.json({ error: "Tell us who trained them." }, { status: 400 });
-  const program = trainedBy === "program" && PROGRAMS.some(([k]) => k === b.program) ? b.program : null;
-  if (trainedBy === "program" && !program) return NextResponse.json({ error: "Pick the program, or Another program." }, { status: 400 });
+  const tn = cleanTrainerText(b.trainer_name), tb = cleanTrainerText(b.trainer_business);
+  if (!tn.ok || !tb.ok) return NextResponse.json({ error: tn.error || tb.error }, { status: 400 });
+  if (trainedBy === "trainer" && !tn.value && !tb.value) return NextResponse.json({ error: "Add the trainer's name or business." }, { status: 400 });
   // Picks only. A value typed before the pick-lists is kept as it was.
   const where = PLACES.some(([k]) => k === b.trained_where) ? b.trained_where : (pet.training?.trained_where || null);
-  const keepTyped = trainedBy !== "owner" && !program ? legacyTrainer(pet.training) || null : null;
-  const trainerName = program ? (programLabel(program) || "Another program") : keepTyped;
+  const trainerName = trainedBy === "trainer" ? [tn.value, tb.value && tb.value !== tn.value ? tb.value : ""].filter(Boolean).join(", ") || null : null;
 
   const text = statementText({ petName: pet.name, signedName: name });
   const now = new Date().toISOString();
@@ -51,7 +51,7 @@ export async function POST(req) {
   });
   if (error) return NextResponse.json({ error: "Couldn't save your statement. Please try again." }, { status: 500 });
   const levels = Array.from(new Set([...(pet.training?.levels || []), "tasks"]));
-  const training = { ...(pet.training || {}), levels, trained_by: trainedBy, program, trainer_name: program ? null : keepTyped, trained_where: where, tasks, show_tasks: b.show_tasks === true };
+  const training = { ...(pet.training || {}), levels, trained_by: trainedBy, program: null, trainer_name: trainedBy === "trainer" ? tn.value || null : null, trainer_business: trainedBy === "trainer" ? tb.value || null : null, trained_where: where, tasks, show_tasks: b.show_tasks === true };
   await svc.from("pets").update({ role: "Service animal", training, service_attested_at: now }).eq("id", petId).eq("user_id", user.id);
   return NextResponse.json({ ok: true, signed_at: now });
 }
