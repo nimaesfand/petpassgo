@@ -1,8 +1,8 @@
 import BorderGuide from "../../components/BorderGuide";
 
 export const metadata = {
-  title: "Flying to Mexico with your dog: every step, there and back",
-  description: "The screwworm certificate, the SENASICA inspection, and the CDC form to get your dog home. Every rule for flying to Mexico with a dog, in order, with official sources.",
+  title: "Flying to Mexico with your dog: what you need, there and back",
+  description: "The screwworm certificate, the SENASICA inspection, and the CDC form to get your dog home. Check your trip free with PetPassGo.",
   alternates: { canonical: "/mexico" },
 };
 
@@ -15,7 +15,7 @@ const GUIDE = {
   name: "Mexico",
   eyebrow: "FLYING TO MEXICO WITH YOUR DOG",
   title: "Take your dog to Mexico, and get them home again.",
-  lead: "Two vet certificates, two 5-day windows, an inspection when you land, and a CDC form for the flight home. Here's all of it, in the order you'll need it.",
+  lead: "Two vet certificates, two 5-day windows, an inspection when you land, and a CDC form for the flight home. Here's what you'll need.",
   checked: "November 13, 2026",
   stats: [["vet certificates, one each way", "2"], ["window for each one", "5 days"], ["old to come home", "6 mo+"]],
   traps: [

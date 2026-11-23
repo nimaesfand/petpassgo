@@ -1,8 +1,8 @@
 import BorderGuide from "../../components/BorderGuide";
 
 export const metadata = {
-  title: "Flying to Canada with your dog: every step, there and back",
-  description: "The rabies certificate Canada checks, what happens at the border, and the CDC form to bring your dog home. Every rule for flying to Canada with a dog, with official sources.",
+  title: "Flying to Canada with your dog: what you need, there and back",
+  description: "The rabies certificate Canada checks, what happens at the border, and the CDC form to bring your dog home. Check your trip free with PetPassGo.",
   alternates: { canonical: "/canada" },
 };
 
@@ -15,7 +15,7 @@ const GUIDE = {
   name: "Canada",
   eyebrow: "FLYING TO CANADA WITH YOUR DOG",
   title: "Take your dog to Canada, and get them home again.",
-  lead: "Canada mostly wants one thing: a proper rabies certificate. Coming home, the U.S. wants a CDC form. Here's exactly what each one needs.",
+  lead: "Canada mostly wants one thing: a proper rabies certificate. Coming home, the U.S. wants a CDC form. Here's what you'll need.",
   checked: "November 13, 2026",
   stats: [["document for adult dogs", "1"], ["quarantine with the right documents", "None"], ["old to come home", "6 mo+"]],
   traps: [

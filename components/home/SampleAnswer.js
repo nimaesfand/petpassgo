@@ -79,7 +79,7 @@ export default function SampleAnswer() {
                   <div style={{ fontFamily: font.body, fontSize: 11.5, fontWeight: 800, letterSpacing: ".06em", color: tokens.primary }}>{s.cat.toUpperCase()}</div>
                   <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 15.5, color: tokens.navy }}>{s.title}</div>
                   <div style={{ fontFamily: font.body, fontSize: 14, color: tokens.ink, lineHeight: 1.4 }}>{s.body}</div>
-                  <div className="mt-1 inline-flex items-center gap-1" style={{ fontFamily: font.body, fontSize: 12, color: tokens.muted }}><Icon name="check" size={12} /> Source: {s.src} · checked Nov 2026</div>
+                  <div className="mt-1 inline-flex items-center gap-1" style={{ fontFamily: font.body, fontSize: 12, color: tokens.muted }}><Icon name="check" size={12} /> Checked Nov 2026</div>
                 </div>
               </li>
             ))}

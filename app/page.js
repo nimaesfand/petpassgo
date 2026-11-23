@@ -248,7 +248,7 @@ export default async function PetPassGoLanding() {
       <section className={`${WRAP} py-16 lg:py-20`}>
         <h2 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[32px] md:text-[44px] font-extrabold max-w-[20ch]">Where our information comes from.</h2>
         <div className="grid md:grid-cols-3 gap-6 mt-8">
-          {[["Official sources", "Every rule links to where it comes from: USDA, the CDC, the destination's government and each airline's own pet policy."], ["Dated and rechecked", "Each rule shows when we last checked it against the official page, and we keep rechecking them."], ["Backed by a guarantee", "If your pet is refused boarding because our information was wrong, we refund your Travel Pass."]].map(([t, b]) => (
+          {[["Checked against the rule makers", "We check every rule against USDA, the CDC, the destination's government and each airline's own pet policy."], ["Dated and rechecked", "Each rule shows when we last checked it against the official page, and we keep rechecking them."], ["Backed by a guarantee", "If your pet is refused boarding because our information was wrong, we refund your Travel Pass."]].map(([t, b]) => (
             <div key={t} className="rounded-3xl p-6" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
               <h3 style={{ fontFamily: D, fontSize: 21, fontWeight: 800, color: tokens.navy }}>{t}</h3>
               <p className="mt-2" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>{b}</p>

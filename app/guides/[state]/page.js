@@ -11,7 +11,7 @@ export function generateMetadata({ params }) {
   if (!s) return {};
   return {
     title: `${s.name} service dog, PSD and ESA laws (2026)`,
-    description: `${s.summary} What's true and what's not about ESA letters, psychiatric service dogs and flying in ${s.name}, with official sources.`,
+    description: `${s.summary} What's true and what's not about ESA letters, psychiatric service dogs and flying in ${s.name}.`,
     alternates: { canonical: `/guides/${s.slug}` },
   };
 }

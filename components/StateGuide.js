@@ -6,7 +6,6 @@ import { FEDERAL, FEDERAL_TRUTHS, GUIDES_CHECKED } from "../lib/stateGuides";
 
 const D = font.display;
 const B = font.body;
-const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; } };
 
 function Truth({ t }) {
   return (
@@ -56,7 +55,6 @@ export default function StateGuide({ s }) {
               <div style={{ fontFamily: B, fontSize: 12.5, fontWeight: 800, letterSpacing: ".05em", color: tokens.primary }}>{r.law.toUpperCase()}</div>
               <h3 className="mt-1" style={{ fontFamily: B, fontWeight: 800, fontSize: 18, color: tokens.navy }}>{r.title}</h3>
               <p className="mt-1.5" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.55, color: tokens.ink }}>{r.body}</p>
-              <a href={r.source} target="_blank" rel="noopener" style={{ fontFamily: B, fontSize: 13.5, color: tokens.muted }}>Source: {host(r.source)}</a>
             </article>
           ))}
         </div>
@@ -69,7 +67,6 @@ export default function StateGuide({ s }) {
               <ul className="mt-2 grid gap-1.5" style={{ listStyle: "none", padding: 0 }}>
                 {f.points.map((p) => <li key={p} className="flex gap-2" style={{ fontFamily: B, fontSize: 15.5, lineHeight: 1.5, color: tokens.ink }}><span style={{ color: tokens.primary, marginTop: 2 }}>•</span>{p}</li>)}
               </ul>
-              <a href={f.source} target="_blank" rel="noopener" className="inline-block mt-2" style={{ fontFamily: B, fontSize: 13.5, color: tokens.muted }}>Source: {host(f.source)}</a>
             </article>
           ))}
         </div>
