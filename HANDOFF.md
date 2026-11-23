@@ -16,6 +16,33 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-23: Built batch 1 (part 2): service dog steps in the passport maker + trainer wording (live)
+Nima: trainer choices are "Owner trained", "Dog trainer", "Trained in a program". Dog trainer = name + business; program = program name. Word filter still applies.
+
+Passport maker (/passport/create), service dog only, after the birthday step and before the email/finish step (same reveal for everyone after):
+- Step: weight (lb, a guess is fine).
+- Step: who trained them (the 3 choices + name fields).
+- Step: what they help with (grouped task chips, at least one).
+- Step: vet name, clinic phone, rabies good-until date ("I'll add this later" allowed).
+- Step: "Your service dog promise": a friendly blue card with 3 lines (trained to do tasks for my disability; well-behaved, house trained, stays with me; false statements can lead to fines and other penalties under federal law), one "All of this is true. I agree to the Terms" box, and a signature (full name). Step counter becomes "of 12" for service dogs, "of 7" for others.
+Saving:
+- Members (and people with paid trips) save straight to the account: weight, vet, rabies record, then the signed statement through /api/service-statement (passport shows the blue badge, "Task trained").
+- Everyone else: kept with the 7-day passport (data.service, plus when/where it was signed). When they pay and keep it, the pet gets weight, vet, rabies, training, and the signed statement is recorded with the original signing time.
+- Starting from /service-dog → Check my flight → "Get it filled in with Pet Vault" opens the maker as Dog + Service animal.
+Also: /assessment?pet=service and the new service result from part 1.
+
+Not tested by Claude in a browser yet (no browser available this session). Build passes.
+
+What to test:
+1. /passport/create?for=service (logged out): goes straight to name; after birthday you get the 5 service steps; counter says "of 12". Try typing "Certified Trainer" as the trainer: blocked. Promise step: can't continue without the box and a first + last name. Reveal shows the blue SERVICE DOG badge with "Handler statement signed" and "Task trained".
+2. Same flow as a pet: still 7 steps, no service steps.
+3. Back button walks back through the service steps correctly; refreshing mid-way keeps your place.
+4. If you can use a member test account: finish as a member, then check the pet page shows the signed statement and the DOT form button.
+
+Still to do: renewal reminder emails (3 days before first renewal, yearly); batch 2 content trims.
+
+Ready for testing.
+
 ### 2026-11-23: Built batch 1 (part 1): pricing A, renewal consent, simpler menu, one service dog page, training fix (live)
 Nima approved after Sisqo's review. Changes from Nima on that review: trainer chips read "Owner trained" / "A trainer or program"; no source links for customers, only "Last checked [month]" (Sisqo: please set up a monthly re-check of the rules and the "last checked" month); no disclaimers we don't need ("you don't need us to fly" etc. is not added anywhere).
 
