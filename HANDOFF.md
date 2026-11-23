@@ -16,6 +16,26 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-23: Plan update: pricing decided (option A), one passport flow, service dog sales path
+Replaces the pricing and DOT parts of the "simpler site" plan below. Nima decided. Not built yet.
+
+**Pricing (option A).**
+- Free: trip check and simple-flight checklist.
+- Pet Vault $6.99/month: passport, records, reminders, lost pet, travel mode, and the DOT Service Animal form filled in for every trip. No separate DOT price.
+- Travel Pass $14.99 per trip, with Pet Vault, only for paperwork trips (Mexico, Canada, Hawaii, cargo, connections). $29.99 standalone goes away.
+- Later (Nima): push international trips, where the Travel Pass makes money.
+- Kept: clear "renews at $6.99/month, cancel anytime" at checkout, one-tap cancel, reminder email 3 days before the first renewal.
+
+**One passport flow for everyone.** Every passport goes through the same Benny steps. A service dog gets one extra step before the reveal (training picks + signed statement), then the same reveal with the blue badge. Buying through the service dog path still makes the passport first.
+
+**Benny collects the DOT details as passport questions** (name, breed, weight, vet, rabies, trainer, tasks), so it never feels like a government form. The sworn part is never hidden: the owner reads and checks the DOT statements themselves before signing, including that false statements are a federal offense. Styled friendly and clean, not scary, not childish.
+
+**Service dog sales path.** /service-dog → "Check my flight" (free) → result: "[Dog] flies with you at no charge. Your airline will ask for the DOT form." One button: "Get it filled in with Pet Vault, $6.99/month" → passport with service dog step → DOT PDF ready to download or email. Mexico, Canada, Hawaii trips also offer the Travel Pass. ESA owners are told kindly their ESA flies as a pet and go to the pet path. Registry kits can link here with a tracking code.
+
+Question for Sisqo: existing Travel Pass buyers who paid $29.99 without Pet Vault: anything we must keep working for them? Also any auto-renew disclosure rules we should meet.
+
+Ready for review.
+
 ### 2026-11-23: Plan: simpler site, new pricing, $9.99 DOT form
 Discussed with Nima. Not built yet. Two batches.
 
