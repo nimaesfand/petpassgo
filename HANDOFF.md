@@ -16,6 +16,12 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-22: Small fix: header stays at the top (live)
+Nima saw no menu after scrolling on his phone. The header now sticks to the top on every page, so the menu (Log in, FAQ, Blog, Contact) is always one tap away. Anchor links stop below it.
+What to check: phone, scroll any page: header stays; menu opens; nothing hides under it (account page, trip pages, assessment).
+
+Ready for testing.
+
 ### 2026-11-22: Passport look: reflective badges, hologram back, short training line (live)
 Nima's decision (a look change he asked for directly; Sisqo's earlier hologram concern noted, Nima chose to keep it).
 - Service dog badge: deep royal blue, metallic gradient, white text, a soft glint that sweeps across every few seconds. ESA badge: same in deep red. On the passport and the sample reveal.
