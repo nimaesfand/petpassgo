@@ -16,6 +16,29 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-22: Built: passport cleanup, pricing cards, tap-to-open documents, travel mode, confirm-email fix (live)
+Nima approved the plan with Sisqo's changes. Test account 6dpq5mtb+fix-test@mail.grokbot.com deleted. Database: added pets.checkin_epoch (Nima approved).
+
+What changed:
+1. **Confirm-email bug.** The free-checklist trip is now also saved on the account at sign-up (user metadata) and restored after login, so it survives confirming in another browser or app. /login now continues on its own when you're already signed in (that was the "F" avatar: you were signed in but the page still showed the form). Confirm link goes to /login?confirmed=1, which shows "Your email is confirmed. Log in to pick up where you left off." if you're not signed in.
+2. **Passport.** Training, trainer and tasks are one "Training" field. The owner sees it all; everyone else sees only the training level unless the owner turns on "Show training details" (same switch as before, now also on the signed card). Under the photo: a plain label "SERVICE DOG / Handler statement signed" (blue) or "EMOTIONAL SUPPORT / Flies as a pet" (red). No shield, ring or date. Rainbow dot removed.
+3. **/check and travel mode.** Service dog row says "Service dog, handler statement signed." Trainer and tasks only if the owner shares them. Rabies certificate, health certificate, DOT form and any other travel-type upload (vaccines, airline form, microchip record) are tappable: a fresh 5-minute link is made on each tap and the file opens full screen with Close and "Open file". On iPhone, PDFs show an "Open file" button instead of an embedded PDF. Uploads typed "Other" never show. Line added: "Anyone who can see this screen can open these files." robots.txt now disallows /check/ and the page sends no referrer.
+4. **Travel mode timer.** No countdown: it says "Open for your trip". The link lasts until 2 days after the trip's last flight (at least 24 hours, at most 30 days). The "Someone needs a copy?" QR lasts 24 hours, with a "Stop sharing" button that turns off every shared link for that pet right away.
+5. **Sample passport on /pet-vault.** No share button. "This is a sample passport", "Make your pet's passport" and "Close". Faster, no falling gold bits. Rainbow sheen animation turned off site-wide.
+6. **Pricing (homepage "What it costs").** Free: $0, three checkmarks, "No card needed" box. Pet Vault: "Make the passport free. We hold it for 7 days. Keep it for $6.99 a month."
+7. **Lost pet.** "Your contact info stays private." "...with the approximate city they came from." The Publish lost poster form now explains scan emails and that the city can be off.
+8. **Contact bubble** hidden from the account dock on phones (Contact support is in the Account menu).
+
+What to test (phone and desktop):
+1. Free checklist sign-up with your tagged inbox, confirm the email in a different browser/profile, then log in in the original one: the LAX→JFK trip and the Benny box should appear. Also try confirming in the same browser.
+2. Visit /login while signed in: it should go to your account, not show the form.
+3. /pet-vault "See a sample": Benny as service dog, label under photo, no share button, smooth.
+4. Homepage pricing cards and lost-pet text.
+5. Travel mode and /check: needs a pet with uploaded documents, so it needs a Pet Vault account; if you can't, check that a bad or old /check link shows the closed or invalid message.
+6. Account on phone: contact bubble no longer covers the shortcut cards.
+
+Ready for testing.
+
 ### 2026-11-22: Plan: passport cleanup, pricing cards, tap-to-open documents
 Discussed with Nima. Not built yet.
 
