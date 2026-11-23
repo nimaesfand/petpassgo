@@ -18,18 +18,13 @@ export const NAV_LINKS = [
   { href: "/faq", label: "FAQ" },
 ];
 
-// Main links, by who is looking.
+// Main links, by who is looking. Kept short on purpose: one job per page.
 const GUEST_MAIN = [
-  { href: "/travel-pass", label: "Travel Pass", icon: "plane", sub: "Everything for one trip" },
-  { href: "/pet-vault", label: "Pet Vault", icon: "shield", sub: "Records, reminders, lost-pet help" },
-  { href: "/passport/create", label: "Pet Passport", icon: "tag", sub: "Make your pet\u2019s passport free, in a minute" },
-  ...(DISCOVER ? [{ href: "/discover", label: "Discover", icon: "pin", sub: "Pet-friendly places" }] : []),
-  { href: "/airlines", label: "Airlines", icon: "file", sub: "Pet rules by airline" },
+  { href: "/assessment", label: "Plan a trip", icon: "plane", sub: "Free check for your flight" },
+  { href: "/passport/create", label: "Pet Passport", icon: "tag", sub: "Make your pet\u2019s passport free" },
+  { href: "/pet-vault", label: "Pet Vault", icon: "shield", sub: "Passport, records, travel mode" },
 ];
 const GUEST_MORE = [
-  { href: "/airlines", label: "Airline pet rules" },
-  { href: "/blog", label: "Blog" },
-  ...(COMMUNITY ? [{ href: "/community", label: "Community" }] : []),
   { href: "/faq", label: "Help & FAQ" },
   { href: "/contact", label: "Contact us" },
 ];
@@ -37,14 +32,12 @@ const MEMBER_MAIN = [
   { href: "/account?tab=trips", label: "My Trips", icon: "plane", sub: "Travel Passes and checklists" },
   { href: "/account?tab=vault", label: "My Pets", icon: "paw", sub: "Profiles and passports" },
   { href: "/account?tab=vault&focus=id", label: "Passport", icon: "passport", sub: "Your pet's passport and QR" },
-  ...(DISCOVER ? [{ href: "/discover", label: "Discover", icon: "pin", sub: "Pet-friendly places" }] : []),
 ];
 const MEMBER_MORE = [
   { href: "/account", label: "Dashboard" },
   { href: "/account?tab=billing", label: "Account & billing" },
-  { href: "/airlines", label: "Airline pet rules" },
-  { href: "/blog", label: "Blog" },
   { href: "/faq", label: "Help & FAQ" },
+  { href: "/contact", label: "Contact us" },
 ];
 
 const link = { fontFamily: font.body, fontSize: 15, fontWeight: 500, color: tokens.navy, textDecoration: "none", whiteSpace: "nowrap" };
@@ -180,7 +173,7 @@ export default function SiteHeader({ onLogout }) {
           <Wordmark size={23} className="ppg-wordmark" />
         </a>
         <div className="flex items-center gap-2 sm:gap-4 lg:gap-6 flex-nowrap flex-shrink-0">
-          {main.map((l) => {
+          {main.filter((l) => l.href !== "/assessment").map((l) => {
             const on = isActive(l.href, here);
             return (
               <a key={l.href} href={l.href} className={`hidden ${l.href === "/airlines" ? "xl:inline" : "lg:inline"}`} aria-current={on ? "page" : undefined}

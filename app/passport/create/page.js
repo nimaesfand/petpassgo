@@ -70,6 +70,10 @@ export default function CreatePassport() {
       const s = JSON.parse(localStorage.getItem(KEY) || "null");
       if (s?.f) { const clean = Object.fromEntries(Object.entries(s.f).map(([k, v]) => [k, typeof v === "string" ? v : ""])); setF((x) => ({ ...x, ...clean })); if (s.photo) setPhoto(s.photo); if (s.done) setDone(s.done); setStep(s.done ? 99 : Math.min(s.step || 0, 7)); }
     } catch {}
+    // Coming from the service dog path: a dog, as a service animal.
+    try {
+      if (new URLSearchParams(window.location.search).get("for") === "service") setF((x) => (x.animal_type || x.role ? x : { ...x, animal_type: "Dog", role: "Service animal" }));
+    } catch {}
     loaded.current = true;
   }, []);
   useEffect(() => {

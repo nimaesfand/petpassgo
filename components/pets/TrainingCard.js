@@ -166,7 +166,7 @@ export default function TrainingCard({ pet, userId, onChanged }) {
                     <p style={hint}>Signed it? <button type="button" onClick={toDocs} style={{ color: tokens.navy, fontWeight: 700, background: "none", border: "none", padding: 0, textDecoration: "underline", cursor: "pointer", font: "inherit" }}>Add a photo of it to Docs</button> so it shows in Gate Ready at the airport.</p>
                   </>
                 ) : member === false ? (
-                  <p style={hint}>With Pet Vault, we fill this form in from {name}&apos;s passport for every trip. <a href="/join" style={{ color: tokens.navy, fontWeight: 700 }}>Unlock it</a>, or <a href="/service-dog/dot-form" style={{ color: tokens.navy, fontWeight: 700 }}>fill in the blank form yourself</a>.</p>
+                  <p style={hint}>With Pet Vault, we fill this form in from {name}&apos;s passport for every trip. <a href="/join" style={{ color: tokens.navy, fontWeight: 700 }}>Unlock it</a>.</p>
                 ) : null}
               </div>
               <div className="flex flex-wrap gap-3">

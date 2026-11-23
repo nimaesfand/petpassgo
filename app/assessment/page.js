@@ -589,6 +589,14 @@ export default function PetPassGoQuiz() {
                   <button type="button" onClick={() => setStep(4)} className="w-full rounded-full py-3.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>Try a different airline</button>
                   <button type="button" onClick={() => setStep(5)} className="w-full rounded-full py-3.5" style={{ background: "#fff", color: tokens.navy, fontFamily: font.body, fontWeight: 700, fontSize: 16, border: `1.5px solid ${tokens.line}`, cursor: "pointer" }}>Change cabin or hold</button>
                 </div>
+              ) : answers.role === "Service animal" && !answers.esa && easyTrip ? (
+                <div className="rounded-2xl p-5 ppg-rise" style={{ border: "2px solid #1D4ED8", background: "#F2F5FF" }}>
+                  <span className="ppg-badge ppg-badge-service inline-flex items-center gap-1.5 rounded-full px-3 py-1" style={{ color: "#fff", fontFamily: font.body, fontWeight: 800, fontSize: 12.5, letterSpacing: ".06em" }}><Icon name="shield" size={14} /> SERVICE DOG</span>
+                  <div className="mt-2" style={{ fontFamily: font.display, fontWeight: 800, fontSize: 21, color: tokens.navy, lineHeight: 1.2 }}>Your dog flies with you at no charge.</div>
+                  <p className="mt-1.5 mb-4" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }}>Your airline can ask for the DOT Service Animal form. Pet Vault fills it in from your dog&apos;s passport, for this trip and every trip after.</p>
+                  <a href={isMember ? "/account?tab=vault" : "/passport/create?for=service"} className="w-full inline-flex items-center justify-center rounded-full py-3.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 800, fontSize: 16, textDecoration: "none" }}>{isMember ? "Open my dog's DOT form" : `Get it filled in with Pet Vault · ${P.member}/mo`}</a>
+                  {!isMember ? <p className="mt-2 text-center" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>Make your dog&apos;s passport first. Cancel anytime.</p> : null}
+                </div>
               ) : easyTrip ? (
                 <div className="rounded-2xl p-5 ppg-rise" style={{ border: `2px solid ${tokens.green}`, background: "#F3FBF6" }}>
                   <div className="flex items-center justify-between gap-3">

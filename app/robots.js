@@ -5,7 +5,7 @@ import { SITE_URL, SITE_LAUNCHED } from "../lib/site";
 export default function robots() {
   if (!SITE_LAUNCHED) return { rules: [{ userAgent: "*", disallow: "/" }] };
   return {
-    rules: [{ userAgent: "*", allow: "/", disallow: ["/account", "/admin", "/api/", "/check/", "/id/", "/login", "/signup"] }],
+    rules: [{ userAgent: "*", allow: "/", disallow: ["/account", "/admin", "/api/", "/check/", "/id/", "/login", "/sandbox"] }],
     sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

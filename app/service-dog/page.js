@@ -3,116 +3,86 @@ import Icon from "../../components/Icon";
 import { TrackOnMount } from "../../components/Analytics";
 import { PRICES as P } from "../../lib/pricing";
 import { tokens, font } from "../../lib/theme";
-import { DOT_AIR_FORM_PAGE } from "../../lib/dotFormLinks";
 
 export const metadata = {
-  title: "Get your service dog ready to fly: what airlines check",
-  description: "Your service dog flies in the cabin at no charge. Here's what U.S. airlines can ask for, why you don't need a registration, and how to get the DOT form and your dog's records ready.",
+  title: "Flying with a service dog: what U.S. airlines ask for",
+  description: "Your service dog flies with you in the cabin at no charge. Here's what U.S. airlines can ask for, and how PetPassGo fills in the DOT Service Animal form for every trip.",
   alternates: { canonical: "/service-dog" },
 };
 
 const D = font.display;
 const B = font.body;
-const CTA = "/service-dog-kit/start";
-const KIT = "/service-dog-kit";
+const CTA = "/assessment?pet=service";
+const CHECKED = "November 2026";
 
+// What the airline can ask for. The "what", not the step-by-step "how".
 const NEED = [
-  { icon: "award", title: "A dog trained to help you", body: "Your dog has to be individually trained to do work or tasks for a person with a disability. You can train the dog yourself, or a trainer can. Psychiatric service dogs count." },
-  { icon: "file", title: "The DOT Service Animal Air Transportation Form", body: "The airline can ask you to fill in this U.S. Department of Transportation form, about your dog's training, health and behavior. You sign it yourself." },
-  { icon: "clock", title: "The relief form for flights of 8 hours or more", body: "For long flights, the airline can also ask how your dog will relieve itself, or that it won't need to." },
-  { icon: "check", title: "Your dog's basics", body: "Rabies vaccine, a harness, leash or tether at all times, and a dog that fits in your foot space or on your lap without blocking the aisle." },
-];
-
-const NOT = [
-  "A certificate, registration or ID card. There's no official U.S. service dog registry, and airlines can't require one.",
-  "A doctor's letter. Airlines can't ask for one for a service dog.",
-  "A pet fee or a carrier. A trained service dog flies in the cabin at no charge.",
+  { icon: "file", title: "The DOT Service Animal form", body: "A U.S. Department of Transportation form about your dog's training, health and behavior." },
+  { icon: "clock", title: "A relief form on long flights", body: "For flights of 8 hours or more, the airline can also ask how your dog will relieve itself." },
+  { icon: "check", title: "A trained, well-behaved dog", body: "Trained to do tasks for you, current on rabies, and on a leash or harness at your feet." },
 ];
 
 const STEPS = [
-  { n: "1", title: "Answer a few questions", body: "Your route, airline and dog. Free, and you get a straight answer for your trip." },
-  { n: "2", title: "We fill in the DOT form", body: "Your name, your dog's details, your vet's rabies info and who trained the dog go into the official form for you." },
-  { n: "3", title: "Check the boxes, sign, and fly", body: "Download the PDF, read and tick the sworn statements yourself, sign, and send it to your airline when they ask." },
+  { title: "Check your flight", body: "Your route, airline and dog. Free, in about a minute." },
+  { title: "Make your dog's passport", body: "Benny walks you through it, with your dog's training and your signed statement." },
+  { title: "Your DOT form, filled in", body: "Ready for every trip. You check the boxes, sign, and you're set." },
 ];
 
 export default function ServiceDogPage() {
   return (
     <div style={{ background: tokens.sky, minHeight: "100vh" }}>
       <SiteHeader />
-      <TrackOnMount contentType="landing" contentName="Service dog" />
-      <main>
-        <section className="max-w-[1100px] mx-auto px-4 sm:px-6 pt-8 lg:pt-14 pb-10">
-          <p style={{ fontFamily: B, fontSize: 15, fontWeight: 800, letterSpacing: "0.08em", color: tokens.primary }}>FLYING WITH A SERVICE DOG</p>
-          <h1 style={{ fontFamily: D, fontWeight: 800, color: tokens.navy, lineHeight: 1.05, textWrap: "balance" }} className="text-[36px] sm:text-[52px] mt-2 max-w-[48rem]">
-            Your service dog flies with you, in the cabin, at no charge.
-          </h1>
-          <p style={{ fontFamily: B, fontSize: 19, lineHeight: 1.5, color: tokens.ink }} className="mt-4 max-w-[40rem]">
-            Here&apos;s what U.S. airlines can actually ask for, and how to have all of it ready in about 10 minutes.
-          </p>
-          <div className="flex flex-wrap gap-3 mt-6">
-            <a href={CTA} className="inline-flex items-center justify-center rounded-full px-8 min-h-[54px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Build my dog&apos;s kit</a>
-            <a href="#what-you-need" className="inline-flex items-center justify-center rounded-full px-6 min-h-[54px]" style={{ background: "#fff", color: tokens.navy, border: `1.5px solid ${tokens.line}`, fontFamily: B, fontWeight: 800, fontSize: 16, textDecoration: "none" }}>What you need</a>
-          </div>
-        </section>
+      <TrackOnMount contentType="service_dog" contentName="Service dog" />
 
-        <section id="what-you-need" className="max-w-[1100px] mx-auto px-4 sm:px-6 pb-12" style={{ scrollMarginTop: 80 }}>
-          <h2 style={{ fontFamily: D, fontWeight: 800, color: tokens.navy }} className="text-[30px] sm:text-[38px]">What you need</h2>
-          <div className="grid sm:grid-cols-2 gap-3 mt-5">
-            {NEED.map((x) => (
-              <div key={x.title} className="rounded-3xl p-5 flex gap-4" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-                <span className="flex items-center justify-center rounded-2xl flex-shrink-0" style={{ width: 48, height: 48, background: "#E3F5F2", color: "#0F766E" }}><Icon name={x.icon} size={24} /></span>
-                <div>
-                  <div style={{ fontFamily: B, fontWeight: 800, fontSize: 18, color: tokens.navy }}>{x.title}</div>
-                  <div className="mt-1" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>{x.body}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+      <section style={{ background: tokens.navyDeep || tokens.navy }}>
+        <div className="max-w-[900px] mx-auto px-5 sm:px-8 py-12 sm:py-16">
+          <span className="ppg-badge ppg-badge-service inline-flex items-center gap-2 rounded-full px-3.5 py-1.5" style={{ color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 13.5, letterSpacing: ".06em" }}>
+            <Icon name="shield" size={16} /> SERVICE DOG
+          </span>
+          <h1 className="mt-4 text-[38px] sm:text-[56px] font-extrabold" style={{ fontFamily: D, color: "#fff", lineHeight: 1.02, letterSpacing: "-0.02em", maxWidth: "16ch" }}>Your service dog flies with you, free.</h1>
+          <p className="mt-4 text-[18px] sm:text-[20px]" style={{ fontFamily: B, color: "#E7EDF6", lineHeight: 1.5, maxWidth: "34rem" }}>Airlines can ask for the DOT Service Animal form. We fill it in from your dog&apos;s passport, for every trip.</p>
+          <a href={CTA} className="btn-primary mt-8 inline-flex items-center justify-center rounded-full px-9 min-h-[58px] w-full sm:w-auto" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 18, textDecoration: "none" }}>Check my flight</a>
+        </div>
+      </section>
 
-          <div className="rounded-3xl p-5 sm:p-6 mt-4" style={{ background: "#FFF8EB", border: "1px solid #F5D9A4" }}>
-            <div style={{ fontFamily: B, fontWeight: 800, fontSize: 18, color: tokens.navy }}>Do you need to register your service dog? No. You don&apos;t need:</div>
-            <ul className="mt-2 grid gap-2" style={{ listStyle: "none", padding: 0, margin: 0 }}>
-              {NOT.map((t) => (
-                <li key={t} className="flex gap-2" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>
-                  <span style={{ color: tokens.green, marginTop: 3 }}><Icon name="check" size={16} /></span>{t}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-3" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>
-              What helps instead is having the real paperwork ready. <a href={KIT} style={{ color: tokens.navy, fontWeight: 800 }}>See the Service Dog Travel Kit</a>.
-            </p>
-          </div>
-        </section>
+      <main className="max-w-[900px] mx-auto px-5 sm:px-8 py-12 sm:py-16">
+        <h2 className="text-[28px] sm:text-[36px] font-extrabold" style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.1 }}>What your airline can ask for</h2>
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          {NEED.map((n) => (
+            <div key={n.title} className="rounded-3xl p-5" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+              <span className="inline-flex items-center justify-center rounded-2xl" style={{ width: 44, height: 44, background: "#E0E7FF", color: "#1D4ED8" }}><Icon name={n.icon} size={22} /></span>
+              <div className="mt-3" style={{ fontFamily: D, fontSize: 19, fontWeight: 800, color: tokens.navy, lineHeight: 1.2 }}>{n.title}</div>
+              <p className="mt-1.5" style={{ fontFamily: B, fontSize: 15.5, color: tokens.ink, lineHeight: 1.5 }}>{n.body}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-3" style={{ fontFamily: B, fontSize: 13.5, color: tokens.muted }}>Last checked {CHECKED}.</p>
 
-        <section style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }}>
-          <div className="max-w-[1100px] mx-auto px-4 sm:px-6 py-12">
-            <h2 style={{ fontFamily: D, fontWeight: 800, color: tokens.navy }} className="text-[30px] sm:text-[38px]">How PetPassGo gets you ready</h2>
-            <ol className="grid md:grid-cols-3 gap-3 mt-5" style={{ listStyle: "none", padding: 0, margin: 0 }}>
-              {STEPS.map((s) => (
-                <li key={s.n} className="rounded-3xl p-5" style={{ background: tokens.sky }}>
-                  <span className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: tokens.navy, color: tokens.gold, fontFamily: D, fontWeight: 800, fontSize: 18 }}>{s.n}</span>
-                  <div className="mt-3" style={{ fontFamily: B, fontWeight: 800, fontSize: 18, color: tokens.navy }}>{s.title}</div>
-                  <div className="mt-1" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.5, color: tokens.ink }}>{s.body}</div>
-                </li>
-              ))}
-            </ol>
-            <p className="mt-5" style={{ fontFamily: B, fontSize: 15, lineHeight: 1.5, color: tokens.muted }}>
-              Your Travel Pass also covers your airline's own steps and deadlines (some ask for the form up to 48 hours before you fly), your destination's entry rules, and a Pet ID for your dog. {P.pass} for one trip, or {P.memberPass} with Pet Vault.
-            </p>
-          </div>
-        </section>
+        <h2 className="mt-14 text-[28px] sm:text-[36px] font-extrabold" style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.1 }}>How we get you ready</h2>
+        <ol className="mt-6 grid gap-3 sm:grid-cols-3">
+          {STEPS.map((s, i) => (
+            <li key={s.title} className="rounded-3xl p-5" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+              <span className="inline-flex items-center justify-center rounded-full" style={{ width: 36, height: 36, background: tokens.navy, color: tokens.gold, fontFamily: D, fontWeight: 800 }}>{i + 1}</span>
+              <div className="mt-3" style={{ fontFamily: D, fontSize: 19, fontWeight: 800, color: tokens.navy, lineHeight: 1.2 }}>{s.title}</div>
+              <p className="mt-1.5" style={{ fontFamily: B, fontSize: 15.5, color: tokens.ink, lineHeight: 1.5 }}>{s.body}</p>
+            </li>
+          ))}
+        </ol>
 
-        <section className="max-w-[1100px] mx-auto px-4 sm:px-6 py-12">
-          <h2 style={{ fontFamily: D, fontWeight: 800, color: tokens.navy }} className="text-[26px] sm:text-[32px]">Emotional support animals</h2>
-          <p className="mt-2 max-w-[44rem]" style={{ fontFamily: B, fontSize: 16, lineHeight: 1.55, color: tokens.ink }}>
-            Since 2021, U.S. airlines treat emotional support animals as pets, so the pet rules and fees apply. If your dog is trained to perform a task for your disability, including psychiatric tasks, it's a service dog. If it isn't, it flies as a pet, and we'll show you exactly how.
-          </p>
-          <p className="mt-4 max-w-[44rem]" style={{ fontFamily: B, fontSize: 14, lineHeight: 1.5, color: tokens.muted }}>
-            The DOT form is an official U.S. government document. You sign it yourself, and knowingly false statements can lead to fines and other penalties. Source: <a href={DOT_AIR_FORM_PAGE} target="_blank" rel="noopener" style={{ color: tokens.navy }}>U.S. Department of Transportation</a>.
-          </p>
-            <div><a href="/service-dog/dot-form" className="inline-flex items-center justify-center rounded-full px-5 mt-3" style={{ minHeight: 46, background: "#fff", color: tokens.navy, border: `1.5px solid ${tokens.navy}`, fontWeight: 700, fontSize: 15.5, textDecoration: "none" }}>How to fill out the DOT form</a></div>
-          <a href={CTA} className="inline-flex items-center justify-center rounded-full px-8 min-h-[54px] mt-6" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Take the 30-second check</a>
-        </section>
+        <div className="mt-10 rounded-3xl p-6 sm:p-8 text-center" style={{ background: tokens.navy }}>
+          <div style={{ fontFamily: B, fontSize: 14, fontWeight: 800, letterSpacing: ".08em", color: tokens.gold }}>PET VAULT</div>
+          <div className="mt-1" style={{ fontFamily: D, fontSize: 40, fontWeight: 800, color: "#fff" }}>{P.member}<span style={{ fontSize: 17, fontWeight: 600 }}> a month</span></div>
+          <p className="mt-2 mx-auto" style={{ fontFamily: B, fontSize: 16, color: "#E7EDF6", lineHeight: 1.5, maxWidth: "30rem" }}>Your dog&apos;s passport, the DOT form for every trip, records, reminders and travel mode at the gate. Cancel anytime.</p>
+          <a href={CTA} className="btn-primary mt-6 inline-flex items-center justify-center rounded-full px-9 min-h-[56px] w-full sm:w-auto" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Check my flight</a>
+        </div>
+
+        <div className="mt-10 rounded-3xl p-5 sm:p-6 flex gap-4 items-start" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+          <span className="ppg-badge ppg-badge-esa flex-shrink-0 inline-flex items-center justify-center rounded-2xl" style={{ width: 44, height: 44, color: "#fff" }}><Icon name="heart" size={22} /></span>
+          <div>
+            <div style={{ fontFamily: D, fontSize: 19, fontWeight: 800, color: tokens.navy }}>Flying with an emotional support animal?</div>
+            <p className="mt-1" style={{ fontFamily: B, fontSize: 15.5, color: tokens.ink, lineHeight: 1.5 }}>On U.S. airlines, emotional support animals fly as pets. <a href="/assessment?pet=esa" style={{ color: tokens.navy, fontWeight: 800 }}>Check your flight</a> to see what yours needs.</p>
+          </div>
+        </div>
       </main>
     </div>
   );
