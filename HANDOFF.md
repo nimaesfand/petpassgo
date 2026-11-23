@@ -16,6 +16,29 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-23: Built batch 1 (part 1): pricing A, renewal consent, simpler menu, one service dog page, training fix (live)
+Nima approved after Sisqo's review. Changes from Nima on that review: trainer chips read "Owner trained" / "A trainer or program"; no source links for customers, only "Last checked [month]" (Sisqo: please set up a monthly re-check of the rules and the "last checked" month); no disclaimers we don't need ("you don't need us to fly" etc. is not added anywhere).
+
+What changed:
+1. **Training (Nima's earlier decision, which Claude missed):** "Owner trained" or "A trainer or program" with typed name + business. A word filter blocks certified, registered, official, approved, licensed, accredited, verified, government, federal, ADA. Program list and "Owner says a service dog program..." removed. Added Nima's tasks (POTS, asthma, back-watching, dissociation, leading home, standing up, wheelchair, carrying, undressing, home sounds, curbs, elevators/crosswalks, meltdowns, finding the car). DOT trainer fields: owner = handler's name; trainer = "name, business".
+2. **Pricing A:** Travel Pass is $14.99 with Pet Vault ($21.98 first trip). Standalone $29.99 retired in UI and checkout; an old "pass" request starts Pet Vault + pass ("join") for non-members, member price for members. Old paid trips untouched. Stripe price `ppg_travel_pass_2999` not deleted. Copy updated on homepage cards, /travel-pass, FAQ, terms, guarantee, Benny list, chat prompt.
+3. **Renewal consent:** every Pet Vault checkout (assessment paywall, account, join, passport keep, guest email step) shows an unticked box: "Start Pet Vault at $6.99 a month. It renews every month until I cancel, and I can cancel anytime in my account." Checkout is blocked until ticked. Stripe Checkout shows the same line by the Pay button. The subscription stores renew_consent_at + renew_terms in Stripe metadata (kept with the subscription). Purchase email now says it renews at $6.99/month until canceled with a direct link to account Billing.
+4. **Menu:** guests see Pet Passport, Pet Vault, Help (FAQ, Contact), Log in, and the Plan trip button. Members: My Trips, My Pets, Passport, account menu with Help & FAQ and Contact. Airlines, Blog, Community, Discover are out of the menu (pages still work).
+5. **One service dog page (/service-dog):** short. Hero "Your service dog flies with you, free." → "Check my flight". What the airline can ask for (3 cards) + "Last checked November 2026". 3 steps. Pet Vault $6.99 box. One-line ESA note. No registry box, no source line. /service-dog-kit, /service-dog-kit/start and /service-dog/dot-form now redirect to /service-dog. /signup redirects to /passport/create. Sitemap updated.
+6. **Service dog trip result (/assessment):** for a simple service dog trip: "Your dog flies with you at no charge. Your airline can ask for the DOT Service Animal form..." with one button "Get it filled in with Pet Vault · $6.99/mo" → /passport/create?for=service (starts as a dog / service animal). Members get "Open my dog's DOT form". Paperwork trips (Mexico etc.) show the Travel Pass with Pet Vault card.
+7. Homepage guarantee "How it works" now links to the FAQ. /guarantee and /welcome stay live (emails link to them).
+
+Not done yet (next): service dog step inside the passport maker before the reveal (Benny collects DOT details + the signed statement, styled friendly); 3-day first-renewal reminder and annual reminder emails; batch 2 content trimming.
+
+What to test:
+1. /service-dog on phone: one page, one button repeated, no source links. /service-dog-kit and /service-dog/dot-form land on it.
+2. Trip check as a service dog, simple U.S. flight: blue box, one button to /passport/create?for=service, which starts as Dog + Service animal.
+3. Trip check, paperwork trip, logged out: one card "Travel Pass with Pet Vault, $21.98 today", renewal box must be ticked before continuing. Stop at Stripe: confirm the renewal line shows by the Pay button. Do not pay.
+4. Menus on phone and desktop, logged out and in.
+5. Training card: "Owner trained" / "A trainer or program"; typing "Certified Trainer" shows the warning and blocks saving.
+
+Ready for testing.
+
 ### 2026-11-23: Plan update: pricing decided (option A), one passport flow, service dog sales path
 Replaces the pricing and DOT parts of the "simpler site" plan below. Nima decided. Not built yet.
 
