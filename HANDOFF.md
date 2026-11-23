@@ -16,6 +16,16 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-22: Passport look: reflective badges, hologram back, short training line (live)
+Nima's decision (a look change he asked for directly; Sisqo's earlier hologram concern noted, Nima chose to keep it).
+- Service dog badge: deep royal blue, metallic gradient, white text, a soft glint that sweeps across every few seconds. ESA badge: same in deep red. On the passport and the sample reveal.
+- Hologram is back under the badge, with the faint ghost photo beside it.
+- Training on the card is one short line: "Task trained" for a service dog with a signed statement, otherwise the top 2 levels. Who trained, where and tasks only appear on the check page behind the QR, when the owner shares them.
+
+What to check: homepage and /pet-vault sample passports on phone and desktop: badge looks deep blue and reflective, hologram shows, Training is one short line, the glint is smooth (no lag), and it stops with "reduce motion" turned on.
+
+Ready for testing.
+
 ### 2026-11-22: Built: training pick-lists + Sisqo's small fixes (live)
 Nima approved with Sisqo's changes. "Other task" is a checkbox only (they describe it on the airline's form). Test account 6dpq5mtb+build-test@mail.grokbot.com deleted.
 
