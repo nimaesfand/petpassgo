@@ -281,6 +281,20 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-23: Built batch 1 (part 1): pricing A, renewal consent, menu, service dog page, training fix: test results
+Tested the live site at 8964e4a (before 701891b/edc6bb5 went live), logged out, phone (375px) and desktop. No payment and no card entered. No test account was created (see 5).
+
+1. **/service-dog and redirects: pass.** Hero says "Your service dog flies with you, free.", "Check my flight" appears twice, there are 3 cards, and "Last checked November 2026" shows. No source links, no "kit", no certified/registered/official. /service-dog-kit, /service-dog-kit/start and /service-dog/dot-form all go to /service-dog. /signup goes to /passport/create. /guarantee loads. /welcome with no session shows "We couldn't find that payment", which is fine. Small thing: on phones the header logo shows only "Go".
+2. **Service dog trip result: FAIL.** LAX to JFK, Delta, direct, service dog, via /assessment?pet=service. The top is right ("Yes, your service dog can fly this trip", "No charge", DOT form step). But it then says **"This trip needs paperwork"** and shows the Travel Pass card ("$21.98 today", "Get my Travel Pass · $21.98"). The "Get it filled in with Pet Vault · $6.99/mo" button to /passport/create?for=service is missing. A simple U.S. service dog flight is being sold the paperwork pass.
+3. **Paperwork trip with renewal consent: pass.** LAX to MEX, Aeromexico, pet dog in cabin. One card says "Travel Pass with Pet Vault … $21.98 today". The renewal box starts unticked, and continuing without ticking it shows "Tick the box to start your access now. Checkout stays closed until you do." Stripe shows "$21.98, then $6.99 per month" and above Subscribe: "Pet Vault renews at $6.99 USD a month until you cancel. Cancel anytime in your PetPassGo account." Stopped there. Odd copy: this pet-dog card lists "DOT form filled in for service dogs", which is out of place for a pet.
+4. **Menus: pass logged out.** Phone menu has Plan a trip, Pet Passport, Pet Vault, Help & FAQ, Contact us, Log in, Plan my pet's trip. Desktop has Pet Passport, Pet Vault, Help, Log in, Plan trip. The footer still links Airlines and Blog, which is fine if intended. **Header did not stay at the top** when scrolling the homepage on phone (the 2026-11-22 sticky-header fix). Logged-in menus were not tested.
+5. **Training card: not tested.** /login has no sign-up, and the only way to make an account is the Benny passport maker, so I didn't get a signed-in dog this round. 701891b changed the trainer options again, so I'll test the current version next round through the passport maker.
+- **Homepage:** one main button, "Plan my pet's trip", plus a "How it works" link. The sample passport badge looked like a pale blue "SERVICE DOG / Handler statement signed" pill, not the deep blue reflective badge with hologram from the 2026-11-22 passport look entry. Claude, please confirm which is live.
+
+**For Claude:** fix 2 (simple service dog trip should get the Pet Vault DOT button, not the Travel Pass); check the sticky header and the passport badge look; drop "DOT form filled in for service dogs" from the pet card; phone logo "Go".
+Next for Sisqo: service dog steps in the passport maker (edc6bb5) plus the training card and logged-in menus.
+Screenshots: /workspace/petpassgo-review/2026-11-23-batch1/
+
 ### 2026-11-23: Plan: simpler site + pricing option A: review
 Read both "Ready for review" plans. The 2026-11-23 option A update replaces the pricing and DOT parts of the simpler-site plan. Leftover $9.99 copy in plan 1 (the result button "Get the DOT form filled in, $9.99 + Pet Vault", item 3 about a $9.99 DOT product, and "DOT form at $16.98") must be rewritten to option A before building, or that wording will ship by mistake. Nima decides.
 
