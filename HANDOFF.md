@@ -16,6 +16,36 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-23: Built: Sisqo's batch 1 fixes, renewal reminders, batch 2 content trims (live)
+Fixes from Sisqo's batch 1 test:
+- **Simple service dog trip (was FAIL):** the Pet Vault DOT box now shows for a service dog on any U.S. flight that isn't to or from Hawaii (the old check relied on "easy trip", which service dog trips never are because of the DOT step). Mexico, Canada and Hawaii still get the Travel Pass card.
+- Pet Travel Pass card no longer lists "DOT form filled in for service dogs" (only shows for service dogs, as "DOT form filled in for every trip").
+- **Sticky header on the homepage:** the homepage wrapper used overflow-x: hidden, which stops sticky. Now overflow-x: clip. Other pages were already fine.
+- **Phone logo showing only "Go":** the full PetPassGo wordmark now shows down to 330px wide.
+- **Pale badge:** the code on main uses the deep blue reflective badge (.ppg-badge-service). Sisqo, please hard-refresh and recheck; if it's still pale, send the page and a screenshot.
+
+Renewal reminders (in the daily cron, /api/cron/reminders, 9am PT):
+- Before the first renewal: one email 0 to 3 days before it, "Pet Vault renews on [date]", $6.99/month until canceled, what's included, direct cancel link.
+- Yearly: one reminder a year after that, same terms and cancel link.
+- Only active members with a Stripe subscription. Each sent once (new table membership_notices, unique per member and kind; Nima approved the migration).
+
+Batch 2 trims:
+- /mexico and /canada: "What you'll need" shows the list of requirements by phase (titles only), no step-by-step bodies, no timing tips box, no source links, no "rules change" footer. Still shows "Last checked". Travel Pass box shows $14.99 per trip with Pet Vault. Page titles say "what you need" instead of "every step".
+- State guides (/guides/*): source links removed; meta description no longer says "with official sources".
+- Homepage "Where our information comes from": "Checked against the rule makers" (no "every rule links"). Sample answer says "Checked Nov 2026" instead of a source.
+- Airline pages were already short. Inside the paid Travel Pass, sources stay (paid customers).
+
+For Sisqo: please set up the monthly re-check of the rules and the "Last checked" month on /service-dog, /mexico, /canada and the state guides, and send Claude the list of anything that changed.
+
+What to test:
+1. Service dog, LAX→JFK Delta: blue "Your dog flies with you at no charge" box with "Get it filled in with Pet Vault · $6.99/mo"; LAX→HNL and LAX→MEX: Travel Pass card.
+2. Pet dog paperwork trip: card has no DOT line.
+3. Homepage on phone: header stays on top while scrolling; full logo shows.
+4. /mexico and /canada on phone: short, no sources, list of what you'll need, $14.99 with Pet Vault.
+5. Plus last round's list for the passport maker service steps (not tested yet).
+
+Ready for testing.
+
 ### 2026-11-23: Built batch 1 (part 2): service dog steps in the passport maker + trainer wording (live)
 Nima: trainer choices are "Owner trained", "Dog trainer", "Trained in a program". Dog trainer = name + business; program = program name. Word filter still applies.
 
