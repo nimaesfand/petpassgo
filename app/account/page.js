@@ -515,7 +515,7 @@ function MemberUpsell() {
       <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted, lineHeight: 1.55 }} className="mb-3">
         Your plan includes one pet. Membership ({usd(P.member)}/mo) adds unlimited pets, {usd(P.memberPass)} Travel Passes and reminders before your documents expire. {MEMBERSHIP_TERMS}
       </p>
-      <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
+      <WithdrawalConsent renews checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
       <MarketingOptIn checked={tips} onChange={setTips} />
       <button disabled={busy} onClick={async () => { if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; } trackBeginCheckout("membership"); setBusy(true); const e = await startStripe("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true, marketing_opt_in: tips }); if (e) { setErr(e); setBusy(false); } }} className="ppg-btn ppg-btn-primary">{JOIN_CTA}</button>
     </div>
@@ -695,14 +695,16 @@ function UnlockTripCard({ trip }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [consent, setConsent] = useState(false);
+  const [isMem, setIsMem] = useState(null);
+  useEffect(() => { supabase.rpc("my_membership").then(({ data }) => setIsMem(!!data)); }, []);
   const [tips, setTips] = useState(false);
   async function unlock() {
     if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; }
     setBusy(true); setErr("");
     const { data: m } = await supabase.rpc("my_membership");
     const { data: s } = await supabase.auth.getSession();
-    trackBeginCheckout(m ? "member_pass" : "pass");
-    const r = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ plan: m ? "member_pass" : "pass", trip_id: trip.id, attribution: getAttribution(), immediate_access_consent: true, marketing_opt_in: tips }) });
+    trackBeginCheckout(m ? "member_pass" : "join");
+    const r = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s?.session?.access_token || "" }, body: JSON.stringify({ plan: m ? "member_pass" : "join", trip_id: trip.id, attribution: getAttribution(), immediate_access_consent: true, marketing_opt_in: tips }) });
     const j = await r.json().catch(() => ({}));
     if (r.ok && j.url) window.location.href = j.url; else { setErr(j.error || "Checkout isn't available right now. Please try again."); setBusy(false); }
   }
@@ -711,8 +713,9 @@ function UnlockTripCard({ trip }) {
       <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-1"><Icon name="lock" size={18} /> This trip isn't unlocked yet</div>
       <p style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, opacity: 0.8 }} className="mb-4">Your full checklist, deadlines and reminders are ready the moment you finish checkout.</p>
       <MarketingOptIn checked={tips} onChange={setTips} />
-      <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
-      <button disabled={busy} onClick={unlock} className="ppg-btn ppg-btn-primary">Unlock this trip</button>
+      {isMem === false ? <p className="mb-2" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>Travel Pass {usd(P.memberPass)} + Pet Vault {usd(P.member)} today, then {P.member} a month.</p> : null}
+      <WithdrawalConsent renews={isMem === false} checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
+      <button disabled={busy || isMem === null} onClick={unlock} className="ppg-btn ppg-btn-primary">Unlock this trip</button>
       <TrustBadges className="mt-4 text-left" />
     </div>
   );
@@ -1082,7 +1085,7 @@ function BillingTab({ userId, email }) {
           {err && <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp }} className="mt-3">{err}</p>}
         </> : <>
           <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}<b>{VAULT_NAME}</b> · {usd(P.member)}{P.memberUnit}. {VAULT_SUB} Plus {usd(P.memberPass)} Travel Passes. {MEMBERSHIP_TERMS}</p>
-          <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
+          <WithdrawalConsent renews checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
           <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => { if (!consent) { setErr(WITHDRAWAL_BLOCKED); return; } trackBeginCheckout("membership"); go("/api/stripe/checkout", { plan: "membership", immediate_access_consent: true, marketing_opt_in: tips }); }} className="ppg-btn ppg-btn-primary">{JOIN_CTA}</button><button disabled={busy} onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary">Receipts and cards</button></div>
         </>}
       </div>

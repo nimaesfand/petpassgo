@@ -7,6 +7,8 @@ import { saveMarketingConsent } from "@/lib/marketingServer";
 import { marketingSourceForPlan } from "@/lib/marketing";
 
 export const dynamic = "force-dynamic";
+const RENEW_TEXT = "Pet Vault renews at $6.99 USD a month until you cancel. Cancel anytime in your PetPassGo account.";
+
 
 // plan: "pass" ($29.99, non-members), "member_pass" ($14.99, active members only),
 // "join" ($6.99/mo membership + this trip at $14.99), "membership" (membership only).
@@ -41,8 +43,9 @@ async function handle(req) {
   const member = await isMember(sb, user.id);
   if (plan === "member_pass" && !member) return NextResponse.json({ error: "The $14.99 USD pass is for members." }, { status: 403 });
   if ((plan === "join" || plan === "membership") && member) return NextResponse.json({ error: "You're already a member." }, { status: 409 });
-  // Members always get the member price.
-  const effPlan = plan === "pass" && member ? "member_pass" : plan;
+  // The standalone $29.99 pass is retired: a Travel Pass comes with Pet Vault ("join"),
+  // or at the member price for members. Old "pass" requests map here.
+  const effPlan = plan === "pass" ? (member ? "member_pass" : "join") : plan;
 
   if (effPlan !== "membership") {
     if (!tripId) return NextResponse.json({ error: "Missing trip" }, { status: 400 });
@@ -78,7 +81,8 @@ async function handle(req) {
     const items = [{ price: await priceId("membership"), quantity: 1 }];
     if (effPlan === "join") items.push({ price: await priceId("member_pass"), quantity: 1 });
     Object.assign(params, {
-      mode: "subscription", line_items: items, subscription_data: { metadata: { user_id: user.id, ...attribution, ...(consent ? consentMetadata(consent.id, consent.consented_at) : {}) } },
+      mode: "subscription", line_items: items, subscription_data: { metadata: { user_id: user.id, renew_consent_at: new Date().toISOString(), renew_terms: "6.99 USD monthly until canceled", ...attribution, ...(consent ? consentMetadata(consent.id, consent.consented_at) : {}) } },
+      custom_text: { submit: { message: RENEW_TEXT } },
       payment_method_data: { allow_redisplay: "always" }, // card can be offered again on later Travel Pass checkouts
       saved_payment_method_options: { allow_redisplay_filters: ["always", "limited", "unspecified"] },
     });

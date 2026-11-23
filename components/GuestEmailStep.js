@@ -66,7 +66,7 @@ export default function GuestEmailStep({ plan, trip, cancelPath, onClose, showCo
           <input type="email" required autoFocus={finePointer()} autoComplete="email" inputMode="email" placeholder="Your email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, height: 52, lineHeight: "normal" }} className="rounded-xl px-4 outline-none" />
           {plan === "membership" ? <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink, margin: 0 }}>{MEMBERSHIP_TERMS}</p> : <GuaranteeLine />}
           {showMarketing ? <MarketingOptIn checked={tips} onChange={setTips} /> : null}
-          {showConsent ? <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} /> : (err ? <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp, margin: 0 }}>{err}</p> : null)}
+          {showConsent ? <WithdrawalConsent renews={plan !== "pass"} checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} /> : (err ? <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp, margin: 0 }}>{err}</p> : null)}
           <button type="submit" disabled={busy} style={btn} className="btn-primary rounded-full py-3.5 text-[16px]">{busy ? "One moment…" : "Continue"}</button>
           {onClose && <button type="button" onClick={onClose} className="py-1" style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted, background: "none", border: "none" }}>Cancel</button>}
         </form>

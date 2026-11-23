@@ -26,7 +26,7 @@ export const PLANS = [
     k: "pass",
     name: "Travel Pass",
     price: P.pass,
-    unit: "one trip",
+    unit: "per trip, with Pet Vault",
     note: "",
     items: [
       "Requirements for your exact airline, route and pet",

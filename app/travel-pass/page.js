@@ -59,7 +59,7 @@ export default function TravelPassPage() {
           <div style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, letterSpacing: "0.08em", color: tokens.gold }}>ONE TRIP</div>
           <div style={{ fontFamily: font.display, fontSize: 56, fontWeight: 700, color: "#fff", lineHeight: 1 }} className="mt-2">{P.pass}</div>
           <p style={{ fontFamily: font.body, fontSize: 17, lineHeight: 1.5, color: tokens.sky }} className="mt-3 mb-6 max-w-[36rem] mx-auto">
-            Includes Pet Vault until 7 days after the trip. If you add a return date, that runs until 7 days after you fly back. Members add a Travel Pass for {P.memberPass}.
+            Per trip, with Pet Vault ({P.member} a month, cancel anytime). Your first trip is {P.joinToday} today.
           </p>
           <a href="/assessment" className="btn-primary inline-flex items-center justify-center rounded-full px-8 py-4 w-full sm:w-auto min-h-[56px]" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 18, textDecoration: "none" }}>{PLAN_CTA}</a>
         </div>

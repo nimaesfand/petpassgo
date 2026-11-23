@@ -301,7 +301,7 @@ export default function PetPassGoQuiz() {
     if (!data.user) {
       // Pay first: ask for the email (existing accounts log in instead), then Stripe.
       // Answers stay in this browser so "Back" from Stripe returns to these results.
-      const nextGuest = plan === "member" ? "join" : "pass";
+      const nextGuest = "join";
       trackBeginCheckout(nextGuest);
       localStorage.setItem("petpassgo_pending_trip", JSON.stringify(answers));
       setGuestPlan(nextGuest);
@@ -315,7 +315,7 @@ export default function PetPassGoQuiz() {
     if (saved.error || !trip) { setBuying(false); alert("Sorry, something went wrong saving your trip. Please try again."); return; }
 
     // Payment happens on Stripe; only the Stripe webhook can mark the trip paid.
-    const stripePlan = plan === "member" ? "join" : isMember ? "member_pass" : "pass";
+    const stripePlan = isMember ? "member_pass" : "join";
     trackBeginCheckout(stripePlan);
     const { data: s } = await supabase.auth.getSession();
     const r = await fetch("/api/stripe/checkout", {
@@ -602,7 +602,7 @@ export default function PetPassGoQuiz() {
               ) : <>
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">This trip needs paperwork</h2>
               <p className="mb-3" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }}>Your Travel Pass walks you through every step above, in order, with due dates.</p>
-              <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setConsentErr(""); }} error={consentErr} />
+              <WithdrawalConsent renews={!isMember} checked={consent} onChange={(v) => { setConsent(v); setConsentErr(""); }} error={consentErr} />
               {isMember ? (
                 <button disabled={buying} onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5 mt-2" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : `Unlock my Travel Pass · ${usd(P.memberPass)}`}</button>
               ) : (
@@ -610,27 +610,24 @@ export default function PetPassGoQuiz() {
                   <div className="rounded-2xl p-5" style={{ border: `2px solid ${tokens.primary}`, background: "#FFFBF8" }}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 20, color: tokens.navy, lineHeight: 1.15 }}>Travel Pass</div>
-                        <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.muted }}>One time, for this trip</div>
+                        <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 20, color: tokens.navy, lineHeight: 1.15 }}>Travel Pass with Pet Vault</div>
+                        <div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 600, color: tokens.muted }}>{P.memberPass} pass + {P.member} first month</div>
                       </div>
-                      <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 24, color: tokens.navy, whiteSpace: "nowrap" }}>{P.pass}</div>
+                      <div className="text-right">
+                        <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 24, color: tokens.navy, whiteSpace: "nowrap" }}>{P.joinToday}</div>
+                        <div style={{ fontFamily: font.body, fontSize: 12.5, fontWeight: 700, color: tokens.muted }}>today</div>
+                      </div>
                     </div>
                     <ul className="mt-2 mb-4 flex flex-col gap-1.5">
-                      {["Every step for this trip, in order", "Due dates and reminders", "Official source on each rule", "Pet Vault free until 7 days after you land"].map((t) => (
+                      {["Every step for this trip, in order", "Due dates and reminders", `Your pet's passport, records and travel mode`, "DOT form filled in for service dogs"].map((t) => (
                         <li key={t} className="flex items-start gap-2" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.4 }}>
                           <span style={{ color: tokens.primary, marginTop: 1 }}><Icon name="check" size={16} /></span>{t}
                         </li>
                       ))}
                     </ul>
-                    <button disabled={buying} onClick={() => handlePurchase("pass")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : "Unlock my Travel Pass"}</button>
+                    <button disabled={buying} onClick={() => handlePurchase("member")} className="w-full rounded-full py-3.5" style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : `Get my Travel Pass · ${P.joinToday}`}</button>
+                    <p className="mt-2 text-center" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>Then {P.member} a month. Cancel anytime.</p>
                   </div>
-                  <button type="button" disabled={buying} onClick={() => handlePurchase("member")} className="w-full rounded-2xl px-4 py-3 mt-3 text-left flex items-center gap-3" style={{ background: "#fff", border: `1px solid ${tokens.line}`, cursor: "pointer", opacity: buying ? 0.7 : 1 }}>
-                    <span className="flex-1 min-w-0">
-                      <span className="block" style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, color: tokens.navy }}>Or join Pet Vault + Pass · {usd(P.joinToday)} today</span>
-                      <span className="block" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted, lineHeight: 1.4 }}>Pet ID, records and lost-pet help all year. Then {P.member}/mo, cancel anytime.</span>
-                    </span>
-                    <span style={{ color: tokens.navy, fontSize: 20, fontWeight: 700 }}>›</span>
-                  </button>
                 </div>
               )}
               <div className="mt-3"><MarketingOptIn checked={tips} onChange={setTips} /></div>

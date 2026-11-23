@@ -90,7 +90,7 @@ export default function KeepPassport() {
             </>
           ) : (
             <>
-              <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
+              <WithdrawalConsent renews checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
               <button type="button" disabled={busy} onClick={pay} className="w-full rounded-full mt-2" style={{ minHeight: 60, background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 19, border: "none", cursor: "pointer" }}>{busy ? "One moment…" : `Keep ${name}'s passport`}</button>
             </>
           )}

@@ -27,8 +27,9 @@ const NAME_FIELDS = [
 async function handle(req) {
   let body;
   try { body = await req.json(); } catch { return NextResponse.json({ error: "Bad request" }, { status: 400 }); }
-  const plan = body?.plan;
-  if (!["pass", "join", "membership"].includes(plan)) return NextResponse.json({ error: "Unknown plan" }, { status: 400 });
+  // The standalone $29.99 pass is retired: a Travel Pass comes with Pet Vault.
+  const plan = body?.plan === "pass" ? "join" : body?.plan;
+  if (!["join", "membership"].includes(plan)) return NextResponse.json({ error: "Unknown plan" }, { status: 400 });
   // The 14-day withdrawal waiver only applies to EU/EEA/UK/Swiss buyers.
   const euUk = needsWithdrawalConsent(req);
   if (euUk && !consentAccepted(body)) return NextResponse.json({ error: WITHDRAWAL_BLOCKED }, { status: 400 });
@@ -85,7 +86,8 @@ async function handle(req) {
     Object.assign(params, {
       mode: "subscription",
       line_items: items,
-      subscription_data: { metadata: { guest_checkout_id: row.id, ...attribution, ...(consent ? consentMetadata(consent.id, consent.consented_at) : {}) } },
+      subscription_data: { metadata: { guest_checkout_id: row.id, renew_consent_at: new Date().toISOString(), renew_terms: "6.99 USD monthly until canceled", ...attribution, ...(consent ? consentMetadata(consent.id, consent.consented_at) : {}) } },
+      custom_text: { submit: { message: "Pet Vault renews at $6.99 USD a month until you cancel. Cancel anytime in your PetPassGo account." } },
       payment_method_data: { allow_redisplay: "always" },
     });
   }

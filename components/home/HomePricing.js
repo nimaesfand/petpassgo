@@ -46,9 +46,9 @@ export default function HomePricing() {
         </div>
         <div className="flex items-baseline gap-x-2 gap-y-1 flex-wrap mt-6">
           <span data-testid="pass-price" style={{ fontFamily: font.display, fontSize: 48, fontWeight: 700, lineHeight: 1 }}>{P.pass}</span>
-          <span style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.3, color: tokens.muted }}>complicated trip</span>
+          <span style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.3, color: tokens.muted }}>per trip, with Pet Vault</span>
         </div>
-        <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, fontWeight: 600 }} className="mt-2 mb-5">Includes Pet Vault until 7 days after your trip.</p>
+        <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, fontWeight: 600 }} className="mt-2 mb-5">{P.joinToday} today for your first trip, then {P.member} a month. Cancel anytime.</p>
         <PlanTripButton full />
       </article>
 

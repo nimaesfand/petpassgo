@@ -62,7 +62,7 @@ export default function JoinPage() {
               <p style={{ fontFamily: font.body, fontSize: 16, fontWeight: 700, color: tokens.navy }}>{VAULT_NAME} · {usd(P.member)}/mo</p>
               <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-2">{VAULT_SUB} Prices are in US dollars (USD).</p>
               <MarketingOptIn checked={tips} onChange={setTips} />
-              <WithdrawalConsent checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
+              <WithdrawalConsent renews checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
               <button type="button" disabled={busy} onClick={pay} style={{ background: tokens.stamp, color: "#fff", fontFamily: font.body, fontWeight: 600, border: "none" }} className="btn-primary w-full rounded-full py-3.5 text-[16px]">{busy ? "One moment…" : "Continue"}</button>
             </>
           ) : (

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { tokens, font } from "../lib/theme";
 import { WITHDRAWAL_CHECKBOX } from "../lib/withdrawal";
+import { PRICES } from "../lib/pricing";
 
 // The 14-day withdrawal waiver is an EU/EEA/UK/Swiss rule. Ask /api/geo once per
 // page load; everywhere else the box never shows and checkout just proceeds.
@@ -18,10 +19,15 @@ export function useWithdrawalRequired() {
 
 // Unticked on purpose for EU/UK buyers. Everyone else: renders nothing and
 // counts as accepted so the existing checkout checks pass.
-export default function WithdrawalConsent({ checked, onChange, error }) {
+// renews: this checkout starts Pet Vault. Everyone ticks the box to agree to the
+// monthly renewal (auto-renewal laws want express consent, not just "Pay").
+export default function WithdrawalConsent({ checked, onChange, error, renews = false }) {
   const need = useWithdrawalRequired();
-  useEffect(() => { if (need === false && !checked) onChange(true); }, [need]); // eslint-disable-line react-hooks/exhaustive-deps
-  if (need !== true) return error ? <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp, margin: "8px 0 0" }}>{error}</p> : null;
+  useEffect(() => { if (need === false && !renews && !checked) onChange(true); }, [need, renews]); // eslint-disable-line react-hooks/exhaustive-deps
+  const text = renews
+    ? `Start Pet Vault at ${PRICES.member} a month. It renews every month until I cancel, and I can cancel anytime in my account.${need === true ? " " + WITHDRAWAL_CHECKBOX : ""}`
+    : WITHDRAWAL_CHECKBOX;
+  if (need !== true && !renews) return error ? <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp, margin: "8px 0 0" }}>{error}</p> : null;
   return (
     <div className="my-3">
       <label style={{ display: "flex", gap: 12, alignItems: "flex-start", fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink, cursor: "pointer", padding: "4px 0" }}>
@@ -31,7 +37,7 @@ export default function WithdrawalConsent({ checked, onChange, error }) {
           onChange={(e) => onChange(e.target.checked)}
           style={{ width: 22, height: 22, marginTop: 2, flex: "0 0 auto", accentColor: tokens.navy }}
         />
-        <span>{WITHDRAWAL_CHECKBOX}</span>
+        <span>{text}</span>
       </label>
       {error ? (
         <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp, margin: "8px 0 0" }}>{error}</p>

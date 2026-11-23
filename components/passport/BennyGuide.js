@@ -35,7 +35,7 @@ const EVERYTHING = [
   "Bring Me Home: QR tag, lost-pet alerts and messages from whoever finds them",
   "Training records and the signed service dog statement",
   "Unlimited pets",
-  "Travel Passes for $14.99 instead of $29.99",
+  "Travel Passes for $14.99 when a trip needs paperwork",
 ];
 
 // Everything Pet Vault includes, folded away so the page stays simple.
