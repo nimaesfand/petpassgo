@@ -25,13 +25,13 @@ export default function TrainingCard({ pet, userId, onChanged }) {
   const isDog = pet.animal_type === "Dog";
   const isService = /service/i.test(pet.role || "");
   const [levels, setLevels] = useState(Array.isArray(t.levels) ? t.levels : pet.trained ? ["house"] : []);
-  const [by, setBy] = useState(t.trained_by === "program" ? "trainer" : t.trained_by || "");
+  const [by, setBy] = useState(t.trained_by || "");
   const [who, setWho] = useState(t.trainer_name || "");
-  const [biz, setBiz] = useState(t.trainer_business || "");
+  const [biz, setBiz] = useState(t.trainer_business || (t.trained_by === "program" ? t.trainer_name || "" : ""));
   const [where, setWhere] = useState(placeLabel(t.trained_where) ? t.trained_where : "");
   const whoCheck = cleanTrainerText(who), bizCheck = cleanTrainerText(biz);
-  const trainerErr = by === "trainer" ? (whoCheck.error || bizCheck.error || "") : "";
-  const trainerMissing = by === "trainer" && !who.trim() && !biz.trim();
+  const trainerErr = by === "trainer" ? (whoCheck.error || bizCheck.error || "") : by === "program" ? (bizCheck.error || "") : "";
+  const trainerMissing = (by === "trainer" && !who.trim() && !biz.trim()) || (by === "program" && !biz.trim());
   const [saving, setSaving] = useState(false);
 
   const [signing, setSigning] = useState(false);
@@ -77,7 +77,7 @@ export default function TrainingCard({ pet, userId, onChanged }) {
     setSaving(true);
     const keepTasks = pet.service_attested_at ? Array.from(new Set([...levels, "tasks"])) : levels;
     if (trainerErr) { alert(trainerErr); return; }
-    const training = { ...t, levels: keepTasks, trained_by: by || null, program: null, trainer_name: by === "trainer" ? whoCheck.value || null : null, trainer_business: by === "trainer" ? bizCheck.value || null : null, trained_where: where || null };
+    const training = { ...t, levels: keepTasks, trained_by: by || null, program: null, trainer_name: by === "trainer" ? whoCheck.value || null : null, trainer_business: by && by !== "owner" ? bizCheck.value || null : null, trained_where: where || null };
     const { error } = await supabase.from("pets").update({ training, trained: keepTasks.length ? true : pet.trained }).eq("id", pet.id).eq("user_id", userId);
     setSaving(false);
     if (error) { alert("Couldn't save training. Please try again."); return; }
@@ -132,6 +132,11 @@ export default function TrainingCard({ pet, userId, onChanged }) {
           </label>
           {trainerErr ? <p role="alert" className="sm:col-span-2" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>{trainerErr}</p> : null}
         </div>
+      ) : by === "program" ? (
+        <label className="grid gap-1.5"><span style={lab}>Program name</span>
+          <input value={biz} onChange={(e) => setBiz(e.target.value)} maxLength={80} style={input} placeholder="The program that trained them" />
+          {trainerErr ? <span role="alert" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>{trainerErr}</span> : null}
+        </label>
       ) : null}
       {by ? (
         <label className="grid gap-1.5"><span style={lab}>Where they trained</span>
@@ -198,7 +203,7 @@ export default function TrainingCard({ pet, userId, onChanged }) {
                   Show training details on the passport and at the gate (off keeps them private)
                 </label>
               </div>
-              {!by ? <p role="alert" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>Pick who trained {name} above first.</p> : trainerMissing ? <p role="alert" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>Add the trainer&apos;s name or business above first.</p> : null}
+              {!by ? <p role="alert" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>Pick who trained {name} above first.</p> : trainerMissing ? <p role="alert" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>Add the trainer or program name above first.</p> : null}
               <div className="rounded-xl p-3" style={{ background: "#fff", border: `1px solid ${tokens.line}`, maxHeight: 220, overflowY: "auto" }}>
                 <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 800, letterSpacing: "0.12em", color: tokens.muted }}>STATEMENT</div>
                 <p className="mt-1" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, lineHeight: 1.55, whiteSpace: "pre-line" }}>{statementText({ petName: pet.name, signedName: signed.trim() || "[your full name]" })}</p>

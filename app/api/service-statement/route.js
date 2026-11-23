@@ -31,14 +31,15 @@ export async function POST(req) {
   const okTask = new Set(ALL_TASK_KEYS);
   const tasks = Array.from(new Set((Array.isArray(b.tasks) ? b.tasks : []).filter((t) => okTask.has(t)))).slice(0, ALL_TASK_KEYS.length);
   if (!tasks.length) return NextResponse.json({ error: "Pick at least one kind of task." }, { status: 400 });
-  const trainedBy = TRAINED_BY.some(([k]) => k === b.trained_by) ? b.trained_by : b.trained_by === "program" ? "trainer" : null;
+  const trainedBy = TRAINED_BY.some(([k]) => k === b.trained_by) ? b.trained_by : null;
   if (!trainedBy) return NextResponse.json({ error: "Tell us who trained them." }, { status: 400 });
   const tn = cleanTrainerText(b.trainer_name), tb = cleanTrainerText(b.trainer_business);
   if (!tn.ok || !tb.ok) return NextResponse.json({ error: tn.error || tb.error }, { status: 400 });
   if (trainedBy === "trainer" && !tn.value && !tb.value) return NextResponse.json({ error: "Add the trainer's name or business." }, { status: 400 });
+  if (trainedBy === "program" && !tb.value) return NextResponse.json({ error: "Add the program's name." }, { status: 400 });
   // Picks only. A value typed before the pick-lists is kept as it was.
   const where = PLACES.some(([k]) => k === b.trained_where) ? b.trained_where : (pet.training?.trained_where || null);
-  const trainerName = trainedBy === "trainer" ? [tn.value, tb.value && tb.value !== tn.value ? tb.value : ""].filter(Boolean).join(", ") || null : null;
+  const trainerName = trainedBy === "trainer" ? [tn.value, tb.value && tb.value !== tn.value ? tb.value : ""].filter(Boolean).join(", ") || null : trainedBy === "program" ? tb.value : null;
 
   const text = statementText({ petName: pet.name, signedName: name });
   const now = new Date().toISOString();
@@ -51,7 +52,7 @@ export async function POST(req) {
   });
   if (error) return NextResponse.json({ error: "Couldn't save your statement. Please try again." }, { status: 500 });
   const levels = Array.from(new Set([...(pet.training?.levels || []), "tasks"]));
-  const training = { ...(pet.training || {}), levels, trained_by: trainedBy, program: null, trainer_name: trainedBy === "trainer" ? tn.value || null : null, trainer_business: trainedBy === "trainer" ? tb.value || null : null, trained_where: where, tasks, show_tasks: b.show_tasks === true };
+  const training = { ...(pet.training || {}), levels, trained_by: trainedBy, program: null, trainer_name: trainedBy === "trainer" ? tn.value || null : null, trainer_business: trainedBy === "owner" ? null : tb.value || null, trained_where: where, tasks, show_tasks: b.show_tasks === true };
   await svc.from("pets").update({ role: "Service animal", training, service_attested_at: now }).eq("id", petId).eq("user_id", user.id);
   return NextResponse.json({ ok: true, signed_at: now });
 }
