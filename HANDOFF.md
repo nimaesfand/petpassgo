@@ -136,6 +136,31 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-22: Built: passport cleanup, pricing, tap-to-open, travel mode, confirm-email fix: test results
+Tested live at phone width (~390px, Chrome device mode) and desktop (1280px). Screenshots on Sisqo's computer under `/workspace/petpassgo-review/2026-11-22-build/`. No payment made.
+
+**1. Confirm-email fix: PASS (the bug from the last round is fixed).**
+- Signed up logged out from a free LAX→JFK Delta trip as 6dpq5mtb+build-test@mail.grokbot.com. Sign-up button hides; "check your email" shows. Email arrived; link now redirects to /login?confirmed=1.
+- Confirmed in a separate Incognito window: it flashed /login?confirmed=1 ("One moment…"), then went straight to /account **already signed in**, with the free checklist, 4 steps and the Benny box. So the "Your email is confirmed. Log in…" note never shows in that case, which is fine because the user is already in. (The note would only matter if the link arrives without a session.)
+- Original window, logged in: landed on /account?free_trip=1 then /account with "Your free checklist is ready", 4 steps, "Your pet flies in 21 days", and the Benny box. No "Make an account". /account?tab=trips shows "Your pet · LAX → JFK / Dec 13, 2026 · Delta". The trip survived.
+- Small: on phones the trip card title truncates to "Your pet · LAX …" and the tab row clips "Arrival" to "A". The Benny box headline says "your pet's passport" (no name, since the quiz doesn't ask for one).
+
+**2. /login while signed in: PASS.** It goes to /account after a short "Loading…", and no form shows.
+
+**3. /pet-vault sample: PASS.** "See a passport come together" runs through PRINTING → CHECKING → PASSPORT ISSUED. Benny shows with a plain light-blue "SERVICE DOG / Handler statement signed" label under the photo, with no shield, ring or date. It says "This is a sample passport", and the buttons are "Make your pet's passport" and "Close". There's no share button, no gold bits and no rainbow dot. The homepage flip passport uses the same label.
+- Note: the static sample on /pet-vault before the reveal still says "Statement not signed yet", which contradicts the finished reveal.
+
+**4. Homepage pricing and lost-pet copy: PASS.** The Free card shows $0, three checkmarks and the green "No card needed" box. Travel Pass shows $29.99, or $14.99 with Pet Vault. Pet Vault shows $6.99 a month with "Make the passport free. We hold it for 7 days. Keep it for $6.99 a month." The cards sit three in a row on desktop. The lost-pet section reads "Your contact info stays private." and "approximate city."
+- On phones, the contact bubble sits over the Travel Pass "Plan my pet's trip" button when scrolled there.
+
+**5. /check and travel mode: PARTLY TESTED.** Without a Pet Vault account with documents, tap-to-open and the travel-mode timer couldn't be tested. Bad and old links (`/check/not-a-real-token`, `/check/SAMP-LE7K-Q3XA`) show "This check-in link isn't valid", which is good. But the message still says **"Codes last 30 minutes,"** which is now wrong with the new trip-length link and the 24-hour QR. robots.txt has `Disallow: /check/`.
+
+**6. Contact bubble on /account (phone): PASS.** It's gone from the account page and no longer covers the shortcut cards.
+
+**For Claude, most important first:** (1) change "Codes last 30 minutes" on the invalid /check page; (2) "Statement not signed yet" on the static /pet-vault sample; (3) the trip card title and "Arrival" tab clipping at 390px; (4) the homepage bubble over "Plan my pet's trip" on phones.
+
+**Test accounts to delete (Claude):** 6dpq5mtb+build-test@mail.grokbot.com (first name "Build", one trip LAX→JFK Dec 13, no pet).
+
 ### 2026-11-22: Plan: training, trainer and tasks pick-lists: review
 Read against the current code on main (lib/training.js, TrainingCard.js, the service-statement API, PetPassport.js, /check, HomePassport.js, and the DOT form filler). Direction is right: free-text trainer and "where trained" fields are how "certified" or "registered" can end up on the passport. Nima decides.
 
