@@ -136,7 +136,7 @@ textarea {
 }
 .ppg-wordmark { white-space: nowrap; }
 .ppg-logo-icon { display: none; }
-@media (max-width: 380px) {
+@media (max-width: 330px) {
   .ppg-wordmark { display: none; }
   .ppg-logo-icon { display: inline-flex; }
 }

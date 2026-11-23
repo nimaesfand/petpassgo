@@ -6,7 +6,7 @@ import { supabase } from "../../lib/supabaseClient";
 import { OTHER_AIRLINE, airlineGroupsForRegion } from "../../lib/airlines";
 import { TRAVEL_METHODS } from "../../lib/tripFit";
 import { pickTripPet } from "../../lib/tripPet";
-import { routeAllowed, tripTypeForRoute } from "../../lib/airports";
+import { routeAllowed, tripTypeForRoute, findAirport } from "../../lib/airports";
 import { connectionReady, rulesRole, segmentsToStore } from "../../lib/segments";
 import { saveCheckoutTrip } from "../../lib/tripCheckout";
 import AirportField from "../../components/AirportField";
@@ -135,6 +135,16 @@ function AirlineChoices({ query, selected, onSelect, region }) {
       )}
     </>
   );
+}
+
+// A service dog on a U.S. flight (not to or from Hawaii) only needs the DOT form,
+// which Pet Vault fills in. Everything else is a paperwork trip.
+const HAWAII = new Set(["HNL", "OGG", "KOA", "LIH", "ITO", "MKK", "LNY", "JHM"]);
+function simpleServiceTrip(a) {
+  const from = findAirport(a.origin), to = findAirport(a.destination);
+  if (!from || !to) return false;
+  if (from.country !== "US" || to.country !== "US") return false;
+  return !HAWAII.has(from.code) && !HAWAII.has(to.code);
 }
 
 export default function PetPassGoQuiz() {
@@ -589,7 +599,7 @@ export default function PetPassGoQuiz() {
                   <button type="button" onClick={() => setStep(4)} className="w-full rounded-full py-3.5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>Try a different airline</button>
                   <button type="button" onClick={() => setStep(5)} className="w-full rounded-full py-3.5" style={{ background: "#fff", color: tokens.navy, fontFamily: font.body, fontWeight: 700, fontSize: 16, border: `1.5px solid ${tokens.line}`, cursor: "pointer" }}>Change cabin or hold</button>
                 </div>
-              ) : answers.role === "Service animal" && !answers.esa && easyTrip ? (
+              ) : answers.role === "Service animal" && !answers.esa && simpleServiceTrip(answers) ? (
                 <div className="rounded-2xl p-5 ppg-rise" style={{ border: "2px solid #1D4ED8", background: "#F2F5FF" }}>
                   <span className="ppg-badge ppg-badge-service inline-flex items-center gap-1.5 rounded-full px-3 py-1" style={{ color: "#fff", fontFamily: font.body, fontWeight: 800, fontSize: 12.5, letterSpacing: ".06em" }}><Icon name="shield" size={14} /> SERVICE DOG</span>
                   <div className="mt-2" style={{ fontFamily: font.display, fontWeight: 800, fontSize: 21, color: tokens.navy, lineHeight: 1.2 }}>Your dog flies with you at no charge.</div>
@@ -627,7 +637,7 @@ export default function PetPassGoQuiz() {
                       </div>
                     </div>
                     <ul className="mt-2 mb-4 flex flex-col gap-1.5">
-                      {["Every step for this trip, in order", "Due dates and reminders", `Your pet's passport, records and travel mode`, "DOT form filled in for service dogs"].map((t) => (
+                      {["Every step for this trip, in order", "Due dates and reminders", `Your pet's passport, records and travel mode`, ...(answers.role === "Service animal" ? ["DOT form filled in for every trip"] : [])].map((t) => (
                         <li key={t} className="flex items-start gap-2" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.4 }}>
                           <span style={{ color: tokens.primary, marginTop: 1 }}><Icon name="check" size={16} /></span>{t}
                         </li>

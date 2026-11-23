@@ -72,7 +72,7 @@ const FOOTER_LINKS = [
 export default async function PetPassGoLanding() {
   const tagQr = await QRCode.toString("https://www.petpassgo.com/pet-vault", { type: "svg", margin: 0, errorCorrectionLevel: "M", color: { dark: "#14213D", light: "#ffffff" } }).catch(() => "");
   return (
-    <div style={{ background: tokens.sky, color: tokens.ink }} className="min-h-screen w-full overflow-x-hidden">
+    <div style={{ background: tokens.sky, color: tokens.ink }} className="min-h-screen w-full overflow-x-clip">
       <style>{`
         .airline-tile { transition: border-color .15s ease, transform .15s ease; }
         .airline-tile:hover { border-color: ${tokens.stamp}; transform: translateY(-2px); }

@@ -98,5 +98,55 @@ export async function GET(req) {
       vetExpired++;
     }
   }
-  return NextResponse.json({ sent, docSent, vetReminded, vetExpired });
+  const renewals = await membershipNotices(sb, today);
+  return NextResponse.json({ sent, docSent, vetReminded, vetExpired, renewals });
+}
+
+// Pet Vault renewal reminders: 3 days before the first renewal, then once a year.
+// Each is sent once per member (membership_notices is unique on user_id + kind).
+async function membershipNotices(sb, today) {
+  const { data: rows } = await sb.from("memberships").select("user_id,status,current_period_end,stripe_subscription_id").eq("status", "active").not("stripe_subscription_id", "is", null);
+  let n = 0;
+  const day = 864e5;
+  for (const m of rows || []) {
+    if (!m.current_period_end) continue;
+    const renew = new Date(m.current_period_end);
+    const daysLeft = Math.round((new Date(renew.toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" })) - new Date(today)) / day);
+    const { data: first } = await sb.from("membership_notices").select("created_at").eq("user_id", m.user_id).eq("kind", "first_renewal").maybeSingle();
+    let kind = "";
+    if (!first && daysLeft >= 0 && daysLeft <= 3) kind = "first_renewal";
+    else if (first) {
+      const years = Math.floor((Date.now() - new Date(first.created_at).getTime()) / (365 * day));
+      if (years >= 1) kind = `annual_${years}`;
+    }
+    if (!kind) continue;
+    const { error: insErr } = await sb.from("membership_notices").insert({ user_id: m.user_id, kind });
+    if (insErr) continue; // already sent
+    const { data: u } = await sb.auth.admin.getUserById(m.user_id);
+    const to = u?.user?.email;
+    if (!to) continue;
+    const when = renew.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "America/Los_Angeles" });
+    const yearly = kind !== "first_renewal";
+    const r = await sendResendEmail({
+      to,
+      kind: yearly ? "membership_annual" : "membership_first_renewal",
+      subject: yearly ? "Your Pet Vault membership: a yearly reminder" : `Pet Vault renews on ${when}`,
+      text: [
+        "Hi,",
+        "",
+        yearly
+          ? "A yearly reminder about your Pet Vault membership."
+          : `Your Pet Vault membership renews on ${when}.`,
+        "",
+        `Pet Vault is $6.99 USD a month and renews every month until you cancel.${yearly ? ` Your next renewal is ${when}.` : ""}`,
+        "It keeps your pet's passport, records, reminders and travel mode, and fills in the DOT form for service dogs.",
+        "",
+        `To cancel, open your account and choose Cancel. No phone call, and you keep access through the month you've paid: ${SITE_URL}/account?tab=billing`,
+        "",
+        "PetPassGo",
+      ].join("\n"),
+    }).catch(() => null);
+    if (r !== null) n++;
+  }
+  return n;
 }
