@@ -15,6 +15,12 @@ export async function POST(req) {
   const email = String(b.email || "").trim().toLowerCase();
   if (!validEmail(email)) return NextResponse.json({ error: "That email doesn't look right. Please check it." }, { status: 400 });
   const data = cleanDraft(b.data);
+  // Keep when and where the service dog promise was signed, for the statement record.
+  if (data.service?.attest && data.service.signed_name) {
+    data.service.signed_at = new Date().toISOString();
+    data.service.ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim().slice(0, 64) || null;
+    data.service.user_agent = (req.headers.get("user-agent") || "").slice(0, 300) || null;
+  }
   if (!data.name) return NextResponse.json({ error: "Your pet's name is missing." }, { status: 400 });
 
   const svc = serviceClient();
@@ -78,5 +84,6 @@ export async function GET(req) {
     const s = await svc.storage.from(BUCKET).createSignedUrl(d.photo_path, 3600);
     photo = s.data?.signedUrl || null;
   }
-  return NextResponse.json({ data: d.data, email: d.email, photo, created_at: d.created_at, expires_at: d.expires_at, expired, claimed: !!d.claimed_at, pet_id: d.claimed_pet_id });
+  const pub = d.data?.service ? { ...d.data, service: { ...d.data.service, ip: undefined, user_agent: undefined } } : d.data;
+  return NextResponse.json({ data: pub, email: d.email, photo, created_at: d.created_at, expires_at: d.expires_at, expired, claimed: !!d.claimed_at, pet_id: d.claimed_pet_id });
 }

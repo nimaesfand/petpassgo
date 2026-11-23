@@ -10,6 +10,7 @@ import { supabase } from "../../../lib/supabaseClient";
 import { usePetAccess } from "../../../lib/access";
 import { PRICES as P } from "../../../lib/pricing";
 import { tokens, font } from "../../../lib/theme";
+import { TRAINED_BY, TASK_GROUPS, cleanTrainerText } from "../../../lib/training";
 
 // A free, guided passport. One question at a time, big and friendly, and the
 // passport fills in beside it as she answers. The email comes last; then the stamp.
@@ -51,7 +52,7 @@ async function shrink(file) {
 
 export default function CreatePassport() {
   const [step, setStep] = useState(0);
-  const [f, setF] = useState({ animal_type: "", role: "", name: "", breed: "", sex: "", month: "", year: "", handler_name: "", email: "" });
+  const [f, setF] = useState({ animal_type: "", role: "", name: "", breed: "", sex: "", month: "", year: "", handler_name: "", email: "", weight: "", trained_by: "", trainer_name: "", trainer_business: "", tasks: "", vet_name: "", vet_phone: "", rabies_exp: "", signed_name: "", attest: "" });
   const [user, setUser] = useState(null); // signed in: { id, email }
   const [reveal, setReveal] = useState(null); // { at, petId? }
   const access = usePetAccess(user?.id);
@@ -68,7 +69,7 @@ export default function CreatePassport() {
   useEffect(() => {
     try {
       const s = JSON.parse(localStorage.getItem(KEY) || "null");
-      if (s?.f) { const clean = Object.fromEntries(Object.entries(s.f).map(([k, v]) => [k, typeof v === "string" ? v : ""])); setF((x) => ({ ...x, ...clean })); if (s.photo) setPhoto(s.photo); if (s.done) setDone(s.done); setStep(s.done ? 99 : Math.min(s.step || 0, 7)); }
+      if (s?.f) { const clean = Object.fromEntries(Object.entries(s.f).map(([k, v]) => [k, typeof v === "string" ? v : ""])); setF((x) => ({ ...x, ...clean })); if (s.photo) setPhoto(s.photo); if (s.done) setDone(s.done); setStep(s.done ? 99 : [0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14].includes(s.step) ? s.step : 0); }
     } catch {}
     // Coming from the service dog path: a dog, as a service animal.
     try {
@@ -87,10 +88,21 @@ export default function CreatePassport() {
   const kind = f.animal_type === "Cat" ? "cat" : "dog";
   const dob = f.year ? `${f.year}-${String(f.month ? MONTHS.indexOf(f.month) + 1 : 6).padStart(2, "0")}-15` : "";
   const go = (n) => { setErr(""); setStep(n); };
+  // Service dogs get a few more passport questions (Benny collects what the DOT form
+  // needs) and sign their promise before the reveal. Everyone else goes 1-7.
+  const svc = f.role === "Service animal" && f.animal_type !== "Cat";
+  const ORDER = svc ? [1, 2, 3, 4, 5, 6, 10, 11, 12, 13, 14, 7] : [1, 2, 3, 4, 5, 6, 7];
+  const nextOf = (n) => ORDER[ORDER.indexOf(n) + 1] ?? 7;
+  const prevOf = (n) => (ORDER.indexOf(n) > 0 ? ORDER[ORDER.indexOf(n) - 1] : 0);
+  const taskList = f.tasks ? f.tasks.split(",").filter(Boolean) : [];
+  const toggleTask = (k) => set("tasks")((taskList.includes(k) ? taskList.filter((x) => x !== k) : [...taskList, k]).join(","));
 
   const pet = {
     id: "sample-draft", name: f.name.trim() || "Your pet", animal_type: f.animal_type || "Dog", role: f.role || "Pet",
     breed: f.breed.trim(), sex: f.sex, date_of_birth: dob, handler_name: f.handler_name.trim(),
+    weight_lb: Number(f.weight) > 0 ? Number(f.weight) : null,
+    training: svc && f.trained_by ? { levels: ["tasks"], trained_by: f.trained_by, tasks: taskList } : null,
+    service_attested_at: svc && f.attest && f.signed_name.trim() ? new Date().toISOString() : null,
     passport_no: "PPG-PREVIEW", passport_issued_at: done?.at || null,
   };
   const passportPhoto = photo ? <img src={photo} alt={f.name || "Your pet"} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : null;
@@ -102,7 +114,8 @@ export default function CreatePassport() {
     try { setPhoto(await shrink(file)); go(4); } catch { setErr("That photo didn't open. Try another one."); }
   }
 
-  const draftData = () => ({ animal_type: pet.animal_type, role: pet.role, name: pet.name, breed: pet.breed, sex: pet.sex, date_of_birth: dob, handler_name: pet.handler_name });
+  const serviceData = () => svc ? { weight: f.weight, trained_by: f.trained_by, trainer_name: f.trainer_name, trainer_business: f.trainer_business, tasks: taskList, vet_name: f.vet_name, vet_phone: f.vet_phone, rabies_exp: f.rabies_exp, signed_name: f.signed_name, attest: f.attest === "1" } : null;
+  const draftData = () => ({ animal_type: pet.animal_type, role: pet.role, name: pet.name, breed: pet.breed, sex: pet.sex, date_of_birth: dob, handler_name: pet.handler_name, service: serviceData() });
 
   // Members (and travelers with a paid trip) save straight to their account.
   async function saveToAccount() {
@@ -110,8 +123,16 @@ export default function CreatePassport() {
       user_id: user.id, name: pet.name, animal_type: pet.animal_type, role: pet.role,
       breed: pet.breed || null, sex: pet.sex || null, date_of_birth: dob || null,
       handler_name: pet.handler_name || null, passport_issued_at: new Date().toISOString(),
+      ...(svc ? { weight_lb: Number(f.weight) > 0 ? Number(f.weight) : null, vet_name: f.vet_name.trim() || null, vet_phone: f.vet_phone.trim() || null } : {}),
     }).select("id").single();
     if (error || !created) return { limit: /PET_LIMIT/.test(error?.message || "") };
+    if (svc) {
+      try {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(f.rabies_exp)) await supabase.from("pet_health_records").insert({ pet_id: created.id, user_id: user.id, kind: "vaccine", name: "Rabies", expires_on: f.rabies_exp });
+        const { data: sess } = await supabase.auth.getSession();
+        await fetch("/api/service-statement", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": sess?.session?.access_token || "" }, body: JSON.stringify({ pet_id: created.id, signed_name: f.signed_name, agree: f.attest === "1", tasks: taskList, trained_by: f.trained_by, trainer_name: f.trainer_name, trainer_business: f.trainer_business, show_tasks: false }) });
+      } catch {}
+    }
     if (photo) {
       try {
         const blob = await (await fetch(photo)).blob();
@@ -153,14 +174,15 @@ export default function CreatePassport() {
 
   function startOver() {
     try { localStorage.removeItem(KEY); } catch {}
-    setF({ animal_type: "", role: "", name: "", breed: "", sex: "", month: "", year: "", handler_name: "", email: "" });
+    setF({ animal_type: "", role: "", name: "", breed: "", sex: "", month: "", year: "", handler_name: "", email: "", weight: "", trained_by: "", trainer_name: "", trainer_business: "", tasks: "", vet_name: "", vet_phone: "", rabies_exp: "", signed_name: "", attest: "" });
     setPhoto(""); setDone(null); setStep(0);
   }
 
-  const total = 7;
+  const total = ORDER.length;
+  const stepNo = Math.max(1, ORDER.indexOf(step) + 1);
   const years = Array.from({ length: 26 }, (_, i) => String(new Date().getFullYear() - i));
   const errLine = err ? <p role="alert" className="mt-3" style={{ fontFamily: B, fontSize: 17, fontWeight: 700, color: tokens.primary }}>{err}</p> : null;
-  const back = step > 0 && step < 99 ? <button type="button" onClick={() => go(step - 1)} style={{ fontFamily: B, fontWeight: 700, fontSize: 17, color: tokens.navy, background: "none", border: "none", cursor: "pointer", padding: "8px 0" }}>← Back</button> : null;
+  const back = step > 0 && step < 99 ? <button type="button" onClick={() => go(prevOf(step))} style={{ fontFamily: B, fontWeight: 700, fontSize: 17, color: tokens.navy, background: "none", border: "none", cursor: "pointer", padding: "8px 0" }}>← Back</button> : null;
 
   let q = null;
   if (step === 0) q = (
@@ -226,7 +248,7 @@ export default function CreatePassport() {
     </>
   );
   if (step === 6) q = (
-    <form onSubmit={(e) => { e.preventDefault(); go(7); }}>
+    <form onSubmit={(e) => { e.preventDefault(); go(nextOf(6)); }}>
       <BennySays sub="A guess is perfectly fine.">When is {name}&apos;s birthday?</BennySays>
       <div className="mt-6 grid grid-cols-2 gap-3">
         <select value={f.month} onChange={(e) => set("month")(e.target.value)} aria-label="Birth month" style={big}>
@@ -240,8 +262,106 @@ export default function CreatePassport() {
       </div>
       <div className="mt-5 flex flex-wrap items-center gap-4">
         <BigButton type="submit">Next</BigButton>
-        <button type="button" onClick={() => { setF((x) => ({ ...x, month: "", year: "" })); go(7); }} style={{ fontFamily: B, fontWeight: 700, fontSize: 17, color: tokens.muted, background: "none", border: "none", textDecoration: "underline", cursor: "pointer" }}>I&apos;m not sure</button>
+        <button type="button" onClick={() => { setF((x) => ({ ...x, month: "", year: "" })); go(nextOf(6)); }} style={{ fontFamily: B, fontWeight: 700, fontSize: 17, color: tokens.muted, background: "none", border: "none", textDecoration: "underline", cursor: "pointer" }}>I&apos;m not sure</button>
       </div>
+    </form>
+  );
+
+  const tName = cleanTrainerText(f.trainer_name), tBiz = cleanTrainerText(f.trainer_business);
+  const trainerErr = f.trained_by === "trainer" ? tName.error || tBiz.error || "" : f.trained_by === "program" ? tBiz.error || "" : "";
+  if (step === 10) q = (
+    <form onSubmit={(e) => { e.preventDefault(); go(nextOf(10)); }}>
+      <BennySays sub="A guess is fine. Airlines like to know.">About how much does {name} weigh?</BennySays>
+      <div className="mt-6 flex items-center gap-3">
+        <input type="number" inputMode="decimal" min="1" max="250" value={f.weight} onChange={(e) => set("weight")(e.target.value.slice(0, 5))} aria-label="Weight in pounds" style={{ ...big, maxWidth: 200 }} />
+        <span style={{ fontFamily: B, fontSize: 20, fontWeight: 700, color: tokens.navy }}>lb</span>
+      </div>
+      <div className="mt-5"><BigButton type="submit">Next</BigButton></div>
+    </form>
+  );
+  if (step === 11) q = (
+    <form onSubmit={(e) => { e.preventDefault(); if (!f.trained_by) { setErr(`Who trained ${name}?`); return; } if (trainerErr) { setErr(trainerErr); return; } if (f.trained_by === "trainer" && !f.trainer_name.trim() && !f.trainer_business.trim()) { setErr("Add the trainer's name or business."); return; } if (f.trained_by === "program" && !f.trainer_business.trim()) { setErr("Add the program's name."); return; } go(nextOf(11)); }}>
+      <BennySays sub="Every great service dog has a teacher.">Who trained {name}?</BennySays>
+      <div className="mt-6 grid gap-3">
+        {TRAINED_BY.map(([k, l]) => <Choice key={k} on={f.trained_by === k} onClick={() => set("trained_by")(k)}>{l}</Choice>)}
+      </div>
+      {f.trained_by === "trainer" ? (
+        <div className="mt-4 grid gap-3">
+          <input value={f.trainer_name} onChange={(e) => set("trainer_name")(e.target.value)} maxLength={80} placeholder="Trainer's name" aria-label="Trainer's name" style={big} />
+          <input value={f.trainer_business} onChange={(e) => set("trainer_business")(e.target.value)} maxLength={80} placeholder="Their business" aria-label="Trainer's business" style={big} />
+        </div>
+      ) : f.trained_by === "program" ? (
+        <input value={f.trainer_business} onChange={(e) => set("trainer_business")(e.target.value)} maxLength={80} placeholder="Program name" aria-label="Program name" className="mt-4" style={big} />
+      ) : null}
+      {errLine}
+      <div className="mt-5"><BigButton type="submit">Next</BigButton></div>
+    </form>
+  );
+  if (step === 12) q = (
+    <>
+      <BennySays sub="Pick everything that fits. Only the kind of help can show on the passport.">What does {name} help you with?</BennySays>
+      <div className="mt-5 grid gap-4">
+        {TASK_GROUPS.map((g) => (
+          <div key={g.key}>
+            <div style={{ fontFamily: B, fontSize: 15, fontWeight: 800, color: tokens.navy, marginBottom: 6 }}>{g.label.replace(/ tasks$/, "")}</div>
+            <div className="flex flex-wrap gap-2">
+              {g.tasks.map(([k, l]) => {
+                const on = taskList.includes(k);
+                return <button key={k} type="button" onClick={() => toggleTask(k)} aria-pressed={on} className="rounded-full px-4 py-2.5" style={{ fontFamily: B, fontSize: 15.5, fontWeight: 700, cursor: "pointer", background: on ? tokens.navy : "#fff", color: on ? "#fff" : tokens.navy, border: `2px solid ${on ? tokens.navy : tokens.line}` }}>{on ? "✓ " : ""}{l}</button>;
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+      {errLine}
+      <div className="mt-6"><BigButton onClick={() => { if (!taskList.length) { setErr(`Pick at least one way ${name} helps you.`); return; } go(nextOf(12)); }}>Next</BigButton></div>
+    </>
+  );
+  if (step === 13) q = (
+    <form onSubmit={(e) => { e.preventDefault(); go(nextOf(13)); }}>
+      <BennySays sub="So everything is in one place when you fly.">Who&apos;s {name}&apos;s vet?</BennySays>
+      <div className="mt-6 grid gap-3">
+        <input value={f.vet_name} onChange={(e) => set("vet_name")(e.target.value)} maxLength={80} placeholder="Vet or clinic name" aria-label="Vet or clinic name" style={big} />
+        <input type="tel" value={f.vet_phone} onChange={(e) => set("vet_phone")(e.target.value)} maxLength={30} placeholder="Clinic phone" aria-label="Clinic phone" inputMode="tel" style={big} />
+        <label className="block">
+          <span style={{ fontFamily: B, fontSize: 17, fontWeight: 700, color: tokens.navy }}>Rabies vaccine good until</span>
+          <input type="date" value={f.rabies_exp} onChange={(e) => set("rabies_exp")(e.target.value)} aria-label="Rabies vaccine expiration date" className="mt-1.5" style={big} />
+        </label>
+      </div>
+      <div className="mt-5 flex flex-wrap items-center gap-4">
+        <BigButton type="submit">Next</BigButton>
+        <button type="button" onClick={() => go(nextOf(13))} style={{ fontFamily: B, fontWeight: 700, fontSize: 17, color: tokens.muted, background: "none", border: "none", textDecoration: "underline", cursor: "pointer" }}>I&apos;ll add this later</button>
+      </div>
+    </form>
+  );
+  const PROMISE = [
+    `${name} is trained to do tasks that help me with a disability.`,
+    `${name} is well-behaved in public, house trained, and stays right with me.`,
+    "I understand that false statements about a service animal can lead to fines and other penalties under federal law.",
+  ];
+  if (step === 14) q = (
+    <form onSubmit={(e) => { e.preventDefault(); if (f.attest !== "1") { setErr("Check each line to sign."); return; } const n = f.signed_name.trim().replace(/\s+/g, " "); if (n.length < 3 || !/\s/.test(n)) { setErr("Sign with your first and last name."); return; } go(nextOf(14)); }}>
+      <BennySays sub="This goes on your DOT form too, so it's ready every time you fly.">Last thing for {name}: your service dog promise.</BennySays>
+      <div className="mt-6 rounded-3xl p-5 sm:p-6" style={{ background: "#fff", border: "2px solid #1D4ED8", boxShadow: "0 14px 36px rgba(29,78,216,.12)" }}>
+        <span className="ppg-badge ppg-badge-service inline-flex items-center rounded-full px-3 py-1" style={{ color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 12.5, letterSpacing: ".08em" }}>SERVICE DOG</span>
+        <ul className="mt-4 grid gap-3">
+          {PROMISE.map((t) => (
+            <li key={t} className="flex items-start gap-3" style={{ fontFamily: B, fontSize: 17, lineHeight: 1.45, color: tokens.ink }}>
+              <span aria-hidden="true" className="flex-shrink-0 flex items-center justify-center rounded-full" style={{ width: 26, height: 26, marginTop: 1, background: f.attest === "1" ? "#1D4ED8" : "#E0E7FF", color: "#fff", fontWeight: 900, fontSize: 14 }}>{f.attest === "1" ? "✓" : ""}</span>{t}
+            </li>
+          ))}
+        </ul>
+        <label className="mt-5 flex items-start gap-3" style={{ fontFamily: B, fontSize: 17, fontWeight: 700, color: tokens.navy, cursor: "pointer" }}>
+          <input type="checkbox" checked={f.attest === "1"} onChange={(e) => set("attest")(e.target.checked ? "1" : "")} style={{ width: 24, height: 24, marginTop: 2, accentColor: "#1D4ED8" }} />
+          <span>All of this is true. I agree to the <a href="/terms#service-dogs" target="_blank" rel="noreferrer" style={{ color: tokens.navy }}>Terms</a>.</span>
+        </label>
+        <label className="block mt-5">
+          <span style={{ fontFamily: B, fontSize: 17, fontWeight: 700, color: tokens.navy }}>Sign with your full name</span>
+          <input value={f.signed_name} onChange={(e) => set("signed_name")(e.target.value)} maxLength={120} autoComplete="name" className="mt-1.5" style={{ ...big, fontFamily: "'Brush Script MT', 'Segoe Script', cursive", fontSize: 26 }} placeholder="Your full name" />
+        </label>
+      </div>
+      {errLine}
+      <div className="mt-5"><BigButton type="submit">Sign and continue</BigButton></div>
     </form>
   );
   if (step === 7) q = (
@@ -289,12 +409,12 @@ export default function CreatePassport() {
           {step > 0 && step < 99 ? (
             <div className="flex items-center justify-between mb-4">
               {back}
-              <span style={{ fontFamily: B, fontSize: 15.5, fontWeight: 700, color: tokens.muted }}>Step {Math.min(step, total)} of {total}</span>
+              <span style={{ fontFamily: B, fontSize: 15.5, fontWeight: 700, color: tokens.muted }}>Step {stepNo} of {total}</span>
             </div>
           ) : null}
           {step > 0 && step < 99 ? (
             <div className="mb-6 rounded-full overflow-hidden" style={{ height: 8, background: tokens.line }}>
-              <div style={{ width: `${(Math.min(step, total) / total) * 100}%`, height: "100%", background: tokens.primary, transition: "width .3s ease" }} />
+              <div style={{ width: `${(stepNo / total) * 100}%`, height: "100%", background: tokens.primary, transition: "width .3s ease" }} />
             </div>
           ) : null}
           {q}
