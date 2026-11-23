@@ -231,6 +231,58 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-23: Plan: simpler site + pricing option A: review
+Read both "Ready for review" plans. The 2026-11-23 option A update replaces the pricing and DOT parts of the simpler-site plan. Leftover $9.99 copy in plan 1 (the result button "Get the DOT form filled in, $9.99 + Pet Vault", item 3 about a $9.99 DOT product, and "DOT form at $16.98") must be rewritten to option A before building, or that wording will ship by mistake. Nima decides.
+
+**Existing paid customers (Claude's question).**
+I queried the live database with read-only counts (no account records were changed; the family household account was not opened or edited). There are no outside customers who paid $29.99 for a standalone Travel Pass. The only Travel Pass-shaped rows are two internal plus-tagged @petpassgo.com test accounts, each with a $0 "pass" purchase. There are no outside Pet Vault subscribers. The only active memberships are the owner's (no Stripe subscription id on the row) and one household/family account with a real Stripe Vault subscription and a $6.99 renewal. There is also one unused gmail signup with no payments. So there is no live $29.99 customer to migrate, but the code still has to treat already-paid trips as paid.
+
+What must keep working: access is already based on `trips.paid` (and the 7-day window after the flight, or an active Vault membership), not on whether $29.99 is still for sale. Leave those paid flags alone. Retire the standalone Stripe price (lookup key `ppg_travel_pass_2999`); do not delete it. The webhook unlocks trips and memberships from session metadata and subscription events, not from "is this the current price," so it should keep handling old sessions and invoices as long as the old price still exists. `plan: "pass"` in checkout should stop being offered, but historical `pass` metadata must still be recognized. Standalone-pass holders today keep trip tools until 7 days after they fly even if they never join Vault (`vaultIsOpen` / `tripAccessOpen`). That window should stay.
+
+**Links in sent emails.**
+These need a redirect, not just a menu change, or old email links will 404:
+- `/guarantee` is in the purchase confirmation email ("Terms: …/guarantee"). If it folds into the FAQ, redirect the old URL, including the guarantee terms people were emailed.
+- `/welcome` is the Stripe success URL for guest checkout (`/welcome?session_id=…`), where the buyer sets a password. If that page is folded into login or the passport maker, the redirect must keep the `session_id` query or paid guests cannot finish their account.
+
+No sent-email templates currently link to `/service-dog-kit`, `/signup`, `/join`, `/community`, or `/travel-pass`. `/signup` confirmations already go to `/login`. Other emails point at `/account`, `/passport/keep`, `/vet-verify/…`, `/contact`, and (for business listings) `/discover/…` and `/business/…`. If Discover/business are only hidden from the menu, keep those URLs working for the emails already sent. There are no redirects in `next.config.mjs` today (the file is essentially empty of redirects), so batch 1 has to add them.
+
+**Google traffic.**
+I could not tell. Search Console is not set up, and a Vercel Web Analytics query for this project was refused (not authorized for the team). Until someone can see actual search landing pages, don't strip the Google pages down to a teaser.
+
+**Auto-renewal rules (research, not legal advice).**
+Pet Vault is a monthly auto-renewing subscription sold online, so California's Automatic Renewal Law (Bus. & Prof. Code §§ 17601–17602, as amended by AB 2863; the new duties apply to contracts entered into, amended, or extended on or after July 1, 2025) and the federal Restore Online Shoppers' Confidence Act (ROSCA, 15 U.S.C. § 8403) both apply, including for California buyers.
+
+At checkout, before billing details: clearly and conspicuously, next to the consent, say that Pet Vault renews until the customer cancels, the amount ($6.99) and frequency (monthly), the term, and how to cancel. Get express affirmative consent to those renewal terms, not only to "Pay." Keep a record of that consent for at least three years, or one year after the membership ends, whichever is longer. If Travel Pass is sold only with Vault, say plainly that they are starting a monthly membership, not a one-time $21.98 charge.
+
+In the confirmation email (this is the acknowledgment the customer keeps): repeat the renewal terms, the cancellation policy, and how to cancel, in a form they can save. Today's purchase email already says they can cancel online anytime in account Billing and keep access through the period paid; add the $6.99/month renews-until-canceled line and a direct link to cancel. A Stripe payment receipt is not enough on its own; Stripe receipts confirm the charge and may not include the renewal terms and cancel instructions (see Stripe's own receipts docs). ROSCA also requires a simple way to stop recurring charges. California requires online cancel at will, without extra obstructive steps, via a prominent account link/button (or an immediately usable cancel email). The plan's one-tap cancel in the account matches that; keep it.
+
+Reminders: a 3-day email before the first $6.99 renewal is a good idea, especially for people who only wanted one trip, but California does not require that reminder for a regular monthly plan at full price. The 3-to-21-day notice is only for a free trial or discounted price lasting more than 31 days. The 15-to-45-day notice is for plans with an initial term of one year or longer. Pet Vault is neither, unless you later add a long trial or an annual plan. A price increase needs notice 7 to 30 days before it takes effect, plus how to cancel.
+
+An annual reminder (product, charge amount and frequency, how to cancel) is the safer course for Vault members. The California Attorney General's Sept. 4, 2025 consumer alert describes an annual reminder for auto-renewal or continuous-service plans. The statute says "annual automatic renewal agreement or continuous service agreement," which some readers might take more narrowly; I would still send the annual reminder.
+
+The FTC's 2024 "click-to-cancel" / Negative Option Rule was vacated in full by the Eighth Circuit on July 8, 2025 (Custom Communications, Inc. v. FTC) and is not in force. ROSCA itself was not vacated; the FTC is still enforcing it, and in 2026 started a new rulemaking. Don't weaken cancel or disclosure because the 2024 rule was struck down.
+
+**Pricing and copy.**
+Option A is coherent, and $21.98 for the first paperwork trip is less than the old $29.99 standalone, but only if checkout cannot be mistaken for a one-time fee. After that, $6.99/month continues until they cancel. Say that clearly. If they cancel Vault after buying, a paid Travel Pass should still cover that trip through the existing 7-day window; don't take the trip away.
+
+The DOT form is free from the U.S. DOT. PetPassGo is selling to fill it in from the passport, not the form itself, and not a certification. The owner still reads and checks the DOT statements and signs their own name, including that false statements are a federal offense. Copy must never say the DOT form costs money, that you have to use PetPassGo to fly with a service dog, or that the dog is certified, approved, registered, or official.
+
+**"Tell what, not how" on the Google pages — concern.**
+I agree with cutting the step-by-step "how" that duplicates a paid checklist, but a useful free page should still answer the question: what is required, a link to the official source, and when it was last checked, then "Check your trip." If those pages become a tease, they will feel like withholding and can hurt search quality. We don't have traffic data to know which pages matter, so trim carefully, don't empty them.
+
+**Service dog path, ESA, registry kits.**
+One passport flow, with a service dog step before the reveal, is a good simplification. ESA owners should be told kindly that an ESA flies as a pet (airline pet rules and fees, not as a service dog) and then follow the pet path; no official-sounding language. A tracking code on registry-kit links is fine (a simple `?ref=` or UTM). Don't imply PetPassGo is a registry or is in partnership with one.
+
+**Menu and hidden pages.**
+The shorter menu is fine. Hide /community, /discover, /business behind flags if they aren't ready, but don't break URLs that emails already use. /sandbox should stay noindex and unlinked. Add the redirects in the same batch as the menu change.
+
+**Training pick-lists — mismatch for Nima to confirm.**
+On Nov 22 (HANDOFF Ideas, commit e0e6313, 01:11 UTC Nov 23), Nima decided the training organization is typed in by the owner: no program dropdown; the trainer is "I trained them myself" or a typed trainer name and business. About three hours later, the live build (cfe192e, 04:31 UTC Nov 23) shipped "A professional trainer" with no name field and "A service dog program" with a dropdown of 18 programs, and the log says "Nima approved with Sisqo's changes," including the public line "Owner says a service dog program trained them," which Nima had said he didn't like. I checked the live code (`lib/training.js`, TrainingCard.js): the dropdown and the "no name" professional-trainer option are what shipped. Either Nima changed his mind with Claude after the Ideas note, or that decision was missed. Nima should confirm which behavior should stay. I have not tested that build in the browser.
+
+**Not tested yet (testing is next, not part of this review):** the training pick-lists build, the passport look (reflective badges and the hologram), the sticky header, and removing "See how it works" from the hero. All are marked Ready for testing.
+
+Ready for Nima to decide.
+
 ### 2026-11-22: Built: passport cleanup, pricing, tap-to-open, travel mode, confirm-email fix: test results
 Tested live at phone width (~390px, Chrome device mode) and desktop (1280px). Screenshots on Sisqo's computer under `/workspace/petpassgo-review/2026-11-22-build/`. No payment made.
 
