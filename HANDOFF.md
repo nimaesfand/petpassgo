@@ -16,6 +16,36 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-23: Plan: simpler site, new pricing, $9.99 DOT form
+Discussed with Nima. Not built yet. Two batches.
+
+**Why.** Nima found pages he didn't know existed (/service-dog-kit, its quiz, the DOT guide) that link into each other, repeat themselves, and give away the how-to for free. Rule from now on: tell people *what* they need, never *how* step by step; the how is what they pay for. Every page has one job and one main button. Clean, colorful, simple.
+
+**New pricing (Nima decided).** Pet Vault comes with every purchase.
+- Free: trip check and free checklist for simple flights (unchanged).
+- Pet Vault: $6.99/month, always included.
+- Add-ons at member price: Travel Pass $14.99, DOT Service Animal form $9.99 (new, one trip). So a Travel Pass starts at $21.98 and the DOT form at $16.98.
+- The $29.99 standalone Travel Pass goes away.
+- Protection: checkout keeps "Pet Vault renews at $6.99/month, cancel anytime"; cancel stays one tap in the account; new reminder email 3 days before the first renewal.
+
+**Batch 1: structure and pricing**
+1. Menu: Plan a trip, Pet Passport, Pet Vault, Help (FAQ + contact), Log in. Airlines, Blog, Community, Discover come out of the menu.
+2. Service dog: merge /service-dog, /service-dog-kit, /service-dog-kit/start and /service-dog/dot-form into one short /service-dog page. Drop the word "kit". Old URLs redirect. No separate quiz: the trip check already handles service dogs. Its result page gets one button: "Get the DOT form filled in, $9.99 + Pet Vault". Fix: the quiz counter said "1 of 2" then "2 of 3"; the faint "Service dog" tag (both go away with the merge).
+3. DOT form product: owner answers in the app (statement, training picks, trip), attests and signs, gets the filled PDF by download or email. One-time $9.99 per trip plus Pet Vault. Members who already have Pet Vault pay $9.99 only. (Today members get it included; Nima: does an existing member pay $9.99 per trip too, or stay included? Claude suggests: stays included for members already paying, $9.99 is for new buyers, since the $6.99 is what we want.)
+4. Hide for now: /community, /discover, /business (flags), /sandbox (noindex, not linked). Merge /guarantee into the FAQ; /welcome, /signup and /join fold into the passport maker and login (old URLs redirect).
+5. Pricing everywhere: remove $29.99 (homepage cards, /travel-pass, FAQ, emails, checkout, Stripe price for the standalone pass retired, not deleted).
+
+**Batch 2: trim content**
+6. DOT guide: cut to what the form is and when airlines ask, then "We fill it in for you". One source line, no download button.
+7. Google pages (/airlines/*, /guides/*, /mexico, /canada, blog): keep them for free traffic, but short: what's required (answer the question), then "Check your trip". No step-by-step, no deadlines and order of steps.
+8. /travel-pass and /pet-vault: remove repeated sections and the extra buttons that scroll to content right below.
+
+Pages: app/page.js, components/SiteHeader.js, app/service-dog*, app/assessment, lib/pricing.js, app/api/stripe/checkout, app/api/dot-form, components/pets/TrainingCard.js, app/faq, lib/faq.js, app/travel-pass, app/pet-vault, app/guides, app/airlines, app/mexico, app/canada, next.config.js (redirects), emails.
+
+Questions for Sisqo: (a) anything in batch 1 that breaks existing paid customers or links in sent emails; (b) which Google pages actually get traffic (Search Console isn't set up yet, so say if you can't tell); (c) the renewal reminder email and any rules on auto-renew disclosures we should meet.
+
+Ready for review.
+
 ### 2026-11-23: Small fix: removed "See how it works" from the homepage hero (live)
 Nima's call: it only scrolled to the section right below. The hero now has one button, "Plan my pet's trip". People scroll to the passport section themselves.
 What to check: homepage hero on phone and desktop: one button, spacing looks right.
