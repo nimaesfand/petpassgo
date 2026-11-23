@@ -84,10 +84,11 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose, preview 
                 {photo || <PhotoSlot type={pet.animal_type} />}
               </div>
               {/service|emotional|esa/i.test(pet.role || "") ? (() => { const svc = /service/i.test(pet.role || ""); return (
-                <div className="rounded-md px-1.5 py-1 text-center" style={{ width: 112, background: svc ? "#E0E7FF" : "#FEE2E2", border: `1.5px solid ${svc ? "#1D4ED8" : "#B91C1C"}` }}>
-                  <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 9, letterSpacing: "0.1em", color: svc ? "#1D4ED8" : "#B91C1C", lineHeight: 1.15 }}>{svc ? "SERVICE DOG" : "EMOTIONAL SUPPORT"}</div>
-                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 8.5, color: svc ? "#1E3A8A" : "#7F1D1D", lineHeight: 1.2 }}>{svc ? (pet.service_attested_at || sample ? "Handler statement signed" : "Statement not signed yet") : "Flies as a pet"}</div>
+                <div className={`ppg-badge ppg-badge-${svc ? "service" : "esa"} rounded-md px-1.5 py-1 text-center`} style={{ width: 112 }}>
+                  <div style={{ fontFamily: font.body, fontWeight: 900, fontSize: 9, letterSpacing: "0.12em", color: "#fff", lineHeight: 1.15, textShadow: "0 1px 1px rgba(0,0,0,.35)" }}>{svc ? "SERVICE DOG" : "EMOTIONAL SUPPORT"}</div>
+                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 8.5, color: "rgba(255,255,255,.92)", lineHeight: 1.2 }}>{svc ? (pet.service_attested_at || sample ? "Handler statement signed" : "Statement not signed yet") : "Flies as a pet"}</div>
                 </div>); })() : null}
+              <div aria-hidden="true" className="ppg-holo rounded-full" style={{ width: 26, height: 26 }} />
             </div>
             <div className="min-w-0 flex flex-col gap-1" style={{ paddingRight: 70 }}>
               <div>{label("NAME")}<div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 800, lineHeight: 1.05, color: tokens.navy, overflowWrap: "break-word" }}>{pet.name}</div></div>

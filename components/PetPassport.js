@@ -98,27 +98,23 @@ function HoloSeal({ size = 54 }) {
   );
 }
 
-// Training, as one short block. Trainer and tasks show only to the owner, or when the
-// owner turned on "Show training details".
-function trainingText(pet, owner) {
+// Training on the card: one short line. Details (who, where, tasks) live behind the
+// QR on the check page, only when the owner shares them.
+function trainingText(pet) {
   const t = pet.training || {};
-  const base = trainingSummary(t) || (pet.trained == null ? "" : pet.trained ? "House trained" : "Not yet");
-  if (!owner && !t.show_tasks) return base;
-  const who = trainedByLine(t, owner);
-  const place = whereLine(t, owner);
-  const by = who ? (t.trained_by === "program" && !owner ? who : `Trained by ${who === "Owner" ? "owner" : who}`) : "";
-  const tasks = pet.service_attested_at && t.tasks?.length ? (owner ? `Tasks: ${tasksLine(t.tasks)}` : taskGroupsLine(t.tasks)) : "";
-  return [base, [by, place && `in ${place}`].filter(Boolean).join(" "), tasks].filter(Boolean).join(". ");
+  if (pet.service_attested_at && Array.isArray(t.levels) && t.levels.includes("tasks")) return "Task trained";
+  const two = trainingSummary(t).split(", ").filter(Boolean).slice(0, 2).join(", ");
+  return two || (pet.trained == null ? "" : pet.trained ? "House trained" : "Not yet");
 }
 
-// Plain role label under the photo. Deliberately simple: no shield, ring or date.
+// Role badge under the photo: deep blue (service dog) or deep red (ESA), metallic sheen.
 function RoleLabel({ kind, signed }) {
   const c = SEALS[kind];
   const sub = kind === "esa" ? "Flies as a pet" : signed ? "Handler statement signed" : "Statement not signed yet";
   return (
-    <div className="w-full rounded-lg px-2 py-1.5 text-center" style={{ background: c.soft, border: `1.5px solid ${c.a}` }}>
-      <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.12em", color: c.a, lineHeight: 1.15 }}>{c.title}</div>
-      <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 9.5, color: c.b, lineHeight: 1.25, marginTop: 1 }}>{sub}</div>
+    <div className={`ppg-badge ppg-badge-${kind} w-full rounded-lg px-2 py-1.5 text-center`}>
+      <div style={{ fontFamily: font.body, fontWeight: 900, fontSize: 11, letterSpacing: "0.14em", color: "#fff", lineHeight: 1.15, textShadow: "0 1px 1px rgba(0,0,0,.35)" }}>{c.title}</div>
+      <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 9.5, color: "rgba(255,255,255,.92)", lineHeight: 1.25, marginTop: 1 }}>{sub}</div>
     </div>
   );
 }
@@ -233,7 +229,7 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
     ["Born", [fmtDob(pet.date_of_birth), age && `(${age})`].filter(Boolean).join(" ")],
     ["Weight", pet.weight_lb ? `${pet.weight_lb} lb` : ""],
     ["Color", pet.color],
-    ["Training", trainingText(pet, owner && !sheet)],
+    ["Training", trainingText(pet)],
     ["Microchip", owner && !sheet ? chipMask(chipValue) : chipValue],
     ["Owner", pet.handler_name],
     ["Issued", pet.passport_issued_at ? fmtDob(String(pet.passport_issued_at).slice(0, 10)) : ""],
@@ -272,6 +268,10 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
               ) : null}
             </div>
             {st === STATUS.service || st === STATUS.esa ? <RoleLabel kind={st === STATUS.service ? "service" : "esa"} signed={!!pet.service_attested_at} /> : null}
+            <div className="flex items-center gap-2">
+              {photo ? <div aria-hidden="true" className="ppg-pp-ghost rounded-md overflow-hidden" style={{ width: 34, height: 42, opacity: 0.22, filter: "grayscale(1) contrast(1.2)", mixBlendMode: "multiply" }}>{photo}</div> : null}
+              <HoloSeal size={40} />
+            </div>
           </div>
 
           <div className="min-w-0">
@@ -289,7 +289,7 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
             </div>
           </div>
           <div className="ppg-pp-fields pt-3 grid gap-x-4 gap-y-2.5 min-w-0" style={{ borderTop: "1px dashed #D9CDB2" }}>
-            {fields.map(([k, v]) => <Field key={k} k={k} v={v} mono={k === "Microchip"} wide={k === "Training" && String(v).length > 22} />)}
+            {fields.map(([k, v]) => <Field key={k} k={k} v={v} mono={k === "Microchip"} wide={k === "Training" && String(v).length > 24} />)}
             <RabiesField rabies={rabies} />
           </div>
         </div>
