@@ -1,5 +1,5 @@
 import { serviceClient } from "../../../lib/serverEmail";
-import { trainingSummary, trainedByLine, tasksLine } from "../../../lib/training";
+import { trainingSummary, trainedByLine, taskGroupsLine, whereLine } from "../../../lib/training";
 import { readCheckin, signCheckin } from "../../../lib/ppgSign";
 import { SITE_URL } from "../../../lib/site";
 import QRCode from "qrcode";
@@ -76,7 +76,7 @@ export default async function CheckPage({ params, searchParams }) {
   const travel = searchParams?.travel === "1";
   const label = travel ? "TRAVEL MODE" : "PET CHECK-IN";
   if (!c.ok) {
-    return <Shell label={label}><div style={{ background: "#fff", borderRadius: 20, padding: 24, textAlign: "center" }}><h1 style={{ fontSize: 22, fontWeight: 800, color: NAVY }}>{travel ? (c.reason === "expired" ? "Travel mode has closed" : "This link isn't valid") : (c.reason === "expired" ? "This check-in link has expired" : "This check-in link isn't valid")}</h1><p style={{ color: INK, marginTop: 8 }}>{travel ? "Open travel mode again from your pet's passport." : "Ask the traveler to open a fresh code from their PetPassGo passport. Codes last 30 minutes."}</p></div></Shell>;
+    return <Shell label={label}><div style={{ background: "#fff", borderRadius: 20, padding: 24, textAlign: "center" }}><h1 style={{ fontSize: 22, fontWeight: 800, color: NAVY }}>{travel ? (c.reason === "expired" ? "Travel mode has closed" : "This link isn't valid") : (c.reason === "expired" ? "This check-in link has expired" : "This check-in link isn't valid")}</h1><p style={{ color: INK, marginTop: 8 }}>{travel ? "Open travel mode again from your pet's passport." : "Ask the traveler to open a fresh code from their PetPassGo passport. Shared codes last 24 hours, or until the owner stops sharing."}</p></div></Shell>;
   }
   const sb = serviceClient();
   const [{ data: pet }, { data: records }, { data: docs }, tripRes] = await Promise.all([
@@ -144,7 +144,7 @@ export default async function CheckPage({ params, searchParams }) {
         <div style={{ marginTop: 14 }}>
           <Row title="Rabies vaccine" kind={vaxKind(rabies)} detail={vaxDetail(rabies)} doc={rabiesDoc?.file_url ? rabiesDoc.id : null} token={token} />
           {otherVax.map((r) => <Row key={r.id} title={r.name} kind={vaxKind(r)} detail={vaxDetail(r)} />)}
-          {service ? <Row title="Service dog" kind={pet.service_attested_at ? "signed" : "missing"} detail={pet.service_attested_at ? ["Service dog, handler statement signed.", showTraining && trainedByLine(pet.training) && `Trained by ${[trainedByLine(pet.training), pet.training?.trained_where].filter(Boolean).join(", ")}.`, showTraining && pet.training?.tasks?.length ? `Tasks: ${tasksLine(pet.training.tasks)}.` : ""].filter(Boolean).join(" ") : "Handler statement not signed yet."} /> : null}
+          {service ? <Row title="Service dog" kind={pet.service_attested_at ? "signed" : "missing"} detail={pet.service_attested_at ? ["Service dog, handler statement signed.", showTraining && trainedByLine(pet.training) && (pet.training.trained_by === "program" ? `${trainedByLine(pet.training)}.` : `Trained by: ${trainedByLine(pet.training).toLowerCase() === "owner" ? "the owner" : trainedByLine(pet.training).toLowerCase()}.`), showTraining && whereLine(pet.training) ? `Trained in ${whereLine(pet.training)}.` : "", showTraining && pet.training?.tasks?.length ? `${taskGroupsLine(pet.training.tasks)}.` : ""].filter(Boolean).join(" ") : "Handler statement not signed yet."} /> : null}
           {showTraining && trainingSummary(pet.training) ? <Row title="Training" kind="owner" detail={trainingSummary(pet.training)} /> : null}
           {service ? <Row title="DOT Service Animal form" kind={dot ? "doc" : "missing"} detail={dot ? `Uploaded ${fmt(String(dot.uploaded_at).slice(0, 10))}. Signed by the handler.` : "Not uploaded to the passport. Ask the traveler for their copy."} doc={dot?.file_url ? dot.id : null} token={token} /> : null}
           <Row title="Health certificate" kind={health ? (health.expires_on && health.expires_on < t ? "expired" : "doc") : "missing"} detail={health ? [health.issued_on ? `Issued ${fmt(health.issued_on)}` : "", health.expires_on ? `Valid until ${fmt(health.expires_on)}` : ""].filter(Boolean).join(" · ") || "On file" : "None on file. Many U.S. domestic trips don't need one; check your airline's rule."} doc={health?.file_url ? health.id : null} token={token} />

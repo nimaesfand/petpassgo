@@ -192,7 +192,7 @@ export default function TravelPassDashboard({ trip, pet, petChoices = [], onPick
               {pet?.photo_url ? <SignedImg value={pet.photo_url} alt={pet.name || "Pet"} className="object-cover" style={{ width: "100%", height: "100%" }} /> : <span style={{ color: tokens.navy }}><Icon name="paw" size={24} /></span>}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="truncate" style={{ fontFamily: font.display, fontSize: 22, fontWeight: 800, color: "#fff", lineHeight: 1.15 }}>{pet?.name || "Your pet"} · {codeOf(trip.origin)} → {codeOf(trip.destination)}</div>
+              <div style={{ fontFamily: font.display, fontSize: 21, fontWeight: 800, color: "#fff", lineHeight: 1.15 }}><span className="block truncate">{pet?.name || "Your pet"}</span><span className="block" style={{ whiteSpace: "nowrap" }}>{codeOf(trip.origin)} → {codeOf(trip.destination)}</span></div>
               <div className="truncate" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.sky }}>{trip.travel_date ? fmtTripDate(trip.travel_date) : "Date not set"}{trip.return_date ? ` · back ${fmtTripDate(trip.return_date)}` : ""} · {trip.airline}{service && !serviceDogMismatch ? " · Service dog" : ""}</div>
             </div>
             {daysToGo != null && daysToGo >= 0 ? (

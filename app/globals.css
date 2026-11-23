@@ -63,6 +63,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, .ppg-choice:focus-wi
   .ppg-contact-fab:not(.is-docked) { width: 46px; height: 46px; }
   .ppg-contact-fab.is-flow { display: none; }
   .ppg-support-dock #ppg-contact-slot { display: none; }
+  .ppg-contact-fab.is-tucked { opacity: 0; pointer-events: none; transform: scale(.8); transition: opacity .15s, transform .15s; }
   body { padding-bottom: 64px; }
 }
 .ppg-fab-clear { padding-bottom: calc(9.5rem + env(safe-area-inset-bottom, 0px)); }

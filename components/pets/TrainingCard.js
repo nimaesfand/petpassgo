@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { tokens, font } from "../../lib/theme";
 import { pingSaved } from "../SavedToast";
-import { levelsFor, TRAINED_BY, SERVICE_TASKS, statementText, tasksLine } from "../../lib/training";
+import { levelsFor, TRAINED_BY, TASK_GROUPS, PROGRAMS, PLACES, placeLabel, legacyTrainer, legacyPlace, statementText, tasksLine } from "../../lib/training";
 
 const input = { fontFamily: font.body, fontSize: 16, border: `2px solid ${tokens.line}`, borderRadius: 12, padding: "11px 13px", width: "100%", background: "#fff", color: tokens.ink };
 const lab = { fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy };
@@ -26,8 +26,9 @@ export default function TrainingCard({ pet, userId, onChanged }) {
   const isService = /service/i.test(pet.role || "");
   const [levels, setLevels] = useState(Array.isArray(t.levels) ? t.levels : pet.trained ? ["house"] : []);
   const [by, setBy] = useState(t.trained_by || "");
-  const [who, setWho] = useState(t.trainer_name || "");
-  const [where, setWhere] = useState(t.trained_where || "");
+  const [program, setProgram] = useState(t.program || "");
+  const [where, setWhere] = useState(placeLabel(t.trained_where) ? t.trained_where : "");
+  const oldWho = legacyTrainer(t), oldWhere = legacyPlace(t);
   const [saving, setSaving] = useState(false);
 
   const [signing, setSigning] = useState(false);
@@ -72,7 +73,8 @@ export default function TrainingCard({ pet, userId, onChanged }) {
   async function saveTraining() {
     setSaving(true);
     const keepTasks = pet.service_attested_at ? Array.from(new Set([...levels, "tasks"])) : levels;
-    const training = { ...t, levels: keepTasks, trained_by: by || null, trainer_name: by && by !== "owner" ? who.trim() || null : null, trained_where: where.trim() || null };
+    // Picks only. Anything typed before the pick-lists stays unless they pick something new.
+    const training = { ...t, levels: keepTasks, trained_by: by || null, program: by === "program" ? program || null : null, trainer_name: by && by !== "owner" && !(by === "program" && program) ? t.trainer_name || null : null, trained_where: where || t.trained_where || null };
     const { error } = await supabase.from("pets").update({ training, trained: keepTasks.length ? true : pet.trained }).eq("id", pet.id).eq("user_id", userId);
     setSaving(false);
     if (error) { alert("Couldn't save training. Please try again."); return; }
@@ -91,7 +93,7 @@ export default function TrainingCard({ pet, userId, onChanged }) {
     e.preventDefault();
     setErr(""); setBusy(true);
     try {
-      await call({ signed_name: signed, agree, tasks, show_tasks: showTasks, trained_by: by, trainer_name: who, trained_where: where });
+      await call({ signed_name: signed, agree, tasks, show_tasks: showTasks, trained_by: by, program, trained_where: where });
       setSigning(false); pingSaved(); onChanged?.();
     } catch (x) { setErr(x.message); }
     setBusy(false);
@@ -106,7 +108,7 @@ export default function TrainingCard({ pet, userId, onChanged }) {
     <section className="rounded-3xl p-4 sm:p-6 grid gap-5" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
       <div>
         <h3 style={{ fontFamily: font.display, fontSize: 22, fontWeight: 800, color: tokens.navy }}>{name}&apos;s training</h3>
-        <p className="mt-1" style={hint}>Shows on the passport. Pick everything that applies.</p>
+        <p className="mt-1" style={hint}>Pick everything that applies. This is what you tell us: PetPassGo doesn&apos;t test or certify training.</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -117,15 +119,25 @@ export default function TrainingCard({ pet, userId, onChanged }) {
         <span style={lab}>Who trained {name}?</span>
         <div className="flex flex-wrap gap-2">{TRAINED_BY.map(([k, l]) => <Chip key={k} on={by === k} onClick={() => setBy(by === k ? "" : k)}>{l}</Chip>)}</div>
       </div>
-      {by && by !== "owner" ? (
-        <label className="grid gap-1.5"><span style={lab}>{by === "program" ? "Program name" : "Trainer or business name"}</span>
-          <input value={who} onChange={(e) => setWho(e.target.value)} maxLength={120} style={input} placeholder={by === "program" ? "e.g. the organization that placed them" : "e.g. the trainer's name or business"} />
+      {by === "program" ? (
+        <label className="grid gap-1.5"><span style={lab}>Which program?</span>
+          <select value={program} onChange={(e) => setProgram(e.target.value)} style={input}>
+            <option value="">Pick a program</option>
+            {PROGRAMS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+          </select>
+          <span style={hint}>Only you see the program&apos;s name. Others see &quot;a service dog program&quot;. We use the name to fill in your DOT form.</span>
         </label>
       ) : null}
       {by ? (
-        <label className="grid gap-1.5"><span style={lab}>Where they trained <span style={{ fontWeight: 500, color: tokens.muted }}>(city and state)</span></span>
-          <input value={where} onChange={(e) => setWhere(e.target.value)} maxLength={120} style={input} placeholder="e.g. San Diego, CA" />
+        <label className="grid gap-1.5"><span style={lab}>Where they trained</span>
+          <select value={where} onChange={(e) => setWhere(e.target.value)} style={input}>
+            <option value="">Pick a state or country</option>
+            {PLACES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+          </select>
         </label>
+      ) : null}
+      {(oldWho && !(by === "program" && program)) || (oldWhere && !where) ? (
+        <p style={{ ...hint, background: "#FFF8E6", borderRadius: 10, padding: "8px 10px" }}>You typed {[oldWho && `"${oldWho}"`, oldWhere && `"${oldWhere}"`].filter(Boolean).join(" and ")} before. Only you see that. Pick from the lists above to show it on the passport.</p>
       ) : null}
       <button type="button" disabled={saving} onClick={saveTraining} className="ppg-btn ppg-btn-primary" style={{ justifySelf: "start" }}>{saving ? "Saving…" : "Save training"}</button>
 
@@ -137,7 +149,7 @@ export default function TrainingCard({ pet, userId, onChanged }) {
               {t.tasks?.length ? <p style={hint}><b style={{ color: tokens.navy }}>Tasks:</b> {tasksLine(t.tasks)}</p> : null}
               <label className="flex items-start gap-2" style={{ ...hint, color: tokens.ink }}>
                 <input type="checkbox" checked={showTasks} onChange={async (e) => { const v = e.target.checked; setShowTasks(v); const { error } = await supabase.from("pets").update({ training: { ...t, show_tasks: v } }).eq("id", pet.id); if (error) setShowTasks(!v); else { pingSaved(); onChanged?.(); } }} style={{ width: 18, height: 18, marginTop: 2 }} />
-                <span>Show training details (who trained {name} and the tasks) on the passport and at the gate. When it&apos;s off, they only see &quot;Service dog, handler statement signed.&quot;</span>
+                <span>Show training details (who trained {name}, where, and the type of tasks) on the passport and at the gate. When it&apos;s off, they only see &quot;Service dog, handler statement signed.&quot;</span>
               </label>
               <div className="rounded-2xl p-4 grid gap-2" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
                 <div style={{ fontFamily: font.display, fontSize: 17, fontWeight: 800, color: tokens.navy }}>{name}&apos;s DOT Service Animal form</div>
@@ -163,7 +175,7 @@ export default function TrainingCard({ pet, userId, onChanged }) {
           ) : !signing ? (
             <>
               <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 800, color: "#0F5E58" }}>{isService ? `Sign ${name}'s service dog statement` : `Is ${name} a service dog?`}</div>
-              <p style={hint}>Tell us what {name} is trained to do and sign a short statement. The passport then shows the service dog seal with the date you signed.</p>
+              <p style={hint}>Tell us what {name} is trained to do and sign a short statement. The passport then shows &quot;Service dog, handler statement signed.&quot;</p>
               <button type="button" onClick={() => setSigning(true)} className="ppg-btn ppg-btn-primary" style={{ justifySelf: "start" }}>Start the statement</button>
             </>
           ) : null}
@@ -172,13 +184,19 @@ export default function TrainingCard({ pet, userId, onChanged }) {
             <form onSubmit={sign} className="grid gap-4">
               <div className="grid gap-2">
                 <span style={lab}>What is {name} trained to do?</span>
-                <div className="flex flex-wrap gap-2">{SERVICE_TASKS.map(([k, l]) => <Chip key={k} on={tasks.includes(k)} onClick={() => toggle(tasks, setTasks, k)}>{l}</Chip>)}</div>
+                <span style={hint}>Pick every task. Only the type (for example &quot;Psychiatric tasks&quot;) can show on the passport.</span>
+                {TASK_GROUPS.map((g) => (
+                  <div key={g.key} className="grid gap-1.5">
+                    <span style={{ ...hint, fontWeight: 800, color: tokens.navy }}>{g.label.replace(/ tasks$/, "")}</span>
+                    <div className="flex flex-wrap gap-2">{g.tasks.map(([k, l]) => <Chip key={k} on={tasks.includes(k)} onClick={() => toggle(tasks, setTasks, k)}>{l}</Chip>)}</div>
+                  </div>
+                ))}
                 <label className="flex items-center gap-2" style={{ ...hint, color: tokens.ink }}>
                   <input type="checkbox" checked={showTasks} onChange={(e) => setShowTasks(e.target.checked)} style={{ width: 18, height: 18 }} />
                   Show training details on the passport and at the gate (off keeps them private)
                 </label>
               </div>
-              {!by ? <p role="alert" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>Pick who trained {name} above first.</p> : null}
+              {!by ? <p role="alert" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>Pick who trained {name} above first.</p> : by === "program" && !program ? <p role="alert" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>Pick the program above first.</p> : null}
               <div className="rounded-xl p-3" style={{ background: "#fff", border: `1px solid ${tokens.line}`, maxHeight: 220, overflowY: "auto" }}>
                 <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 800, letterSpacing: "0.12em", color: tokens.muted }}>STATEMENT</div>
                 <p className="mt-1" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.ink, lineHeight: 1.55, whiteSpace: "pre-line" }}>{statementText({ petName: pet.name, signedName: signed.trim() || "[your full name]" })}</p>
@@ -192,7 +210,7 @@ export default function TrainingCard({ pet, userId, onChanged }) {
               </label>
               {err ? <p role="alert" style={{ ...hint, color: tokens.stamp, fontWeight: 700 }}>{err}</p> : null}
               <div className="flex flex-wrap gap-3 items-center">
-                <button type="submit" disabled={busy || !agree || !by} className="ppg-btn ppg-btn-primary">{busy ? "Signing…" : "Sign statement"}</button>
+                <button type="submit" disabled={busy || !agree || !by || (by === "program" && !program) || !tasks.length} className="ppg-btn ppg-btn-primary">{busy ? "Signing…" : "Sign statement"}</button>
                 <button type="button" onClick={() => setSigning(false)} style={{ fontFamily: font.body, fontWeight: 700, color: tokens.muted, background: "none", border: "none", cursor: "pointer" }}>Cancel</button>
               </div>
             </form>

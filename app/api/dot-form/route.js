@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { trainerForDot } from "../../../lib/training";
 import { allowRequest, clientIp } from "../../../lib/rateLimit";
 import { requireUser } from "../../../lib/paidUser";
 import { animalDescription, fillAirTransportationForm, fillReliefForm, isServiceTrip } from "../../../lib/dotForm";
@@ -66,7 +67,7 @@ export async function POST(req) {
       vetName: pet?.vet_name || "",
       vetPhone: pet?.vet_phone || "",
       hours: Number.isFinite(hours) ? String(hours) : "",
-      trainer: clip(body.trainer, 80) || (pet?.training?.trained_by === "owner" ? clip(body.handler, 80) || clip(pet?.handler_name, 80) : clip(pet?.training?.trainer_name, 80)),
+      trainer: clip(body.trainer, 80) || clip(trainerForDot(pet?.training, clip(body.handler, 80) || clip(pet?.handler_name, 80)), 80),
       flightDate: trip.travel_date,
       origin: trip.origin,
       destination: trip.destination,

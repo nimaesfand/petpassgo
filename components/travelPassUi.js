@@ -19,7 +19,7 @@ export function RouteLine({ from, to }) {
 
 export function PassTabs({ tabs, value, onChange, label }) {
   return (
-    <div role="tablist" aria-label={label} className="ppg-hscroll flex gap-2 mb-4">
+    <div role="tablist" aria-label={label} className="flex flex-wrap gap-1.5 sm:gap-2 mb-4">
       {tabs.map(([k, text]) => (
         <button
           key={k}
@@ -27,8 +27,8 @@ export function PassTabs({ tabs, value, onChange, label }) {
           role="tab"
           aria-selected={value === k}
           onClick={() => onChange(k)}
-          className="rounded-full px-4 py-2.5 flex-shrink-0"
-          style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, whiteSpace: "nowrap", minHeight: 44, background: value === k ? tokens.navy : "#fff", color: value === k ? "#fff" : tokens.ink, border: `1px solid ${value === k ? tokens.navy : tokens.line}`, cursor: "pointer" }}
+          className="rounded-full px-3 sm:px-4 py-2.5 flex-shrink-0"
+          style={{ fontFamily: font.body, fontSize: 14.5, fontWeight: 700, whiteSpace: "nowrap", minHeight: 44, background: value === k ? tokens.navy : "#fff", color: value === k ? "#fff" : tokens.ink, border: `1px solid ${value === k ? tokens.navy : tokens.line}`, cursor: "pointer" }}
         >
           {text}
         </button>

@@ -7,7 +7,7 @@ import Icon from "./Icon";
 import PetQr from "../lib/PetQr";
 import { tokens, font } from "../lib/theme";
 import { filled, fmtDob, mrzLines, issuedLabel, chipMask } from "../lib/petProfile";
-import { trainingSummary, trainedByLine, tasksLine } from "../lib/training";
+import { trainingSummary, trainedByLine, tasksLine, taskGroupsLine, whereLine } from "../lib/training";
 
 const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 
@@ -104,9 +104,11 @@ function trainingText(pet, owner) {
   const t = pet.training || {};
   const base = trainingSummary(t) || (pet.trained == null ? "" : pet.trained ? "House trained" : "Not yet");
   if (!owner && !t.show_tasks) return base;
-  const by = [trainedByLine(t), t.trained_where].filter(Boolean).join(", ");
-  const tasks = pet.service_attested_at && t.tasks?.length ? `Tasks: ${tasksLine(t.tasks)}` : "";
-  return [base, by && `Trained by ${by}`, tasks].filter(Boolean).join(". ");
+  const who = trainedByLine(t, owner);
+  const place = whereLine(t, owner);
+  const by = who ? (t.trained_by === "program" && !owner ? who : `Trained by ${who === "Owner" ? "owner" : who}`) : "";
+  const tasks = pet.service_attested_at && t.tasks?.length ? (owner ? `Tasks: ${tasksLine(t.tasks)}` : taskGroupsLine(t.tasks)) : "";
+  return [base, [by, place && `in ${place}`].filter(Boolean).join(" "), tasks].filter(Boolean).join(". ");
 }
 
 // Plain role label under the photo. Deliberately simple: no shield, ring or date.
