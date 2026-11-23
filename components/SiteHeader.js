@@ -173,7 +173,7 @@ export default function SiteHeader({ onLogout }) {
   const main = signedIn ? MEMBER_MAIN : GUEST_MAIN;
   const more = signedIn ? MEMBER_MORE : GUEST_MORE;
   return (
-    <header style={{ background: "#fff", borderBottom: `1px solid ${tokens.line}` }}>
+    <header className="ppg-no-print" style={{ background: "#fff", borderBottom: `1px solid ${tokens.line}`, position: "sticky", top: 0, zIndex: 60 }}>
       <nav className="max-w-[1280px] mx-auto flex items-center justify-between px-3 sm:px-5 md:px-10 py-3 md:py-4 gap-2 min-w-0">
         <a href="/" className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0" style={{ textDecoration: "none" }} aria-label="PetPassGo">
           <span className="ppg-logo-icon"><Logo size={30} /></span>
