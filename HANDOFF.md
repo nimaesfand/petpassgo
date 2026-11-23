@@ -136,6 +136,63 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-22: Plan: training, trainer and tasks pick-lists: review
+Read against the current code on main (lib/training.js, TrainingCard.js, the service-statement API, PetPassport.js, /check, HomePassport.js, and the DOT form filler). Direction is right: free-text trainer and "where trained" fields are how "certified" or "registered" can end up on the passport. Nima decides.
+
+**1. Picking a named program — concern.**
+Yes, a pick list lets someone claim Guide Dogs for the Blind (or any other school) trained their dog when it didn't. Putting that name on the passport or the gate page reads like an endorsement, which breaks the owner rule: never imply official status. Don't use program logos.
+
+What I'd do: keep the list for the owner's records, but label it clearly as "Owner says trained by …" everywhere it appears. On the public passport and /check, even when sharing is on, I'd only show "Owner says a service dog program trained them," not the school name. The named program can still fill the DOT form's "Name of Task Trainer or Training Organization" field, with a preview and a reminder that the handler is attesting this is true. "Another program" should stay nameless (no free text). The homepage sample should keep a fictional name ("Sample Service Dog Program"), not a real school.
+
+**2. Task picks — agree, with a few adds and a clear "Other".**
+The grouped list is a solid upgrade over today's seven broad groups. I'd add: allergen detection, migraine alert, behavior interruption for PTSD or self-harm (not the same as interrupting anxiety or panic), and counterbalance (or rename the mobility item "Balance, bracing, or counterbalance"). "Other task" needs a clear rule: if nothing can be typed, the owner still has no way to record what the task is, and the DOT form can't describe it. Either allow a short description only for Other, with a filter that blocks words like certified, registered, approved, and official, or make it obvious that "Other" is just a checkbox and they describe the task themselves on the airline form.
+
+On the public passport and /check, showing group names only when the owner turns on sharing is the right call.
+
+**3. Old typed values that "stop showing" — concern.**
+Don't silently drop what an owner already entered, and don't delete it from the record. Keep the stored trainer name and location. Show them only to the owner, with a prompt to re-pick from the list if they want that information on the passport. Unmatched free text should stay off the public passport and /check, which is the point. "San Diego, CA" will not match a state dropdown unless you parse it, so this will hit real accounts (and the Benny sample, which uses that location). Past signed statements in `service_dog_statements` should be left as they were.
+
+**4. "Training level" — it's already defined; this plan doesn't need to change it.**
+`TRAINING_LEVELS` in lib/training.js is the chip list: house, crate, leash, basic obedience, AKC Canine Good Citizen, public access, and "trained to do tasks for a disability." Those are owner-stated, except CGC, which is a real AKC title someone could also claim falsely. "Public access trained" can sound official too (ADI has a Public Access Test). Same rule: this is what the owner told us, not a certification. Leave the levels as they are unless you want to add the same "owner-stated" caution on CGC and public access.
+
+**5. DOT auto-fill and the statement API — concern, they will break unless updated together.**
+The statement API today only allows the seven old task keys and silently keeps the first seven (`slice(0, 7)`). The new list is much longer; a dog with several psychiatric tasks would lose some of them. It also requires a typed `trainer_name` whenever the trainer isn't the owner. If "A professional trainer" has no name field, signing will fail until that rule changes: require a program pick (including "Another program") when they choose a program, and don't require a name for a professional trainer.
+
+DOT auto-fill uses `pet.training.trainer_name` for both trainer fields on the air transportation form. It does not fill a task description today. If `trainer_name` goes away, those fields will come out blank unless you map "I trained them" to the handler's name (already the case), "A professional trainer" to that phrase, and a program pick to the program's official name. Do that in the same change, and show a preview.
+
+`tasksLine` and `trainedByLine` must understand both old group keys and the new specific keys so existing passports don't go blank.
+
+**Programs on the list (Claude's question).**
+All 11 in the draft are real, currently operating U.S. programs. Official sites and name notes:
+
+- Guide Dogs for the Blind — https://www.guidedogs.com/ (campuses in San Rafael, CA and Boring, OR; also serves Canada)
+- The Seeing Eye — https://www.seeingeye.org/ (Morristown, NJ)
+- Guide Dog Foundation (Guide Dog Foundation for the Blind, Inc.) — https://www.guidedog.org/ (Smithtown, NY)
+- Canine Companions — https://canine.org/ (formerly Canine Companions for Independence; legal name is still Canine Companions for Independence, Inc.)
+- NEADS World Class Service Dogs — https://neads.org/ (formerly National Education for Assistance Dog Services, and later Dogs for Deaf and Disabled Americans; Princeton, MA)
+- Paws With A Cause — https://pawswithacause.org/ (formerly Ears for the Deaf, renamed in 1989; Wayland, MI)
+- Dogs for Better Lives — https://dogsforbetterlives.org/ (formerly Dogs for the Deaf)
+- 4 Paws for Ability — https://www.4pawsforability.org/ (Xenia, OH)
+- Freedom Service Dogs of America — https://freedomservicedogs.org/ (Englewood, CO)
+- K9s For Warriors — https://k9sforwarriors.org/
+- America's VetDogs — https://www.vetdogs.org/ — created by the Guide Dog Foundation in 2003; a separate 501(c)(3) since 2006. They are sister nonprofits and share staff and the Smithtown, NY campus. List both, with a short note that they're related.
+
+Use the current official names on the pick list (Canine Companions, not CCI; Dogs for Better Lives, not Dogs for the Deaf).
+
+Notable missing programs I also verified:
+
+- Leader Dogs for the Blind — https://www.leaderdog.org/ (Rochester Hills, MI)
+- Guiding Eyes for the Blind — https://www.guidingeyes.org/ (Yorktown Heights, NY)
+- Canine Partners for Life — https://k94life.org/ (Cochranville, PA)
+- Can Do Canines — https://candocanines.org/ (New Hope, MN)
+- Patriot PAWS Service Dogs — https://patriotpaws.org/ (Rockwall, TX)
+- Susquehanna Service Dogs — a program of Keystone Human Services, official page https://www.khs.org/what-we-do/assistance-dogs/ (Grantville, PA). susquehannaservicedogs.org does not resolve.
+- Guide Dogs of America | Tender Loving Canines — https://www.guidedogsofamerica.org/ (Guide Dogs of America and Tender Loving Canines merged in 2020; still operating)
+
+Don't add Assistance Dogs International to the trainer list. ADI is an accrediting coalition, not a school that trains a person's dog. Its member directory is a fine way to choose which programs to include, but picking "ADI" would imply official status.
+
+Ready for Nima to decide.
+
 ### 2026-11-22: Fixes from Sisqo's DOT test + Benny as service dog: test results
 Tested live (www.petpassgo.com), logged out unless noted, at phone width (~390px, Chrome device mode) and desktop (1280px). Screenshots on Sisqo's computer under `/workspace/petpassgo-review/2026-11-22-fixes/`. No payment made.
 
