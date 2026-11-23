@@ -311,6 +311,30 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-23 (12:20 PM PT): Sisqo test results, batch 1 fixes + batch 2 trims (tested live at eaadf13)
+
+Screenshots are in Sisqo's /workspace/petpassgo-review/2026-11-23-batch2/. No payment was made.
+
+**Passes**
+- Service dog LAX to JFK on Delta now shows the "Get it filled in with Pet Vault · $6.99/mo" box, with no "This trip needs paperwork" and no $21.98. LAX to HNL (Delta) and LAX to MEX (Aeroméxico) show the Travel Pass card ($14.99 + $6.99 = $21.98).
+- The pet dog's Mexico paperwork card no longer has a DOT form line.
+- Phone homepage (375 px): the header stays on top and the full PetPassGo logo shows.
+- /mexico and /canada are short on the phone and show "$14.99 one trip, there and back, with Pet Vault ($6.99/mo)."
+- Service passport maker: the counter says "of 12," "Certified Trainer" is blocked with a clear message, and the promise step needs both the box and a first plus last name. Refreshing mid-flow keeps your place.
+- The pet passport maker has 7 steps.
+
+**Fails / fixes needed**
+1. **The badge is still not the deep blue reflective one.** After finishing and a hard refresh (Ctrl+Shift+R), the service badge is a flat navy "SERVICE DOG / Handler statement signed" pill with a small rainbow dot and an orange ISSUED stamp.
+2. **Browser Back leaves the passport maker.** From step 8, Back went to the previous page (Canada), not step 7, because the steps aren't history entries. Forward returned to step 8. Please make Back go to the previous step.
+3. **The LAX to JFK service dog result has mixed messages.** The green banner above the Vault box still says "Your Travel Pass walks you through each one," which is wrong for a Vault-only trip. Also, the box border is blue but the button is orange. Was that intended?
+4. **Promise step wording.** There's only one checkbox, but the error says "Check each line to sign." It should say "Check the box to sign," or the step should have one box per line.
+5. **Step 12 contradicts itself.** It says no password is needed, then "We also emailed it to <email>." Say clearly what was emailed (the passport? a sign-in link?).
+6. **Leftover on /mexico and /canada.** The "See every step" button (href #steps) is still in the markup, hidden. Please remove it, since the step-by-step was removed.
+
+**Couldn't test: the training card on a saved pet and the logged-in menus.** The passport maker never asks for a password ("No password needed"), so there's no way to log into the account it creates (6dpq5mtb+batch2@mail.grokbot.com). The trainer options inside the maker are right (Owner trained / Dog trainer (name + business) / Trained in a program). How should a passport-maker user get into their account later: a magic link, set a password on step 12, or only after buying Vault? Until that's answered, I can't reach the training card or the logged-in menus. Please also add that test account to the cleanup list.
+
+**Monthly rules re-check:** it already exists. It runs on the 1st of each month around 9 AM PT, starting Dec 1, 2026, and posts its findings here asking you to update "Last checked."
+
 ### 2026-11-23: Built batch 1 (part 1): pricing A, renewal consent, menu, service dog page, training fix: test results
 Tested the live site at 8964e4a (before 701891b/edc6bb5 went live), logged out, phone (375px) and desktop. No payment and no card entered. No test account was created (see 5).
 
