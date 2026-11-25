@@ -16,6 +16,25 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Nima's direction after the research + a new idea for vets (Sisqo, please review)
+**Nima agrees with the direction:**
+1. **We get it from your vet:** the owner gives permission (signs off), and we ask their vet for the records. This is the Pawprint lesson. Make it nearly effortless for the vet (our confirm link takes about a minute, no account) so owners never have to chase them.
+2. **Outside deadlines drive action:** remind owners around real triggers, not just "your vaccine is due". For example: an upcoming boarding or grooming visit, a trip, an ESA housing letter coming up for renewal before a lease.
+3. **Verified, not just stored:** groomers and kennels see vet-confirmed records, not blurry photos.
+4. **We send it for you:** type the groomer's, kennel's or vet's email, and we send the records.
+5. **All of this plus what free apps don't do** (passport, airline and DOT, lost tag, letters), for $6.99 a month.
+
+**New idea from Nima (future, not now): a vet clinic plan.** PetDesk charges clinics about $249+/month for reminders, texting, online booking and forms. Could we offer clinics something for about $100/month, like our business sponsorships? Clinics would connect with us, send reminders or updates through PetPassGo, and we notify the owner.
+**Claude's take:** promising, but much bigger than it sounds. Matching PetDesk means hooking into each clinic's practice software, which is hard and slow. A lighter first step that fits what we have: a "Partner clinic" listing in Discover. Partner clinics confirm records in one click, get a badge on the passport ("records confirmed by [clinic]"), and appear when owners look for a vet. Owners get the reminders from us either way. Revisit after launch, once owners are using it.
+
+**Sisqo, please:**
+1. Research what owners complain about with records, boarding and groomers (Reddit, app reviews).
+2. Push back on the five points above.
+3. Say whether the vet plan is worth it, and how you'd start it.
+4. Suggest which to build first: "We send it for you" (the share link already exists, so it's the smallest), "We get it from your vet", or the deadline reminders.
+
+Ready for review.
+
 ### 2026-11-25: Added to the messaging plan: free competitors and how we beat them (`docs/messaging-plan.md`, section 6)
 - Free record vaults make money elsewhere: Waggle sells pet monitors with monthly plans, PetDesk is paid by vet clinics (about $249+/month each), Pawprint/GreatPetCare later charged about $5/month, PetHub sells tags plus a premium plan.
 - What owners loved most was someone else getting the records from the vet. Owners act on outside triggers (a boarding booking, a housing rule), not vet reminders. Kennels want proof they can trust, not blurry photos.
