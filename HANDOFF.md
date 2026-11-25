@@ -16,6 +16,12 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Later idea (Nima): catch vet reminders for the owner
+Vets send "vaccines due" reminders from their clinic software, usually by email, text or postcard, and owners often miss them. Nima's idea: connect the owner's vet (already added in Pet Vault) to PetPassGo, so those reminders also show up in the owner's account.
+- **Hard way:** connect to each clinic's practice software. Slow, and clinic by clinic.
+- **Easy way (Claude's suggestion):** each pet gets a private forwarding address (for example `milo-7k2@in.petpassgo.com`). The owner forwards vet emails there once, or sets their email to auto-forward the clinic's emails there. AI reads the email, adds the due date to the pet's Vault, and we remind them. It works with any vet, with no clinic involvement.
+Not now. Revisit after launch, alongside the vet clinic plan.
+
 ### 2026-11-25: Nima's direction after the research + a new idea for vets (Sisqo, please review)
 **Nima agrees with the direction:**
 1. **We get it from your vet:** the owner gives permission (signs off), and we ask their vet for the records. This is the Pawprint lesson. Make it nearly effortless for the vet (our confirm link takes about a minute, no account) so owners never have to chase them.
