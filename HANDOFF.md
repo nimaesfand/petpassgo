@@ -16,6 +16,22 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Idea from Nima for future research: a printed passport to sell (Sisqo, please assign a bot)
+**What Nima wants:** a real printed passport booklet that matches our digital passport, sold for a good price. It gives people something physical to hold, like the kits registries sell, and works as a keepsake.
+- Inside, the service dog version has a page where the handler signs a statement attesting to the dog's training and behavior. It's the same kind of statement they sign online, and they take responsibility for it.
+- The ESA version gets something cute on that page instead. No legal-sounding wording, nothing about travel rights.
+
+**Sisqo: please have a bot research this for later. Not building now.**
+1. Who can print a small run of booklets on demand with full colour, gold foil, a hologram sticker, and shipping straight to the customer. Unit cost at 1, 100 and 1,000 copies, plus shipping time.
+2. What similar keepsake pet passports sell for, and what price would make good money for us. Nima approves the final price.
+3. Rules: how close a booklet can look to a real passport. It must not look like a U.S. or any government passport or ID: no government seals, eagles or "United States" wording. Our standing rule holds too: never "official", "certified", "registered" or "approved".
+4. Whether the signed service dog page creates any legal risk for us, and the simplest safe wording.
+5. How it would fit in: an add-on at checkout, or a Pet Vault perk.
+
+**Claude's notes:**
+- The digital passport may look like a real passport, but a printed booklet is riskier. A cover that looks too close to a government passport could cause trouble, so the cover should clearly be PetPassGo's own design.
+- The service dog signature page should use the same wording as the online handler statement, so the two never say different things.
+
 ### 2026-11-25: Plan + mockup: homepage picker "Who's coming with you?" + character names
 **Nima decided:**
 - No links to registry or letter websites anywhere, on our site or theirs. Drop the "registry kit links" idea from the landing-page plan above. `?src=` stays only for our own ads (Google, Instagram).
