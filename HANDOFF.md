@@ -658,6 +658,33 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Sisqo review of the sales copy and condensed homepage plan
+The direction is right: outcomes instead of feature names, and less homepage. Most lines are better than what's there now. Here's my pushback, most important first.
+
+**Overpromising (please fix before shipping)**
+1. **"Both DOT forms, filled in and ready" / "filled in for every trip".** The relief form is only needed on flights of 8 hours or more, so "both" doesn't fit most trips. Also, many airlines want the forms submitted ahead of time (up to 48 hours) through their own website, and a passport doesn't send them. Suggest: **"Your DOT forms, filled in and ready to send"** and bullet 1: **"DOT forms filled in for each trip, including the relief form for long flights."**
+2. **"…filled in before you reach the gate."** This hints that showing up at the gate is enough, and with a 48-hour airline deadline it isn't. Suggest: **"Everything your airline can ask for, filled in before you fly."** (This keeps Nima's line.)
+3. **"Exactly what your airline needs, before you book".** "Exactly" is a promise we can't guarantee when airlines change rules. Suggest: **"What your airline requires, before you book."**
+4. **"Vet-checked records".** This is only true if every record shown has actually been confirmed by a vet. If confirmation is optional, use **"Records your vet can confirm"**.
+5. **ESA "A reminder before your letter expires".** Only promise this if the letters feature actually sends that reminder. It isn't tested yet, because letters is still waiting on a test account with Vault access.
+
+**Conflicts with Nima's decisions**
+6. **Header "Start free".** Nima decided: no free anything, and passport sign-up is paid. "Start free" reads like a free account or trial, and people will feel misled at the $6.99 screen. The free part is the requirements check, so the header should say that: **"See what my pet needs"** (same as the hero), or simply "Get started".
+
+**Cuts that were earning their spot**
+7. **"without sharing your number".** That's the one privacy benefit in the lost-pet line and the thing that sets it apart from an engraved tag. Keep it short: **"Lost? One scan reaches you, and your number stays private."**
+8. **"Where our information comes from".** Removing the section is fine, but keep the sources reachable. Make the "last checked [month]" line a link to a sources page. That's a trust signal for rule accuracy and helps SEO. Also, the month has to update automatically or be dropped. A stale month looks worse than no month.
+
+**Smaller notes**
+9. **"Their whole life, in one passport"** is vague and a bit much. Suggest **"Travel, health and ID, in one passport."**
+10. **Benny's service dog passport on the homepage** may tell ESA and pet visitors this is only for service dogs. Consider the plain Pet passport, or the colour of whichever card they hovered or picked last.
+11. **ESA sub "When your landlord asks, it's ready."** It's strong, so keep it. "Saved and private to you" is fine. Maybe add "you choose who sees it", since they'll be sharing it with a landlord.
+12. **Hero "See what my pet needs" with "Free" under it** is good. Keep it.
+
+Everything else is approved: card sub line, Pet sub, "One tap shows the gate agent everything", tile merge, pricing trim, dropping the chat demo and "See travel mode on a phone".
+
+Reviewed.
+
 ### 2026-11-25: Sisqo retest: ESA badge and neutral maker preview (4191f52)
 **Pass:** the ESA badge reads EMOTIONAL SUPPORT ANIMAL, with no "Flies as a pet" anywhere. For both for=esa and for=pet the preview stays neutral until a choice is made (paw, "Your pet", no species, no DOG or CAT in the MRZ). Picking "It's for my cat" switches the preview to Cat/CAT and asks "What's your cat's name?". All fixed.
 Still open: the letters test, which waits on a comped test account from Nima, and the phone-width check.
