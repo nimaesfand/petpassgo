@@ -16,6 +16,35 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-24: Plan: simplify everything (Nima's walk-through) — freeze new features
+Nima went through the passport maker and the keep page and isn't happy: too much going on, too many layers, too much to read, and Pet Vault reads like a travel product. Not built yet.
+
+**The two products, in one line each (Nima):**
+- **Travel Pass** guides you through your trip.
+- **Pet Vault** is everything for your pet: documents, vet, records, grooming and trainer info, snap a photo of records and AI organizes it, lost pet help.
+
+**Rule for every screen from now on:** one headline, at most two short sentences, at most three bullets, one main button. No nested lists, no "see everything" expanders, no locked-feature walls. No new features until the simplify pass is done.
+
+**Passport maker fixes (from Nima's test):**
+1. Breed: placeholder follows the animal (cat: "Like Maine Coon or Mixed", dog: "Like Dachshund or Mixed"). Breed must be picked from the list (type to search), plus "Mixed or not sure", so nothing gets typed wrong onto the passport.
+2. Photo: add crop (drag to position, pinch or slider to zoom) before saving.
+3. Sex: "Male" / "Female" instead of boy / girl.
+4. Things Claude sees wrong on the finished passport: the ESA/service label shows twice (pill next to the name and badge under the photo: keep only the badge under the photo); the hologram and the faint "ghost photo" read like a broken image (keep one clean hologram, drop the ghost square); "PPG-PREVIEW" and "PPGPREVIEW" in the passport number and the code lines look unfinished (show a real-looking number for the preview); owner shows first name only (ask full name or show it as "Nima" without the OWNER label until we have it).
+5. Keep page: the passport turns almost black and unreadable behind a lock. Show it clearly instead, with a soft "Not kept yet" ribbon.
+
+**Keep page, rewritten short (Pet Vault, not travel):**
+- Headline: "Keep [Name]'s passport"
+- One sentence: "Pet Vault keeps everything for [Name] in one place: records, vet, documents and lost pet help."
+- 3 icons max: "Snap a record, we organize it" (the AI record import already exists), "Reminders before anything expires", "Lost pet QR tag".
+- Button: "Keep [Name]'s passport · $6.99/mo". Small line: "Cancel anytime. We hold it for 7 days."
+- Remove the 4 locked cards and the 9-item "See everything" list.
+
+**Then, one screen at a time, same rule:** trip result, account home (pet page), Pet Vault page, homepage. For each, Claude posts a before/after list here first.
+
+**Ask for Sisqo:** do a full phone walk-through of the site and list every screen that breaks the rule (too much text, more than one main button, extra layers or pages that open more pages), with a screenshot or the exact URL. That list becomes the order of work.
+
+Ready for review.
+
 ### 2026-11-23: Built: Sisqo's batch 1 fixes, renewal reminders, batch 2 content trims (live)
 Fixes from Sisqo's batch 1 test:
 - **Simple service dog trip (was FAIL):** the Pet Vault DOT box now shows for a service dog on any U.S. flight that isn't to or from Hawaii (the old check relied on "easy trip", which service dog trips never are because of the DOT step). Mexico, Canada and Hawaii still get the Travel Pass card.
