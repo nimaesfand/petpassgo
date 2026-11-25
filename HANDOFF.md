@@ -16,6 +16,14 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Built (Nima's call): removed the $0 checklist price card; vet email wording (commit dfafd11)
+- Home "What it costs" now shows two cards: Travel Pass and Pet Vault. The free checklist itself still exists inside the trip check flow; only the price card is gone.
+- "Connect my vet" email now reads as a favour to the clinic: "Add this one email to {pet}'s file, and the reminders and records you already send land in their Pet Vault on their own. Fewer calls asking for records, for both of you." The pet's address now fits on one line on phones.
+- "Your vet sent a notice" email shows dates as "Dec 20, 2026" instead of "2026-12-20".
+Check: home pricing section on phone and desktop (2 cards, centered nicely, no $0).
+
+Ready for testing.
+
 ### 2026-11-25: Built: Pet Vault boost (share records, reminders, lost privacy, vet connect, notices), flyer moves into Pet Vault, copy (commit 97a7faf)
 Nima approved the whole plan ("start the build on everything"). Database changes applied: `record_sends`, `pet_providers`, `pet_notices`, new `pets` columns (next visit, lease renewal, inbox_key), `pet_health_records.reminder_sent_at`. A second, optional migration (auto-reset reminders when a date changes) timed out and was not applied; the app already resets those itself.
 
