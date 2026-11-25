@@ -16,6 +16,38 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Plan: messaging built on research (replaces the quick Pet Vault drafts below). Sisqo, please research and push back
+**Full plan:** `docs/messaging-plan.md` (research with sources, positioning, copy for every spot, what has to be true).
+
+**Why:** Nima wants copy that names the moments owners actually hit ("ever had this? we've got you"), not quick word swaps.
+
+**Key findings:**
+- Our own data is too early to use: 5 pets and 14 trip checks, mostly tests.
+- **Records alone won't sell.** Waggle Vault stores, AI-organizes and shares pet records by link for free.
+- **Groomers, boarding, daycare and trainers all demand proof of vaccines.** Some VCA sites cancel the reservation if records aren't in 72 hours before, or charge for an exam on arrival.
+- **Landlords** ask for vaccines, a pet resume and microchip info. **New vets and ER clinics** don't have the history.
+- **Moving is the #1 reason pets fly** (about 45%). Those movers need the airline, the landlord and a new vet all at once.
+- **Airline trouble:** about 1 in 5 flyers with pets had it. Fees run $95–$200 and rules change often.
+- **Service dogs:** DOT lets airlines deny boarding without the forms. Under the ADA, shops can't demand papers, so we sell being ready at the **airport** only.
+
+**Positioning:** Pet Vault is what gets your pet in the door wherever you go (airport, groomer, boarding, new vet, new apartment) and gets them back if they're lost.
+
+**Copy highlights (full list in the doc):**
+- Home Vault sub: "The airport, the groomer, a new vet, a new apartment. Whoever asks, it's ready."
+- Four moment tiles: "At the airport? One tap shows everything they ask for." / "Groomer or boarding wants proof? Share their vaccines in seconds." / "Lost? One scan of their tag reaches you." / "About to expire? We remind you first."
+- Pet Vault card: "Their passport, records and letters, ready for whoever asks" / "One tap at the airport. One scan of their tag reaches you if they're lost" / "A reminder before vaccines, letters or papers expire"
+- Service page bullet 3: "Asked for paperwork at check-in? It's all one tap away."
+- Pet page sub: "Airline, groomer, vet or landlord. Whoever asks, you'll have it."
+
+**Product change needed to back "Share their vaccines in seconds":** the private share link with a PDF already exists, but it's buried as "Care card for sitters". Rename it "Share records" and move it to the top of the Vault. Nima's idea: type the groomer's or vet's email and we send it for them.
+
+**Sisqo:**
+1. Do your own research (Reddit, reviews, forums) on what pet owners, handlers and ESA owners complain about. Add anything we missed.
+2. Push back on any line that overpromises or sounds weak.
+3. Weigh in on the "Share records" change.
+
+Ready for review.
+
 ### 2026-11-25: Correction to the Pet Vault ideas below (Nima)
 - **My mistake:** "Travel Pass for $14.99 instead of $29.99" is wrong. The $29.99 standalone pass was retired on Nov 23. A Travel Pass is $14.99 and always comes with Pet Vault. I took $29.99 from an outdated line in CLAUDE.md, which is now fixed. I checked the site: $29.99 isn't shown to customers anywhere. It only appears in code comments and the old Stripe price ID. Drop that bullet.
 - **Nima:** say "airport", not "gate", and don't lead with "no stress".
