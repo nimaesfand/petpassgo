@@ -8,66 +8,120 @@
 <body>
 <x-dc>
 <helmet>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
 body{margin:0}
-.badge-svc{background:linear-gradient(135deg,#071C5C 0%,#1D4ED8 36%,#8FB0FF 50%,#1D4ED8 64%,#071C5C 100%)}
+.badge-svc{position:relative;overflow:hidden;background:linear-gradient(135deg,#071C5C 0%,#1D4ED8 36%,#8FB0FF 50%,#1D4ED8 64%,#071C5C 100%)}
+.holo{position:relative;overflow:hidden;background:conic-gradient(from 30deg,#f9d976,#9be7ff,#c4b5fd,#fbcfe8,#a7f3d0,#f9d976);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.75)}
+.badge-svc:after,.holo:after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.7) 46%,transparent 60%);background-size:260% 100%;animation:glint 3.8s ease-in-out infinite}
+@keyframes glint{0%,50%{background-position:160% 0}100%{background-position:-110% 0}}
+.glow{animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,.45)}50%{box-shadow:0 0 0 8px rgba(22,163,74,0)}}
+@media (prefers-reduced-motion:reduce){.badge-svc:after,.holo:after,.glow{animation:none}}
 </style>
 </helmet>
-<div style="width:390px;height:844px;box-sizing:border-box;background:#F3F5F9;font-family:Inter,system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden">
-  <section style="background:linear-gradient(160deg,#14213D,#22386A);padding:18px 22px 24px;border-radius:0 0 30px 30px;color:#fff">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div style="font-size:12px;font-weight:800;letter-spacing:.14em;color:#F2B84B">PET VAULT</div>
+<div style="position:relative;width:390px;height:1500px;box-sizing:border-box;background:#F3F5F9;font-family:Inter,system-ui,sans-serif;overflow:hidden">
+  <section style="background:radial-gradient(130% 90% at 50% 0%,#2B4A8B 0%,#14213D 60%,#0B1529 100%);padding:16px 20px 26px;border-radius:0 0 32px 32px">
+    <div style="display:flex;justify-content:space-between;align-items:center;color:#fff">
+      <div style="font-size:12px;font-weight:800;letter-spacing:.16em;color:#F2B84B">PET VAULT</div>
       <a href="#" style="font-size:14px;font-weight:700;color:#fff;text-decoration:none;padding:8px 0">Benny ▾</a>
     </div>
-    <div style="display:flex;gap:16px;align-items:center;margin-top:14px">
-      <img src="/_blob/645ca68c4a1c97f9579a2e9eddcac49c" alt="Benny" style="width:86px;height:104px;border-radius:14px;object-fit:cover;object-position:62% 22%;border:3px solid #fff;outline:2px solid #F2B84B">
-      <div>
-        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:36px;line-height:1">Benny</div>
-        <div style="font-size:14px;color:#C9D4E6;margin-top:4px">Golden Retriever · 5 yrs</div>
-        <div class="badge-svc" style="display:inline-block;margin-top:10px;border-radius:8px;padding:5px 10px;font-weight:900;font-size:11px;letter-spacing:.14em">SERVICE DOG</div>
+    <a href="#" style="display:block;margin-top:12px;text-decoration:none;border-radius:20px;overflow:hidden;background:#FBF7EE;box-shadow:0 24px 50px rgba(0,0,0,.45)">
+      <div style="background:linear-gradient(120deg,#0E1A33,#1E3466);padding:9px 14px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:15px;color:#fff">PetPass<span style="color:#F2B84B">Go</span></div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#F2B84B;letter-spacing:.06em">PPG-4821-BEN</div>
       </div>
-    </div>
-    <a href="#" style="margin-top:16px;display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:999px;border:1.5px solid rgba(255,255,255,.35);color:#fff;font-weight:700;font-size:15px;text-decoration:none">See Benny's passport</a>
+      <div style="height:3px;background:#F2B84B"></div>
+      <div style="display:flex;gap:14px;padding:14px">
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+          <div style="position:relative;width:98px;height:120px;border-radius:12px;overflow:hidden;border:3px solid #fff;outline:1.5px solid #F2B84B">
+            <img src="/_blob/645ca68c4a1c97f9579a2e9eddcac49c" alt="Benny the golden retriever" style="width:100%;height:100%;object-fit:cover;object-position:62% 22%">
+            <div class="holo" aria-hidden="true" style="position:absolute;right:5px;bottom:5px;width:26px;height:26px;border-radius:50%;opacity:.9"></div>
+          </div>
+          <div class="badge-svc" style="width:98px;border-radius:8px;padding:5px 0;text-align:center;color:#fff;font-weight:900;font-size:9px;letter-spacing:.14em">SERVICE DOG</div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:8.5px;font-weight:800;letter-spacing:.16em;color:#4B5565">NAME</div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:34px;line-height:1;color:#14213D">Benny</div>
+          <div style="margin-top:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px">
+            <div><div style="font-size:8px;font-weight:800;letter-spacing:.14em;color:#4B5565">BREED</div><div style="font-weight:700;font-size:12px;color:#14213D">Golden Retriever</div></div>
+            <div><div style="font-size:8px;font-weight:800;letter-spacing:.14em;color:#4B5565">AGE</div><div style="font-weight:700;font-size:12px;color:#14213D">5 years</div></div>
+            <div><div style="font-size:8px;font-weight:800;letter-spacing:.14em;color:#4B5565">WEIGHT</div><div style="font-weight:700;font-size:12px;color:#14213D">68 lb</div></div>
+            <div><div style="font-size:8px;font-weight:800;letter-spacing:.14em;color:#4B5565">CHIP</div><div style="font-weight:700;font-size:12px;color:#14213D">•••• 6789</div></div>
+          </div>
+        </div>
+      </div>
+    </a>
+    <div style="text-align:center;font-size:13px;color:#9FB0CA;margin-top:10px">Tap to open Benny's passport</div>
   </section>
 
-  <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px;flex:1">
-    <a href="#" style="display:flex;align-items:center;gap:14px;background:#C2410C;color:#fff;border-radius:22px;padding:18px;text-decoration:none;box-shadow:0 12px 28px rgba(194,65,12,.3)">
-      <span style="width:52px;height:52px;border-radius:16px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></span>
-      <span><span style="display:block;font-weight:800;font-size:18px">Snap a record</span><span style="display:block;font-size:14px;opacity:.9;margin-top:2px">Take a photo. We read the dates for you.</span></span>
-    </a>
+  <div style="padding:22px 20px 120px;display:flex;flex-direction:column;gap:26px">
+    <section>
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:#14213D">Health</h2><span style="font-size:13px;font-weight:700;color:#EA580C">1 runs out soon</span></div>
+      <div style="margin-top:12px;background:#fff;border-radius:22px;padding:16px 10px;display:flex;box-shadow:0 8px 22px rgba(20,33,61,.06)"><div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1">
+<div style="position:relative;width:76px;height:76px"><svg width="76" height="76" viewBox="0 0 76 76" aria-hidden="true"><circle cx="38" cy="38" r="30" fill="none" stroke="#E6EBF2" stroke-width="8"></circle><circle cx="38" cy="38" r="30" fill="none" stroke="#EA580C" stroke-width="8" stroke-linecap="round" stroke-dasharray="33.9 188.5" transform="rotate(-90 38 38)"></circle></svg>
+<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#14213D">41 d</div></div>
+<div style="font-weight:800;font-size:13.5px;color:#14213D">Rabies</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1">
+<div style="position:relative;width:76px;height:76px"><svg width="76" height="76" viewBox="0 0 76 76" aria-hidden="true"><circle cx="38" cy="38" r="30" fill="none" stroke="#E6EBF2" stroke-width="8"></circle><circle cx="38" cy="38" r="30" fill="none" stroke="#16A34A" stroke-width="8" stroke-linecap="round" stroke-dasharray="135.7 188.5" transform="rotate(-90 38 38)"></circle></svg>
+<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#14213D">9 mo</div></div>
+<div style="font-weight:800;font-size:13.5px;color:#14213D">DHPP</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1">
+<div style="position:relative;width:76px;height:76px"><svg width="76" height="76" viewBox="0 0 76 76" aria-hidden="true"><circle cx="38" cy="38" r="30" fill="none" stroke="#E6EBF2" stroke-width="8"></circle><circle cx="38" cy="38" r="30" fill="none" stroke="#16A34A" stroke-width="8" stroke-linecap="round" stroke-dasharray="94.2 188.5" transform="rotate(-90 38 38)"></circle></svg>
+<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#14213D">6 mo</div></div>
+<div style="font-weight:800;font-size:13.5px;color:#14213D">Bordetella</div></div></div>
+    </section>
 
-    <div style="display:flex;align-items:center;gap:12px;background:#FFF7E6;border-radius:18px;padding:14px 16px">
-      <span style="width:10px;height:10px;border-radius:50%;background:#D97706;flex-shrink:0"></span>
-      <span style="font-size:15px;color:#14213D"><b>Rabies vaccine</b> runs out in 41 days. We'll remind you.</span>
-    </div>
+    <section>
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:#14213D">Documents</h2><a href="#" style="font-size:13.5px;font-weight:700;color:#14213D;padding:6px 0">See all 5</a></div>
+      <div style="margin:12px -20px 0;padding:8px 20px 14px;display:flex;gap:12px;overflow:hidden"><div style="flex-shrink:0;width:150px;height:96px;border-radius:16px;padding:12px;box-sizing:border-box;background:linear-gradient(135deg,#14213D,#2B4A8B);color:#fff;transform:rotate(-3deg);box-shadow:0 10px 22px rgba(20,33,61,.18);display:flex;flex-direction:column;justify-content:space-between">
+<div style="font-size:10px;font-weight:800;letter-spacing:.14em;opacity:.85">VALID TO DEC 30</div><div style="font-weight:800;font-size:15px;line-height:1.15">Health certificate</div></div><div style="flex-shrink:0;width:150px;height:96px;border-radius:16px;padding:12px;box-sizing:border-box;background:linear-gradient(135deg,#071C5C,#1D4ED8 60%,#6F93F5);color:#fff;transform:rotate(2deg);box-shadow:0 10px 22px rgba(20,33,61,.18);display:flex;flex-direction:column;justify-content:space-between">
+<div style="font-size:10px;font-weight:800;letter-spacing:.14em;opacity:.85">READY TO SIGN</div><div style="font-weight:800;font-size:15px;line-height:1.15">DOT Service Animal form</div></div><div style="flex-shrink:0;width:150px;height:96px;border-radius:16px;padding:12px;box-sizing:border-box;background:linear-gradient(135deg,#C2410C,#EA580C);color:#fff;transform:rotate(-2deg);box-shadow:0 10px 22px rgba(20,33,61,.18);display:flex;flex-direction:column;justify-content:space-between">
+<div style="font-size:10px;font-weight:800;letter-spacing:.14em;opacity:.85">3-YEAR</div><div style="font-weight:800;font-size:15px;line-height:1.15">Rabies certificate</div></div></div>
+    </section>
 
-    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
-      <a href="#" style="background:#fff;border-radius:20px;padding:16px;text-decoration:none;box-shadow:0 6px 18px rgba(20,33,61,.06)">
-        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;color:#14213D">4</div>
-        <div style="font-weight:800;font-size:15px;color:#14213D">Records</div>
-        <div style="font-size:13px;color:#15803D;font-weight:700;margin-top:2px">All current</div>
-      </a>
-      <a href="#" style="background:#fff;border-radius:20px;padding:16px;text-decoration:none;box-shadow:0 6px 18px rgba(20,33,61,.06)">
-        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;color:#14213D">3</div>
-        <div style="font-weight:800;font-size:15px;color:#14213D">Documents</div>
-        <div style="font-size:13px;color:#4B5565;margin-top:2px">DOT form ready</div>
-      </a>
-      <a href="#" style="background:#fff;border-radius:20px;padding:16px;text-decoration:none;box-shadow:0 6px 18px rgba(20,33,61,.06)">
-        <div style="font-weight:800;font-size:15px;color:#14213D">Vet</div>
-        <div style="font-size:13px;color:#4B5565;margin-top:2px">Sunset Animal Clinic</div>
-      </a>
-      <a href="#" style="background:#fff;border-radius:20px;padding:16px;text-decoration:none;box-shadow:0 6px 18px rgba(20,33,61,.06)">
-        <div style="font-weight:800;font-size:15px;color:#14213D">Lost pet tag</div>
-        <div style="font-size:13px;color:#15803D;font-weight:700;margin-top:2px">Active</div>
-      </a>
-    </div>
+    <section>
+      <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:#14213D">Benny's people</h2>
+      <div style="margin-top:12px;background:#fff;border-radius:22px;padding:16px 8px;display:flex;justify-content:space-around;box-shadow:0 8px 22px rgba(20,33,61,.06)"><div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:72px">
+<div style="width:58px;height:58px;border-radius:50%;background:#0F766E;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;border:3px solid #fff;box-shadow:0 6px 14px rgba(20,33,61,.15)">ML</div>
+<div style="font-weight:800;font-size:12.5px;color:#14213D">Vet</div><div style="font-size:11.5px;color:#4B5565;text-align:center;line-height:1.2">Dr. Lee</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:72px">
+<div style="width:58px;height:58px;border-radius:50%;background:#7C3AED;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;border:3px solid #fff;box-shadow:0 6px 14px rgba(20,33,61,.15)">PS</div>
+<div style="font-weight:800;font-size:12.5px;color:#14213D">Groomer</div><div style="font-size:11.5px;color:#4B5565;text-align:center;line-height:1.2">Paws Spa</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:72px">
+<div style="width:58px;height:58px;border-radius:50%;background:#1D4ED8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;border:3px solid #fff;box-shadow:0 6px 14px rgba(20,33,61,.15)">JO</div>
+<div style="font-weight:800;font-size:12.5px;color:#14213D">Trainer</div><div style="font-size:11.5px;color:#4B5565;text-align:center;line-height:1.2">J. Ortiz</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:72px">
+<div style="width:58px;height:58px;border-radius:50%;background:#94A3B8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;border:3px solid #fff;box-shadow:0 6px 14px rgba(20,33,61,.15)">+</div>
+<div style="font-weight:800;font-size:12.5px;color:#14213D">Sitter</div><div style="font-size:11.5px;color:#4B5565;text-align:center;line-height:1.2">Add</div></div></div>
+    </section>
 
-    <a href="#" style="margin-top:auto;display:flex;align-items:center;justify-content:center;min-height:54px;border-radius:999px;background:#fff;border:2px solid #14213D;color:#14213D;font-weight:800;font-size:16px;text-decoration:none">Plan a trip with Benny</a>
+    <section style="background:linear-gradient(135deg,#ECFDF3,#FFFFFF);border:1.5px solid #BBF7D0;border-radius:22px;padding:16px;display:flex;gap:16px;align-items:center">
+      <div style="padding:6px;background:#fff;border-radius:12px;box-shadow:0 6px 14px rgba(20,33,61,.1)"><svg width="96" height="96" viewBox="0 0 17 17" role="img" aria-label="Benny's lost pet QR code (sample)" style="display:block;background:#fff"><g fill="#14213D"><rect x="0" y="0" width="1" height="1"></rect><rect x="0" y="1" width="1" height="1"></rect><rect x="0" y="2" width="1" height="1"></rect><rect x="0" y="3" width="1" height="1"></rect><rect x="0" y="4" width="1" height="1"></rect><rect x="0" y="5" width="1" height="1"></rect><rect x="0" y="6" width="1" height="1"></rect><rect x="0" y="8" width="1" height="1"></rect><rect x="0" y="10" width="1" height="1"></rect><rect x="0" y="11" width="1" height="1"></rect><rect x="0" y="12" width="1" height="1"></rect><rect x="0" y="13" width="1" height="1"></rect><rect x="0" y="14" width="1" height="1"></rect><rect x="0" y="15" width="1" height="1"></rect><rect x="0" y="16" width="1" height="1"></rect><rect x="1" y="0" width="1" height="1"></rect><rect x="1" y="6" width="1" height="1"></rect><rect x="1" y="8" width="1" height="1"></rect><rect x="1" y="10" width="1" height="1"></rect><rect x="1" y="16" width="1" height="1"></rect><rect x="2" y="0" width="1" height="1"></rect><rect x="2" y="2" width="1" height="1"></rect><rect x="2" y="3" width="1" height="1"></rect><rect x="2" y="4" width="1" height="1"></rect><rect x="2" y="6" width="1" height="1"></rect><rect x="2" y="10" width="1" height="1"></rect><rect x="2" y="12" width="1" height="1"></rect><rect x="2" y="13" width="1" height="1"></rect><rect x="2" y="14" width="1" height="1"></rect><rect x="2" y="16" width="1" height="1"></rect><rect x="3" y="0" width="1" height="1"></rect><rect x="3" y="2" width="1" height="1"></rect><rect x="3" y="3" width="1" height="1"></rect><rect x="3" y="4" width="1" height="1"></rect><rect x="3" y="6" width="1" height="1"></rect><rect x="3" y="8" width="1" height="1"></rect><rect x="3" y="10" width="1" height="1"></rect><rect x="3" y="12" width="1" height="1"></rect><rect x="3" y="13" width="1" height="1"></rect><rect x="3" y="14" width="1" height="1"></rect><rect x="3" y="16" width="1" height="1"></rect><rect x="4" y="0" width="1" height="1"></rect><rect x="4" y="2" width="1" height="1"></rect><rect x="4" y="3" width="1" height="1"></rect><rect x="4" y="4" width="1" height="1"></rect><rect x="4" y="6" width="1" height="1"></rect><rect x="4" y="10" width="1" height="1"></rect><rect x="4" y="12" width="1" height="1"></rect><rect x="4" y="13" width="1" height="1"></rect><rect x="4" y="14" width="1" height="1"></rect><rect x="4" y="16" width="1" height="1"></rect><rect x="5" y="0" width="1" height="1"></rect><rect x="5" y="6" width="1" height="1"></rect><rect x="5" y="8" width="1" height="1"></rect><rect x="5" y="10" width="1" height="1"></rect><rect x="5" y="16" width="1" height="1"></rect><rect x="6" y="0" width="1" height="1"></rect><rect x="6" y="1" width="1" height="1"></rect><rect x="6" y="2" width="1" height="1"></rect><rect x="6" y="3" width="1" height="1"></rect><rect x="6" y="4" width="1" height="1"></rect><rect x="6" y="5" width="1" height="1"></rect><rect x="6" y="6" width="1" height="1"></rect><rect x="6" y="8" width="1" height="1"></rect><rect x="6" y="10" width="1" height="1"></rect><rect x="6" y="11" width="1" height="1"></rect><rect x="6" y="12" width="1" height="1"></rect><rect x="6" y="13" width="1" height="1"></rect><rect x="6" y="14" width="1" height="1"></rect><rect x="6" y="15" width="1" height="1"></rect><rect x="6" y="16" width="1" height="1"></rect><rect x="8" y="0" width="1" height="1"></rect><rect x="8" y="1" width="1" height="1"></rect><rect x="8" y="2" width="1" height="1"></rect><rect x="8" y="3" width="1" height="1"></rect><rect x="8" y="4" width="1" height="1"></rect><rect x="8" y="6" width="1" height="1"></rect><rect x="8" y="7" width="1" height="1"></rect><rect x="8" y="11" width="1" height="1"></rect><rect x="8" y="13" width="1" height="1"></rect><rect x="8" y="15" width="1" height="1"></rect><rect x="8" y="16" width="1" height="1"></rect><rect x="9" y="8" width="1" height="1"></rect><rect x="9" y="9" width="1" height="1"></rect><rect x="9" y="11" width="1" height="1"></rect><rect x="9" y="14" width="1" height="1"></rect><rect x="9" y="16" width="1" height="1"></rect><rect x="10" y="0" width="1" height="1"></rect><rect x="10" y="1" width="1" height="1"></rect><rect x="10" y="2" width="1" height="1"></rect><rect x="10" y="3" width="1" height="1"></rect><rect x="10" y="4" width="1" height="1"></rect><rect x="10" y="5" width="1" height="1"></rect><rect x="10" y="6" width="1" height="1"></rect><rect x="10" y="8" width="1" height="1"></rect><rect x="10" y="9" width="1" height="1"></rect><rect x="10" y="11" width="1" height="1"></rect><rect x="10" y="12" width="1" height="1"></rect><rect x="10" y="14" width="1" height="1"></rect><rect x="10" y="15" width="1" height="1"></rect><rect x="11" y="0" width="1" height="1"></rect><rect x="11" y="6" width="1" height="1"></rect><rect x="11" y="9" width="1" height="1"></rect><rect x="11" y="14" width="1" height="1"></rect><rect x="11" y="16" width="1" height="1"></rect><rect x="12" y="0" width="1" height="1"></rect><rect x="12" y="2" width="1" height="1"></rect><rect x="12" y="3" width="1" height="1"></rect><rect x="12" y="4" width="1" height="1"></rect><rect x="12" y="6" width="1" height="1"></rect><rect x="12" y="8" width="1" height="1"></rect><rect x="12" y="10" width="1" height="1"></rect><rect x="12" y="12" width="1" height="1"></rect><rect x="13" y="0" width="1" height="1"></rect><rect x="13" y="2" width="1" height="1"></rect><rect x="13" y="3" width="1" height="1"></rect><rect x="13" y="4" width="1" height="1"></rect><rect x="13" y="6" width="1" height="1"></rect><rect x="13" y="8" width="1" height="1"></rect><rect x="13" y="12" width="1" height="1"></rect><rect x="13" y="15" width="1" height="1"></rect><rect x="14" y="0" width="1" height="1"></rect><rect x="14" y="2" width="1" height="1"></rect><rect x="14" y="3" width="1" height="1"></rect><rect x="14" y="4" width="1" height="1"></rect><rect x="14" y="6" width="1" height="1"></rect><rect x="14" y="8" width="1" height="1"></rect><rect x="14" y="13" width="1" height="1"></rect><rect x="14" y="14" width="1" height="1"></rect><rect x="14" y="16" width="1" height="1"></rect><rect x="15" y="0" width="1" height="1"></rect><rect x="15" y="6" width="1" height="1"></rect><rect x="15" y="8" width="1" height="1"></rect><rect x="15" y="9" width="1" height="1"></rect><rect x="15" y="10" width="1" height="1"></rect><rect x="15" y="11" width="1" height="1"></rect><rect x="15" y="13" width="1" height="1"></rect><rect x="15" y="14" width="1" height="1"></rect><rect x="15" y="15" width="1" height="1"></rect><rect x="16" y="0" width="1" height="1"></rect><rect x="16" y="1" width="1" height="1"></rect><rect x="16" y="2" width="1" height="1"></rect><rect x="16" y="3" width="1" height="1"></rect><rect x="16" y="4" width="1" height="1"></rect><rect x="16" y="5" width="1" height="1"></rect><rect x="16" y="6" width="1" height="1"></rect><rect x="16" y="8" width="1" height="1"></rect><rect x="16" y="9" width="1" height="1"></rect><rect x="16" y="14" width="1" height="1"></rect><rect x="16" y="15" width="1" height="1"></rect><rect x="16" y="16" width="1" height="1"></rect></g></svg></div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="glow" style="width:10px;height:10px;border-radius:50%;background:#16A34A"></span><span style="font-weight:800;font-size:13px;letter-spacing:.1em;color:#15803D">ACTIVE</span></div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;color:#14213D;margin-top:4px">Lost pet tag</div>
+        <div style="font-size:14px;color:#2B3443;line-height:1.4;margin-top:2px">Anyone who scans it can reach you. Your number stays private.</div>
+      </div>
+    </section>
+
+    <section style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+      <div style="background:#FFF4E5;border-radius:22px;padding:16px">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21V11H4v10M2 21h20M7 11V8M12 11V8M17 11V8M7 5v.01M12 5v.01M17 5v.01"></path></svg>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#14213D;margin-top:8px;line-height:1">138 days</div>
+        <div style="font-size:13.5px;color:#2B3443;margin-top:4px">until Benny turns 6</div>
+      </div>
+      <div style="background:#fff;border-radius:22px;padding:16px;box-shadow:0 8px 22px rgba(20,33,61,.06)">
+        <div style="font-size:13px;font-weight:700;color:#4B5565">Weight</div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#14213D;line-height:1.1">68 lb</div>
+        <svg width="130" height="40" viewBox="0 0 130 40" role="img" aria-label="Weight steady over the past year" style="margin-top:6px"><polyline points="0,30 22,26 44,28 66,20 88,22 110,16 130,18" fill="none" stroke="#1D4ED8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="130" cy="18" r="4" fill="#1D4ED8"></circle></svg>
+      </div>
+    </section>
+
+    <a href="#" style="display:flex;align-items:center;justify-content:center;min-height:54px;border-radius:999px;background:#fff;border:2px solid #14213D;color:#14213D;font-weight:800;font-size:16px;text-decoration:none">Plan a trip with Benny</a>
   </div>
+
+  <a href="#" style="position:absolute;left:20px;right:20px;bottom:24px;display:flex;align-items:center;justify-content:center;gap:10px;min-height:60px;border-radius:999px;background:#C2410C;color:#fff;font-weight:800;font-size:18px;text-decoration:none;box-shadow:0 14px 30px rgba(194,65,12,.4)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>Snap a record
+  </a>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1500}}'>
 class Component extends DCLogic {
   renderVals() { return {}; }
 }
