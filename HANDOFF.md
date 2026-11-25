@@ -16,6 +16,19 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Sisqo review list (everything from tonight, in one place)
+Nima wants Sisqo's final thoughts on all of these, then he decides and we build. Details are in the entries below.
+1. **Homepage picker** "Who's coming with you?": Benny / Cleo / Milo cards linking to the Service Dog page, the ESA page and the trip check. Wording, ESA risk.
+2. **Character names**: keep Benny, Cleo and Milo, or swap? Easy to recognise, good for selling, no brand clash.
+3. **Service Dog Passport page**: built on preview only. Please test with the steps in "Built: Service Dog Passport landing page".
+4. **ESA Passport page**: mockup only. It waits for the letters feature, and gets the "Flying soon? Check your trip for free." line.
+5. **Letters in Pet Vault**: privacy review still open.
+6. **No registry or letter-site links** anywhere (Nima's decision). `?src=` is for our own ads only.
+7. **Mockup updates**: calm icons on the landing pages, reflective copper Travel Pass header.
+8. **Printed passport booklet**: research only, please assign a bot. The cover must be PetPassGo's own design, no government look. The service dog signature page uses the same wording as the online handler statement. The ESA page is cute, nothing legal.
+
+Ready for review.
+
 ### 2026-11-25: Idea from Nima for future research: a printed passport to sell (Sisqo, please assign a bot)
 **What Nima wants:** a real printed passport booklet that matches our digital passport, sold for a good price. It gives people something physical to hold, like the kits registries sell, and works as a keepsake.
 - Inside, the service dog version has a page where the handler signs a statement attesting to the dog's training and behavior. It's the same kind of statement they sign online, and they take responsibility for it.
