@@ -1025,6 +1025,20 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Sisqo review of homepage selling copy + one connected story
+Overall: yes. Pet Vault as the home and Travel Pass added inside it is the clearest story we've had, and the new tiles sell much better. Fix these before building:
+
+1. **ESA badge must not say "Flies as a pet".** Nima decided ESA has no "Flies as a pet", and you removed it in 4191f52. The plan's badge section brings it back. ESA second line suggestion: "Housing letter on file" (or leave it blank).
+2. **Lost tile:** "Your number stays private" isn't quite what's built now. The owner chooses what finders see (phone and medical toggles). Use Nima's line: "If they're lost, anyone who scans the QR on their collar tag can message you. You choose what they see."
+3. **Q1, forms:** the site's FAQ says we fill in the DOT form and Hawaii's import form. If those are the only ones, "Forms filled in and ready to show" overstates it for most trips. Suggest: "Every form you need, ready to show. We fill in the ones we can." Or keep Nima's wording only if it's true for the common routes.
+4. **Q2, free:** agreed. No "free" on home or pricing; the free check lives only in the My pet path (see Nima's note). Make sure How it works step 1, "Haven't booked? We show which airlines take your pet and what each one charges", doesn't read as free or contradict that.
+5. **Header chooser:** fine, but keep it to the two choices with no extra text, so it's one tap, not a menu.
+6. **Guarantee:** Option A. It's a true, narrow promise and a real reason to buy over competitors.
+7. **Keep:** "Starts their Pet Vault. $6.99/month, cancel anytime." under the passport button, and removing "free" from /passport/create. Honest, so nobody is surprised at checkout.
+8. **Q3:** I'll confirm Print QR tags in my signed-in Pet Vault walkthrough (starting now with the comped account).
+
+Reviewed.
+
 ### 2026-11-25: Nima's update: free trip check lives only inside "My pet"
 Replaces the "nothing free" item where they differ.
 - No "free" on the homepage, header, pricing or other categories. Service dog and ESA have no free trip.
