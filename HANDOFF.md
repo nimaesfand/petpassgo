@@ -382,6 +382,42 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Design mockups (passport, Home, Travel Pass, Pet Vault): review
+
+Looked at the four HTML mockups in `design/mockups/` from commit c945b93 (Nov 25, 12:11 AM PT). Nothing on the live site changed. Rendered them locally (Benny's photo in place of the canvas blob) at the designed sizes: passport 1040×700, Home / Travel Pass / Pet Vault at 390×844. Also read the Nov 24 before/after for the maker and keep page (0752dc5), which these screens sit with.
+
+**What they show.** The passport is a landscape cream card with a navy cover band, gold trim, a large "Benny", an orange ISSUED stamp, fields, machine-readable lines, number PPG-SAMPLE, a gold SAMPLE ribbon, one Service Dog badge under the photo (no pill next to the name), a holographic disc on the photo corner, and the line "Handler statement signed." Home (phone) uses a tilted mini passport as the hook, "Bring them along.", one sentence, two buttons (Plan a trip, Start Pet Vault), and "Checking your trip is free." Travel Pass (phone) has an orange LAX → CUN header, a "Next up" vet-visit card, a 2-of-6 step list, and "Open travel mode." Pet Vault (phone) has Benny's header and badge, "See Benny's passport", a large "Snap a record" card, one reminder, four tiles, and "Plan a trip with Benny." There is no ESA passport, no phone layout of the full passport, and no start / sign-up / pay screen.
+
+**Verdict.** The visual direction is strong. The passport finally looks like something people would pay for, and the Service Dog badge has the deep-blue reflective glint Nima asked for — that part is a clear step up from the flat navy pill. Do not build from these as-is. The SAMPLE ribbon covers the passport number, there is no phone version of the full passport, the ESA badge is missing, and the $6.99 pay-first start screen from the Nov 24 after is not in the set.
+
+**Against Nima's decisions.**
+- **Passport look.** Role shows once, under the photo. The badge is deep blue with a real highlight, not flat. "Handler statement signed" is the right kind of wording (a statement, not a certification). The hologram is a blank pastel disc — it does the job of dropping the old ghost-photo square, but it reads more like a sticker than a nice seal. The gold SAMPLE ribbon is the right idea, but it cuts through "PPG-SAMPLE" so the number reads as "PPG-SAMP". The "PASSPORT ISSUED" label above a sample card is also a mixed signal.
+- **ESA.** Not mocked. The Nov 24 before/after still says Claude will keep "Flies as a pet" unless Nima says otherwise. Nima already decided: deep red, label "Emotional Support Animal", no travel-rights wording. That still stands.
+- **Sample before paying.** The desktop passport is marked SAMPLE / PPG-SAMPLE (once the ribbon is moved). The homepage phone teaser is not: no SAMPLE ribbon, no PPG-SAMPLE, and it shows "Rabies: Current" as if it were a live record. That teaser is the pre-signup hook, so it needs to be clearly a sample, with less personal/health detail.
+- **Pricing and pay-first flow.** None of these four screens show $6.99, $21.98, or "Then $6.99/mo, cancel anytime." The written after correctly drops the 7-day hold and the keep page. Those buy screens still need a mockup before anyone builds them.
+- **Compact rule.** Home has two equal-weight buttons, which breaks "one main button." Travel Pass and Vault are logged-in dashboards, so more than one action is fair, but each still has two strong buttons competing (Find a vet / Open travel mode; Snap a record / Plan a trip).
+- **Nov 23 bugs** (Back in the maker, JFK Travel Pass banner, orange vs blue button, promise-step wording, hidden "See every step") are listed in the written after and are not in these pictures, which is fine.
+
+**Overpromise.** "Take a photo. We read the dates for you" is closer to the truth than "Snap a record, we organize it." The existing document check can read rabies dates and a signature off a photo of a health paper, but only when that feature is turned on, and the API returns a check result — it does not, today, file a record into the Vault. Only use that line if the next build actually saves the dates. "Find a vet near me" is fair: a vet search already exists in the pet extras. Don't ship it as a new product, just open that search.
+
+**Top fixes before build.**
+1. Move the SAMPLE ribbon (or put a clear SAMPLE label next to the number) so PPG-SAMPLE is fully readable.
+2. Design the full passport for a phone. The current card is about 860px wide. Scaling it down to 390px would make the fields too small to read. The homepage mini card is a teaser, not the issued page.
+3. Mark the homepage teaser as a sample (PPG-SAMPLE + ribbon) and drop "Rabies: Current" from it.
+4. Add an ESA passport: deep red reflective badge, "EMOTIONAL SUPPORT ANIMAL", no "Flies as a pet" or other travel wording.
+5. Give the hologram a simple mark (a paw or a small PPG monogram) so it looks like a seal, not a blank pastel sticker.
+6. Mock the start → email + password → pay path: $6.99/mo up front, the unticked renewal box, "Cancel anytime," and for Travel Pass, "Includes your first month of Pet Vault. Then $6.99/mo, cancel anytime."
+7. On Home, pick one primary button. If both products stay on the screen, make Vault clearly secondary, and put the price near the Vault action.
+8. On Travel Pass, don't say "2 of 6 done" and then list only four steps.
+
+**Decisions for Nima.**
+1. Is this passport direction close enough to approve, if Claude fixes the SAMPLE overlap, adds a phone layout, and puts a simple mark in the hologram?
+2. Please reconfirm ESA: no "Flies as a pet." (This was already decided.)
+3. Should Home lead with "Plan a trip" (travel first) or "Start Pet Vault" (the $6.99 passport)? The mock leads with the trip.
+4. Claude's earlier concern still stands: paying before someone sees their own pet's passport means the sample has to do the selling. The desktop sample is close; the phone teaser is not there yet.
+
+Ready for Claude to revise the mockups. Not ready to build, and no browser test of the live site is needed for this set.
+
 ### 2026-11-24 (8:55 PM PT): Nima clarified Travel Pass + Vault (replaces point 3 "Sisqo is confirming" below)
 
 - **Travel Pass = $14.99 + $6.99 = $21.98 at checkout, and includes the first month of Pet Vault.** Pet Vault alone is $6.99/mo up front.
