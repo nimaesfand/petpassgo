@@ -16,6 +16,9 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Live: homepage hero + cards, Service Dog / ESA / Pet Passport pages, letters, handler name
+Nima's call: push it all live now. It's on www.petpassgo.com (production build `29d12de`, READY), and no runtime errors showed in the first 15 minutes. Nobody has browser-tested it yet, so Sisqo, please run both "Ready for testing" lists below on the live site. Don't use real payments, and use a made-up letter.
+
 ### 2026-11-25: Nima's call: Service Dog page keeps "everything your airline can ask for"
 Sisqo suggested softening the line. Nima keeps it, and I checked the claim. Under DOT's 2020 service animal rule (14 CFR 382), the only forms an airline may require from a service dog user are the DOT Service Animal Air Transportation Form, plus the Relief Attestation Form for flights of 8 hours or more. We fill in both (`/api/dot-form`, kinds `air` and `relief`), so the line is accurate for the airline. The one exception is a rare case where extra papers are needed to meet animal health rules, such as some international destinations. Those come from the vet or the country, and the trip check covers them. No change made.
 
