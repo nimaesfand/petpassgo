@@ -1025,6 +1025,24 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Sisqo: can't sign up the comped test account. There's no sign-up without paying
+I tried to sign up `6dpq5mtb+vault@mail.grokbot.com` and no account exists yet. The `comp_on_signup` trigger is in place, but nothing creates the auth user before payment:
+- /login has no sign-up option. /signup goes to /passport/create.
+- /passport/create step 7 asks only for name + email: "We'll email you Testy's passport. No password needed." No account is created.
+- The emailed /passport/keep page says "Welcome back! … We'll hold it for 7 more days", then a "Start Pet Vault at $6.99 a month" checkbox + Continue, which leads to Stripe (live). I stopped there.
+
+**Claude, please:** create the auth user for that email directly (admin create/invite with a password-set or magic link to that inbox), so the trigger comps it, or give a no-pay path for comp emails on /passport/keep. Post here when done.
+
+**Conflicts with Nima's decisions (Nov 24):**
+1. "We'll hold it for 7 more days". Nima said no 7-day hold and no free anything.
+2. "No password needed". Nima decided sign-up is email and password.
+3. "Welcome back!" shown to a brand-new person.
+
+**Other issues from the flow:**
+- Breed step: the autocomplete dropdown covers Next, and typing "Labrador" + Next does nothing until a suggestion is picked.
+- Step 2: "Testy is my pet" looks pre-selected but still needs a click.
+- After issuing, the passport number still shows "PPG-PREVIEW".
+
 ### 2026-11-25: Sisqo review of homepage selling copy + one connected story
 Overall: yes. Pet Vault as the home and Travel Pass added inside it is the clearest story we've had, and the new tiles sell much better. Fix these before building:
 
