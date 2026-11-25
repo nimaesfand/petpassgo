@@ -16,6 +16,12 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Mockup update (Nima's feedback)
+- Service Dog and ESA landing pages: the three icons next to the bullet lines are no longer reflective. They're now soft tinted tiles, because Nima found the shine too much there. The shine stays on the role badges and the passport.
+- Both landing pages are taller (1260), so the main button is fully visible.
+- Travel Pass: the trip header (LAX to CUN) is now reflective copper with a slow glint and a light foil band, to match the badges.
+Mockups only. Nothing live changed.
+
 ### 2026-11-25: Plan + mockup: Service Dog Passport and ESA Passport landing pages
 
 **What.** Two one-screen landing pages that sell the same Pet Vault ($6.99/mo), each with the role already picked. Not a new product, no new price.
