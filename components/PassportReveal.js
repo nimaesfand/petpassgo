@@ -86,7 +86,7 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose, preview 
               {/service|emotional|esa/i.test(pet.role || "") ? (() => { const svc = /service/i.test(pet.role || ""); return (
                 <div className={`ppg-badge ppg-badge-${svc ? "service" : "esa"} rounded-md px-1.5 py-1 text-center`} style={{ width: 112 }}>
                   <div style={{ fontFamily: font.body, fontWeight: 900, fontSize: 9, letterSpacing: "0.12em", color: "#fff", lineHeight: 1.15, textShadow: "0 1px 1px rgba(0,0,0,.35)" }}>{svc ? "SERVICE DOG" : "EMOTIONAL SUPPORT"}</div>
-                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 8.5, color: "rgba(255,255,255,.92)", lineHeight: 1.2 }}>{svc ? (pet.service_attested_at || sample ? "Handler statement signed" : "Statement not signed yet") : "Flies as a pet"}</div>
+                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 8.5, color: "rgba(255,255,255,.92)", lineHeight: 1.2 }}>{svc ? (pet.service_attested_at || sample ? "Handler statement signed" : "Statement not signed yet") : "ANIMAL"}</div>
                 </div>); })() : null}
               <div aria-hidden="true" className="ppg-holo rounded-full" style={{ width: 26, height: 26 }} />
             </div>

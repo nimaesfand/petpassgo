@@ -110,17 +110,17 @@ function trainingText(pet) {
 // Role badge under the photo: deep blue (service dog) or deep red (ESA), metallic sheen.
 function RoleLabel({ kind, signed }) {
   const c = SEALS[kind];
-  const sub = kind === "esa" ? "Flies as a pet" : signed ? "Handler statement signed" : "Statement not signed yet";
+  const sub = kind === "esa" ? "ANIMAL" : signed ? "Handler statement signed" : "Statement not signed yet";
   return (
     <div className={`ppg-badge ppg-badge-${kind} w-full rounded-lg px-2 py-1.5 text-center`}>
       <div style={{ fontFamily: font.body, fontWeight: 900, fontSize: 11, letterSpacing: "0.14em", color: "#fff", lineHeight: 1.15, textShadow: "0 1px 1px rgba(0,0,0,.35)" }}>{c.title}</div>
-      <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 9.5, color: "rgba(255,255,255,.92)", lineHeight: 1.25, marginTop: 1 }}>{sub}</div>
+      <div style={kind === "esa" ? { fontFamily: font.body, fontWeight: 900, fontSize: 11, letterSpacing: "0.14em", color: "#fff", lineHeight: 1.15, textShadow: "0 1px 1px rgba(0,0,0,.35)" } : { fontFamily: font.body, fontWeight: 700, fontSize: 9.5, color: "rgba(255,255,255,.92)", lineHeight: 1.25, marginTop: 1 }}>{sub}</div>
     </div>
   );
 }
 
 // Role seals. Service dogs (including psychiatric service dogs) get blue; emotional
-// support animals get red, with a reminder that they fly as pets.
+// support animals get red.
 const SEALS = {
   service: { a: "#1D4ED8", b: "#1E3A8A", soft: "#E0E7FF", glow: "rgba(29,78,216,.3)", title: "SERVICE DOG" },
   esa: { a: "#B91C1C", b: "#7F1D1D", soft: "#FEE2E2", glow: "rgba(185,28,28,.28)", title: "EMOTIONAL SUPPORT" },
@@ -155,7 +155,13 @@ export function PhotoSlot({ type = "Dog", label = "PHOTO" }) {
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center" style={{ background: "repeating-linear-gradient(135deg, #F3EEE2 0 6px, #EFE8D9 6px 7px)" }}>
       <svg viewBox="0 0 100 110" style={{ width: "62%", height: "auto" }} fill="none" stroke={ink} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        {type === "Cat" ? (
+        {type !== "Cat" && type !== "Dog" ? (
+          <g fill={ink} stroke="none">
+            <ellipse cx="50" cy="68" rx="15" ry="12.5" />
+            <ellipse cx="30" cy="50" rx="6.5" ry="8" /><ellipse cx="70" cy="50" rx="6.5" ry="8" />
+            <ellipse cx="41" cy="37" rx="6" ry="7.5" /><ellipse cx="59" cy="37" rx="6" ry="7.5" />
+          </g>
+        ) : type === "Cat" ? (
           <g>
             <path d="M31 44 C31 30 69 30 69 44 L69 64 C69 80 60 88 50 88 C40 88 31 80 31 64 Z" />
             <path d="M32 40 L28 19 L45 31" /><path d="M68 40 L72 19 L55 31" />

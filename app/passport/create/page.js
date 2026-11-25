@@ -109,7 +109,7 @@ export default function CreatePassport() {
   const toggleTask = (k) => set("tasks")((taskList.includes(k) ? taskList.filter((x) => x !== k) : [...taskList, k]).join(","));
 
   const pet = {
-    id: "sample-draft", name: f.name.trim() || "Your pet", animal_type: f.animal_type || "Dog", role: f.role || "Pet",
+    id: "sample-draft", name: f.name.trim() || "Your pet", animal_type: f.animal_type, role: f.role || "Pet",
     breed: f.breed.trim(), sex: f.sex, date_of_birth: dob, handler_name: f.handler_name.trim(),
     weight_lb: Number(f.weight) > 0 ? Number(f.weight) : null,
     training: svc && f.trained_by ? { levels: ["tasks"], trained_by: f.trained_by, tasks: taskList } : null,
@@ -126,12 +126,12 @@ export default function CreatePassport() {
   }
 
   const serviceData = () => svc ? { weight: f.weight, trained_by: f.trained_by, trainer_name: f.trainer_name, trainer_business: f.trainer_business, tasks: taskList, vet_name: f.vet_name, vet_phone: f.vet_phone, rabies_exp: f.rabies_exp, signed_name: f.signed_name, attest: f.attest === "1" } : null;
-  const draftData = () => ({ animal_type: pet.animal_type, role: pet.role, name: pet.name, breed: pet.breed, sex: pet.sex, date_of_birth: dob, handler_name: pet.handler_name, service: serviceData() });
+  const draftData = () => ({ animal_type: pet.animal_type || "Dog", role: pet.role, name: pet.name, breed: pet.breed, sex: pet.sex, date_of_birth: dob, handler_name: pet.handler_name, service: serviceData() });
 
   // Members (and travelers with a paid trip) save straight to their account.
   async function saveToAccount() {
     const { data: created, error } = await supabase.from("pets").insert({
-      user_id: user.id, name: pet.name, animal_type: pet.animal_type, role: pet.role,
+      user_id: user.id, name: pet.name, animal_type: pet.animal_type || "Dog", role: pet.role,
       breed: pet.breed || null, sex: pet.sex || null, date_of_birth: dob || null,
       handler_name: pet.handler_name || null, passport_issued_at: new Date().toISOString(),
       ...(svc ? { weight_lb: Number(f.weight) > 0 ? Number(f.weight) : null, vet_name: f.vet_name.trim() || null, vet_phone: f.vet_phone.trim() || null } : {}),

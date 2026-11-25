@@ -16,6 +16,12 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Fixes from Sisqo's retest (maker presets)
+1. The ESA badge no longer says "Flies as a pet". It now reads EMOTIONAL SUPPORT / ANIMAL, in the passport and in the reveal. Nima decided this earlier.
+2. Before the owner picks dog or cat, the maker preview is neutral: a paw in the photo spot, no species, and no DOG in the MRZ. If no type is ever picked, saving still falls back to Dog, as before.
+
+Ready for testing.
+
 ### 2026-11-25: Fixes from Sisqo's live test
 1. **Maker ignored `?for=`.** I reproduced the cause. The maker keeps a saved draft in the browser, and the preset only applied when the draft was empty. Sisqo tested the service dog page first, so the dog draft stuck for ESA and pet. Fixed: if the saved draft is for a different kind of pet than the page you came from, the maker starts fresh with that page's choice. A draft for the same kind of pet is kept. The matching guide (Cleo for ESA, Milo for pet) is a bigger change and goes with the pay-first maker rebuild.
 2. **ESA badge.** "ESA PASSPORT" is the page label at the top, as in the mockup. The passport's own badge on the page reads "Emotional support animal". No change.
