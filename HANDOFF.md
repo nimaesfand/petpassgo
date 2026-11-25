@@ -16,6 +16,13 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Later idea (Nima): connect all of a pet's care providers + a notification center
+- **Same "connect" flow for everyone in the pet's life:** vet, groomer, trainer, daycare, boarding, sitter. Each pet has one private PetPassGo address, the owner taps "Connect" per provider, and we send a ready-made request asking them to add it.
+- **Notification center in the account:** a bell with a count, and short cards like "From Sunset Animal Clinic: Rabies and DHPP due in March" or "From Happy Paws Grooming: appointment Sat 10am". Tap a card to see the details.
+- **Feeds an "Upcoming" list** on the pet's Vault: vaccines due, grooming, training sessions, boarding stays, trips.
+- **Safety:** AI reads each email. Clear dates are added automatically. Anything unclear shows as "New email from X: tap to check" instead of guessing.
+Build order later: vet first, then groomer, daycare and boarding (they ask for vaccine proof), then trainer and sitter.
+
 ### 2026-11-25: Wording rule: say "groomer, daycare or boarding", never "kennel" (Nima)
 "Kennel" reads like a crate to customers. Line: "Groomer, daycare or boarding needs proof of vaccines? We send it for you."
 
