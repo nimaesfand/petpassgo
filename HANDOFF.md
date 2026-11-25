@@ -853,6 +853,74 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Sisqo review of messaging plan + vet ideas
+I reviewed Claude's entries from 4367c39 to 5f2fad8 and all of `docs/messaging-plan.md`, checked the code and database (read-only) and the live site, and spot-checked the research. I followed the review order. Most important first.
+
+**A. Step 1 copy (home + 3 passport pages)**
+1. **Two of the plan's lines take back lines Nima already shipped. Nima has to OK this on purpose.**
+   - Home Vault sub: the plan replaces "Backed by your Pet Vault, where every record lives." with "The airport, the groomer, a new vet, a new apartment. Whoever asks, it's ready." Nima chose and liked the "Backed by" line. Suggest keeping it and putting the "moments" in the tiles only.
+   - Pet page bullet 2: the plan replaces "All their vet records, always with you". That's fine, since Nima later said it sounds like a records folder. But say it's his change, not a silent swap.
+   - Pet page sub and Pet card line change too. Both are fine, but they're Nima's call.
+2. **"About to expire? We remind you first" / "A reminder before vaccines … expire" is only partly true.** The cron (`app/api/cron/reminders`) emails for uploaded `documents` that have an expiry date, trips, vet-confirm follow-ups and letters. It does **not** read `pet_health_records`, which is where vaccines typed into the Vault are saved. So a vaccine the owner types in never gets a reminder. Either add `pet_health_records` to the cron before this ships, or word it as "A reminder before their documents and letters expire".
+3. **"Share their vaccines in seconds" is technically true, but weak today.** The share link exists (`/api/pet-share`). It opens a web page with a "Print / save as PDF" button, not an attached PDF. It says **"Health details are owner-entered and not verified by PetPassGo"** and doesn't show the vet confirmation even when there is one. Nobody has ever made one (0 rows in `pet_share_cards`). Groomers and boarding places want a vet's document with due dates (see the research below). Before this line goes live, ship the "Share records" rename and move, include the uploaded vaccine certificate itself, and show "Confirmed by Dr X" when it exists.
+4. **Keep the privacy part in the home lost tile.** "Lost? One scan of their tag reaches you." drops "your info stays private", which Nima chose. Use the shipped line: **"Lost? Anyone who scans their tag can reach you, and your info stays private."** Also, "alerts you" is only true while the pet is marked lost: scans of the lost page email the owner at most once an hour, with an IP-based area that can be miles off. "Reaches you" is the honest word.
+5. **"At the airport? One tap shows everything they ask for."** That's only true if the owner has uploaded everything. Suggest: **"At the airport? One tap shows everything you've saved for them."** The "Asked for paperwork at check-in? It's all one tap away." line on the Service Dog page is fine next to the "before you fly" sub.
+6. **No "kennel" anywhere customers can see.** The candidate Vault card line in "Candidate selling line" ("Groomer or kennel needs proof? We send it for you") and section 6 ("groomer or kennel", "Kennels complain…") both still say kennel. Section 6 is internal, but any copy built from it must use "groomer, daycare or boarding" (Nima's rule).
+7. **Nothing in the plan says "Start free", "Check my trip" or "Flies as a pet", and nothing adds a sources link. Good.** One note: the live home page still shows **"Free lost pet flyer"**, "Free checklist" and "Simple flights are free". The free checklist is the allowed free part. The free flyer is Nima's call under his "no free anything except the requirements check" rule.
+8. **Keep the ESA page as is.** I agree with the plan.
+
+**B. "What has to be true" check (code + DB, read-only)**
+- Travel mode: true.
+- Tag: the finder can message the owner from `/id/[pet]`. True.
+- Scan emails while lost: true, at most once an hour, with an approximate area. Only when the pet is marked lost.
+- Letter reminders: the cron sends one email about 30 days before expiry. The code is there, but it's **untested** (0 letters in the DB, and the letters test is still blocked on a comped account).
+- **Vet-confirm flow:** it exists and works on paper. The owner taps "Ask your vet" on the passport, the vet gets a 14-day one-use link, and records show "✓ Vet verified · Dr X, Clinic" on the passport and on `/check`. **It has been used once and never completed** (1 request, 0 confirmed, 0 verified records). So any "verified" or "vet-confirmed" marketing ("Verified, not just stored", "records confirmed by [clinic]") is unproven. Nima also dropped "Vet-checked". Keep "verified" out of customer copy until real vets are confirming.
+
+**C. Research spot-check**
+- 45% move / 21.7% airline trouble: real, but from one 2019 Pet Life Today survey of about 980 people (TravelPulse). A 2023 study (PMC10571552) found 43.5% relocation, which supports it. Fine for planning. Don't put the numbers on the site.
+- VCA 72-hour rule: confirmed on the VCA Maple Grove policy page ("If records are not received, VCA has the right to cancel reservations").
+- PetDesk $249: that's Capterra's listed starting price. PetDesk doesn't publish prices ("reach out to sales"). Say "about $249+ (third-party listing)".
+- **Pawprint → GreatPetCare: weak and out of date.** The "30 days of records, $5/month" comes from one 2023 App Store review. Covetrus (a vet software company) bought it in 2022, and the GreatPetCare FAQ now says accounts are free. The better lesson is that the "we fetch it from your vet" app got bought by the vet-software side, because the vet relationship is where the power sits.
+- New: boarding places already collect records themselves. Hounds Lounge calls the vet for you (48–72 h, "sometimes we are unsuccessful") and takes email at a shots.pet address. Walkers Pet Hotel asks for **fax**, because "emails may not be seen… and they sometimes bounce".
+
+**Real owner complaints (add to section 2):**
+- Vet front desk refused to give actual vaccine records, and boarding wouldn't accept the invoice reminders. Vacation was the next week: https://www.reddit.com/r/AskVet/comments/1vgdioi/my_veterinarian_office_wont_provide_vaccine/
+- Boarding needed proof while the vet was closed: https://www.reddit.com/r/dogs/comments/tv0xxi/is_there_a_way_for_me_to_prove_vaccination_if_i/
+- Rescue paperwork had no expiry dates and no rabies certificate, so daycare rejected it, and the owner faced re-vaccinating: https://www.reddit.com/r/puppy101/comments/14km84z/never_received_rabies_tag_incomplete_vaccination/
+- Switching vets takes "two weeks". ER clinic at 9pm Sunday "asks for history, you cannot get it". Kennels want the rabies certificate and number, not the tag: https://www.reddit.com/r/Dogowners/comments/1tt913q/things_i_learned_about_keeping_dog_records_that/
+- Daycare won't book until staff manually approve uploads (up to 24 h) and rejects records without due dates: https://www.jazzswonderland.com/getstarted
+- "Annoying to bring vaccination records each time you switch vets, go to the groomers…": https://www.reddit.com/r/Pets/comments/473fcl/pet_vaccination_records/
+
+Takeaway: the pain is **the right document (vet certificate with due dates) reaching the right place before a deadline**. Storage isn't the pain. That supports "We send it for you" plus deadline reminders.
+
+**D. Nima's 5 points: pushback**
+1. **We get it from your vet.** It's the right pain, but the wrong first step. Vets have no reason to click a stranger's confirm link, and the one we've sent was never answered. Asking them to attest also feels like liability to them. Lighter version: the vet just **emails the records to the pet's private PetPassGo address**. Vets already do this every day for boarding places, and it needs no account and no attestation.
+2. **Outside deadlines.** Strongest idea, I agree fully. But we only know a deadline if the owner tells us. Add one optional question, "Next grooming, daycare or boarding date?", plus the lease renewal date for ESA. Remind them **before the place's cutoff** (for example, 4 days before a stay, since VCA wants records 72 h ahead), not on the day.
+3. **Verified, not just stored.** Not yet (see B). Send the vet's **original** certificate. That's what facilities trust, and it doesn't need our "verified" badge.
+4. **We send it for you.** Yes, build this first. Details below.
+5. **All for $6.99.** Fine as a positioning statement. Only market what's live.
+
+**E. Vet clinic plan**
+Not worth building now. A $100/month clinic product means competing with PetDesk, which plugs into the clinic's software, and clinics won't pay a startup with 5 pets to send reminders. I agree with Claude's lighter start: a **free** "Partner clinic" listing in Discover, offered to clinics that already received a records request through PetPassGo. Track two numbers: how many owners tap "connect my vet", and how many clinics reply. Talk about charging only when several owners share the same clinic.
+
+**F. What to build first**
+1. **"Share records" + "We send it for you"** (smallest, since the link exists), together with **one deadline reminder** tied to the stay date. Rules:
+   - Send from a clear sender ("Maya, via PetPassGo"), with reply-to set to the owner and a copy to the owner.
+   - Attach the actual certificate.
+   - Limit sends per day.
+   - Keep the email purely transactional, with **no** "list your business" ad in it. Adding promotion makes it a commercial email under CAN-SPAM (unsubscribe link and postal address needed) and hurts deliverability.
+   - Show "Sent" plus "Ask them to confirm they got it". Facilities say emails get missed.
+2. **Deadline reminders** (trip, stay, lease), using the existing cron. Also fix the vaccine gap in A2.
+3. **"We get it from your vet" / pet inbox address**, later.
+   - AI reading forwarded emails will misread dates (due date vs given date, "booster in 3 weeks"). For a first version, **never auto-add a date: show it and let the owner tap "Looks right"**.
+   - Use random, unguessable addresses, filter spam, and update the privacy policy to cover health info we receive by email.
+   - Emailing vets or groomers on an owner's behalf needs the owner's explicit consent each time. It's the owner's data, not ours, so no reuse for marketing.
+4. **Notification center: after launch.** It's scope creep right now. Email plus the Vault's "Upcoming" list covers it until there's real traffic.
+
+Not verified: phone layout, letters end-to-end (still blocked on the comped account), and how the share page looks on a phone.
+
+Reviewed.
+
 ### 2026-11-25: Sisqo live test of sales copy rewrite (81ecbc5), text check
 I checked the live page text on home, the three passport pages and /login.
 
