@@ -16,6 +16,36 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Built: Pet Vault boost (share records, reminders, lost privacy, vet connect, notices), flyer moves into Pet Vault, copy (commit 97a7faf)
+Nima approved the whole plan ("start the build on everything"). Database changes applied: `record_sends`, `pet_providers`, `pet_notices`, new `pets` columns (next visit, lease renewal, inbox_key), `pet_health_records.reminder_sent_at`. A second, optional migration (auto-reset reminders when a date changes) timed out and was not applied; the app already resets those itself.
+
+**What changed**
+- **Share records** (My Pets > a pet): gold "Share records" button under the pet, and a "Share records" card in Docs. Pick who it's for (Groomer, Daycare, Boarding, New vet, Sitter, Trainer), type their email, tick files, tick "I agree", Send. They get the actual files plus a one-page summary PDF, from "{Owner first name} via PetPassGo", reply goes to the owner, owner gets a copy. They can tap "Got them" and the owner gets an email. Limit 10 sends a day.
+- **Reminders** (daily cron): vaccines and meds typed into Health (30 days before), next grooming/daycare/boarding/training/vet visit (4 days before, with a Share records button), ESA lease renewal (30 days before). Set in Docs > "Coming up". Respects the reminder opt-out.
+- **Lost section**: "Lost? Anyone who scans their tag can reach you." with switches for showing the emergency phone and medical info to finders.
+- **Vet emails**: the vet confirm request is now a branded email (pet card, vaccine list, Confirm button), sent from "{Owner} via PetPassGo".
+- **Connect my vet** (Health section, "Never chase your vet again"): owner enters clinic name and email, ticks consent, we send the clinic a ready-made note asking them to add the pet's private records address. Shows "Coming soon" until Nima finishes setup below.
+- **Vet notices**: when a connected clinic emails the pet's address, a card appears at the top of the pet: "{Clinic} sent a notice", with the vaccines found (ticked) and attached files. Confirm adds only what's ticked; "Not now" hides it. Nothing is added without the tap.
+- **Lost pet flyer is Pet Vault only**: /lost-flyer shows a short Pet Vault pitch to non-members. Removed "Free" from the home footer, sitemap, page title, privacy, terms and the chat assistant. Terms now say the trip requirements check is the free part.
+- **Copy**: home Pet Vault tiles are now 4 (airport, records sent for you, lost, reminders). Pet Vault price card first bullet: "Records sent for you when someone needs proof". Pet passport page: "Groomer, daycare or boarding needs proof? We send it for you." ESA page: "A reminder before your letter expires or your lease renews". Lost bullet: "You choose what they see." No "verified", no "kennel".
+
+**What to test (Sisqo)**
+1. Home: 4 tiles show and read right on phone and desktop. No "Free lost pet flyer" in the footer.
+2. /lost-flyer logged out: Pet Vault pitch, buttons "Make your pet's passport" and "Log in". Logged in as a member: the flyer maker works.
+3. /pet-passport and /esa-passport bullets match the text above.
+4. Member account > a pet > Share records: send to your own second email. Check sender name, reply-to, the attached files and the summary PDF, then tap "Got them" and confirm the owner email and "Received ✓" in the card.
+5. Docs > Coming up: set a visit 3 days out and save. (The email arrives on the next daily cron run.)
+6. Lost section: toggle the switches, open the pet's public page and confirm the phone/medical show or hide.
+7. Health > "Never chase your vet again": should show "Coming soon" until setup is done. Don't send to a real clinic.
+8. Nima: send the vet confirm request to your own dogs' vet as planned.
+
+**Nima's setup to switch on Connect my vet (I can't add secrets)**
+1. In Resend, add a receiving domain, e.g. `in.petpassgo.com`, and add the MX record it gives you in DNS.
+2. In Resend, add a webhook for `email.received` pointing to `https://petpassgo.com/api/inbound-email`. Copy its signing secret.
+3. In Vercel env vars (Production): `INBOUND_DOMAIN` = `in.petpassgo.com`, `RESEND_WEBHOOK_SECRET` = the signing secret. Redeploy.
+
+Ready for testing.
+
 ### 2026-11-25: Wording fix (Nima): homepage passport sub line
 "Backed by your Pet Vault, where every record lives." is now "Backed by Pet Vault, where all your pet's records live." Check: home, passport section.
 
