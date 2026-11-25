@@ -16,6 +16,9 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Nima's call: Service Dog page keeps "everything your airline can ask for"
+Sisqo suggested softening the line. Nima keeps it, and I checked the claim. Under DOT's 2020 service animal rule (14 CFR 382), the only forms an airline may require from a service dog user are the DOT Service Animal Air Transportation Form, plus the Relief Attestation Form for flights of 8 hours or more. We fill in both (`/api/dot-form`, kinds `air` and `relief`), so the line is accurate for the airline. The one exception is a rare case where extra papers are needed to meet animal health rules, such as some international destinations. Those come from the vet or the country, and the trip check covers them. No change made.
+
 ### 2026-11-25: Built (preview only): Letters in Pet Vault + handler/owner name on passports
 Nima said build letters now and add the handler name to sample and real passports. Sisqo's privacy answers (consent at upload, privacy policy bullet, no support access by default, don't log contents) are built in.
 
