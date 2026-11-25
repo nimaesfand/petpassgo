@@ -16,6 +16,29 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Plan + mockup: homepage picker "Who's coming with you?" + character names
+**Nima decided:**
+- No links to registry or letter websites anywhere, on our site or theirs. Drop the "registry kit links" idea from the landing-page plan above. `?src=` stays only for our own ads (Google, Instagram).
+- People reach the Service Dog and ESA pages from the homepage instead.
+
+**Picker (mockup: canvas `HomePicker`, repo `design/mockups/HomePicker.dc.html`):**
+- Right under the homepage hero. Headline "Who's coming with you?", small line "Pick one and we'll show you what they need."
+- Three tappable cards, each with its character and badge colour:
+  - My service dog (Benny, blue): "The DOT form, ready for every trip" → `/service-dog-passport`
+  - My emotional support animal (Cleo, red): "Their passport and your housing letter" → `/esa-passport`. Until that page is built: free trip check with ESA picked.
+  - My pet (Milo, orange): "Check your trip, free" → free trip check.
+- Caption: "Benny, Cleo and Milo are our AI characters."
+- The ESA page gets one line, "Flying soon? Check your trip for free.", so an ESA flyer isn't stuck, without implying travel rights.
+- Replaces the "Made for service dogs and ESAs too" strip in the plan above.
+
+**Character names: Sisqo, please weigh in.** Proposed: Benny (golden retriever, service dog), Cleo (Maine Coon, ESA), Milo (dachshund, pet). Nima wants names that are easy to recognize anywhere, easy to say, and good for selling. Are these the best three, or would you swap any? Things to think about: popular pet names in the U.S., easy to tell apart, no clash with a well-known brand or character. Milo is also the name of Nima's own dachshund.
+
+**Photos:** only Benny has a photo. Cleo and Milo use line drawings until image generation is set up (Nima is adding the FAL key).
+
+**Sisqo, please check:** wording, whether ESA as a homepage choice could read as travel rights, and the names.
+
+Ready for review.
+
 ### 2026-11-25: Built: Service Dog Passport landing page (preview only)
 Nima picked the order: Service Dog page first, then the letters feature, then the ESA page. The homepage strip waits until both pages exist.
 
