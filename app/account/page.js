@@ -34,6 +34,7 @@ import Fold from "../../components/pets/Fold";
 import PetBasicsCard from "../../components/PetBasicsCard";
 import PetCareCard from "../../components/PetCareCard";
 import PetDocumentsCard from "../../components/PetDocumentsCard";
+import PetLettersCard from "../../components/PetLettersCard";
 import { SECTION_THEME } from "../../lib/petSections";
 import PetProfileExperience from "../../components/PetProfileExperience";
 import { KEEP_TOKEN_KEY } from "../../lib/passportDraft";
@@ -450,6 +451,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
 
         {section === "docs" && (<>
           <PetDocumentsCard pet={pet} userId={userId} />
+          {pet.role === "Emotional support animal" || pet.role === "Service animal" ? <PetLettersCard pet={pet} userId={userId} /> : null}
           <Fold icon="home" color={th("docs").color} soft={th("docs").soft} title="Housing paperwork" hint="Pet resume, landlord forms, references">
             <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="docs" />
           </Fold>

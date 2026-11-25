@@ -369,14 +369,15 @@ export default function CreatePassport() {
   if (step === 7) q = (
     <form onSubmit={finish}>
       <BennySays sub={user ? "" : `We'll email you ${name}'s passport. No password needed.`}>{user ? `Last step! Ready to make ${name}'s passport?` : <>Last step! Where should we send {name}&apos;s passport?</>}</BennySays>
+      <label className="block mt-6">
+        <span style={{ fontFamily: B, fontSize: 17, fontWeight: 700, color: tokens.navy }}>Your full name</span>
+        <input value={f.handler_name} onChange={(e) => set("handler_name")(e.target.value)} maxLength={60} autoComplete="name" className="mt-1.5" style={big} />
+        <span className="block mt-1.5" style={{ fontFamily: B, fontSize: 14.5, color: tokens.muted }}>Shown on {name}&apos;s passport as {svc ? "the handler" : "the owner"}. Anything you share shows only your first name and last initial.</span>
+        </label>
       {user ? (
-        <p className="mt-6" style={{ fontFamily: B, fontSize: 17, color: tokens.ink }}>{access.allowed ? `It goes straight into your account.` : `We'll send it to ${user.email}.`}</p>
+        <p className="mt-4" style={{ fontFamily: B, fontSize: 17, color: tokens.ink }}>{access.allowed ? `It goes straight into your account.` : `We'll send it to ${user.email}.`}</p>
       ) : (
         <>
-      <label className="block mt-6">
-        <span style={{ fontFamily: B, fontSize: 17, fontWeight: 700, color: tokens.navy }}>Your first name</span>
-        <input value={f.handler_name} onChange={(e) => set("handler_name")(e.target.value)} maxLength={60} autoComplete="given-name" className="mt-1.5" style={big} />
-        </label>
         <label className="block mt-4">
         <span style={{ fontFamily: B, fontSize: 17, fontWeight: 700, color: tokens.navy }}>Your email</span>
         <input type="email" value={f.email} onChange={(e) => set("email")(e.target.value)} maxLength={200} autoComplete="email" inputMode="email" className="mt-1.5" style={big} />

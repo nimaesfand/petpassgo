@@ -98,8 +98,9 @@ export async function GET(req) {
       vetExpired++;
     }
   }
+  const letters = await letterReminders(sb, today, targets["30d"], optedOut);
   const renewals = await membershipNotices(sb, today);
-  return NextResponse.json({ sent, docSent, vetReminded, vetExpired, renewals });
+  return NextResponse.json({ sent, docSent, vetReminded, vetExpired, letters, renewals });
 }
 
 // Pet Vault renewal reminders: 3 days before the first renewal, then once a year.
@@ -147,6 +148,33 @@ async function membershipNotices(sb, today) {
       ].join("\n"),
     }).catch(() => null);
     if (r !== null) n++;
+  }
+  return n;
+}
+
+// Letters (ESA / service dog): one email about a month before the letter expires.
+// The email never includes the letter or the provider's details.
+async function letterReminders(sb, today, in30, optedOut) {
+  const { data: rows, error } = await sb.from("pet_letters").select("id,user_id,pet_id,kind,expires_on").is("reminder_sent_at", null).gte("expires_on", today).lte("expires_on", in30);
+  if (error) return 0;
+  let n = 0;
+  for (const l of rows || []) {
+    if (optedOut?.has(l.user_id)) continue;
+    const { data: claimed } = await sb.from("pet_letters").update({ reminder_sent_at: new Date().toISOString() }).eq("id", l.id).is("reminder_sent_at", null).select("id");
+    if (!claimed?.length) continue;
+    const { data: u } = await sb.auth.admin.getUserById(l.user_id);
+    const to = u?.user?.email;
+    if (!to) continue;
+    const { data: pet } = await sb.from("pets").select("name").eq("id", l.pet_id).maybeSingle();
+    const what = l.kind === "esa_housing" ? "housing letter" : l.kind === "service_travel" ? "travel letter" : "housing letter";
+    const r = await sendResendEmail({
+      to,
+      kind: "letter_reminder",
+      subject: `PetPassGo: ${pet?.name ? pet.name + "'s " : "your "}${what} expires ${fmt(l.expires_on)}`,
+      text: `${pet?.name ? pet.name + "'s " : "Your "}${what} expires on ${fmt(l.expires_on)}.\n\nIf you need a new one, reach out to your provider now so you're never caught without one when a lease comes up. When you have it, add it to your Vault: ${SITE_URL}/account`,
+    });
+    if (r.ok) n++;
+    else await sb.from("pet_letters").update({ reminder_sent_at: null }).eq("id", l.id);
   }
   return n;
 }

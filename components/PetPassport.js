@@ -219,9 +219,18 @@ function RabiesField({ rabies }) {
   );
 }
 
+export function shortName(full) {
+  const parts = String(full || "").trim().split(/\s+/).filter(Boolean);
+  if (parts.length < 2) return parts[0] || "";
+  return `${parts[0]} ${parts[parts.length - 1][0].toUpperCase()}.`;
+}
+
 function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPhotoTap, onFlip, rabies, code }) {
   const st = statusOf(pet.role);
   const age = ageLabel(pet.date_of_birth);
+  // Full name for the owner, prints and samples; first name + last initial anywhere it's shared.
+  const fullHolder = String(pet.handler_name || "").trim();
+  const holder = owner || sheet || String(pet.id || "").startsWith("sample") ? fullHolder : shortName(fullHolder);
   const fields = [
     ["Species", pet.animal_type],
     ["Breed", pet.breed],
@@ -231,7 +240,6 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
     ["Color", pet.color],
     ["Training", trainingText(pet)],
     ["Microchip", owner && !sheet ? chipMask(chipValue) : chipValue],
-    ["Owner", pet.handler_name],
     ["Issued", pet.passport_issued_at ? fmtDob(String(pet.passport_issued_at).slice(0, 10)) : ""],
   ];
   return (
@@ -279,6 +287,12 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
               <div className="min-w-0">
                 <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>NAME</div>
                 <h2 className={`ppg-pp-name ${String(pet.name || "").length > 9 ? "is-long" : String(pet.name || "").length > 5 ? "is-mid" : ""}`} style={{ fontFamily: font.display, fontWeight: 800, lineHeight: 1, letterSpacing: "-0.02em", color: tokens.navy, overflowWrap: "break-word" }}>{pet.name}</h2>
+                {holder ? (
+                  <div className="mt-2">
+                    <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>{st === STATUS.service ? "HANDLER" : "OWNER"}</div>
+                    <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, color: tokens.navy, overflowWrap: "break-word" }}>{holder}</div>
+                  </div>
+                ) : null}
                 {st === STATUS.service || st === STATUS.esa ? null : <span className="inline-block rounded-md px-2 py-0.5 mt-2" style={{ background: st.bg, color: st.fg, fontFamily: font.body, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.14em" }}>{st.label}</span>}
               </div>
               {pet.passport_issued_at ? (

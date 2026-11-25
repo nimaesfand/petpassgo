@@ -105,7 +105,7 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose, preview 
               pet.color && ["COLOR", pet.color],
               pet.trained != null && ["TRAINED", pet.trained ? "Yes" : "Not yet"],
               pet.microchip_number && ["MICROCHIP", chipMask(pet.microchip_number)],
-              pet.handler_name && ["OWNER", pet.handler_name],
+              pet.handler_name && [pet.role === "Service animal" ? "HANDLER" : "OWNER", pet.handler_name],
               pet.passport_no && ["PASSPORT NO.", pet.passport_no],
             ].filter(Boolean).slice(0, 9).map(([k, v], i) => (
               <div key={k} className={`min-w-0 ${k === "OWNER" || k === "PASSPORT NO." ? "col-span-2" : ""}`} style={{ paddingTop: i < 3 ? 8 : 0, opacity: stage >= 2 ? 1 : 0, transform: stage >= 2 ? "none" : "translateY(6px)", transition: `opacity .45s ease ${i * 0.22}s, transform .45s ease ${i * 0.22}s` }}>

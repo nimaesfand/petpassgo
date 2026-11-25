@@ -13,7 +13,7 @@ import { Wordmark } from "./Logo";
 // A filled-in sample vault so visitors see what theirs will look like.
 // Everything here is clearly labeled Sample; no real pet data is shown.
 
-const SAMPLE_PET = { id: "sample", name: "Benny", animal_type: "Dog", role: "Service animal", sex: "Male", breed: "Golden Retriever", date_of_birth: "2023-04-12", color: "Golden", handler_name: "Sample owner", passport_no: "PPG-4821-BSC", passport_issued_at: "2026-10-02T17:00:00Z", service_attested_at: "2026-10-02T17:00:00Z" };
+const SAMPLE_PET = { id: "sample", name: "Benny", animal_type: "Dog", role: "Service animal", sex: "Male", breed: "Golden Retriever", date_of_birth: "2023-04-12", color: "Golden", handler_name: "Alex Morgan", passport_no: "PPG-4821-BSC", passport_issued_at: "2026-10-02T17:00:00Z", service_attested_at: "2026-10-02T17:00:00Z" };
 
 const DOCS = [
   { name: "Rabies vaccine", note: "Expires in 41 days", tone: "warn", icon: "health" },

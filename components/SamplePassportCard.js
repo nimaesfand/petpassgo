@@ -8,6 +8,7 @@ const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 const SAMPLES = {
   service: {
     name: "Benny",
+    holder: ["HANDLER", "Alex Morgan"],
     photo: "/images/hero-golden-retriever.jpg",
     alt: "Benny, a golden retriever in a service vest",
     fields: [["SPECIES", "Dog"], ["BREED", "Golden Retriever"], ["SEX", "Male"], ["BORN", "Apr 12, 2021"], ["WEIGHT", "68 lb"], ["TRAINING", "Task trained"], ["MICROCHIP", "•••• 6789", true], ["ISSUED", "Nov 25, 2026"]],
@@ -16,6 +17,7 @@ const SAMPLES = {
   },
   esa: {
     name: "Cleo",
+    holder: ["OWNER", "Jamie Cruz"],
     icon: "cat",
     alt: "Cleo, a Maine Coon",
     fields: [["SPECIES", "Cat"], ["BREED", "Maine Coon"], ["SEX", "Female"], ["BORN", "Mar 3, 2022"], ["WEIGHT", "14 lb"], ["TRAINING", "Leash trained"], ["MICROCHIP", "•••• 4410", true], ["ISSUED", "Nov 25, 2026"]],
@@ -24,6 +26,7 @@ const SAMPLES = {
   },
   pet: {
     name: "Milo",
+    holder: ["OWNER", "Sam Rivera"],
     icon: "dog",
     alt: "Milo, a dachshund",
     fields: [["SPECIES", "Dog"], ["BREED", "Dachshund"], ["SEX", "Male"], ["BORN", "Jun 2, 2020"], ["WEIGHT", "11 lb"], ["TRAINING", "House trained"], ["MICROCHIP", "•••• 2048", true], ["ISSUED", "Nov 25, 2026"]],
@@ -85,8 +88,12 @@ export default function SamplePassportCard({ kind = "service" }) {
           <div style={{ flex: 1, minWidth: 0 }}>
             <Label>NAME</Label>
             <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 38, lineHeight: 1, letterSpacing: "-.02em", color: tokens.navy }}>{s.name}</div>
-            <div role="img" aria-label="Issued Nov 25, 2026" className="flex items-center justify-center" style={{ marginTop: 14, width: 84, height: 84, borderRadius: "50%", border: `3px solid ${tokens.primary}`, transform: "rotate(-13deg)", color: tokens.primary, opacity: 0.9, mixBlendMode: "multiply" }}>
-              <div className="flex flex-col items-center justify-center" style={{ width: 68, height: 68, borderRadius: "50%", border: `1.5px dashed ${tokens.primary}` }}>
+            <div style={{ marginTop: 8 }}>
+              <Label>{s.holder[0]}</Label>
+              <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 14, color: tokens.navy }}>{s.holder[1]}</div>
+            </div>
+            <div role="img" aria-label="Issued Nov 25, 2026" className="flex items-center justify-center" style={{ marginTop: 8, width: 76, height: 76, borderRadius: "50%", border: `3px solid ${tokens.primary}`, transform: "rotate(-13deg)", color: tokens.primary, opacity: 0.9, mixBlendMode: "multiply" }}>
+              <div className="flex flex-col items-center justify-center" style={{ width: 62, height: 62, borderRadius: "50%", border: `1.5px dashed ${tokens.primary}` }}>
                 <div style={{ fontFamily: font.body, fontSize: 5.5, fontWeight: 800, letterSpacing: ".2em" }}>PETPASSGO</div>
                 <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 17, lineHeight: 1.05 }}>ISSUED</div>
                 <div style={{ fontFamily: MONO, fontSize: 7, fontWeight: 700 }}>NOV 25, 2026</div>
