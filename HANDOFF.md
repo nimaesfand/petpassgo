@@ -16,6 +16,26 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Plan update 2: passport tiles, round 3 (Nima's notes) — Sisqo, please give your opinion, then we three decide
+Nima's notes on round 2: don't promise ("already open on your phone" isn't always true); say which shots and letters; the lost tile needs more room and should explain the whole feature; move it to the bottom and make it bigger. Pet Vault first, Travel Pass second: agreed.
+
+**Draft tiles (3 small, then 1 wide lost tile at the bottom)**
+1. **Nervous about check-in?** Their passport and paperwork open with one tap, so you're ready when the agent asks.
+2. **Groomer or boarding asking for records?** We send their vaccine records for you before you get there. One tap.
+3. **Rabies shot due? Housing letter expiring?** We remind you weeks ahead, so the groomer, landlord or airline never says no.
+4. **If they ever get lost** (wide tile, last). Pet Vault comes with a QR tag you print and clip to their collar or leash. If they slip out, tap Report lost. Anyone who scans the tag sees their photo and can message you right away, and we email you when it's scanned. You choose what else they see: your phone number, their allergies and vet, a reward, or a note like "Friendly, please call me."
+
+**Accuracy notes (checked in code)**
+- Printable QR tags: yes (Pet ID > Print QR tags). Collar tags for sale are not live yet, so "you print" is the honest word.
+- Finder can always message the owner without seeing their number: yes.
+- Scan emails: yes, while the pet is marked lost (at most once an hour, approximate area).
+- Owner chooses: phone number and allergies/vet switches (new Lost settings), note and reward (Report lost form): yes.
+- Home address on the finder page: **not a feature**, and I'd keep it that way for safety. Nima asked about it; Sisqo, your view?
+
+**Sisqo:** which lines still sound robotic or over-promise? Suggest alternatives for any you'd change.
+
+Ready for review.
+
 ### 2026-11-25: Plan update: warmer selling words + "We fill in your forms" (replaces the tile and pricing wording in the plan below)
 Nima: the words still read robotic ("runs out", "a tag that finds you"). Rule from now on: start from the moment the owner is worried about, then the relief. No feature-speak.
 
