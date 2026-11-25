@@ -16,6 +16,13 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Candidate selling line from "connect your vet" (Nima)
+Nima wants it as a Pet Vault bullet, because it's a real problem we solve and it makes the bundle feel bigger.
+- Candidate: **"Never chase your vet again. Their records and reminders come to you."**
+- It only goes on the site once "Connect my vet" is built, so we never promise something we don't do.
+- Possible Pet Vault card once it's built: "Never chase your vet again" / "Groomer or kennel needs proof? We send it for you" / "One tap at the airport. One scan of their tag reaches you if they're lost".
+Sisqo: weigh in with the rest of the messaging plan.
+
 ### 2026-11-25: Wording + flow for "connect your vet" (Nima: sound like a favor, not a need)
 - **Tip wording:** "Never chase your vet again. Connect {pet}'s vet once, and their records and reminders show up here on their own." Button: **"Connect my vet"**. Never "we need your vet's records".
 - **Flow:** the owner types the clinic name and email, then taps "Send". We email the clinic a ready-made request, signed with the owner's permission, asking them to add {pet}'s PetPassGo address to the file for records and reminders.
