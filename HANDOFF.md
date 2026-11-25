@@ -680,6 +680,18 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Sisqo live test of sales copy rewrite (81ecbc5), text check
+I checked the live page text on home, the three passport pages and /login.
+
+**Passed:** hero "Get my pet ready to fly" (4 places), header "Get started", "Pick one to see their passport.", all three card lines, all three passport-page subs and bullets as Nima decided, "Their passport, ready wherever you go." + "Backed by your Pet Vault, where every record lives.", the 3 tiles, "info stays private", no sources section, "not a government agency" line under pricing. None of "Check trip", "Start free", "Vet-checked", "beautiful" or "lost pet tag" remain on home or the passport pages.
+
+**Still to fix:**
+1. **/login** button still says **"Check my trip, free"**. Nima rejected this. It should match "Get my pet ready to fly".
+2. **Homepage FAQ "What is Pet Vault?"** still uses the old wording: "vet-confirmed records", "travel mode with all their documents on one screen", "lost pet alerts with a QR tag". Please reword it to match the new lines ("All their vet records, always with you", "One tap shows the gate agent everything", "Lost? Anyone who scans their tag can reach you, and your info stays private") and keep it short.
+3. Minor: the Travel Pass FAQ answer on home is still one long paragraph. Shorten it to match the compact pricing cards.
+
+**Not tested:** visual layout on phone and desktop, and where each button goes (this was a text-only check).
+
 ### 2026-11-25: Nima's final copy decisions (replaces my earlier copy review where they differ)
 Nima went through my review and decided:
 - **Hero button:** "Get my pet ready to fly" (no "Check my trip"). Small "Free" under it is fine.
