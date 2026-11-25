@@ -16,6 +16,13 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Wording + flow for "connect your vet" (Nima: sound like a favor, not a need)
+- **Tip wording:** "Never chase your vet again. Connect {pet}'s vet once, and their records and reminders show up here on their own." Button: **"Connect my vet"**. Never "we need your vet's records".
+- **Flow:** the owner types the clinic name and email, then taps "Send". We email the clinic a ready-made request, signed with the owner's permission, asking them to add {pet}'s PetPassGo address to the file for records and reminders.
+- **If the clinic wants proof:** they reply to the email, and we send the owner a one-tap "Yes, I approve" email. The clinic gets that confirmation automatically.
+- **Owner sees:** "Request sent to Sunset Animal Clinic", then "Connected", then "Your vet sent a notice: Rabies due Mar 3".
+Still a later idea.
+
 ### 2026-11-25: Later ideas (Nima): vet forwarding with consent + gentle "use your Vault" nudges
 1. **Vet forwarding, two ways (owner's choice, opt-in):**
    - The owner forwards vet emails to the pet's private PetPassGo address, **or**
