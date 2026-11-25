@@ -16,6 +16,15 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Review order for the whole site (Nima)
+We verify and polish the site in this order. Each step: Claude plans, Sisqo reviews, Nima decides, Claude builds, Sisqo tests.
+1. **Homepage and the three passport pages** (Service Dog, ESA, Pet): finish the copy from `docs/messaging-plan.md` once Sisqo has reviewed it. The regular-pet option is "My pet" on the homepage card, and its page is "Pet Passport" (`/pet-passport`).
+2. **Inside Pet Vault (logged in):** go through every screen. What each button does, where it leads, how it looks and how it's worded. "Share records" and "We send it for you" are built in this step.
+3. **Travel Pass:** the whole trip flow. What a free (simple) trip gets, what a paid trip gets, and how each is shown and sold.
+After that come the later ideas: connecting vets and providers, the notification center, gentle nudges, the vet clinic plan, and the printed passport.
+
+Sisqo: when you review, please work in this order too.
+
 ### 2026-11-25: Later idea (Nima): connect all of a pet's care providers + a notification center
 - **Same "connect" flow for everyone in the pet's life:** vet, groomer, trainer, daycare, boarding, sitter. Each pet has one private PetPassGo address, the owner taps "Connect" per provider, and we send a ready-made request asking them to add it.
 - **Notification center in the account:** a bell with a count, and short cards like "From Sunset Animal Clinic: Rabies and DHPP due in March" or "From Happy Paws Grooming: appointment Sat 10am". Tap a card to see the details.
