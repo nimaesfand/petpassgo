@@ -12,7 +12,8 @@
 <style>
 body{margin:0}
 .badge-svc{position:relative;overflow:hidden;background:linear-gradient(135deg,#071C5C 0%,#1D4ED8 36%,#8FB0FF 50%,#1D4ED8 64%,#071C5C 100%)}
-.holo{position:relative;background:conic-gradient(from 30deg,#f9d976,#9be7ff,#c4b5fd,#fbcfe8,#a7f3d0,#f9d976);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.75)}
+.holo{position:absolute;overflow:hidden;background:conic-gradient(from 30deg,#f9d976,#9be7ff,#c4b5fd,#fbcfe8,#a7f3d0,#f9d976);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.75)}
+.foil{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 38%,rgba(249,217,118,.22) 44%,rgba(155,231,255,.22) 49%,rgba(196,181,253,.22) 54%,rgba(251,207,232,.2) 58%,transparent 64%);mix-blend-mode:multiply}
 </style>
 </helmet>
 <div style="width:390px;height:844px;box-sizing:border-box;background:#0B1529;font-family:Inter,system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden">
@@ -34,7 +35,6 @@ body{margin:0}
           <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
             <div style="position:relative;width:96px;height:118px;border-radius:10px;overflow:hidden;border:3px solid #fff;outline:1.5px solid #F2B84B">
               <img src="/_blob/645ca68c4a1c97f9579a2e9eddcac49c" alt="Benny the golden retriever" style="width:100%;height:100%;object-fit:cover;object-position:62% 22%">
-              <div class="holo" aria-hidden="true" style="position:absolute;right:5px;bottom:5px;width:24px;height:24px;border-radius:50%;opacity:.9"><svg width="60%" height="60%" viewBox="0 0 24 24" aria-hidden="true" style="position:absolute;left:20%;top:20%;opacity:.55;mix-blend-mode:multiply"><g fill="#14213D"><ellipse cx="12" cy="15.5" rx="4.2" ry="3.6"></ellipse><circle cx="6.5" cy="10" r="1.9"></circle><circle cx="17.5" cy="10" r="1.9"></circle><circle cx="9.5" cy="6.5" r="1.8"></circle><circle cx="14.5" cy="6.5" r="1.8"></circle></g></svg></div>
             </div>
             <div class="badge-svc" style="width:96px;border-radius:7px;padding:4px 0;text-align:center;color:#fff;font-weight:900;font-size:8.5px;letter-spacing:.14em">SERVICE DOG</div>
           </div>
@@ -44,11 +44,13 @@ body{margin:0}
             <div style="margin-top:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
               <div><div style="font-size:7.5px;font-weight:800;letter-spacing:.14em;color:#4B5565">BREED</div><div style="font-weight:700;font-size:11px;color:#14213D">Golden Retriever</div></div>
               <div><div style="font-size:7.5px;font-weight:800;letter-spacing:.14em;color:#4B5565">WEIGHT</div><div style="font-weight:700;font-size:11px;color:#14213D">68 lb</div></div>
-              <div><div style="font-size:7.5px;font-weight:800;letter-spacing:.14em;color:#4B5565">RABIES</div><div style="font-weight:700;font-size:11px;color:#14213D">Good until 2027</div></div>
+              <div><div style="font-size:7.5px;font-weight:800;letter-spacing:.14em;color:#4B5565">RABIES EXP.</div><div style="font-weight:700;font-size:11px;color:#14213D">Apr 2027</div></div>
               <div><div style="font-size:7.5px;font-weight:800;letter-spacing:.14em;color:#4B5565">TRAINING</div><div style="font-weight:700;font-size:11px;color:#14213D">Task trained</div></div>
             </div>
           </div>
         </div>
+        <div class="foil" aria-hidden="true"></div>
+        <div class="holo" aria-hidden="true" style="position:absolute;right:10px;bottom:8px;width:38px;height:38px;border-radius:50%;opacity:.92;z-index:2"><svg width="60%" height="60%" viewBox="0 0 24 24" aria-hidden="true" style="position:absolute;left:20%;top:20%;opacity:.55;mix-blend-mode:multiply"><g fill="#14213D"><ellipse cx="12" cy="15.5" rx="4.2" ry="3.6"></ellipse><circle cx="6.5" cy="10" r="1.9"></circle><circle cx="17.5" cy="10" r="1.9"></circle><circle cx="9.5" cy="6.5" r="1.8"></circle><circle cx="14.5" cy="6.5" r="1.8"></circle></g></svg></div>
       </article>
     </div>
 
