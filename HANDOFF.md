@@ -16,6 +16,63 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Plan: homepage selling copy + one connected story (Nima's feedback on his phone)
+Nima's feedback: the home bullets don't sell, "free" still shows, and the three buttons (Get started, Get my pet ready to fly, Make your pet's passport) don't connect into one story. Nothing built yet. Sisqo: please review, then Nima decides.
+
+**The one story (every page and button follows it)**
+PetPassGo gets your pet ready for trips and keeps everything they need in one place.
+- **Pet Vault ($6.99/mo) is the home.** The passport is the front page of their Pet Vault, so making a passport = starting Pet Vault.
+- **Travel Pass ($14.99/trip) is added inside the Vault** whenever you fly. Inside the Vault there's always "Add a trip".
+- Two doors, same house: "Get my pet ready to fly" (trip questions) and "Make your pet's passport". Both end in the Vault.
+
+**Buttons**
+- Header "Get started": opens a small chooser with two choices: "Flying soon? Get my pet ready to fly" and "Make your pet's passport". Today it only goes to the trip questions.
+- Passport block button stays "Make your pet's passport", with a small line under it: "Starts their Pet Vault. $6.99/month, cancel anytime."
+- /passport/create page title "Make your pet's passport, free" changes to "Make your pet's passport". Its first screen says the same line about Pet Vault, so nobody thinks it's free.
+
+**How it works (no "free")**
+1. **Tell us where you're flying.** Pick your airline and dates. Haven't booked? We show which airlines take your pet and what each one charges.
+2. **We get your pet ready.** Every step in order, with deadlines: vet visit, health certificate, airline forms. We remind you before each one.
+3. **Show it in one tap.** It all lives in their passport. At check-in, open it and show the agent what they ask for.
+
+**The 4 passport tiles: a short headline + one plain line each**
+- **Ready at check-in.** Show the gate agent the right document in one tap.
+- **Records sent for you.** Groomers, daycare and boarding ask for proof of rabies and other shots. We email it to them.
+- **A tag that finds you.** If they're lost, anyone who scans the QR on their collar tag can message you. Your number stays private.
+- **Never miss a due date.** We remind you before a vaccine, document or letter runs out.
+
+**What it costs**
+- Heading: "What it costs". Sub: "Pet Vault keeps their passport and records. Add a Travel Pass when you fly." (no "free")
+- Pet Vault goes first, because the Travel Pass is added to it.
+- **Pet Vault, $6.99/month.** Sub: "Their passport and records, wherever you go." Bullets:
+  - Their passport, vaccines and documents in one place
+  - We email records to the groomer, daycare, boarding or a new vet
+  - A QR collar tag so anyone who finds them can message you
+  - Reminders before anything expires
+  - Cancel anytime
+  - Button: "Make your pet's passport"
+- **Travel Pass, $14.99 per trip.** Unit line: "Added to Pet Vault. First trip $21.98 (pass + first month)." Sub: "Everything for one flight." Bullets:
+  - Every step for your airline and destination, in order
+  - Deadlines and reminders for each step
+  - Forms filled in and ready to show (Nima's wording)
+  - Service dog? Your DOT form, filled in
+  - Button: "Get my pet ready to fly"
+- **Flight-Ready Guarantee:** the terms already promise a Travel Pass refund if the pet is refused because a requirement we showed was wrong. Option A: keep the name and say exactly that under it. Option B: drop it until launch. Recommend A, because it's a true, narrow promise. Nima decides.
+- Removed: "Mexico, Canada, Hawaii, service dogs and cargo", "Records sent for you when someone needs proof", "every record".
+
+**Sample passport badge (all three passports)**
+- Top line bigger and bolder: shield icon + "SERVICE DOG" (ESA: heart + "EMOTIONAL SUPPORT"; pet: paw + "PET").
+- A thin line, then the second line smaller and lighter (gold on blue): "Handler statement signed". ESA: "Flies as a pet". Same for the real passports.
+
+**Questions for Sisqo to check**
+1. Do we fill in airline forms beyond the DOT form today? If not, say "Forms ready to show" (Nima's wording) and not "filled in".
+2. The free trip check: per Nima's later note it only shows inside "My pet". This plan removes "free" from home and pricing either way.
+3. Is the QR collar tag printable today (My Pets > Pet ID > Print QR tags)? Yes per the chat assistant text. The tile says "QR on their collar tag", which fits.
+
+Pages touched: home (hero buttons, How it works, passport tiles, pricing), header, /passport/create title and first screen, sample passport badges (home + 3 passport pages), real passport badge.
+
+Ready for review.
+
 ### 2026-11-25: Sisqo's test account: sign up now, it's a member instantly
 Nima wants all three of us able to see and test everything. Done for the database side:
 - New list `comp_emails` (Nima approved). Any email on it becomes an active Pet Vault member the moment it signs up, with no Stripe charge and no end date. `6dpq5mtb+vault@mail.grokbot.com` is on it.
