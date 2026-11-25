@@ -25,7 +25,6 @@ const STEPS = [
 
 
 const PRICE_CARDS = [
-  { title: "Free checklist", sub: "For simple flights", price: "$0", unit: "with a free account", checks: ["Every step for your flight, in order", "Your airline's pet fee and carrier size", "Saved for travel day"], cta: "Get my pet ready to fly", href: "/assessment", bordered: true },
   { title: "Travel Pass", sub: "For flights that need paperwork", price: P.memberPass, unit: "per trip, with Pet Vault", checks: ["Mexico, Canada, Hawaii, service dogs and cargo", "Your dates, reminders and forms filled in", "Flight-Ready Guarantee"], cta: "Get my pet ready to fly", href: "/assessment", dark: true },
   { title: "Pet Vault", sub: "Their passport and every record", price: P.member, unit: "a month", checks: ["Records sent for you when someone needs proof", "A tag anyone can scan if they're lost", "Cancel anytime"], cta: "Make your pet's passport", href: "/passport/create", accent: true, tag: "Best for records and frequent travel" },
 ];
@@ -166,7 +165,7 @@ export default async function PetPassGoLanding() {
         <div className={WRAP}>
           <h2 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[32px] md:text-[44px] font-extrabold">What it costs</h2>
           <p className="mt-3 max-w-[38rem]" style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }}>Seeing what your pet needs is free. You only pay when a flight needs paperwork.</p>
-          <div className="grid md:grid-cols-3 gap-4 mt-10">
+          <div className="grid md:grid-cols-2 gap-4 mt-10 max-w-[900px]">
             {PRICE_CARDS.map((c) => (
               <article key={c.title} className="rounded-3xl p-6 flex flex-col" style={{ background: c.dark ? tokens.navy : c.accent ? "#fff" : tokens.sky, color: c.dark ? "#fff" : tokens.navy, border: c.accent || c.bordered ? `2px solid ${tokens.primary}` : "none", boxShadow: c.accent ? "0 18px 44px rgba(194,65,12,.14)" : "none" }}>
                 <div className="flex items-start justify-between gap-3">

@@ -29,6 +29,7 @@ function verified(raw, headers) {
 }
 
 const resend = (path) => fetch(`https://api.resend.com${path}`, { headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}` } }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+const nice = (d) => { const [y, m, day] = d.split("-").map(Number); return new Date(Date.UTC(y, m - 1, day)).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }); };
 const iso = (v) => (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null);
 const clip = (v, n) => (typeof v === "string" && v.trim() ? v.trim().slice(0, n) : null);
 const strip = (html) => String(html || "").replace(/<style[\s\S]*?<\/style>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ");
@@ -112,7 +113,7 @@ export async function POST(req) {
   if (emailConfigured()) {
     const { data: u } = await sb.auth.admin.getUserById(pet.user_id);
     if (u?.user?.email) {
-      const lines = vaccines.slice(0, 6).map((v) => ({ label: v.name, note: v.due_date ? `Due ${v.due_date}` : v.date_given ? `Given ${v.date_given}` : "" }));
+      const lines = vaccines.slice(0, 6).map((v) => ({ label: v.name, note: v.due_date ? `Due ${nice(v.due_date)}` : v.date_given ? `Given ${nice(v.date_given)}` : "" }));
       await sendResendEmail({
         to: u.user.email,
         kind: "pet_notice",
