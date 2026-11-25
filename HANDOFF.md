@@ -598,6 +598,11 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Sisqo retest: maker presets and sample dates (3405d00)
+**Pass:** sample issue dates read Nov 1, 2026 on home and all three passport pages. The maker preset now works and switches cleanly in one tab (service, then esa, then pet, then esa): SERVICE DOG badge with "Statement not signed yet", EMOTIONAL SUPPORT badge, and PET label. Nothing carries over between loads.
+**Fix:**
+1. The ESA preview badge shows "Flies as a pet". Nima decided ESA has no "Flies as a pet", so please remove it.
+2. With for=esa or for=pet the preview still defaults to species Dog, with DOG in the MRZ, before the user picks dog or cat. Show a neutral preview until they pick. Minor.
 ### 2026-11-25: Sisqo test: role-colour cards, AI captions removed, "Check trip" (da36482)
 **Pass:** cards are navy, deep red and copper with white text, gold rings and gold names; text readable, nothing cut off; no AI captions on home or the three passport pages; SAMPLE tag still on the photos; home header reads "Check trip".
 **Small fixes:**
