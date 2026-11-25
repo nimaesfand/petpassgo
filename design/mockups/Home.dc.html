@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.badge-svc{position:relative;overflow:hidden;background:linear-gradient(135deg,#071C5C 0%,#1D4ED8 36%,#8FB0FF 50%,#1D4ED8 64%,#071C5C 100%)}
+.holo{background:conic-gradient(from 30deg,#f9d976,#9be7ff,#c4b5fd,#fbcfe8,#a7f3d0,#f9d976);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.75)}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#0B1529;font-family:Inter,system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <header style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px">
+    <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:23px;letter-spacing:-.03em;color:#fff">PetPass<span style="color:#F2B84B">Go</span></div>
+    <a href="#" style="color:#fff;font-weight:700;font-size:15px;text-decoration:none;padding:10px 4px">Log in</a>
+  </header>
+
+  <div style="flex:1;display:flex;flex-direction:column;padding:8px 22px 28px;background:radial-gradient(120% 70% at 50% 30%,#24407A 0%,#0B1529 70%)">
+    <div style="position:relative;height:300px;margin-top:6px">
+      <div style="position:absolute;left:10px;top:18px;width:300px;height:200px;border-radius:18px;background:linear-gradient(120deg,#0E1A33,#1E3466);transform:rotate(-8deg);box-shadow:0 20px 40px rgba(0,0,0,.4)"></div>
+      <article style="position:absolute;left:36px;top:26px;width:310px;border-radius:18px;overflow:hidden;background:#FBF7EE;transform:rotate(3deg);box-shadow:0 30px 60px rgba(0,0,0,.5)">
+        <div style="background:linear-gradient(120deg,#0E1A33,#1E3466);padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:15px;color:#fff">PetPass<span style="color:#F2B84B">Go</span></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#F2B84B;letter-spacing:.08em">PET PASSPORT</div>
+        </div>
+        <div style="height:3px;background:#F2B84B"></div>
+        <div style="display:flex;gap:14px;padding:14px">
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+            <div style="position:relative;width:96px;height:118px;border-radius:10px;overflow:hidden;border:3px solid #fff;outline:1.5px solid #F2B84B">
+              <img src="/_blob/645ca68c4a1c97f9579a2e9eddcac49c" alt="Benny the golden retriever" style="width:100%;height:100%;object-fit:cover;object-position:62% 22%">
+              <div class="holo" aria-hidden="true" style="position:absolute;right:5px;bottom:5px;width:24px;height:24px;border-radius:50%;opacity:.88"></div>
+            </div>
+            <div class="badge-svc" style="width:96px;border-radius:7px;padding:4px 0;text-align:center;color:#fff;font-weight:900;font-size:8.5px;letter-spacing:.14em">SERVICE DOG</div>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:8px;font-weight:800;letter-spacing:.16em;color:#4B5565">NAME</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;line-height:1;color:#14213D">Benny</div>
+            <div style="margin-top:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+              <div><div style="font-size:7.5px;font-weight:800;letter-spacing:.14em;color:#4B5565">BREED</div><div style="font-weight:700;font-size:11px;color:#14213D">Golden Retriever</div></div>
+              <div><div style="font-size:7.5px;font-weight:800;letter-spacing:.14em;color:#4B5565">WEIGHT</div><div style="font-weight:700;font-size:11px;color:#14213D">68 lb</div></div>
+              <div><div style="font-size:7.5px;font-weight:800;letter-spacing:.14em;color:#4B5565">RABIES</div><div style="font-weight:700;font-size:11px;color:#15803D">Current</div></div>
+              <div><div style="font-size:7.5px;font-weight:800;letter-spacing:.14em;color:#4B5565">TRAINING</div><div style="font-weight:700;font-size:11px;color:#14213D">Task trained</div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <h1 style="margin:18px 0 0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;line-height:1;letter-spacing:-.025em;color:#fff">Bring them along.</h1>
+    <p style="margin:12px 0 0;font-size:18px;line-height:1.45;color:#C9D4E6">Everything your pet needs to fly, and everything about your pet, in one place.</p>
+
+    <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px">
+      <a href="#" style="display:flex;align-items:center;justify-content:center;min-height:58px;border-radius:999px;background:#C2410C;color:#fff;font-weight:800;font-size:18px;text-decoration:none">Plan a trip</a>
+      <a href="#" style="display:flex;align-items:center;justify-content:center;min-height:58px;border-radius:999px;background:#fff;color:#14213D;font-weight:800;font-size:18px;text-decoration:none">Start Pet Vault</a>
+      <div style="text-align:center;font-size:13.5px;color:#9FB0CA">Checking your trip is free</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

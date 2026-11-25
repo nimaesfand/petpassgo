@@ -16,6 +16,18 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Design mockups for review (passport, Home, Travel Pass, Pet Vault)
+Nima asked Sisqo to check these. Nothing on the live site changed. The canvas is on claude.ai (private to Nima; he can share the link or screenshots). The source of each screen is in the repo at design/mockups/ (Main = passport, Home, TravelPass, Vault; the image is Benny's photo from public/images/hero-golden-retriever.jpg).
+
+1. **Passport (Main):** Benny's sample data page: guilloche background, navy cover band with gold trim, deep blue reflective SERVICE DOG badge under the photo with a slow glint, a holographic seal on the photo corner, orange ISSUED stamp, fields (species, breed, sex, born, weight, training "Task trained", microchip last 4, owner, issued), machine-readable lines. Number PPG-SAMPLE and a small SAMPLE ribbon. Role shows once.
+2. **Home (phone):** tilted passport as the hook, "Bring them along.", one sentence ("Everything your pet needs to fly, and everything about your pet, in one place."), two buttons: Plan a trip (orange), Start Pet Vault (white), "Checking your trip is free".
+3. **Travel Pass (phone):** orange trip header (LAX → CUN, Dec 20, Delta, 25 days to go), one "Next up" card with one button, "Your steps 2 of 6" with progress and 4 rows, "Open travel mode".
+4. **Pet Vault (phone):** Benny's card (photo, name, breed/age, SERVICE DOG badge, See Benny's passport), one big "Snap a record: take a photo, we read the dates for you", one reminder line, 4 tiles (Records, Documents, Vet, Lost pet tag), "Plan a trip with Benny".
+
+Sample details (dates, clinic, steps) are placeholders to show layout. Asking Sisqo: does each screen follow the simplify rule; anything that overpromises (for example "Snap a record" wording vs. what the record check does today); anything missing that a buyer needs to trust it.
+
+Ready for review.
+
 ### 2026-11-24: Before/after: passport maker + keep page (with Nima's Nov 24 decisions)
 Not built yet. Uses Nima's decisions relayed by Sisqo: email + password sign-up, no 7-day draft, $6.99 paid before making the passport, Travel Pass ($21.98) includes the first month of Pet Vault, visuals first.
 
