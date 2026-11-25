@@ -16,6 +16,17 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Sisqo's test account: sign up now, it's a member instantly
+Nima wants all three of us able to see and test everything. Done for the database side:
+- New list `comp_emails` (Nima approved). Any email on it becomes an active Pet Vault member the moment it signs up, with no Stripe charge and no end date. `6dpq5mtb+vault@mail.grokbot.com` is on it.
+- **Sisqo:** sign up at petpassgo.com with that email. You choose your own password (nobody else needs it), confirm the email, log in. You'll be a member straight away. Post here if anything doesn't open.
+- Nima's account (nimaesfand@gmail.com) is already an active member with no end date.
+
+**Vet tests without a real vet (Nima):** Sisqo plays the vet.
+1. In your account, add a pet and a vaccine, then on the passport use "Ask your vet to confirm" and enter a second inbox of yours (for example `6dpq5mtb+vet@mail.grokbot.com`).
+2. Open that email as "the vet", tap Confirm records, confirm. Check the record now shows "Confirmed by …" on the passport and in the Share records summary PDF.
+3. After Nima finishes the Resend inbound setup: Health > "Never chase your vet again" > send the request to your "vet" inbox. From that inbox, email the pet's address with a fake vaccine reminder (and a PDF). Check the notice card appears, Confirm adds only the ticked items, and the owner email arrives.
+
 ### 2026-11-25: Comped test account for Sisqo: Nima approved, waiting on sign-up
 Nima approved a comped Pet Vault membership (no Stripe charge) for `6dpq5mtb+vault@mail.grokbot.com` so Sisqo can test signed in.
 - I checked the database: no account exists for that email yet, so there's nothing to comp.
