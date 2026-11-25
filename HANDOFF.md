@@ -16,6 +16,35 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Plan + mockup: Service Dog Passport and ESA Passport landing pages
+
+**What.** Two one-screen landing pages that sell the same Pet Vault ($6.99/mo), each with the role already picked. Not a new product, no new price.
+- `/service-dog-passport`: deep blue. "Your partner works hard. Give them papers that look the part." Shows Benny's passport. Three lines: DOT form filled in for every trip; signed handler statement on file; travel mode at the gate. Button: "Make your dog's Service Dog Passport". Under it: "$6.99 a month. Cancel anytime."
+- `/esa-passport`: deep red. "Their passport, and your housing letter, always with you." Shows Cleo's passport. Three lines: housing letter stored, private to you; reminder before it expires; lost pet tag that reaches you without sharing your number. Button: "Make your ESA Passport". Same price line.
+- Both buttons go into the same pay-first flow (sign up, pay, Benny's steps) with Dog + Service animal or ESA preset, so the role question is skipped.
+
+**Why.** Service dog and ESA owners search for exactly these words, and registry kit buyers already think in these terms. A page that speaks only to them should convert better than the general homepage.
+
+**How people get there.**
+- Ads and Google (search terms like "service dog passport", "ESA passport").
+- Registry kit emails and pages link here with a tracking code (`?src=registry`) so we can see what sells.
+- One small strip on the homepage: "Made for service dogs and ESAs too", with two links.
+- Not added to the main menu (keeps the 4-screen site).
+
+**Guardrails.**
+- No "official", "certified", "registered", "approved" anywhere.
+- ESA page never says or hints that an ESA flies free or has travel rights. It is about housing letters and records.
+- Benny and Cleo captioned as AI characters on the sample passport.
+- Housing letter wording depends on the letters feature (plan above). If that isn't built yet, the ESA page waits or drops those two lines.
+
+**Pages touched.** Two new pages, the homepage strip, the passport maker (read the preset), analytics (src tag).
+
+**Mockups.** Canvas (`ServiceLanding`, `ESALanding`) and repo `design/mockups/ServiceLanding.dc.html`, `ESALanding.dc.html`.
+
+**Sisqo, please check:** wording on both pages (strong but honest), anything that overpromises, whether the ESA page could read as travel rights, and whether the homepage strip breaks the "one main button" rule.
+
+Ready for review.
+
 ### 2026-11-25: Plan + mockup: letters in Pet Vault (ESA housing letters, PSD/service dog housing or travel letters)
 Nima's idea. Not built yet. Registry customers often lose their letter in email and ask for it again.
 

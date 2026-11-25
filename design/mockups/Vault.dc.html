@@ -25,6 +25,10 @@ body{margin:0}
 @keyframes glint{0%,50%{background-position:160% 0}100%{background-position:-110% 0}}
 @media (prefers-reduced-motion:reduce){.badge-svc:after,.badge-esa:after,.holo:after{animation:none}}
 .foil{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 38%,rgba(249,217,118,.22) 44%,rgba(155,231,255,.22) 49%,rgba(196,181,253,.22) 54%,rgba(251,207,232,.2) 58%,transparent 64%);mix-blend-mode:multiply}
+.doc{position:relative;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 0 rgba(0,0,0,.25),0 10px 22px rgba(20,33,61,.22)}
+.doc:after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.55) 46%,transparent 60%);background-size:260% 100%;animation:glint 4.2s ease-in-out infinite}
+.doc.d2:after{animation-delay:.7s}.doc.d3:after{animation-delay:1.4s}
+@media (prefers-reduced-motion:reduce){.doc:after{animation:none}}
 </style>
 </helmet>
 <div style="position:relative;width:390px;height:1820px;box-sizing:border-box;background:#F3F5F9;font-family:Inter,system-ui,sans-serif;overflow:hidden">
@@ -85,9 +89,9 @@ body{margin:0}
 
     <section>
       <div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:#14213D">Documents</h2><a href="#" style="font-size:13.5px;font-weight:700;color:#14213D;padding:6px 0">See all 5</a></div>
-      <div style="margin:12px -20px 0;padding:8px 20px 14px;display:flex;gap:12px;overflow:hidden"><div style="flex-shrink:0;width:150px;height:96px;border-radius:16px;padding:12px;box-sizing:border-box;background:linear-gradient(135deg,#14213D,#2B4A8B);color:#fff;transform:rotate(-3deg);box-shadow:0 10px 22px rgba(20,33,61,.18);display:flex;flex-direction:column;justify-content:space-between">
-<div style="font-size:10px;font-weight:800;letter-spacing:.14em;opacity:.85">VALID TO DEC 30</div><div style="font-weight:800;font-size:15px;line-height:1.15">Health certificate</div></div><div style="flex-shrink:0;width:150px;height:96px;border-radius:16px;padding:12px;box-sizing:border-box;background:linear-gradient(135deg,#071C5C,#1D4ED8 60%,#6F93F5);color:#fff;transform:rotate(2deg);box-shadow:0 10px 22px rgba(20,33,61,.18);display:flex;flex-direction:column;justify-content:space-between">
-<div style="font-size:10px;font-weight:800;letter-spacing:.14em;opacity:.85">READY TO SIGN</div><div style="font-weight:800;font-size:15px;line-height:1.15">DOT Service Animal form</div></div><div style="flex-shrink:0;width:150px;height:96px;border-radius:16px;padding:12px;box-sizing:border-box;background:linear-gradient(135deg,#C2410C,#EA580C);color:#fff;transform:rotate(-2deg);box-shadow:0 10px 22px rgba(20,33,61,.18);display:flex;flex-direction:column;justify-content:space-between">
+      <div style="margin:12px -20px 0;padding:8px 20px 14px;display:flex;gap:12px;overflow:hidden"><div class="doc d1" style="flex-shrink:0;width:150px;height:96px;border-radius:16px;padding:12px;box-sizing:border-box;background:linear-gradient(135deg,#0B1530 0%,#22386A 38%,#7F97C9 50%,#22386A 62%,#0B1530 100%);color:#fff;transform:rotate(-3deg);display:flex;flex-direction:column;justify-content:space-between;text-shadow:0 1px 1px rgba(0,0,0,.35)">
+<div style="font-size:10px;font-weight:800;letter-spacing:.14em;opacity:.85">VALID TO DEC 30</div><div style="font-weight:800;font-size:15px;line-height:1.15">Health certificate</div></div><div class="doc d2" style="flex-shrink:0;width:150px;height:96px;border-radius:16px;padding:12px;box-sizing:border-box;background:linear-gradient(135deg,#071C5C 0%,#1D4ED8 36%,#8FB0FF 50%,#1D4ED8 64%,#071C5C 100%);color:#fff;transform:rotate(2deg);display:flex;flex-direction:column;justify-content:space-between;text-shadow:0 1px 1px rgba(0,0,0,.35)">
+<div style="font-size:10px;font-weight:800;letter-spacing:.14em;opacity:.85">READY TO SIGN</div><div style="font-weight:800;font-size:15px;line-height:1.15">DOT Service Animal form</div></div><div class="doc d3" style="flex-shrink:0;width:150px;height:96px;border-radius:16px;padding:12px;box-sizing:border-box;background:linear-gradient(135deg,#7A2306 0%,#C2410C 36%,#FDBA74 50%,#C2410C 64%,#7A2306 100%);color:#fff;transform:rotate(-2deg);display:flex;flex-direction:column;justify-content:space-between;text-shadow:0 1px 1px rgba(0,0,0,.35)">
 <div style="font-size:10px;font-weight:800;letter-spacing:.14em;opacity:.85">3-YEAR</div><div style="font-weight:800;font-size:15px;line-height:1.15">Rabies certificate</div></div></div>
     </section>
 
