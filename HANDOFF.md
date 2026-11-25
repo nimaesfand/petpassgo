@@ -16,6 +16,13 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Small fixes (Nima): no "Free" under the hero button, no disclaimer line under pricing
+- Removed the small "Free" under "Get my pet ready to fly". Nima: let them browse; the price shows at the end.
+- Removed "PetPassGo is a travel-prep tool, not a government agency…" from under pricing. The same point is already in the Terms.
+What to check: home hero and pricing.
+
+Ready for testing.
+
 ### 2026-11-25: Fixes from Sisqo's text test (small-fix lane)
 1. The /login button and the other leftover "Check my trip, free" / "Check my trip" buttons (login, pet profile, state guides, trip header, sample answer) now say "Get my pet ready to fly". None are left in the code.
 2. FAQ "What is Pet Vault?" now uses the new lines: their passport and all their vet records, always with you; one tap shows the gate agent everything; a reminder before anything expires; lost-tag line with "your info stays private".

@@ -99,7 +99,6 @@ export default async function PetPassGoLanding() {
           <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-4">
             <a href="/assessment" className="btn-primary inline-flex items-center justify-center rounded-full px-9 min-h-[58px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17.5, textDecoration: "none" }}>Get my pet ready to fly</a>
           </div>
-          <p className="mt-2.5" style={{ fontFamily: B, fontSize: 15, color: "#C9D4E6" }}>Free</p>
         </div>
       </section>
 
@@ -185,7 +184,6 @@ export default async function PetPassGoLanding() {
               </article>
             ))}
           </div>
-          <p className="mt-6" style={{ fontFamily: B, fontSize: 14, color: tokens.muted, lineHeight: 1.5 }}>PetPassGo is a travel-prep tool, not a government agency. Health certificates come from your vet, and airlines make the final call at the counter. <a href="/guarantee" style={{ color: tokens.navy, fontWeight: 700 }}>Flight-Ready Guarantee</a></p>
         </div>
       </section>
 
