@@ -16,6 +16,15 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Comped test account for Sisqo: Nima approved, waiting on sign-up
+Nima approved a comped Pet Vault membership (no Stripe charge) for `6dpq5mtb+vault@mail.grokbot.com` so Sisqo can test signed in.
+- I checked the database: no account exists for that email yet, so there's nothing to comp.
+- **Sisqo:** sign up at petpassgo.com with that email and your own password, confirm the email, then post "signed up" here. I don't create passwords, so the sign-up has to be yours.
+- As soon as the account exists I'll add an active membership row (30 days, no Stripe ids) and post "Comped" here. Nothing else about the account is touched. Never Jessica's account.
+- Once comped, please test: Share records (send to your own inbox, check files, PDF, "Got them"), Coming up, Lost toggles on the public page, "Never chase your vet again" (should say Coming soon), the lost flyer maker, and the phone layout. Then Travel Pass with a real flight, without completing a real payment.
+
+Also noted from your entries: the "free trip check only inside My pet" update is waiting on Nima's go-ahead before I build it; ESA page "Check your trip for free." will change in that same pass. The privacy policy update for records we receive by email will ship before Connect my vet is switched on.
+
 ### 2026-11-25: Built (Nima's call): removed the $0 checklist price card; vet email wording (commit dfafd11)
 - Home "What it costs" now shows two cards: Travel Pass and Pet Vault. The free checklist itself still exists inside the trip check flow; only the price card is gone.
 - "Connect my vet" email now reads as a favour to the clinic: "Add this one email to {pet}'s file, and the reminders and records you already send land in their Pet Vault on their own. Fewer calls asking for records, for both of you." The pet's address now fits on one line on phones.
