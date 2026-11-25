@@ -340,6 +340,35 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-24: Plan: simplify everything: review
+Read the Nov 24 plan against Nima's walk-through and against Sisqo's Nov 23 (12:20 PM PT) live test. The simplify rule is the right direction. Nima decides.
+
+**Agree.** One headline, at most two short sentences, at most three bullets, one main button, no nested lists or "see everything" expanders, and no new features until this pass is done. Start with the passport maker and the keep page, then do the trip result, account home, Pet Vault page, and homepage one screen at a time, with a before/after posted here first. The two product lines are clear and match option A: Travel Pass guides the trip; Pet Vault is the pet's records and documents at $6.99/mo. Removing the four locked cards and the nine-item "See everything" list on the keep page will help a lot. Showing the passport clearly, with a soft "Not kept yet" ribbon, is better than darkening it behind a lock. Male/Female, a photo crop before save, and keeping only the badge under the photo (drop the extra pill next to the name, and drop the ghost square that looks broken) all sound right.
+
+**Keep-page wording — concern.** The proposed small line, "Cancel anytime. We hold it for 7 days," is easy to misread as a 7-day membership or a free Vault trial. It isn't: the draft passport is held for 7 days, and Pet Vault starts when they pay. I'd use: "Your draft is free for 7 days. To keep it, Pet Vault is $6.99/mo, cancel anytime." Put the price on the button as planned ("Keep [Name]'s passport · $6.99/mo"). Don't imply they already have Vault for a week.
+
+**Don't sell features that aren't this product.** The Vault one-liner mentions "grooming and trainer info." Grooming in the code is a Discover business category, not a Pet Vault tool, and Discover is hidden. Trainer info belongs on the pet, but it isn't a Vault selling point in the way records and the lost-pet tag are. "Snap a record, we organize it" overstates what exists today: there is a photo check that reads key details from a certificate to help you prep, and it is not a certification. Don't promise that the AI files and organizes the record into the Vault unless that's already how it works. Stick the three keep-page icons to things that are real: reminders, the lost-pet QR tag, and either "Records and documents in one place" or a careful line about snapping a certificate to read the dates.
+
+**Breed list.** Typing to search plus "Mixed or not sure" is good, and a cat-specific placeholder is good. Don't make the list a closed door. If someone's breed isn't in it, they need "My breed isn't listed" (a short typed name), or they will pick the wrong one and it will print on the passport.
+
+**Preview passport number.** "PPG-PREVIEW" looks unfinished, but a real-looking number on an unkept draft can look official. Use a clearly marked sample, such as PPG-SAMPLE, not something that could pass for an issued ID.
+
+**Open items from the Nov 23 test that this plan does not mention.** These should be fixed in the same pass, while Nima and Claude are already in the passport maker:
+1. The service badge is still a flat navy pill with a small rainbow dot, not the deep blue reflective badge. Nima is looking at that passport now.
+2. Browser Back leaves the maker (from step 8 it went back to Canada, not step 7). Steps should be history entries so Back goes to the previous step.
+3. The LAX to JFK service-dog result still has a green banner that mentions Travel Pass, which is wrong for a Vault-only trip. The box is blue and the button is orange; confirm if that was intended.
+4. The promise step has one checkbox, but the error says "Check each line to sign."
+5. Step 12 says no password is needed, then "We also emailed it to [email]," without saying what was emailed.
+6. A hidden "See every step" button is still in the markup on /mexico and /canada. Remove it.
+
+**Sign-in is still open, and it blocks testing.** The maker still doesn't ask for a password, so Sisqo couldn't log into the account it created and couldn't test the training card or the logged-in menus. How should a passport-maker user get back in later: an emailed sign-in link (Sisqo's suggestion), set a password on the last step, or only after they buy Vault? This also decides the step 12 copy. Nima needs to answer before, or as part of, this pass. Until then, users who leave and come back may not be able to reach their draft.
+
+**The full phone walk-through Claude asked for.** I'll do that as its own pass once Nima approves the rule, with URLs and screenshots, and that list can be the order of work after the maker and keep page. Screens already known to break the rule: the keep page (locked cards plus a nine-item expander), the service-dog trip result (banner plus a second product message), and the maker (Back, step 12, and the promise-step wording).
+
+For later screens, keep Nima's earlier calls: option A pricing, compact pages, plain names, "Last checked [month]" only (no source links for customers), and no extra disclaimers.
+
+Ready for Nima to decide.
+
 ### 2026-11-23 (12:20 PM PT): Sisqo test results, batch 1 fixes + batch 2 trims (tested live at eaadf13)
 
 Screenshots are in Sisqo's /workspace/petpassgo-review/2026-11-23-batch2/. No payment was made.
