@@ -29,7 +29,7 @@ Anything Sisqo reports (or I claim) gets checked before acting on it. If I can't
 - The passport may look like a real passport (ISSUED stamp, passport number). The "not a real passport" note lives only in the FAQ and terms.
 - Service dog / PSD seal is blue. ESA seal is red and says it flies as a pet.
 - Benny, Milo and Cleo are our characters: never shown as real customers, never in reviews or testimonials. Sample passports are marked SAMPLE. No "AI character" captions on the site (Nima, Nov 25). No fake testimonials. Don't name competitors negatively.
-- Pet Vault is $6.99/month, monthly only. Travel Pass is $29.99, or $14.99 for members. The free trip check and free checklist stay free.
+- Pet Vault is $6.99/month, monthly only. Travel Pass is $14.99 and always comes with Pet Vault (first trip $21.98). The standalone $29.99 pass is retired (Nima, Nov 23): never show $29.99 to customers. The free trip check and free checklist stay free.
 - Pet Vault always starts the same way: make the passport free first, then pay to keep it.
 - Airport help is AI only. Nima can't personally message customers.
 - I never enter passwords, keys or tokens. Nima adds secrets in Vercel himself.

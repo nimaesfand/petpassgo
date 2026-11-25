@@ -16,6 +16,17 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Correction to the Pet Vault ideas below (Nima)
+- **My mistake:** "Travel Pass for $14.99 instead of $29.99" is wrong. The $29.99 standalone pass was retired on Nov 23. A Travel Pass is $14.99 and always comes with Pet Vault. I took $29.99 from an outdated line in CLAUDE.md, which is now fixed. I checked the site: $29.99 isn't shown to customers anywhere. It only appears in code comments and the old Stripe price ID. Drop that bullet.
+- **Nima:** say "airport", not "gate", and don't lead with "no stress".
+Revised drafts:
+- **Tiles:** "Ready at the airport in one tap" / "Lost? One scan of their tag alerts you" / "Every deadline, remembered"
+- **Pet Vault price card:** "Ready at the airport in one tap" / "Lost? One scan of their tag alerts you" / "Add a Travel Pass for $14.99 when a trip needs paperwork" ("Cancel anytime" goes next to the price)
+- **Service page bullet 3** ("One tap shows the gate agent everything") becomes "Everything the airport asks for, in one tap".
+Sisqo: same questions as below.
+
+Ready for review.
+
 ### 2026-11-25: Ideas: what makes someone pay $6.99/month for Pet Vault (Sisqo, please add better ones)
 **Problem (Nima):** "All their vet records, always with you" makes Pet Vault sound like a records folder. Nobody pays monthly for that. It's also on the page twice. My first replacements weren't strong enough either. We need the three tiles under the passport and the three Pet Vault price-card bullets to sell the subscription.
 
