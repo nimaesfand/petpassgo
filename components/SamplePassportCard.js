@@ -2,7 +2,7 @@ import { Wordmark } from "./Logo";
 import { tokens, font } from "../lib/theme";
 
 // A static sample passport for landing pages, matching the Nov 25 mockups.
-// Benny is one of our AI characters; the page shows that caption under it.
+// Marked SAMPLE on the photo; never shown as a real customer.
 const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 
 const SAMPLES = {

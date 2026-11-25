@@ -18,7 +18,6 @@ export default function PetPassportPage({ searchParams }) {
       eyebrow="PET PASSPORT"
       title="Your best friend deserves a passport too."
       sub="Everything your airline and vet ask for, plus every record, in one beautiful passport."
-      caption="Sample passport. Milo is one of our AI characters."
       items={[
         { icon: <Icon name="plane" size={20} />, text: "Know exactly what your airline needs" },
         { icon: <Icon name="stethoscope" size={20} />, text: "Vaccines and vet records in one place, with reminders" },

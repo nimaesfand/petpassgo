@@ -41,7 +41,7 @@ export default function PassportLanding({ kind, eyebrow, title, sub, caption, it
           <div style={{ transform: `rotate(${t.rot}deg)`, width: "100%", display: "flex", justifyContent: "center" }}>
             <SamplePassportCard kind={kind} />
           </div>
-          <div className="text-center" style={{ fontSize: 12.5, color: t.muted, marginTop: 12 }}>{caption}</div>
+          {caption ? <div className="text-center" style={{ fontSize: 12.5, color: t.muted, marginTop: 12 }}>{caption}</div> : null}
         </div>
 
         <div className="ppg-landing-rest" style={{ maxWidth: "32rem" }}>

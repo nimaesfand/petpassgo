@@ -71,9 +71,9 @@ const FOOTER_LINKS = [
 ];
 
 const WHO = [
-  { href: "/service-dog-passport", title: "My service dog", sub: "The DOT form, ready for every trip", name: "Benny", ring: "#1D4ED8", photo: "/images/hero-golden-retriever.jpg" },
-  { href: "/esa-passport", title: "My emotional support animal", sub: "Their passport and your housing letter", name: "Cleo", ring: "#C21E1E", icon: "cat" },
-  { href: "/pet-passport", title: "My pet", sub: "Every trip and every record, in one passport", name: "Milo", ring: "#C2410C", icon: "dog" },
+  { href: "/service-dog-passport", title: "My service dog", sub: "The DOT form, ready for every trip", name: "Benny", bg: "linear-gradient(135deg, #0B1A45 0%, #1E3A8A 100%)", photo: "/images/hero-golden-retriever.jpg" },
+  { href: "/esa-passport", title: "My emotional support animal", sub: "Their passport and your housing letter", name: "Cleo", bg: "linear-gradient(135deg, #3B0D0D 0%, #8F1D1D 100%)", icon: "cat" },
+  { href: "/pet-passport", title: "My pet", sub: "Every trip and every record, in one passport", name: "Milo", bg: "linear-gradient(135deg, #3A160A 0%, #A3400F 100%)", icon: "dog" },
 ];
 
 export default async function PetPassGoLanding() {
@@ -130,20 +130,22 @@ export default async function PetPassGoLanding() {
         <p className="mt-3 max-w-[38rem]" style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }}>Pick one and we&apos;ll show you what they need.</p>
         <div className="grid md:grid-cols-3 gap-3 md:gap-4 mt-7">
           {WHO.map((w) => (
-            <a key={w.href} href={w.href} className="ppg-lift flex items-center gap-4 rounded-3xl p-4 md:p-5" style={{ background: "#fff", border: `1px solid ${tokens.line}`, textDecoration: "none" }}>
-              <span className="flex-shrink-0 overflow-hidden rounded-full flex items-center justify-center" style={{ width: 64, height: 64, border: `3px solid ${w.ring}`, background: "#FBF7EE" }}>
+            <a key={w.href} href={w.href} className="ppg-lift relative overflow-hidden flex items-center gap-4 rounded-3xl p-4 md:p-5" style={{ background: w.bg, textDecoration: "none", boxShadow: "0 14px 30px rgba(20,33,61,.22)" }}>
+              <span aria-hidden="true" className="ppg-foil" style={{ mixBlendMode: "screen", opacity: 0.55 }} />
+              <span className="relative flex-shrink-0 overflow-hidden rounded-full flex items-center justify-center" style={{ width: 64, height: 64, border: `3px solid ${tokens.gold}`, background: "#FBF7EE", boxShadow: "0 0 0 3px rgba(255,255,255,.12)" }}>
                 {w.photo ? <Image src={w.photo} alt="" width={64} height={64} className="object-cover" style={{ width: "100%", height: "100%", objectPosition: "62% 22%" }} /> : <span style={{ transform: "scale(.55)", display: "flex" }}>{PET_ICONS[w.icon]}</span>}
               </span>
-              <span className="flex-1 min-w-0">
-                <span className="block" style={{ fontFamily: D, fontSize: 20, fontWeight: 800, color: tokens.navy, lineHeight: 1.2 }}>{w.title}</span>
-                <span className="block mt-1" style={{ fontFamily: B, fontSize: 15.5, color: tokens.ink, lineHeight: 1.4 }}>{w.sub}</span>
-                <span className="block mt-1" style={{ fontFamily: B, fontSize: 13, color: tokens.muted }}>{w.name}</span>
+              <span className="relative flex-1 min-w-0">
+                <span className="block" style={{ fontFamily: D, fontSize: 20, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>{w.title}</span>
+                <span className="block mt-1" style={{ fontFamily: B, fontSize: 15.5, color: "rgba(255,255,255,.82)", lineHeight: 1.4 }}>{w.sub}</span>
+                <span className="block mt-1.5" style={{ fontFamily: B, fontSize: 13, fontWeight: 800, letterSpacing: ".08em", color: tokens.gold }}>{w.name.toUpperCase()}</span>
               </span>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={tokens.muted} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}><path d="m9 6 6 6-6 6" /></svg>
+              <span className="relative flex-shrink-0 flex items-center justify-center rounded-full" style={{ width: 36, height: 36, background: "rgba(255,255,255,.14)", border: "1px solid rgba(255,255,255,.22)" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+              </span>
             </a>
           ))}
         </div>
-        <p className="mt-4" style={{ fontFamily: B, fontSize: 13.5, color: tokens.muted }}>Benny, Cleo and Milo are our AI characters.</p>
       </section>
 
       <section style={{ background: tokens.navy }} className="py-16 lg:py-24 overflow-hidden">

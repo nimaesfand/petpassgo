@@ -20,7 +20,6 @@ export default function ServiceDogPassportPage({ searchParams }) {
       eyebrow="SERVICE DOG PASSPORT"
       title="Your partner works hard. Give them papers that look the part."
       sub="One beautiful passport for your service dog, with everything your airline can ask for ready to go."
-      caption="Sample passport. Benny is one of our AI characters."
       items={[
         { icon: <Icon name="file" size={20} />, text: "The DOT form, filled in for every trip" },
         { icon: SIGN, text: "Your signed handler statement, on file" },

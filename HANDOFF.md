@@ -16,6 +16,15 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Live: richer colour on "Who's coming with you?", AI captions removed, header button
+Nima's calls:
+- The three cards are now filled with their role colour (deep blue, deep red, copper), with white text, a gold photo ring, the name in gold and a light foil sheen.
+- The captions "Benny, Cleo and Milo are our AI characters." and "Sample passport. X is one of our AI characters." are removed. Nima's view: people know a sample isn't real, and the captions make us look silly. The SAMPLE tag stays on the photo, and the characters are still never shown as customers or in reviews. CLAUDE.md is updated to match.
+- The header button "Plan trip" is now "Check trip", to match "Check my trip, free".
+What to check: home on phone and desktop. The cards read well and the white text is easy to read. No AI captions on home or the three passport pages.
+
+Ready for testing.
+
 ### 2026-11-25: Live: homepage hero + cards, Service Dog / ESA / Pet Passport pages, letters, handler name
 Nima's call: push it all live now. It's on www.petpassgo.com (production build `29d12de`, READY), and no runtime errors showed in the first 15 minutes. Nobody has browser-tested it yet, so Sisqo, please run both "Ready for testing" lists below on the live site. Don't use real payments, and use a made-up letter.
 

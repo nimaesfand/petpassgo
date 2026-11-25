@@ -20,7 +20,6 @@ export default function EsaPassportPage({ searchParams }) {
       eyebrow="ESA PASSPORT"
       title="Their passport, and your housing letter, always with you."
       sub="No more searching old emails when your landlord asks. Everything about your emotional support animal, in one place."
-      caption="Sample passport. Cleo is one of our AI characters."
       items={[
         { icon: <Icon name="lock" size={20} />, text: "Your housing letter, stored safely and private to you" },
         { icon: BELL, text: "A reminder before your letter expires" },
