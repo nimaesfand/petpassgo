@@ -383,7 +383,7 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
                 {trips.length === 0 && owner ? (
                   <div className="rounded-2xl p-4" style={{ background: tokens.paper }}>
                     <p style={text}>No trips yet. When you plan one, the date shows up here. Airline details stay hidden until the Travel Pass is paid.</p>
-                    <a href="/assessment" className="ppg-btn ppg-btn-primary mt-2">Plan my pet&apos;s trip</a>
+                    <a href="/assessment" className="ppg-btn ppg-btn-primary mt-2">Check my trip, free</a>
                   </div>
                 ) : null}
                 {trips.map((t) => {

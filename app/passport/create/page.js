@@ -73,7 +73,9 @@ export default function CreatePassport() {
     } catch {}
     // Coming from the service dog path: a dog, as a service animal.
     try {
-      if (new URLSearchParams(window.location.search).get("for") === "service") setF((x) => (x.animal_type || x.role ? x : { ...x, animal_type: "Dog", role: "Service animal" }));
+      const forWho = new URLSearchParams(window.location.search).get("for");
+      const preset = forWho === "service" ? { animal_type: "Dog", role: "Service animal" } : forWho === "esa" ? { role: "Emotional support animal" } : forWho === "pet" ? { role: "Pet" } : null;
+      if (preset) setF((x) => (x.animal_type || x.role ? x : { ...x, ...preset }));
     } catch {}
     loaded.current = true;
   }, []);

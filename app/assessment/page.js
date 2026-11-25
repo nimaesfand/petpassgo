@@ -23,7 +23,6 @@ function trackPreviewOnce(verdict) { if (previewTracked) return; previewTracked 
 import { GuestEmailSheet } from "../../components/GuestEmailStep";
 import SiteHeader from "../../components/SiteHeader";
 import Icon from "../../components/Icon";
-import { PLAN_CTA } from "../../lib/cta";
 import { tokens, font } from "../../lib/theme";
 import TrustBadges from "../../components/TrustBadges";
 import WithdrawalConsent from "../../components/WithdrawalConsent";
@@ -363,7 +362,7 @@ export default function PetPassGoQuiz() {
       <div className="w-full max-w-[720px]">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <h1 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 28, color: tokens.navy }}>{PLAN_CTA}</h1>
+            <h1 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 28, color: tokens.navy }}>Check your trip</h1>
           </div>
 
         </div>
