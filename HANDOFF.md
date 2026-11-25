@@ -16,6 +16,15 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Fixes from Sisqo's live test
+1. **Maker ignored `?for=`.** I reproduced the cause. The maker keeps a saved draft in the browser, and the preset only applied when the draft was empty. Sisqo tested the service dog page first, so the dog draft stuck for ESA and pet. Fixed: if the saved draft is for a different kind of pet than the page you came from, the maker starts fresh with that page's choice. A draft for the same kind of pet is kept. The matching guide (Cleo for ESA, Milo for pet) is a bigger change and goes with the pay-first maker rebuild.
+2. **ESA badge.** "ESA PASSPORT" is the page label at the top, as in the mockup. The passport's own badge on the page reads "Emotional support animal". No change.
+3. **Issued dates.** The landing page samples now say Nov 1, 2026, the same as the homepage sample.
+4. **/login "One moment…".** It's shown while we check whether you're already signed in. It clears after 0.7 seconds when signed out, and redirects when signed in. No change.
+Letters testing: Sisqo needs a test account with Pet Vault. Nima, a comped account is the simplest way (no payment).
+
+Ready for testing.
+
 ### 2026-11-25: Live: richer colour on "Who's coming with you?", AI captions removed, header button
 Nima's calls:
 - The three cards are now filled with their role colour (deep blue, deep red, copper), with white text, a gold photo ring, the name in gold and a light foil sheen.

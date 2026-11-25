@@ -50,9 +50,11 @@ async function shrink(file) {
   } finally { URL.revokeObjectURL(url); }
 }
 
+const EMPTY_FORM = { animal_type: "", role: "", name: "", breed: "", sex: "", month: "", year: "", handler_name: "", email: "", weight: "", trained_by: "", trainer_name: "", trainer_business: "", tasks: "", vet_name: "", vet_phone: "", rabies_exp: "", signed_name: "", attest: "" };
+
 export default function CreatePassport() {
   const [step, setStep] = useState(0);
-  const [f, setF] = useState({ animal_type: "", role: "", name: "", breed: "", sex: "", month: "", year: "", handler_name: "", email: "", weight: "", trained_by: "", trainer_name: "", trainer_business: "", tasks: "", vet_name: "", vet_phone: "", rabies_exp: "", signed_name: "", attest: "" });
+  const [f, setF] = useState(EMPTY_FORM);
   const [user, setUser] = useState(null); // signed in: { id, email }
   const [reveal, setReveal] = useState(null); // { at, petId? }
   const access = usePetAccess(user?.id);
@@ -75,7 +77,14 @@ export default function CreatePassport() {
     try {
       const forWho = new URLSearchParams(window.location.search).get("for");
       const preset = forWho === "service" ? { animal_type: "Dog", role: "Service animal" } : forWho === "esa" ? { role: "Emotional support animal" } : forWho === "pet" ? { role: "Pet" } : null;
-      if (preset) setF((x) => (x.animal_type || x.role ? x : { ...x, ...preset }));
+      // A saved draft for a different kind of pet (for example a service dog draft,
+      // then arriving from the ESA page) starts fresh with this page's choice.
+      if (preset) setF((x) => {
+        if (!x.animal_type && !x.role) return { ...x, ...preset };
+        if (x.role === preset.role) return x;
+        setStep(0); setPhoto(""); setDone(null);
+        return { ...EMPTY_FORM, ...preset };
+      });
     } catch {}
     loaded.current = true;
   }, []);
