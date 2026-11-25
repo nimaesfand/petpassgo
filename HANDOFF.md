@@ -16,6 +16,60 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Plan: rewrite the sales copy + condense the homepage (Sisqo, please push back hard)
+**Why:** Nima says buttons like "Check trip" and "Check my trip, free" sound bad, the wording on the passport pages is odd ("One beautiful passport" is cringe), and terms like "travel mode" and "lost pet tag" mean nothing to a new visitor. The homepage also explains too much below the passport. The goal is copy that hits the real worry and makes people curious enough to sign up.
+
+**What the research says people worry about:**
+- **Service dog handlers:** being turned away at the gate. DOT lets airlines deny a service dog when the required DOT forms aren't provided, and news stories show real handlers stuck over form timing.
+- **Pet owners:** their pet's safety, and every airline having different rules. About 1 in 5 flyers report trouble with their airline.
+- **ESA owners:** the landlord asking for the letter at lease renewal, which is exactly the wrong moment to go looking for it, and letters that need renewing.
+
+**Copy rules:** name the outcome, not the feature. Say what something does in plain words ("one tap shows the gate agent everything", not "travel mode"). One idea per line. Show, don't explain everything.
+
+**Buttons**
+- Hero: "Check my trip, free" becomes **"See what my pet needs"**, with a small "Free" under it.
+- Header: "Check trip" becomes **"Start free"**.
+
+**"Who's coming with you?" cards**
+- Sub line: "Pick one and we'll show you what they need" isn't true, because the cards open the product page. It becomes **"Pick one to see their passport."**
+- Service dog: **"Both DOT forms, filled in and ready"**
+- ESA: **"Your housing letter, always on hand"**
+- Pet: **"Their records and airline rules, in one place"**
+
+**Service Dog Passport page**
+- Sub: "One beautiful passport…" becomes **"Everything your airline can ask for, filled in before you reach the gate."**
+- Bullets:
+  1. Both DOT forms, filled in for every trip
+  2. Your signed handler statement, kept on file
+  3. **One tap shows the gate agent everything** (replaces "Travel mode…")
+
+**ESA Passport page**
+- Sub: **"When your landlord asks, it's ready. Your ESA's records and your housing letter, in one place."**
+- Bullets:
+  1. Your housing letter, saved and private to you
+  2. A reminder before your letter expires
+  3. **If they're ever lost, anyone who scans their collar tag can reach you** (replaces "A lost pet tag that reaches you, without sharing your number")
+
+**Pet Passport page**
+- Sub: **"Their records, their airline's rules and every reminder, in one place."**
+- Bullets:
+  1. Exactly what your airline needs, before you book
+  2. Vaccines and vet records, with reminders before they expire
+  3. If they're ever lost, anyone who scans their collar tag can reach you
+
+**Homepage below the cards: show less, make them curious**
+1. **Passport section:** use the same Benny passport as the Service Dog page, so there's one design everywhere. Headline: **"Their whole life, in one passport."** Three short checks and one button, "Make your pet's passport". Drop "See travel mode on a phone".
+2. **Merge "If they ever get lost" and "Records your vet confirms"** into one row of three tiles, one line each: "Vet-checked records" / "Lost? One scan reaches you" / "A reminder before anything expires". No long paragraphs, no fake chat demo.
+3. **Remove "Where our information comes from".** Replace it with one line near pricing: "Airline and country rules, last checked [month]."
+4. **Pricing:** keep the same prices with less text on each card: a title, the price, three checks and a button.
+5. Keep the last call to action, "Where are you and your pet flying?"
+
+**Pages touched:** home, header, the three passport pages. No price changes.
+
+**Sisqo:** please check the new lines for overpromising, suggest stronger options, and say whether anything we cut was actually earning its spot.
+
+Ready for review.
+
 ### 2026-11-25: Fixes from Sisqo's retest (maker presets)
 1. The ESA badge no longer says "Flies as a pet". It now reads EMOTIONAL SUPPORT / ANIMAL, in the passport and in the reveal. Nima decided this earlier.
 2. Before the owner picks dog or cat, the maker preview is neutral: a paw in the photo spot, no species, and no DOG in the MRZ. If no type is ever picked, saving still falls back to Dog, as before.
