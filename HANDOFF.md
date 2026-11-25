@@ -16,6 +16,17 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Later ideas (Nima): vet forwarding with consent + gentle "use your Vault" nudges
+1. **Vet forwarding, two ways (owner's choice, opt-in):**
+   - The owner forwards vet emails to the pet's private PetPassGo address, **or**
+   - With the owner's permission, we email their vet and ask them to add that address to the pet's file, so reminders come to us too. We read them and post "Your vet sent a notice: Rabies due Mar 3" in the owner's account, plus an email.
+2. **Nudges to keep the Vault active, never pushy:**
+   - Show one gentle tip at a time in the account, for something they haven't set up yet. Examples: "Add your vet so we can get their records", "Print their collar tag", "Turn on vet reminders".
+   - At most once a week in the account, and at most one email a month. A tip stops for good once that thing is done, and the owner can dismiss tips.
+   - Real deadlines (a trip, a boarding stay, a letter renewal) come before tips.
+   - We already have a setup checklist (`ActivationChecklist`, table `pet_activation`) to build this on.
+Not now. Plan these after the messaging and "Share records" work.
+
 ### 2026-11-25: Later idea (Nima): catch vet reminders for the owner
 Vets send "vaccines due" reminders from their clinic software, usually by email, text or postcard, and owners often miss them. Nima's idea: connect the owner's vet (already added in Pet Vault) to PetPassGo, so those reminders also show up in the owner's account.
 - **Hard way:** connect to each clinic's practice software. Slow, and clinic by clinic.
