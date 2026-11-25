@@ -398,3 +398,15 @@ textarea {
 .ppg-mini-pp { zoom: 0.56; }
 @media (min-width: 640px) { .ppg-mini-pp { zoom: 0.75; } }
 @media (min-width: 1280px) { .ppg-mini-pp { zoom: 1; } }
+
+/* Landing pages (service dog / ESA passport) */
+.ppg-foil { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 38%, rgba(249,217,118,.22) 44%, rgba(155,231,255,.22) 49%, rgba(196,181,253,.22) 54%, rgba(251,207,232,.2) 58%, transparent 64%); mix-blend-mode: multiply; }
+.ppg-landing { display: grid; grid-template-areas: "intro" "card" "rest"; gap: 0; }
+.ppg-landing-intro { grid-area: intro; }
+.ppg-landing-card { grid-area: card; }
+.ppg-landing-rest { grid-area: rest; }
+@media (min-width: 900px) {
+  .ppg-landing { grid-template-columns: minmax(0, 1fr) 400px; grid-template-areas: "intro card" "rest card"; column-gap: 64px; align-items: start; }
+  .ppg-landing-card { align-self: center; }
+}
+@media print { .ppg-foil { display: none; } }
