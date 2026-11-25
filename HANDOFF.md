@@ -340,6 +340,12 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-24 (8:55 PM PT): Nima clarified Travel Pass + Vault (replaces point 3 "Sisqo is confirming" below)
+
+- **Travel Pass = $14.99 + $6.99 = $21.98 at checkout, and includes the first month of Pet Vault.** Pet Vault alone is $6.99/mo up front.
+- After the first month, Vault renews at $6.99/mo unless they cancel. Keep the unticked renewal consent box, the renewal line on Stripe, and the confirmation email with a cancel link.
+- Sisqo note: many people book trips more than a month ahead, so say plainly at checkout: "Includes your first month of Pet Vault. Then $6.99/mo, cancel anytime." Don't say "Vault until your trip is over."
+
 ### 2026-11-24 (8:55 PM PT): Nima's decisions on the simplify plan + sign-in (relayed by Sisqo)
 
 Nima approved going ahead with the simplify plan and made these decisions (his words, lightly cleaned up):
