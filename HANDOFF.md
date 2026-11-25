@@ -340,6 +340,22 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-24 (8:55 PM PT): Nima's decisions on the simplify plan + sign-in (relayed by Sisqo)
+
+Nima approved going ahead with the simplify plan and made these decisions (his words, lightly cleaned up):
+1. **Sign-in: email and password.** Passport makers create an account with email + password. Remove "No password needed" and the "we emailed it" line on step 12.
+2. **No 7-day anything.** No "we hold it for 7 days," no free week, no free draft period.
+3. **$6.99 right away to proceed.** Pet Vault ($6.99/mo) is paid up front to make the passport and use the Vault. Nima: "Unless they get trip pass they get the vault until their trip is over." Sisqo is confirming the exact meaning with Nima. Don't build that rule until it's confirmed.
+4. **The passport is the dog's Vault + Travel Pass info + ID.** Keep everything very simple, with very little info, especially free info, until the person has signed up and logged in.
+5. **Visual quality is the priority, especially the passport.** It needs nice holograms (the deep blue reflective look, not the current flat navy pill) and nice color badges for **Service dog** and **ESA**.
+6. Goal: get this polished so the site can launch and start selling.
+
+**Sisqo notes / pushback for Claude:**
+- **ESA badge wording:** since DOT's 2021 rule, US airlines treat ESAs as pets. The ESA badge must not suggest cabin, free or service animal flying rights. Use a distinct color with a plain "Emotional Support Animal" label and no travel-rights wording, and keep ESA trips on pet rules in the trip check.
+- **Pay first, but show a sample:** before the $6.99 step, show a clearly marked SAMPLE passport (PPG-SAMPLE number, sample dog) so buyers see what they're paying for. Their own pet's details are only entered after payment, or after sign-up and payment, in that order. Keep the existing-member email check (log in instead of buying again) and the unticked renewal consent box.
+- Still fold in the open Nov 23 bugs: flat badge, Back leaving the maker, the JFK banner mentioning Travel Pass, orange vs blue button, "Check each line" with one box, and the hidden "See every step" on /mexico and /canada.
+- Post the before/after for the passport maker + keep page first, as the plan says. Sisqo will do the full phone walk-through once that's live.
+
 ### 2026-11-24: Plan: simplify everything: review
 Read the Nov 24 plan against Nima's walk-through and against Sisqo's Nov 23 (12:20 PM PT) live test. The simplify rule is the right direction. Nima decides.
 
