@@ -11,48 +11,59 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
 body{margin:0}
-.badge-svc{position:relative;overflow:hidden;background:linear-gradient(135deg,#071C5C 0%,#1D4ED8 36%,#8FB0FF 50%,#1D4ED8 64%,#071C5C 100%)}
-.holo{position:relative;overflow:hidden;background:conic-gradient(from 30deg,#f9d976,#9be7ff,#c4b5fd,#fbcfe8,#a7f3d0,#f9d976);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.75)}
-.badge-svc:after,.holo:after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.7) 46%,transparent 60%);background-size:260% 100%;animation:glint 3.8s ease-in-out infinite}
-@keyframes glint{0%,50%{background-position:160% 0}100%{background-position:-110% 0}}
 .glow{animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,.45)}50%{box-shadow:0 0 0 8px rgba(22,163,74,0)}}
-@media (prefers-reduced-motion:reduce){.badge-svc:after,.holo:after,.glow{animation:none}}
+
+
+body{margin:0}
+.guil{background-color:#FBF7EE;background-image:repeating-radial-gradient(circle at 18% 120%,rgba(20,33,61,.045) 0 1px,transparent 1px 9px),repeating-radial-gradient(circle at 110% -10%,rgba(194,65,12,.04) 0 1px,transparent 1px 11px)}
+.badge-svc,.badge-esa{position:relative;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 0 rgba(0,0,0,.3),0 6px 16px rgba(20,33,61,.3)}
+.badge-svc{background:linear-gradient(135deg,#071C5C 0%,#1D4ED8 36%,#8FB0FF 50%,#1D4ED8 64%,#071C5C 100%)}
+.badge-esa{background:linear-gradient(135deg,#5C0A0A 0%,#C21E1E 36%,#FF9A9A 50%,#C21E1E 64%,#5C0A0A 100%)}
+.holo{position:relative;overflow:hidden;background:conic-gradient(from 30deg,#f9d976,#9be7ff,#c4b5fd,#fbcfe8,#a7f3d0,#f9d976);box-shadow:inset 0 0 0 2px rgba(255,255,255,.75),0 2px 8px rgba(20,33,61,.25)}
+.badge-svc:after,.badge-esa:after,.holo:after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.7) 46%,transparent 60%);background-size:260% 100%;animation:glint 3.8s ease-in-out infinite}
+@keyframes glint{0%,50%{background-position:160% 0}100%{background-position:-110% 0}}
+@media (prefers-reduced-motion:reduce){.badge-svc:after,.badge-esa:after,.holo:after{animation:none}}
 .foil{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 38%,rgba(249,217,118,.22) 44%,rgba(155,231,255,.22) 49%,rgba(196,181,253,.22) 54%,rgba(251,207,232,.2) 58%,transparent 64%);mix-blend-mode:multiply}
 </style>
 </helmet>
-<div style="position:relative;width:390px;height:1500px;box-sizing:border-box;background:#F3F5F9;font-family:Inter,system-ui,sans-serif;overflow:hidden">
+<div style="position:relative;width:390px;height:1820px;box-sizing:border-box;background:#F3F5F9;font-family:Inter,system-ui,sans-serif;overflow:hidden">
   <section style="background:radial-gradient(130% 90% at 50% 0%,#2B4A8B 0%,#14213D 60%,#0B1529 100%);padding:16px 20px 26px;border-radius:0 0 32px 32px">
     <div style="display:flex;justify-content:space-between;align-items:center;color:#fff">
       <div style="font-size:12px;font-weight:800;letter-spacing:.16em;color:#F2B84B">PET VAULT</div>
       <a href="#" style="font-size:14px;font-weight:700;color:#fff;text-decoration:none;padding:8px 0">Benny ▾</a>
     </div>
-    <a href="#" style="position:relative;display:block;margin-top:12px;text-decoration:none;border-radius:20px;overflow:hidden;background:#FBF7EE;box-shadow:0 24px 50px rgba(0,0,0,.45)">
-      <div style="background:linear-gradient(120deg,#0E1A33,#1E3466);padding:9px 14px;display:flex;justify-content:space-between;align-items:center">
-        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:15px;color:#fff">PetPass<span style="color:#F2B84B">Go</span></div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#F2B84B;letter-spacing:.06em">PPG-4821-BEN</div>
-      </div>
-      <div style="height:3px;background:#F2B84B"></div>
-      <div style="display:flex;gap:14px;padding:14px">
-        <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
-          <div style="position:relative;width:98px;height:120px;border-radius:12px;overflow:hidden;border:3px solid #fff;outline:1.5px solid #F2B84B">
-            <img src="/_blob/645ca68c4a1c97f9579a2e9eddcac49c" alt="Benny the golden retriever" style="width:100%;height:100%;object-fit:cover;object-position:62% 22%">
-          </div>
-          <div class="badge-svc" style="width:98px;border-radius:8px;padding:5px 0;text-align:center;color:#fff;font-weight:900;font-size:9px;letter-spacing:.14em">SERVICE DOG</div>
+    <a href="#" aria-label="Open Benny's passport" style="display:flex;justify-content:center;margin-top:12px;text-decoration:none">
+      <div style="zoom:.98">
+<article class="guil" style="position:relative;width:350px;border-radius:24px;overflow:hidden;box-shadow:0 1px 0 #E6DCC6,0 30px 60px rgba(0,0,0,.45)">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background-image:repeating-radial-gradient(circle at 50% 160%,rgba(242,184,75,.10) 0 1px,transparent 1px 10px),linear-gradient(120deg,#0E1A33,#1E3466)">
+    <div><div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:21px;letter-spacing:-.03em;color:#fff;line-height:1">PetPass<span style="color:#F2B84B">Go</span></div><div style="font-size:9px;font-weight:800;letter-spacing:.24em;color:#F2B84B;margin-top:3px">PET PASSPORT</div></div>
+    <div style="text-align:right"><div style="font-size:8.5px;font-weight:800;letter-spacing:.16em;color:#F2B84B">PASSPORT NO.</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13.5px;color:#fff;letter-spacing:.05em">PPG-4821-BEN</div></div>
+  </div>
+  <div style="height:3px;background:linear-gradient(90deg,#F2B84B,#FBE3A6 50%,#F2B84B)"></div>
+  <div style="padding:18px 18px 14px">
+    <div style="display:flex;gap:16px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="position:relative;width:128px;height:156px;border-radius:14px;overflow:hidden;border:3px solid #fff;outline:2px solid #F2B84B;box-shadow:0 8px 20px rgba(20,33,61,.2)"><img src="/_blob/645ca68c4a1c97f9579a2e9eddcac49c" alt="Benny, a golden retriever in a service vest" style="width:100%;height:100%;object-fit:cover;object-position:62% 22%">
         </div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:8.5px;font-weight:800;letter-spacing:.16em;color:#4B5565">NAME</div>
-          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:34px;line-height:1;color:#14213D">Benny</div>
-          <div style="margin-top:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px">
-            <div><div style="font-size:8px;font-weight:800;letter-spacing:.14em;color:#4B5565">BREED</div><div style="font-weight:700;font-size:12px;color:#14213D">Golden Retriever</div></div>
-            <div><div style="font-size:8px;font-weight:800;letter-spacing:.14em;color:#4B5565">AGE</div><div style="font-weight:700;font-size:12px;color:#14213D">5 years</div></div>
-            <div><div style="font-size:8px;font-weight:800;letter-spacing:.14em;color:#4B5565">WEIGHT</div><div style="font-weight:700;font-size:12px;color:#14213D">68 lb</div></div>
-            <div><div style="font-size:8px;font-weight:800;letter-spacing:.14em;color:#4B5565">CHIP</div><div style="font-weight:700;font-size:12px;color:#14213D">•••• 6789</div></div>
-          </div>
+        <div class="badge-svc" style="width:128px;box-sizing:border-box;border-radius:10px;padding:7px 6px;text-align:center;color:#fff">
+          <div style="display:flex;align-items:center;justify-content:center;gap:5px;font-weight:900;font-size:10.5px;letter-spacing:.12em;line-height:1.2;text-shadow:0 1px 1px rgba(0,0,0,.35)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>SERVICE DOG</div><div style="font-size:10.5px;font-weight:700;opacity:.95;margin-top:2px">Handler statement signed</div>
         </div>
       </div>
-      <div class="foil" aria-hidden="true"></div>
-      <div class="holo" aria-hidden="true" style="position:absolute;right:12px;bottom:10px;width:40px;height:40px;border-radius:50%;opacity:.92;z-index:2"><svg width="60%" height="60%" viewBox="0 0 24 24" aria-hidden="true" style="position:absolute;left:20%;top:20%;opacity:.55;mix-blend-mode:multiply"><g fill="#14213D"><ellipse cx="12" cy="15.5" rx="4.2" ry="3.6"></ellipse><circle cx="6.5" cy="10" r="1.9"></circle><circle cx="17.5" cy="10" r="1.9"></circle><circle cx="9.5" cy="6.5" r="1.8"></circle><circle cx="14.5" cy="6.5" r="1.8"></circle></g></svg></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:9.5px;font-weight:800;letter-spacing:.16em;color:#4B5565">NAME</div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:38px;line-height:1;letter-spacing:-.02em;color:#14213D">Benny</div>
+        <div aria-label="Issued NOV 25, 2026" role="img" style="margin-top:14px;width:84px;height:84px;border-radius:50%;border:3px solid #C2410C;display:flex;align-items:center;justify-content:center;transform:rotate(-13deg);color:#C2410C;opacity:.9;mix-blend-mode:multiply">
+          <div style="width:68px;height:68px;border-radius:50%;border:1.5px dashed #C2410C;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:5.5px;font-weight:800;letter-spacing:.2em">PETPASSGO</div><div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px;line-height:1.05">ISSUED</div><div style="font-family:'JetBrains Mono',monospace;font-size:7px;font-weight:700">NOV 25, 2026</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1.5px dashed #D9CDB2;margin:16px 0 12px"></div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px 16px"><div><div style="font-size:9.5px;font-weight:800;letter-spacing:.16em;color:#4B5565">SPECIES</div><div style="font-weight:700;font-size:15px;color:#14213D">Dog</div></div><div><div style="font-size:9.5px;font-weight:800;letter-spacing:.16em;color:#4B5565">BREED</div><div style="font-weight:700;font-size:15px;color:#14213D">Golden Retriever</div></div><div><div style="font-size:9.5px;font-weight:800;letter-spacing:.16em;color:#4B5565">SEX</div><div style="font-weight:700;font-size:15px;color:#14213D">Male</div></div><div><div style="font-size:9.5px;font-weight:800;letter-spacing:.16em;color:#4B5565">BORN</div><div style="font-weight:700;font-size:15px;color:#14213D">Apr 12, 2021</div></div><div><div style="font-size:9.5px;font-weight:800;letter-spacing:.16em;color:#4B5565">WEIGHT</div><div style="font-weight:700;font-size:15px;color:#14213D">68 lb</div></div><div><div style="font-size:9.5px;font-weight:800;letter-spacing:.16em;color:#4B5565">TRAINING</div><div style="font-weight:700;font-size:15px;color:#14213D">Task trained</div></div><div><div style="font-size:9.5px;font-weight:800;letter-spacing:.16em;color:#4B5565">MICROCHIP</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#14213D">•••• 6789</div></div><div><div style="font-size:9.5px;font-weight:800;letter-spacing:.16em;color:#4B5565">ISSUED</div><div style="font-weight:700;font-size:15px;color:#14213D">Nov 25, 2026</div></div></div>
+  </div>
+  <div style="margin:0 14px 16px;border-radius:10px;background:#F1EADA;padding:8px 70px 8px 12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:#2B3443;line-height:1.55;overflow:hidden;white-space:nowrap">P&lt;PPGBENNY&lt;&lt;GOLDEN&lt;RETRIEVER&lt;&lt;&lt;&lt;&lt;&lt;<br>PPG4821BEN&lt;DOG&lt;210412&lt;SVC&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+<div class="foil" aria-hidden="true"></div><div class="holo" aria-hidden="true" style="position:absolute;right:16px;bottom:12px;width:56px;height:56px;border-radius:50%;opacity:.92;z-index:2"><svg width="60%" height="60%" viewBox="0 0 24 24" aria-hidden="true" style="position:absolute;left:20%;top:20%;opacity:.55;mix-blend-mode:multiply"><g fill="#14213D"><ellipse cx="12" cy="15.5" rx="4.2" ry="3.6"></ellipse><circle cx="6.5" cy="10" r="1.9"></circle><circle cx="17.5" cy="10" r="1.9"></circle><circle cx="9.5" cy="6.5" r="1.8"></circle><circle cx="14.5" cy="6.5" r="1.8"></circle></g></svg></div></article>
+      </div>
     </a>
     <div style="text-align:center;font-size:13px;color:#9FB0CA;margin-top:10px">Tap to open Benny's passport</div>
   </section>
@@ -123,7 +134,7 @@ body{margin:0}
   </a>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1500}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1820}}'>
 class Component extends DCLogic {
   renderVals() { return {}; }
 }
