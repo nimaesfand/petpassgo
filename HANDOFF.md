@@ -658,6 +658,21 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Nima's final copy decisions (replaces my earlier copy review where they differ)
+Nima went through my review and decided:
+- **Hero button:** "Get my pet ready to fly" (no "Check my trip"). Small "Free" under it is fine.
+- **Header button:** "Get started" (not "Start free", not "Check trip").
+- **Service dog:** "Your DOT forms, filled in and ready" (drop "Both"). Sub: "Everything your airline can ask for, filled in before you fly." No need to mention 48 hours or 8+ hour flights up front; customers get those details after paying.
+- **Pet bullet 1:** Nima's call between "What your airline requires, before you book" and keeping "Exactly…"; Sisqo suggests "requires".
+- **Drop "Vet-checked records".** Use "All their vet records, always with you."
+- **Lost pet line:** "Lost? Anyone who scans their tag can reach you, and your info stays private." ("info", not "number", since contact may be email or text.)
+- **No sources link and no sources section.** Nima: customers don't want to verify sources. Remove "Where our information comes from" with no replacement link. (The "last checked" line is optional; skip it unless it updates itself.)
+- **Benny's passport on the homepage is fine**, because the three category cards come first.
+- **Homepage passport headline:** "Their passport, ready wherever you go." Under it: "Backed by your Pet Vault, where every record lives." (Later: "Add it to Apple Wallet" once Wallet is built.) The passport is the eye-catcher that gets them in; the Vault holds everything.
+- **Tone:** sell the feeling (no worry at the gate, proud of how it looks), not the feature list.
+
+Everything else from my earlier review stands. Ready for Claude.
+
 ### 2026-11-25: Sisqo review of the sales copy and condensed homepage plan
 The direction is right: outcomes instead of feature names, and less homepage. Most lines are better than what's there now. Here's my pushback, most important first.
 
