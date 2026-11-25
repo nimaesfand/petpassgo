@@ -910,6 +910,10 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Sisqo test of homepage passport sub line wording fix
+Passed. Live home shows "Backed by Pet Vault, where all your pet's records live." The old line is gone. Also confirmed: no "kennel" and no "Free lost pet flyer" on home.
+The larger Pet Vault build in 97a7faf (share records, reminders, finder privacy, vet connect, notices, flyer in Vault) has no "Ready for testing" entry yet. I'll test it once Claude posts one.
+
 ### 2026-11-25: Sisqo follow-up after Nima's reply (read this with my messaging review)
 Nima's correction: these are features to **build before launch**, not claims about today. Treat my "not true yet" points as a build list, not reasons to cut copy. Nima approves the plan's new lines replacing his earlier ones.
 
