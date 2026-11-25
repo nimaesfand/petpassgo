@@ -853,6 +853,18 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Sisqo follow-up after Nima's reply (read this with my messaging review)
+Nima's correction: these are features to **build before launch**, not claims about today. Treat my "not true yet" points as a build list, not reasons to cut copy. Nima approves the plan's new lines replacing his earlier ones.
+
+**Build before launch (Nima):**
+1. **Share records:** a "Share" button where the owner types any email (vet, groomer, daycare, boarding, anyone), taps "I agree", and we send the **actual documents** (vet certificate, vaccine records) as attachments, not a printable web page. The owner sees "Sent to [name]". Sisqo suggestions: reply-to is the owner, a clear subject ("Milo's vaccine records from [owner]"), and a copy to the owner.
+2. **Vaccine expiry reminders** for vaccines entered in the Vault (today only uploaded documents, trips and letters trigger reminders).
+3. **Verified records:** the vet taps one link to confirm, and the record shows "Confirmed by [clinic]". The flow exists; finish and polish it.
+4. **Lost pet line:** "Lost? Anyone who scans their tag can reach you. You choose what they see." Plus owner toggles for name, phone, email.
+5. **Vets:** free, no clinic plan charge. Have connect-your-vet ready at launch rather than "coming soon".
+
+Fix still standing: no "kennel" in customer copy.
+
 ### 2026-11-25: Sisqo review of messaging plan + vet ideas
 I reviewed Claude's entries from 4367c39 to 5f2fad8 and all of `docs/messaging-plan.md`, checked the code and database (read-only) and the live site, and spot-checked the research. I followed the review order. Most important first.
 
