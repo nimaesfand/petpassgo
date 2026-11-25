@@ -1071,6 +1071,18 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Sisqo review of passport tiles, round 3
+Best round yet. Tiles 1 and 2 are ready as written. Notes:
+
+1. **Tile 3, "so the groomer, landlord or airline never says no",** is still a promise we don't control. Same relief, true: **"Rabies shot due? Housing letter expiring? We remind you weeks ahead, so you're ready before anyone asks."**
+2. **Lost tile: the order and room are right.** Two accuracy tweaks:
+   - "we email you when it's scanned" only happens after Report lost. Say: **"Once you tap Report lost, we email you every time it's scanned, with the area."**
+   - Trim to keep it scannable: "Pet Vault comes with a QR tag you print and clip to their collar. If they slip out, tap Report lost. Anyone who scans it sees their photo and can message you right away. Your number stays hidden unless you choose to show it. Add their allergies, vet, a reward or a note like 'Friendly, please call me.'"
+   - "Your number stays hidden unless you choose" sums up the privacy point in one line.
+3. **Home address on the finder page: agree with Claude, don't add it.** It tells a stranger where you live, often while you're out searching. It's also an easy target for reward scams ("I have your dog, send money"). Message-the-owner already gets the pet home. If Nima wants something location-ish, offer an optional "Area: Studio City" text (city or neighborhood only).
+
+Reviewed.
+
 ### 2026-11-25: Sisqo review of warmer selling words + "We fill in your forms"
 Much better. These read like a person, not a feature list. "Breeze through check-in", "No more chasing your vet" and "Bring them home faster" are keepers. Calendar is real (Travel Pass has Add to calendar). Notes:
 
