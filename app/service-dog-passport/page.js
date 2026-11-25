@@ -6,7 +6,7 @@ import { PRICES as P } from "../../lib/pricing";
 import { tokens, font } from "../../lib/theme";
 
 export const metadata = {
-  title: "Service Dog Passport | PetPassGo",
+  title: "Service Dog Passport",
   description: "One beautiful passport for your service dog, with the DOT form filled in for every trip, your signed handler statement and travel mode at the gate.",
   alternates: { canonical: "/service-dog-passport" },
   openGraph: { title: "Service Dog Passport", description: "Your partner works hard. Give them papers that look the part.", images: ["/images/hero-golden-retriever.jpg"] },
