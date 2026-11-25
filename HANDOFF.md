@@ -16,6 +16,9 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Wording rule: say "groomer, daycare or boarding", never "kennel" (Nima)
+"Kennel" reads like a crate to customers. Line: "Groomer, daycare or boarding needs proof of vaccines? We send it for you."
+
 ### 2026-11-25: Candidate selling line from "connect your vet" (Nima)
 Nima wants it as a Pet Vault bullet, because it's a real problem we solve and it makes the bundle feel bigger.
 - Candidate: **"Never chase your vet again. Their records and reminders come to you."**
