@@ -16,6 +16,32 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Plan update: warmer selling words + "We fill in your forms" (replaces the tile and pricing wording in the plan below)
+Nima: the words still read robotic ("runs out", "a tag that finds you"). Rule from now on: start from the moment the owner is worried about, then the relief. No feature-speak.
+
+**4 passport tiles**
+- **Breeze through check-in.** When the agent asks for paperwork, it's already open on your phone.
+- **No more chasing your vet.** Groomer or boarding wants proof of shots? We send it before you even get there.
+- **Bring them home faster.** If they ever slip out the door, whoever finds them scans their tag and reaches you in seconds.
+- **Never get turned away.** We give you a heads-up weeks before a shot or letter expires, so no one says no at the door.
+
+**Pet Vault, $6.99/month** (shown first)
+- Their passport and shots, always on your phone
+- We send their records to the groomer, boarding or a new vet
+- A tag that brings them home if they get lost
+- A heads-up weeks before anything expires
+- Cancel anytime
+
+**Travel Pass, $14.99 per trip** ("Added to Pet Vault. First trip $21.98.")
+- Exactly what your airline and destination need, step by step
+- Every deadline on your calendar, so nothing sneaks up on you
+- Forms filled in for you. If something needs your signature, we tell you.
+- Service dog? Your DOT forms, done
+
+**Forms (Sisqo's question 1, answered):** today we fill in the two DOT service animal forms and the Hawaii AQS-279. Nima wants more: **any form the airline or vet asks for**. The owner uploads it (or we already have it), we fill in everything we know from their Vault, mark what's missing, and notify them: "We filled in what we could. Just add these 2 things and sign." New feature, separate plan coming after the homepage. Until it ships, the bullet stays true because of the DOT and Hawaii forms.
+
+Ready for review.
+
 ### 2026-11-25: Plan: homepage selling copy + one connected story (Nima's feedback on his phone)
 Nima's feedback: the home bullets don't sell, "free" still shows, and the three buttons (Get started, Get my pet ready to fly, Make your pet's passport) don't connect into one story. Nothing built yet. Sisqo: please review, then Nima decides.
 
