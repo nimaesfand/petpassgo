@@ -191,7 +191,7 @@ export default function SiteHeader({ onLogout }) {
           {signedIn ? (
             <a href="/account" aria-label="My account" className="lg:hidden rounded-full flex items-center justify-center" style={{ width: 40, height: 40, background: tokens.gold || "#F2B84B", color: tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 16, textDecoration: "none" }}>{initial || "•"}</a>
           ) : (
-            <a href="/assessment" onClick={(e) => { const href = readHomeIntentHref(); if (href !== "/assessment") { e.preventDefault(); window.location.href = href; } }} className="btn-primary rounded-full px-3 sm:px-5 py-2" style={{ ...link, background: tokens.primary, color: "#fff", fontWeight: 700, fontSize: 15 }}>Check trip</a>
+            <a href="/assessment" onClick={(e) => { const href = readHomeIntentHref(); if (href !== "/assessment") { e.preventDefault(); window.location.href = href; } }} className="btn-primary rounded-full px-3 sm:px-5 py-2" style={{ ...link, background: tokens.primary, color: "#fff", fontWeight: 700, fontSize: 15 }}>Get started</a>
           )}
           <button type="button" onClick={() => setMenu(true)} aria-label="Open menu" aria-expanded={menu} className="lg:hidden rounded-xl flex items-center justify-center" style={{ width: 40, height: 40, background: tokens.sky, border: "none", color: tokens.navy }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>

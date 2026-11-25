@@ -3,7 +3,7 @@ import PassportLanding from "../../components/PassportLanding";
 
 export const metadata = {
   title: "ESA Passport",
-  description: "A beautiful passport for your emotional support animal, with your housing letter stored safely and a reminder before it expires.",
+  description: "A passport for your emotional support animal, with your housing letter saved and a reminder before it expires.",
   alternates: { canonical: "/esa-passport" },
   openGraph: { title: "ESA Passport", description: "Their passport, and your housing letter, always with you." },
 };
@@ -19,11 +19,11 @@ export default function EsaPassportPage({ searchParams }) {
       searchParams={searchParams}
       eyebrow="ESA PASSPORT"
       title="Their passport, and your housing letter, always with you."
-      sub="No more searching old emails when your landlord asks. Everything about your emotional support animal, in one place."
+      sub="When your landlord asks, it's ready. Your ESA's records and your housing letter, in one place."
       items={[
-        { icon: <Icon name="lock" size={20} />, text: "Your housing letter, stored safely and private to you" },
+        { icon: <Icon name="lock" size={20} />, text: "Your housing letter, saved and private to you" },
         { icon: BELL, text: "A reminder before your letter expires" },
-        { icon: <Icon name="tag" size={20} />, text: "A lost pet tag that reaches you, without sharing your number" },
+        { icon: <Icon name="tag" size={20} />, text: "Lost? Anyone who scans their tag can reach you, and your info stays private." },
       ]}
       button="Get your ESA Passport"
       after={<>Flying soon? <a href="/assessment?pet=esa" style={{ color: "#fff", fontWeight: 800 }}>Check your trip for free.</a></>}

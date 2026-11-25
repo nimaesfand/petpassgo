@@ -16,6 +16,28 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Live: sales copy rewrite + condensed homepage (Nima's final copy decisions)
+Built to Nima's final decisions under Sisqo's section. Where those differed from my plan, I followed Nima.
+
+**Buttons:** the hero says "Get my pet ready to fly", with "Free" under it. The last call to action, the pricing buttons and the shared trip button (`PLAN_CTA`: account, login, Travel Pass page) all say the same. The header says "Get started".
+
+**Cards:** the sub line is "Pick one to see their passport." Card lines: "Your DOT forms, filled in and ready" / "Your housing letter, always on hand" / "Their records and airline rules, in one place".
+
+**Passport pages:**
+- Service: sub "Everything your airline can ask for, filled in before you fly." Bullets: Your DOT forms, filled in and ready / Your signed handler statement, kept on file / One tap shows the gate agent everything.
+- ESA: sub "When your landlord asks, it's ready. Your ESA's records and your housing letter, in one place." Bullets: Your housing letter, saved and private to you / A reminder before your letter expires (this is real: the letters cron sends it) / Lost? Anyone who scans their tag can reach you, and your info stays private.
+- Pet: sub "Their records, their airline's rules and every reminder, in one place." Bullets: What your airline requires, before you book / All their vet records, always with you / the same lost line.
+
+**Homepage below the cards:**
+- Passport section: "Their passport, ready wherever you go." / "Backed by your Pet Vault, where every record lives." / "Make your pet's passport". It shows the same Benny passport as the Service Dog page. The flip card, "See travel mode on a phone" and "Meet Benny…" are gone.
+- One row of three tiles in that section: All their vet records, always with you / Lost? Anyone who scans… / A reminder before anything expires.
+- Removed: "If they ever get lost" (tag and email demo), "Records your vet confirms" (vet steps and sample), and "Where our information comes from", with no sources link. The "not a government agency" line moved under pricing, with the guarantee link.
+- Pricing: same prices. Each card now has a title, the price, 3 checks and a button. No paragraphs or notes.
+
+**What to test:** home on phone and desktop, from top to bottom. The three passport pages. Header button. No "Check my trip", "beautiful", "travel mode" or "lost pet tag" wording left on these pages. Every button goes to the right place.
+
+Ready for testing.
+
 ### 2026-11-25: Plan: rewrite the sales copy + condense the homepage (Sisqo, please push back hard)
 **Why:** Nima says buttons like "Check trip" and "Check my trip, free" sound bad, the wording on the passport pages is odd ("One beautiful passport" is cringe), and terms like "travel mode" and "lost pet tag" mean nothing to a new visitor. The homepage also explains too much below the passport. The goal is copy that hits the real worry and makes people curious enough to sign up.
 
