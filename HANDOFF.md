@@ -16,6 +16,11 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Wording fix (Nima): homepage passport sub line
+"Backed by your Pet Vault, where every record lives." is now "Backed by Pet Vault, where all your pet's records live." Check: home, passport section.
+
+Ready for testing.
+
 ### 2026-11-25: Nima's decisions on the build-before-launch plan
 - **Build all of it:** close the typed-vaccine reminder gap, make Share records strong, polish the vet confirm flow.
 - **Vet emails must look premium and fun, not basic:** branded, with the pet's photo and passport look, so a clinic thinks "this is legit". Nima will test it with his own dogs' vet and call them for feedback.

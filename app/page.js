@@ -145,7 +145,7 @@ export default async function PetPassGoLanding() {
         <div className={`${WRAP} grid lg:grid-cols-[minmax(0,1fr)_420px] gap-10 lg:gap-16 items-center`}>
           <div>
             <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.05, letterSpacing: "-0.01em" }} className="text-[36px] md:text-[52px] font-extrabold max-w-[14ch]">Their passport, ready wherever you go.</h2>
-            <p className="mt-5 max-w-[30rem]" style={{ fontFamily: B, color: "#D5DEEB", fontSize: 19, lineHeight: 1.5 }}>Backed by your Pet Vault, where every record lives.</p>
+            <p className="mt-5 max-w-[30rem]" style={{ fontFamily: B, color: "#D5DEEB", fontSize: 19, lineHeight: 1.5 }}>Backed by Pet Vault, where all your pet&apos;s records live.</p>
             <a href="/passport/create" className="mt-8 inline-flex items-center justify-center rounded-full px-9 min-h-[56px]" style={{ background: "#fff", color: tokens.navy, fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Make your pet&apos;s passport</a>
           </div>
           <div className="flex justify-center" style={{ transform: "rotate(-2deg)" }}>
