@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Start Pet Vault</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>body{margin:0} input::placeholder{color:#8A94A6}</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#F3F5F9;font-family:Inter,system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <header style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:#fff;border-bottom:1px solid #DCE3EC">
+    <a href="#" style="color:#14213D;font-weight:700;font-size:15px;text-decoration:none;padding:8px 0">← Back</a>
+    <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;color:#14213D">PetPass<span style="color:#C2410C">Go</span></div>
+    <div style="width:52px"></div>
+  </header>
+  <form style="padding:22px 20px 24px;display:flex;flex-direction:column;gap:16px;flex:1">
+    <div style="background:linear-gradient(135deg,#14213D,#22386A);border-radius:22px;padding:18px;color:#fff">
+      <div style="font-size:12px;font-weight:800;letter-spacing:.16em;color:#F2B84B">PET VAULT</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-top:4px"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:40px;line-height:1">$6.99</span><span style="font-size:15px;color:#C9D4E6">today</span></div>
+      <div style="font-size:14.5px;color:#C9D4E6;margin-top:6px">Then $6.99 a month. Cancel anytime.</div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+        <span style="background:rgba(255,255,255,.12);border-radius:999px;padding:6px 11px;font-size:13px;font-weight:700">Your pet's passport</span>
+        <span style="background:rgba(255,255,255,.12);border-radius:999px;padding:6px 11px;font-size:13px;font-weight:700">Records and reminders</span>
+        <span style="background:rgba(255,255,255,.12);border-radius:999px;padding:6px 11px;font-size:13px;font-weight:700">Lost pet tag</span>
+      </div>
+    </div>
+
+    <h1 style="margin:6px 0 0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#14213D">Create your account</h1>
+    <label style="display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:15px;color:#14213D">Your name
+      <input type="text" autocomplete="name" placeholder="First and last name" style="min-height:52px;border-radius:14px;border:1.5px solid #C9D2DE;padding:0 14px;font-size:17px;font-family:inherit">
+    </label>
+    <label style="display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:15px;color:#14213D">Email
+      <input type="email" autocomplete="email" placeholder="you@email.com" style="min-height:52px;border-radius:14px;border:1.5px solid #C9D2DE;padding:0 14px;font-size:17px;font-family:inherit">
+    </label>
+    <label style="display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:15px;color:#14213D">Password
+      <input type="password" autocomplete="new-password" placeholder="At least 8 characters" style="min-height:52px;border-radius:14px;border:1.5px solid #C9D2DE;padding:0 14px;font-size:17px;font-family:inherit">
+    </label>
+    <label style="display:flex;gap:12px;align-items:flex-start;background:#fff;border:1.5px solid #DCE3EC;border-radius:16px;padding:14px;font-size:14.5px;line-height:1.45;color:#2B3443">
+      <input type="checkbox" style="width:22px;height:22px;margin:1px 0 0;flex-shrink:0;accent-color:#C2410C">
+      <span>Start Pet Vault at $6.99 a month. It renews every month until I cancel, and I can cancel anytime in my account.</span>
+    </label>
+
+    <button type="button" style="margin-top:auto;min-height:58px;border:none;border-radius:999px;background:#C2410C;color:#fff;font-weight:800;font-size:18px;font-family:inherit;cursor:pointer">Continue to payment · $6.99</button>
+    <div style="text-align:center;font-size:14px;color:#4B5565">Already have an account? <a href="#" style="color:#14213D;font-weight:800">Log in</a></div>
+  </form>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -16,6 +16,18 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Mockups updated with Sisqo's fixes + Nima's answers
+Nima: passport direction approved; Plan a trip leads (trips bring people in, Pet Vault keeps them); ESA badge drops "Flies as a pet"; no "SAMPLE" stamp on the homepage (a "Meet Benny, our AI guide" line covers the AI-character rule); keep rabies on the homepage card, shown as "Good until 2027".
+Changes on the canvas (source in design/mockups/):
+- Main passport: SAMPLE tag moved onto the photo corner (no longer covers the number); paw mark inside the hologram.
+- New: PassportPhone (Benny, service dog, phone size) and PassportESA (Cleo, Maine Coon, deep red reflective "EMOTIONAL SUPPORT ANIMAL" badge, no travel wording, photo slot).
+- New: Pay ("Start Pet Vault"): $6.99 today, "Then $6.99 a month. Cancel anytime.", name/email/password, unticked renewal box with the full wording, "Continue to payment · $6.99", "Already have an account? Log in".
+- Home: "Meet Benny, our AI guide" line, rabies "Good until 2027", paw in hologram.
+- Vault: fuller screen (passport, health rings, documents wallet, Benny's people, lost pet tag, birthday and weight), paw in hologram.
+Next: Nima signs off on the mockups, then Claude builds the 4-screen site to match.
+
+Ready for review.
+
 ### 2026-11-25: Design mockups for review (passport, Home, Travel Pass, Pet Vault)
 Nima asked Sisqo to check these. Nothing on the live site changed. The canvas is on claude.ai (private to Nima; he can share the link or screenshots). The source of each screen is in the repo at design/mockups/ (Main = passport, Home, TravelPass, Vault; the image is Benny's photo from public/images/hero-golden-retriever.jpg).
 
