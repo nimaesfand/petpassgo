@@ -16,6 +16,44 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Ideas: what makes someone pay $6.99/month for Pet Vault (Sisqo, please add better ones)
+**Problem (Nima):** "All their vet records, always with you" makes Pet Vault sound like a records folder. Nobody pays monthly for that. It's also on the page twice. My first replacements weren't strong enough either. We need the three tiles under the passport and the three Pet Vault price-card bullets to sell the subscription.
+
+**What Pet Vault actually includes today (please check I'm not missing anything):** the passport. One tap to show everything at the gate (travel mode). Both DOT forms filled in for service dogs. Travel Pass at $14.99 instead of $29.99. A QR collar tag: the finder messages you without seeing your info, and when the pet is marked lost, each scan emails you with the approximate city. Reminders before vaccines, documents and letters expire. Your vet confirms records. ESA and service dog letters, private. Housing paperwork.
+
+**What other pet subscriptions sell (research):**
+- PetHub (QR tags) sells speed home: "96% of PetHub recovered pets are home in 24 hours or less", plus scan alerts with a map.
+- Tractive (GPS) sells one feeling over and over: "peace of mind".
+- Reviews show people resent subscriptions that feel like nickel-and-diming ("Subscription? Really?"). The bundle has to feel big.
+- ASPCA: 15% of owners lost a dog or cat in 5 years, and a tag or microchip led to 15% of recovered dogs. (The "1 in 3 pets get lost" stat is everywhere, but it's weakly sourced, so let's not use it.)
+
+**Takeaway:** sell three outcomes people feel, each tied to something real:
+1. **No stress at the gate** (travel mode, DOT forms)
+2. **Getting them back if they're lost** (tag and scan alerts)
+3. **Saving money on trips** (Travel Pass $14.99 instead of $29.99)
+Reminders are the fourth. Records stay underneath everything, not a selling point.
+
+**Draft A: tiles under the passport (feeling-first)**
+- "Breeze through the gate. One tap shows everything they ask for."
+- "If they ever slip away, one scan of their tag alerts you."
+- "Never miss a vaccine, letter or form deadline."
+
+**Draft B: tiles (shorter, punchier)**
+- "Ready at the gate in one tap"
+- "Lost? Their tag brings them home"
+- "Every deadline, remembered"
+
+**Pet Vault price card (3 bullets, "Cancel anytime" moves next to the price):**
+- "Ready at the gate in one tap"
+- "Lost? One scan of their tag alerts you"
+- "Travel Pass for $14.99 instead of $29.99"
+
+**Pet page bullet 2:** replace "All their vet records…" with "Ready at the gate in one tap".
+
+**Sisqo:** which lines would actually make you pay? Anything overpromising ("brings them home" can't be guaranteed)? Any Vault benefit we're underselling? Please suggest your own versions.
+
+Ready for review.
+
 ### 2026-11-25: Small fixes (Nima): no "Free" under the hero button, no disclaimer line under pricing
 - Removed the small "Free" under "Get my pet ready to fly". Nima: let them browse; the price shows at the end.
 - Removed "PetPassGo is a travel-prep tool, not a government agency…" from under pricing. The same point is already in the Terms.
