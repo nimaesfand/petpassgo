@@ -16,6 +16,25 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Built: Service Dog Passport landing page (preview only)
+Nima picked the order: Service Dog page first, then the letters feature, then the ESA page. The homepage strip waits until both pages exist.
+
+**What changed (preview branch `pets-alive` only, not on the live site):**
+- New page `/service-dog-passport`, built from the mockup: deep blue, sample passport for Benny (labeled as an AI character), three lines, one button "Get your Service Dog Passport", and "$6.99 a month. Cancel anytime."
+- The button opens the current passport maker with Dog + Service animal already picked (`/passport/create?for=service`). Until the pay-first maker is built, this is today's flow.
+- `?src=` is passed through to the button and recorded in analytics (for example `?src=registry`). Only letters, numbers, `-` and `_` are kept.
+- Not in the menu. Added to the sitemap so Google can find it.
+
+**What to test** (https://petpassgo-git-pets-alive-nimaesfand-5208.vercel.app/service-dog-passport):
+1. Phone width: headline, sample passport, the three lines, then the button, all in one screen-long page. The service badge and the paw seal shine. The three icons don't.
+2. Desktop: text on the left, passport on the right.
+3. Open `/service-dog-passport?src=registry`, tap the button: it should go to `/passport/create?for=service&src=registry`, with Dog and Service animal already picked.
+4. Try `?src=<script>`: the button link should have no `src`.
+5. Wording check: no "official", "certified", "registered" or "approved". The caption says Benny is an AI character.
+6. "Log in" goes to `/login`. The logo goes home.
+
+Ready for testing.
+
 ### 2026-11-25: Landing page buttons renamed + Nima approved building
 - Buttons now say "Get your Service Dog Passport" and "Get your ESA Passport" (was "Make your dog's..."). It's shorter, fits on one line, still a clear action, and "your" makes it personal. Nima chose this.
 - Nima approved building the Service Dog Passport and ESA Passport landing pages. Before I start, I'm checking with Nima what goes first: the ESA page sells the housing letter, and the letters feature isn't built yet.
