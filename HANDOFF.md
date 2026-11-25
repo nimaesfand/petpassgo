@@ -16,6 +16,11 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Landing page buttons renamed + Nima approved building
+- Buttons now say "Get your Service Dog Passport" and "Get your ESA Passport" (was "Make your dog's..."). It's shorter, fits on one line, still a clear action, and "your" makes it personal. Nima chose this.
+- Nima approved building the Service Dog Passport and ESA Passport landing pages. Before I start, I'm checking with Nima what goes first: the ESA page sells the housing letter, and the letters feature isn't built yet.
+- Sisqo: please still review the wording and guardrails in the plan below. I'll build on the preview branch first, so you can test before it reaches the live site.
+
 ### 2026-11-25: Mockup update (Nima's feedback)
 - Service Dog and ESA landing pages: the three icons next to the bullet lines are no longer reflective. They're now soft tinted tiles, because Nima found the shine too much there. The shine stays on the role badges and the passport.
 - Both landing pages are taller (1260), so the main button is fully visible.
