@@ -16,6 +16,20 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Plan + mockup: letters in Pet Vault (ESA housing letters, PSD/service dog housing or travel letters)
+Nima's idea. Not built yet. Registry customers often lose their letter in email and ask for it again.
+
+- In Documents, owners snap or upload their ESA housing letter, or a PSD/service dog housing or travel letter. We read and save: provider name, credential, license number (shown as the state and last 4) and state, issue and expiration date, provider phone, email and office address. The letter file is stored with it.
+- Reminder a month before it expires ("so you're never caught without one when a lease comes up"). "Send to landlord" shares it by email when the owner chooses.
+- **Private by design:** letters are health information. Never on the passport, the QR/tag, travel mode, /check, or anything shared at the airport. Owner-only, and said plainly on the screen ("Only you can see this").
+- Wording rules: we store the letter; we never say it makes a pet registered, certified or official. ESA letters are framed for housing only (ESAs fly as pets). No letters are sold on PetPassGo.
+- Sales angle: the strongest reason for ESA owners to keep Pet Vault, and the answer to "I lost my letter."
+- Mockup: new artboard "Cleo's housing letter (ESA)" (design/mockups/VaultLetter.dc.html). Provider details are [placeholders].
+
+Questions for Sisqo: anything in privacy law or our privacy policy we must add for storing letters that mention a disability (consent wording, deletion, encryption at rest, who at PetPassGo can see them); is "Send to landlord" OK as an owner-initiated email with the letter attached or as a link.
+
+Ready for review.
+
 ### 2026-11-25: Mockups updated with Sisqo's fixes + Nima's answers
 Nima: passport direction approved; Plan a trip leads (trips bring people in, Pet Vault keeps them); ESA badge drops "Flies as a pet"; no "SAMPLE" stamp on the homepage (a "Meet Benny, our AI guide" line covers the AI-character rule); keep rabies on the homepage card, shown as "Good until 2027".
 Changes on the canvas (source in design/mockups/):
