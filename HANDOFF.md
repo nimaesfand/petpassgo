@@ -467,6 +467,47 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25 (1:16 AM PT): Mockup updates, landing pages, letters plan, and Service Dog preview: review
+
+Looked at everything on main since my last review (d77822d): nine commits, ending at 5b598e3 (Nov 25, 1:10 AM PT). Rendered the current mockups in `design/mockups/` at their designed sizes (phone 390px, desktop passport 1040×700). Also read the new plans and the Service Dog page source on branch `pets-alive` (55294b2, 87ad1b4).
+
+**Nima's decisions, which stand.** Passport direction approved. "Plan a trip" leads on the homepage. ESA badge drops "Flies as a pet." No SAMPLE stamp on the homepage; a "Meet Benny, our AI guide" line is enough. Keep the role badges and passport shine; landing-page icons stay calm (soft tiles). Buttons say "Get your Service Dog Passport" / "Get your ESA Passport." Build order: Service Dog page first, then letters, then the ESA page; the homepage strip waits until both pages exist. A later "one passport everywhere" change uses the same fields and holograms on Home, Vault, and the phone passport, which also dropped the earlier "Good until 2027" rabies line from the homepage card.
+
+**Earlier fixes (from my last review).** All of these are in good shape, with Nima's overrides honored:
+- SAMPLE no longer covers the number. The tag sits on the photo; PPG-SAMPLE is fully readable in the header.
+- A real phone layout exists (PassportPhone). Fields are readable; the hologram sits in the card's bottom-right corner with space left in the code line.
+- Homepage: no SAMPLE stamp on the photo, as Nima asked. The number is still PPG-SAMPLE, plus "Meet Benny, our AI guide." Rabies is no longer on that card (same fields as the issued passport).
+- ESA badge is deep red and reflective, labeled "EMOTIONAL SUPPORT ANIMAL," with a heart (not a shield) and no travel-rights wording.
+- The hologram has a paw mark, and a light foil wash was added. It now reads as a seal.
+- Pay screen: "$6.99 today," "Then $6.99 a month. Cancel anytime.", name / email / password, unticked renewal box with the full wording, "Continue to payment · $6.99," and "Already have an account? Log in."
+- Homepage primary button is "Plan a trip" (orange), with "Start Pet Vault" as the second button, as Nima decided.
+
+**Verdict on the mockups.** These are ready to build from for the passport, the phone and ESA versions, the pay screen, and the Service Dog landing. The passport looks like a product now. A few wording and flow issues should be fixed before ads or the ESA page go out (below).
+
+**Service Dog and ESA landing pages.** Strong, compact, and clearly the same $6.99 Vault, not a new product. ESA copy stays on housing letters, reminders, and the lost-pet tag — no flying rights. Captions correctly say Benny and Cleo are AI characters. Two wording nits on the Service Dog page: "Give them papers that look the part" is punchy and fine if the sample stays clearly labeled; "everything your airline can ask for ready to go" overpromises (airlines can ask for a health certificate and other papers we don't issue). Softer: "the DOT form and your handler statement, ready when you fly." Cleo is still an empty photo slot; a real sample photo, like Benny's, would sell the ESA page better. The landing mock is 1260px tall, so on a phone you scroll to the button — that's all right if the headline and passport are the first screen.
+
+**Letters in Pet Vault.** Good idea, and the privacy line on the mock ("Only you can see this. It's never on Cleo's passport, her tag, or anything you share at the airport.") is the right promise. License shown as state + last 4 is good. Answers to Claude's questions: treat letters as sensitive (they can include health or disability information). At upload, get a short consent ("This letter may include health information. We store it only in your Vault, never on the passport, the tag, or at the airport."). Add a specific bullet to the privacy policy. Keep the existing deletion rule (owner can delete in the app; account deletion removes uploaded documents within 30 days). Encrypt at rest (Supabase already does). Don't log letter contents, and don't let support tools open them by default. "Send to landlord" is fine if the owner types the address, confirms what will be sent, and we record the send in their account. Warn that a sent letter can't be pulled back. A short-lived link or an attachment both work; don't add anyone else on the email and don't include extra records they didn't pick. Don't sell letters, and never call them official or certified — the plan already says this.
+
+**Fuller Vault and Travel Pass.** The logged-in Vault looks rich (passport, health rings, documents, people, lost-pet tag, birthday). It's also 1820px tall, which is more than two phone screens and busier than the simplify rule. For the first build pass, keep the passport plus the next reminder and one main action on the first screen; put people, birthday, and extra tiles further down. Don't take all of this as new work until the 4-screen site and pay-first maker are done. Travel Pass header is now reflective copper and looks better. It still says "2 of 6 done" and lists only four steps.
+
+**Service Dog page on the preview (Ready for testing).** I could not load https://petpassgo-git-pets-alive-nimaesfand-5208.vercel.app/service-dog-passport — curl returned 403 (`x-vercel-mitigated: deny`), and the Vercel connector is still forbidden for team nimaesfand-5208 (same as Nov 23). I reviewed the source on `pets-alive` instead. What the code does well: no "official / certified / registered / approved" in the copy; "Sample passport. Benny is one of our AI characters."; price from `PRICES.member`; logo goes home; "Log in" goes to `/login`; `?src=` keeps only letters, numbers, `-` and `_` (a `?src=<script>` value would be dropped); the page is in the sitemap and not in the menu; desktop layout (from 900px) is text on the left and the passport on the right, as described.
+
+What will not fully match the test notes until it's fixed:
+1. The button goes to today's passport maker (`/passport/create?for=service`), which is still the free draft with "We'll hold it for 7 days," not the $6.99 pay-first screen. Claude flagged this. Don't send paid traffic to this page until pay-first is built, or people will see a different offer than "$6.99 a month."
+2. `for=service` pre-fills Dog + Service animal, but it does not skip those questions. The maker still starts at "It's for my dog," and the role step still appears. A leftover draft in localStorage can also block the preset (the code only fills those fields if both are empty).
+3. `src` is recorded on the landing page and passed in the button URL, but the maker does not store it. That's fine for a first test; if we want to know which visits pay, it needs to be carried into checkout later.
+
+**Browser tests still needed** (someone who can open the preview): the six items Claude listed (phone, desktop, `?src=registry` on the button, `?src=<script>` stripped, wording, logo and Log in), plus: does the first phone screen show the headline and passport without clipping the badge or paw seal; after tapping the button, are Dog and Service animal actually selected, and does a leftover draft get in the way; confirm you still land in the current free maker, not a pay wall.
+
+**Left for Nima.**
+1. Soften "everything your airline can ask for ready to go" before this page is promoted? I recommend yes.
+2. Hold ads and kit links until the pay-first maker is live? I recommend yes.
+3. Should `for=service` skip the animal and role questions, as the plan said, rather than only pre-filling them?
+4. Add a Cleo photo before the ESA page is built?
+5. For the first Vault build, start from the simpler earlier screen, or from this long 1820px dashboard?
+
+The live site at www.petpassgo.com was not changed. No payment was made.
+
 ### 2026-11-25: Design mockups (passport, Home, Travel Pass, Pet Vault): review
 
 Looked at the four HTML mockups in `design/mockups/` from commit c945b93 (Nov 25, 12:11 AM PT). Nothing on the live site changed. Rendered them locally (Benny's photo in place of the canvas blob) at the designed sizes: passport 1040×700, Home / Travel Pass / Pet Vault at 390×844. Also read the Nov 24 before/after for the maker and keep page (0752dc5), which these screens sit with.
