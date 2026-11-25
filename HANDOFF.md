@@ -16,6 +16,14 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Added to the messaging plan: free competitors and how we beat them (`docs/messaging-plan.md`, section 6)
+- Free record vaults make money elsewhere: Waggle sells pet monitors with monthly plans, PetDesk is paid by vet clinics (about $249+/month each), Pawprint/GreatPetCare later charged about $5/month, PetHub sells tags plus a premium plan.
+- What owners loved most was someone else getting the records from the vet. Owners act on outside triggers (a boarding booking, a housing rule), not vet reminders. Kennels want proof they can trust, not blurry photos.
+- Our edge: verified records (vet confirms), "we send it for you" (groomer or kennel email), a new idea "we get it from your vet", plus everything free apps don't do (passport, airline and DOT, lost tag, letters).
+Sisqo: please research too (Reddit, app reviews) and add what owners complain about most.
+
+Ready for review.
+
 ### 2026-11-25: Plan: messaging built on research (replaces the quick Pet Vault drafts below). Sisqo, please research and push back
 **Full plan:** `docs/messaging-plan.md` (research with sources, positioning, copy for every spot, what has to be true).
 

@@ -107,3 +107,27 @@ Tone: name the moment ("Groomer asking for vaccines?"), then calm it ("Send them
 - Fees and changing policies: https://www.cbsnews.com/news/airlines-travel-dogs-cats-pets-jetblue-united-american-alaska-cbs-news-explains/
 - Assistance dog access: https://assistancedogsinternational.org/news/2025/06/03/member-news/refused-driven-away-from-and-almost-run-over-assistance-dog-handlers-share-everyday-experiences-of-exclusion-discrimination-and-humiliation/ , https://cdn.guidedogs.com.au/wp-content/uploads/2025/06/Paws-for-Access-Report-prelim.pdf
 - ESA renewal timing: https://www.prosebox.net/book/103032/
+
+---
+
+## 6. Free pet-record apps: how they make money, and how we beat them (added Nov 25)
+
+| Company | Free part | How they really get paid |
+|---|---|---|
+| Waggle Vault | Records vault, AI organizing, share link | Pet temperature monitors and cameras with monthly plans. The vault is bait. |
+| PetDesk (7M+ owners) | Owner app: records, reminders, booking | Vet clinics pay (about $249+/month per clinic) |
+| Pawprint → GreatPetCare | Fetched your records from your vet for you | Later limited the free version (30 days of records) and charged about $5/month. Planned in-app promotions. |
+| PetHub | Basic tag profile | Tags plus a premium plan (scan alerts with a map, shelter alerts) |
+
+**Lessons**
+1. Records alone are a free commodity. Nobody wins on storage.
+2. What owners loved most was **someone else getting the records for them** (Pawprint asked the vet directly).
+3. Owners act when something outside forces them to: a boarding reservation or a housing rule, not a vet reminder.
+4. Owners rarely use apps to share vaccines with groomers or kennels today. Kennels complain about blurry photos and misread dates. They want proof they can trust.
+
+**How PetPassGo does it better**
+- **Verified, not just stored:** our vet-confirm flow means a groomer or kennel sees "confirmed by Dr. X at Y Clinic on date", not a blurry photo.
+- **We send it for you:** type the groomer's or kennel's email and we send the verified records (Nima's idea, now backed by research).
+- **We get it from your vet:** new idea. Owner types the clinic's email, and we ask the vet to send or confirm the records. This answers "your documents aren't there yet".
+- **Everything else free apps don't do:** the passport, airline rules and DOT forms, the lost-pet tag, ESA and service dog letters.
+- **Money beyond $6.99:** groomers, kennels and vets who receive our records are natural Discover listing customers later.
