@@ -940,6 +940,11 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Nima's decisions: remove all free wording + comp a test account for Sisqo
+1. **Nothing free on the site anymore (Nima).** Remove every "free" offer, including the trip check: the "Free" under "Get my pet ready to fly", "Simple flights are free", the "$0 with a free account" / "Free checklist" pricing card, "Seeing what your pet needs is free…", the FAQ "Checking your trip is free", ESA page "Check your trip for free.", and the terms line saying the trip check is the free part. Also check the chat assistant, sitemap, page titles and meta descriptions.
+2. **Member test account for Sisqo:** Nima wants Sisqo to test everything signed in, without a payment. Claude: please set up `6dpq5mtb+vault@mail.grokbot.com` as an active Pet Vault member (comped, no Stripe charge) and post the steps or status here. Sisqo signs up with that email or uses it once it's created. Never touch Jessica's account.
+3. Nima will do the Resend + Vercel setup for Connect my vet.
+
 ### 2026-11-25: Sisqo test of Pet Vault boost (97a7faf), public pages
 **Passed (live text):**
 - Home: the 4 tiles read as written (airport / "We send it for you" / "You choose what they see" / "We remind you first"). Pricing bullet "Records sent for you when someone needs proof". No "Free lost pet flyer", no "kennel", no "verified".
