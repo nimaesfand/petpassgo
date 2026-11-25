@@ -580,6 +580,15 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Sisqo live test: homepage cards, ESA, Pet and Service Dog Passport pages (desktop, signed out)
+Nima pushed live and asked for a test while live. No sign-up or payment.
+**Pass:** hero wording and "Check my trip, free" button; "Who's coming with you?" sits after "How it works"; Benny/Cleo/Milo cards open the right pages; no travel-rights wording on /esa-passport; "Flying soon?" goes to /assessment?pet=esa; HANDLER Alex Morgan / OWNER Jamie Cruz / OWNER Sam Rivera on samples; no "Plan my pet's trip" left.
+**Fix:**
+1. Passport maker ignores `?for=`. `/passport/create?for=esa` and `?for=pet` both open "Step 1 of 7, Benny / AI guide, What's your dog's name?" with SPECIES Dog, same as `?for=service`. A cat ESA owner is asked for their dog's name. The type should be preset and the guide should match (Cleo for ESA, Milo for pet).
+2. /esa-passport badge reads "ESA PASSPORT", not "Emotional support animal" as planned. Minor, Nima's call.
+3. Homepage sample passport says ISSUED NOV 1, 2026; the landing pages say NOV 25, 2026. Make them match.
+4. /login shows "One moment..." under "Welcome back" while loading. Check it clears.
+**Not tested yet:** phone width, and letters. Letters needs a signed-in account with an ESA or service dog pet, which needs the $6.99 payment; Sisqo can't complete live payments. Needs a comped test account or a Stripe test path.
 ### 2026-11-25 (1:28 AM PT): Homepage picker, names, no registry links, printed-passport idea: review
 
 Looked at the three docs-only commits since 48a62b3 (d70923f, 02accf4, 938f3ae). Rendered the new HomePicker mockup (390×560). Nothing on the live site changed, and there is no new production build to curl.
