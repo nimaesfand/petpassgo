@@ -16,6 +16,36 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-24: Before/after: passport maker + keep page (with Nima's Nov 24 decisions)
+Not built yet. Uses Nima's decisions relayed by Sisqo: email + password sign-up, no 7-day draft, $6.99 paid before making the passport, Travel Pass ($21.98) includes the first month of Pet Vault, visuals first.
+
+**Before:** /passport/create lets anyone make a passport free → reveal → "Keep" page (4 locked cards, 9-item list, dark locked passport, "we hold it 7 days", "no password needed", "we emailed it") → pay later.
+
+**After (one path for everyone):**
+1. **/passport/create start screen:** the SAMPLE passport (Benny, number PPG-SAMPLE, a "SAMPLE" ribbon), headline "Make your pet's passport", one sentence ("Pet Vault keeps everything for your pet in one place: the passport, records, vet and documents, and lost pet help."), three icons (Records and documents in one place · Reminders before anything expires · Lost pet QR tag), one button "Start · $6.99/mo". Small line: "Cancel anytime."
+2. **Account:** email + password (+ first and last name). Email already has an account → "Log in instead".
+3. **Pay:** the unticked renewal box ("Start Pet Vault at $6.99 a month. It renews every month until I cancel...") → Stripe $6.99/mo. Members and people with a paid Travel Pass skip steps 1-3.
+4. **Benny's steps (same feel, with fixes)**, saved straight to the account, no draft:
+   - Breed: type to search and pick from the list, placeholder follows the animal (cat: "Like Maine Coon"), plus "Mixed or not sure" and "My breed isn't listed" (short typed name).
+   - Photo: crop and zoom before saving.
+   - Sex: Male / Female.
+   - Service dogs: the same extra steps; promise error says "Check the box to sign."
+   - Browser Back goes to the previous step (steps become history entries).
+5. **Reveal** → "Open [Name]'s Vault".
+Removed: free drafts, the keep page and its 7-day hold, draft emails, "No password needed", "We also emailed it". Old /passport/keep links show "Log in to see your passport" (no drafts are kept going forward).
+
+**Passport look (all versions):**
+- Role shows once: only the reflective badge under the photo. Remove the flat pill next to the name (that's the flat navy/red pill Sisqo and Nima saw).
+- Service dog: deep blue reflective. ESA: deep red reflective, label "EMOTIONAL SUPPORT ANIMAL". Nima earlier asked for "Flies as a pet" under it; Sisqo says no travel wording. Claude keeps "Flies as a pet" unless Nima says otherwise (it limits rights, it doesn't claim any).
+- One clean hologram; drop the faint ghost photo square.
+- Real passport number only after payment; the sample uses PPG-SAMPLE.
+
+**Also in this pass:** LAX→JFK service result: remove the "Your Travel Pass walks you through each one" banner line for the Vault-only box, and make the box button blue to match; remove the hidden "See every step" button on /mexico and /canada; delete test account 6dpq5mtb+batch2@mail.grokbot.com.
+
+**Claude's one concern (Nima decides):** asking $6.99 before people see their own pet's passport removes the "wow" moment that sells it. The sample passport has to do that job, so it must look great. If sales are slow, an easy test later is letting them add just the name and photo before paying.
+
+Ready for review.
+
 ### 2026-11-24: Plan: simplify everything (Nima's walk-through) — freeze new features
 Nima went through the passport maker and the keep page and isn't happy: too much going on, too many layers, too much to read, and Pet Vault reads like a travel product. Not built yet.
 
