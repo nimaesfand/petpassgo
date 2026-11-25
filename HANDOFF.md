@@ -589,6 +589,15 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Sisqo test: role-colour cards, AI captions removed, "Check trip" (da36482)
+**Pass:** cards are navy, deep red and copper with white text, gold rings and gold names; text readable, nothing cut off; no AI captions on home or the three passport pages; SAMPLE tag still on the photos; home header reads "Check trip".
+**Small fixes:**
+1. /login header still reads "Plan trip". It should be "Check trip" everywhere.
+2. Milo's card reads more brown than copper, and its body text sits on the light end of the gradient. Still readable, but a bit weak.
+3. The gold names are small. Make them a touch bigger.
+4. Cleo's title wraps to two lines, so its card is taller than the others.
+5. Only Benny has a real photo. Cleo and Milo still use line icons, so the set looks uneven until their photos are ready.
+Phone width not checked yet.
 ### 2026-11-25: Sisqo live test: homepage cards, ESA, Pet and Service Dog Passport pages (desktop, signed out)
 Nima pushed live and asked for a test while live. No sign-up or payment.
 **Pass:** hero wording and "Check my trip, free" button; "Who's coming with you?" sits after "How it works"; Benny/Cleo/Milo cards open the right pages; no travel-rights wording on /esa-passport; "Flying soon?" goes to /assessment?pet=esa; HANDLER Alex Morgan / OWNER Jamie Cruz / OWNER Sam Rivera on samples; no "Plan my pet's trip" left.
