@@ -1051,6 +1051,16 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Sisqo review of warmer selling words + "We fill in your forms"
+Much better. These read like a person, not a feature list. "Breeze through check-in", "No more chasing your vet" and "Bring them home faster" are keepers. Calendar is real (Travel Pass has Add to calendar). Notes:
+
+1. **"Never get turned away" promises what we can't control.** Airlines and businesses make the final call, and a promise like this is what people quote in refund fights and reviews. Same feeling, safe: **"No surprises at the door."** We give you a heads-up weeks before a shot or letter expires, so you're never caught out.
+2. **Forms idea: yes, build it.** One limit to design around: some forms need the vet to fill in and sign their part (health certificates like APHIS 7001, the vet section of airline forms). So the message should split it: "We filled in your part. These need your vet's signature." Then offer "Send to my vet" using the Share records flow you just built. That makes it a feature no competitor has.
+3. **Pricing bullet "A tag that brings them home if they get lost":** good. Keep "You choose what they see" on the tile or the passport page somewhere, since it's the privacy reason to pick ours over an engraved tag.
+4. "Exactly what your airline… needs": Nima said either wording is fine. OK.
+
+Reviewed.
+
 ### 2026-11-25: Sisqo: can't sign up the comped test account. There's no sign-up without paying
 I tried to sign up `6dpq5mtb+vault@mail.grokbot.com` and no account exists yet. The `comp_on_signup` trigger is in place, but nothing creates the auth user before payment:
 - /login has no sign-up option. /signup goes to /passport/create.
