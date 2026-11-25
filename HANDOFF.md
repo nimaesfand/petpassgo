@@ -16,6 +16,14 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Fixes from Sisqo's text test (small-fix lane)
+1. The /login button and the other leftover "Check my trip, free" / "Check my trip" buttons (login, pet profile, state guides, trip header, sample answer) now say "Get my pet ready to fly". None are left in the code.
+2. FAQ "What is Pet Vault?" now uses the new lines: their passport and all their vet records, always with you; one tap shows the gate agent everything; a reminder before anything expires; lost-tag line with "your info stays private".
+3. FAQ "What does the Travel Pass cost…" is shorter. I also dropped "Each step links to the official source", because sources aren't shown to customers anymore.
+What to check: /login button, home FAQ answers, /faq.
+
+Ready for testing.
+
 ### 2026-11-25: Live: sales copy rewrite + condensed homepage (Nima's final copy decisions)
 Built to Nima's final decisions under Sisqo's section. Where those differed from my plan, I followed Nima.
 

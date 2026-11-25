@@ -158,7 +158,7 @@ export default function LoginPage() {
 
           <div style={{ fontFamily: font.body, fontSize: 15, opacity: 0.65 }} className="text-center mt-5">
             <a href="/assessment" style={{ color: tokens.navy, fontWeight: 600, textDecoration: "underline" }}>
-              Check my trip, free
+              Get my pet ready to fly
             </a>
           </div>
         </div>

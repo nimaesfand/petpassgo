@@ -76,7 +76,7 @@ export default function StateGuide({ s }) {
           <p className="mt-2" style={{ fontFamily: B, fontSize: 16.5, lineHeight: 1.5, color: "rgba(255,255,255,.85)" }}>
             Check your trip before you book. See which airlines take your dog from {s.airports.slice(0, 3).join(", ")} and more, what it costs, and exactly what you need. Service dog? We fill in the DOT form for you.
           </p>
-          <a href={cta} className="mt-4 inline-flex items-center justify-center rounded-full px-8 min-h-[54px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Check my trip · free</a>
+          <a href={cta} className="mt-4 inline-flex items-center justify-center rounded-full px-8 min-h-[54px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Get my pet ready to fly</a>
         </section>
       </main>
     </div>

@@ -59,7 +59,7 @@ export default function TripHero() {
           <p className="mt-3" style={{ fontFamily: B, fontSize: 15.5, color: tokens.ink }}>
             Going across the border? <a href="/mexico" style={{ color: tokens.primary, fontWeight: 800 }}>Mexico with your dog</a> · <a href="/canada" style={{ color: tokens.primary, fontWeight: 800 }}>Canada with your dog</a>
           </p>
-          <a href="/assessment" className="sm:hidden mt-4 flex items-center justify-center rounded-full min-h-[54px] w-full" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Check my trip · free</a>
+          <a href="/assessment" className="sm:hidden mt-4 flex items-center justify-center rounded-full min-h-[54px] w-full" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Get my pet ready to fly</a>
         </div>
 
         <div className="order-2 relative min-h-[170px] sm:min-h-[320px] lg:h-full lg:min-h-[520px] lg:col-start-2 lg:row-start-1 lg:row-span-2 rounded-3xl overflow-hidden" style={{ boxShadow: "0 18px 40px rgba(20,33,61,0.12)" }}>
@@ -97,7 +97,7 @@ export default function TripHero() {
           </fieldset>
           <div>
             <a href={href} data-testid="hero-plan" className="btn-primary inline-flex items-center justify-center rounded-full px-8 py-3.5 min-h-[52px] w-full max-sm:w-[calc(100%-4.75rem)] sm:w-auto" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>
-              Check my trip
+              Get my pet ready to fly
             </a>
             <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mt-2 max-sm:w-[calc(100%-4.75rem)] sm:pl-4 text-center sm:text-left">Free · takes a minute</div>
           </div>

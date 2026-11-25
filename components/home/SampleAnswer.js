@@ -43,7 +43,7 @@ export default function SampleAnswer() {
         <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.5, color: tokens.muted }} className="mt-3">
           The Travel Pass then gives you every step in order, with deadlines, reminders and a link to the official page for each one.
         </p>
-        <a href="/assessment" className="inline-flex items-center justify-center rounded-full px-8 py-3.5 min-h-[52px] mt-5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>Check my trip</a>
+        <a href="/assessment" className="inline-flex items-center justify-center rounded-full px-8 py-3.5 min-h-[52px] mt-5" style={{ background: tokens.primary, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>Get my pet ready to fly</a>
         <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mt-2">Free · takes a minute</div>
       </div>
 
