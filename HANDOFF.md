@@ -16,6 +16,37 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Built (preview only): Letters in Pet Vault + handler/owner name on passports
+Nima said build letters now and add the handler name to sample and real passports. Sisqo's privacy answers (consent at upload, privacy policy bullet, no support access by default, don't log contents) are built in.
+
+**Database (Nima approved by saying "implement it now"):** new table `pet_letters`. RLS means only the owner can read, add, edit or delete their own letters, and files must sit in the owner's own storage folder. The anon role has no access. It's a separate table from `documents`, so letters can never appear in travel mode, `/check`, `/api/check-doc`, the tag, or Travel Pass lists.
+
+**Letters (Pet Vault → Documents, only for ESA and service dog pets):**
+- "Only you can see this. It's never on {pet}'s passport, tag, or anything you share at the airport."
+- Add a letter: pick a photo or PDF. Photos are read by AI (`/api/letter-scan`, nothing stored or logged) to fill in provider name, credential, state, license, dates, phone, email and office. The owner checks and edits.
+- Only the last 4 of the license number are kept.
+- A consent box must be ticked to save: "This letter may include health information. Store it only in my Vault, never on the passport, the tag, or at the airport."
+- View (2-minute signed link) and Delete (with confirm). Status chip: Valid, Expiring soon or Expired.
+- Daily cron: one email about a month before a letter expires. The email doesn't include the letter or provider details. Honors the document-reminder opt-out.
+- Privacy policy: new "Letters" bullet.
+- Not built yet: "Send to landlord" (next, with Sisqo's rules: owner types the address, confirms, the send is logged, and a warning that it can't be pulled back).
+
+**Handler / owner name:**
+- Real passport: "HANDLER" (service dog) or "OWNER" under the pet's name. Full name for the owner, prints and samples. First name + last initial anywhere shared (public pages). The old "Owner" field in the grid is gone, so the name isn't shown twice.
+- Reveal: HANDLER/OWNER label to match.
+- The passport maker now asks "Your full name" for everyone (signed in too), with a note on how it's shown.
+- Samples: Benny, handler Alex Morgan. Cleo, owner Jamie Cruz. Milo, owner Sam Rivera. All fictional.
+
+**What to test (preview):**
+1. Signed in with an ESA or service dog pet: Pet Vault → Documents shows "Letters". A plain pet doesn't.
+2. Add a photo of a sample letter (make one up, not a real person's). Fields fill in, then edit, tick consent, save. Save is disabled until consent is ticked.
+3. View opens the letter. Delete asks first, then removes it.
+4. Travel mode, `/check`, the tag and Travel Pass never show the letter.
+5. The passport shows HANDLER/OWNER under the name. On a public view it's first name + last initial.
+6. The landing page samples show the handler/owner line.
+
+Ready for testing.
+
 ### 2026-11-25: Built (preview only): new homepage hero + "Who's coming with you?" cards + ESA and Pet Passport pages
 Nima approved: one simple homepage, with the three cards in place of a block that wasn't needed.
 
