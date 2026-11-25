@@ -519,6 +519,24 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25 (1:28 AM PT): Homepage picker, names, no registry links, printed-passport idea: review
+
+Looked at the three docs-only commits since 48a62b3 (d70923f, 02accf4, 938f3ae). Rendered the new HomePicker mockup (390×560). Nothing on the live site changed, and there is no new production build to curl.
+
+**Nima's new decisions, which stand.** No links to registry or letter websites, on our site or theirs. Drop the kit-link idea. `?src=` is only for PetPassGo's own ads. People reach the Service Dog and ESA pages from the homepage picker, not from a small strip.
+
+**Homepage picker.** Clear and easy to scan: "Who's coming with you?", three role cards with distinct colours, and "Benny, Cleo and Milo are our AI characters." The ESA card copy ("Their passport and your housing letter") is housing-first and does not imply travel rights. "Flying soon? Check your trip for free." is fine as a secondary line on the ESA page itself, once that page exists.
+
+Top pushback: until the ESA page is built, do not send the ESA card to the free trip check. That turns an ESA choice into a flight flow and is the one place this could be read as travel rights. Leave the ESA card off, or have it go to a short "housing letters — coming soon" note, until letters and the ESA page are live. Also, this picker sits under a homepage that already has a large passport and two buttons ("Plan a trip", "Start Pet Vault"). That's a lot. I'd let the picker replace those two hero buttons, not stack under them.
+
+**Names.** I'd keep Benny, Cleo and Milo. They're short, easy to say, easy to tell apart (different first letters, different animals, different roles), and they sound like real pets. No clash that would make me swap one. Two notes for Nima: Milo is also his own dachshund — in public copy, treat the character as an AI pet, not as his dog, and don't use family photos for the character. (Milo is also a well-known chocolate drink outside the U.S., and the cat in *Milo and Otis*; neither is a reason to change it.) Cleo and Milo still need real sample photos, like Benny, before this ships.
+
+**Letters privacy.** My earlier answers still stand (consent at upload, a privacy-policy bullet, deletion, no staff browsing, owner-confirmed "send to landlord"). No change.
+
+**Service Dog page.** Already reviewed in my 1:16 AM PT entry. Preview was 403 from here; source review and the open issues (button still goes to the free maker; `for=service` doesn't skip those questions; soften the airline line) are unchanged. A browser test is still needed by someone who can open the preview.
+
+**Printed passport.** Agree this is research only, not for this build. I'll have a separate research task queued for later — not tonight. Starting guardrails: the cover must be clearly PetPassGo, not a government passport (no eagles, seals, or "United States"); never official/certified/registered/approved; the service dog signature page must use the exact online handler-statement wording; the ESA page stays cute and non-legal, with no travel-rights wording; Nima sets the price.
+
 ### 2026-11-25 (1:16 AM PT): Mockup updates, landing pages, letters plan, and Service Dog preview: review
 
 Looked at everything on main since my last review (d77822d): nine commits, ending at 5b598e3 (Nov 25, 1:10 AM PT). Rendered the current mockups in `design/mockups/` at their designed sizes (phone 390px, desktop passport 1040×700). Also read the new plans and the Service Dog page source on branch `pets-alive` (55294b2, 87ad1b4).
