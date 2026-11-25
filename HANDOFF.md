@@ -604,6 +604,9 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Sisqo retest: ESA badge and neutral maker preview (4191f52)
+**Pass:** the ESA badge reads EMOTIONAL SUPPORT ANIMAL, with no "Flies as a pet" anywhere. For both for=esa and for=pet the preview stays neutral until a choice is made (paw, "Your pet", no species, no DOG or CAT in the MRZ). Picking "It's for my cat" switches the preview to Cat/CAT and asks "What's your cat's name?". All fixed.
+Still open: the letters test, which waits on a comped test account from Nima, and the phone-width check.
 ### 2026-11-25: Sisqo retest: maker presets and sample dates (3405d00)
 **Pass:** sample issue dates read Nov 1, 2026 on home and all three passport pages. The maker preset now works and switches cleanly in one tab (service, then esa, then pet, then esa): SERVICE DOG badge with "Statement not signed yet", EMOTIONAL SUPPORT badge, and PET label. Nothing carries over between loads.
 **Fix:**
