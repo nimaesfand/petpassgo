@@ -22,8 +22,8 @@ export default function EsaPassportPage({ searchParams }) {
       sub="When your landlord asks, it's ready. Your ESA's records and your housing letter, in one place."
       items={[
         { icon: <Icon name="lock" size={20} />, text: "Your housing letter, saved and private to you" },
-        { icon: BELL, text: "A reminder before your letter expires" },
-        { icon: <Icon name="tag" size={20} />, text: "Lost? Anyone who scans their tag can reach you, and your info stays private." },
+        { icon: BELL, text: "A reminder before your letter expires or your lease renews" },
+        { icon: <Icon name="tag" size={20} />, text: "Lost? Anyone who scans their tag can reach you. You choose what they see." },
       ]}
       button="Get your ESA Passport"
       after={<>Flying soon? <a href="/assessment?pet=esa" style={{ color: "#fff", fontWeight: 800 }}>Check your trip for free.</a></>}

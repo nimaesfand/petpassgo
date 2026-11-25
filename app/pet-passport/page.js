@@ -20,8 +20,8 @@ export default function PetPassportPage({ searchParams }) {
       sub="Their records, their airline's rules and every reminder, in one place."
       items={[
         { icon: <Icon name="plane" size={20} />, text: "What your airline requires, before you book" },
-        { icon: <Icon name="stethoscope" size={20} />, text: "All their vet records, always with you" },
-        { icon: <Icon name="tag" size={20} />, text: "Lost? Anyone who scans their tag can reach you, and your info stays private." },
+        { icon: <Icon name="send" size={20} />, text: "Groomer, daycare or boarding needs proof? We send it for you." },
+        { icon: <Icon name="tag" size={20} />, text: "Lost? Anyone who scans their tag can reach you. You choose what they see." },
       ]}
       button="Get your Pet Passport"
     />

@@ -3,9 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
-import { JOIN_CTA } from "../../lib/cta";
+import { LOGIN_CTA } from "../../lib/cta";
+import { supabase } from "../../lib/supabaseClient";
+import { usePetAccess } from "../../lib/access";
+import { PRICES } from "../../lib/pricing";
 
-// Free for everyone, no account. Everything stays in the browser: nothing is uploaded or saved.
+// Part of Pet Vault (Nima, Nov 25: nothing is free except the trip check).
+// Everything stays in the browser: nothing is uploaded or saved.
 // Letter size at 120 dpi.
 const W = 1020, H = 1320;
 
@@ -19,7 +23,35 @@ function wrap(ctx, text, x, y, maxW, lh, maxLines) {
   return y + lh;
 }
 
+function VaultOnly() {
+  return (
+    <div style={{ background: tokens.sky, minHeight: "100vh" }}>
+      <SiteHeader />
+      <main className="max-w-[640px] mx-auto px-6 py-14">
+        <div className="rounded-3xl p-6 sm:p-8" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,.08)" }}>
+          <h1 style={{ fontFamily: font.display, fontSize: 34, fontWeight: 800, color: tokens.navy, lineHeight: 1.1 }} className="mb-3">Lost pet flyers come with Pet Vault</h1>
+          <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.ink, lineHeight: 1.5 }} className="mb-2">Make a printable flyer in a minute, with your pet&apos;s photo and a QR code that lets anyone who finds them message you. Your number stays private.</p>
+          <p style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.muted }} className="mb-6">Make your pet&apos;s passport first. Keep it with Pet Vault for {PRICES.member}/month.</p>
+          <div className="flex flex-wrap gap-3">
+            <a href="/passport/create" className="ppg-btn ppg-btn-primary">Make your pet&apos;s passport</a>
+            <a href="/login" className="ppg-btn ppg-btn-secondary">{LOGIN_CTA}</a>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
 export default function LostFlyer() {
+  const [userId, setUserId] = useState(undefined);
+  useEffect(() => { supabase.auth.getUser().then(({ data }) => setUserId(data?.user?.id || null)); }, []);
+  const access = usePetAccess(userId || undefined);
+  if (userId === undefined || (userId && access.loading)) return <div style={{ background: tokens.sky, minHeight: "100vh" }}><SiteHeader /></div>;
+  if (!access.allowed) return <VaultOnly />;
+  return <FlyerMaker />;
+}
+
+function FlyerMaker() {
   const [f, setF] = useState({ name: "", desc: "", area: "", date: "", contact: "", page: "" });
   const [photo, setPhoto] = useState(null);
   const [qr, setQr] = useState("");
@@ -91,7 +123,7 @@ export default function LostFlyer() {
       <main className="max-w-[1100px] mx-auto px-6 py-12 grid lg:grid-cols-[1fr_420px] gap-10 items-start">
         <div>
           <h1 style={{ fontFamily: font.display, fontSize: 40, fontWeight: 700, color: tokens.navy, lineHeight: 1.1 }} className="mb-2">Make a lost pet flyer</h1>
-          <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.ink }} className="mb-6">Free, no account. Nothing you enter leaves your device.</p>
+          <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.ink }} className="mb-6">Nothing you enter leaves your device.</p>
           <div className="grid gap-3">
             <label className="inline-flex items-center min-h-[44px] rounded-full px-4 cursor-pointer" style={{ fontFamily: font.body, fontWeight: 700, color: "#fff", background: tokens.navy }}>Choose a photo<input type="file" accept="image/*" className="ppg-hp" onChange={(e) => { const x = e.target.files?.[0]; if (x) setPhoto(URL.createObjectURL(x)); }} /></label>
             <input placeholder="Pet's name" value={f.name} onChange={set("name")} maxLength={30} className="rounded-lg px-3 py-2.5" style={input} aria-label="Pet's name" />
@@ -108,11 +140,6 @@ export default function LostFlyer() {
             <button onClick={download} className="ppg-btn ppg-btn-secondary">Download</button>
           </div>
           {msg && <p role="status" className="mt-3" style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>{msg}</p>}
-          <div className="rounded-2xl p-5 mt-8" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-            <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy }} className="mb-1">Want finders to reach you without sharing your number?</div>
-            <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-3">Finder messages come to you, and you get a note when someone opens the poster. The Lost &amp; Found board shows a pet in one state and city only after you tap Report lost.</p>
-            <a href="/passport/create" className="ppg-btn ppg-btn-primary">Make your pet&apos;s passport</a>
-          </div>
         </div>
         <div className="min-w-0 max-w-full">
           <canvas ref={canvas} width={W} height={H} className="block w-full max-w-full min-w-0 rounded-xl" style={{ width: "100%", maxWidth: "100%", height: "auto", boxShadow: "0 10px 30px rgba(20,33,61,.15)", background: "#fff" }} aria-label="Flyer preview" role="img" />

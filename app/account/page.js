@@ -35,6 +35,11 @@ import PetBasicsCard from "../../components/PetBasicsCard";
 import PetCareCard from "../../components/PetCareCard";
 import PetDocumentsCard from "../../components/PetDocumentsCard";
 import PetLettersCard from "../../components/PetLettersCard";
+import ShareRecordsSheet, { RecentShares } from "../../components/ShareRecordsSheet";
+import ComingUpCard from "../../components/ComingUpCard";
+import PetNotices from "../../components/PetNotices";
+import VetConnectCard from "../../components/VetConnectCard";
+import FinderPrivacy from "../../components/FinderPrivacy";
 import { SECTION_THEME } from "../../lib/petSections";
 import PetProfileExperience from "../../components/PetProfileExperience";
 import { KEEP_TOKEN_KEY } from "../../lib/passportDraft";
@@ -349,6 +354,8 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
   const previous = measurements[1];
   const delta = current && previous ? current.value - previous.value : null;
   const [showId, setShowId] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareKey, setShareKey] = useState(0);
   const [healthRows, setHealthRows] = useState([]);
   const [healthKey, setHealthKey] = useState(0);
   useEffect(() => { supabase.from("pet_health_records").select("kind,name,expires_on").eq("pet_id", pet.id).then(({ data }) => setHealthRows(data || [])); }, [pet.id, healthKey]);
@@ -380,7 +387,10 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
 
   return (
     <div id={`pet-top-${pet.id}`} className="mb-8 grid grid-cols-1 gap-4 min-w-0">
-      <PetHero pet={pet} photo={photoEl} photoBusy={uploadingPhoto} onPhoto={handlePhotoUpload} onGo={(k, field) => { setSection(k); setTimeout(() => { if (field) window.dispatchEvent(new CustomEvent("ppg-focus-field", { detail: { petId: pet.id, field } })); else document.getElementById(`pet-nav-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60); }} />
+      <ShareRecordsSheet pet={pet} open={shareOpen} onClose={() => setShareOpen(false)} onSent={() => setShareKey((k) => k + 1)} />
+      <PetHero pet={pet} photo={photoEl} photoBusy={uploadingPhoto} onPhoto={handlePhotoUpload} onShare={() => setShareOpen(true)} onGo={(k, field) => { setSection(k); setTimeout(() => { if (field) window.dispatchEvent(new CustomEvent("ppg-focus-field", { detail: { petId: pet.id, field } })); else document.getElementById(`pet-nav-${pet.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60); }} />
+
+      <PetNotices pet={pet} onAdded={() => { setHealthKey((n) => n + 1); onPhotoUpdated(); }} />
 
       <div id={`pet-nav-${pet.id}`} className="ppg-pet-nav grid grid-cols-5 gap-1.5 sm:gap-2" style={{ scrollMarginTop: 8 }} role="tablist" aria-label={`${pet.name} sections`}>
         {sections.map(([key, label, icon]) => {
@@ -414,6 +424,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
             {sectionTitle("Vaccines & records", rab?.text || null)}
             <HealthPassport pet={pet} userId={userId} bare refreshKey={healthKey} onRows={setHealthRows} />
           </div>
+          <VetConnectCard pet={pet} />
           <Fold icon="camera" color={th("health").color} soft={th("health").soft} title="Scan a vet record" hint="Snap a photo, we fill it in">
             <VetImport pet={pet} userId={userId} onSaved={() => { setHealthKey((n) => n + 1); onPhotoUpdated(); }} />
           </Fold>
@@ -451,6 +462,17 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
 
         {section === "docs" && (<>
           <PetDocumentsCard pet={pet} userId={userId} />
+          <section className="rounded-3xl p-4 sm:p-6 min-w-0" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 style={{ fontFamily: font.display, fontSize: 21, fontWeight: 800, color: tokens.navy }}>Share records</h3>
+                <p className="mt-1" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink, lineHeight: 1.45 }}>Groomer, daycare or boarding needs proof of vaccines? We email the actual files for you.</p>
+              </div>
+              <button type="button" onClick={() => setShareOpen(true)} className="ppg-btn ppg-btn-primary ppg-btn-compact flex-shrink-0">Send</button>
+            </div>
+            <RecentShares pet={pet} refreshKey={shareKey} />
+          </section>
+          <ComingUpCard pet={pet} onSaved={onPhotoUpdated} />
           {pet.role === "Emotional support animal" || pet.role === "Service animal" ? <PetLettersCard pet={pet} userId={userId} /> : null}
           <Fold icon="home" color={th("docs").color} soft={th("docs").soft} title="Housing paperwork" hint="Pet resume, landlord forms, references">
             <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="docs" />
@@ -459,6 +481,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
 
         {section === "lost" && (
           <div id={`lost-${pet.id}`} className="rounded-3xl p-4 sm:p-5" style={panel}>
+            <FinderPrivacy pet={pet} userId={userId} onChanged={onPhotoUpdated} />
             <LostPanel pet={pet} userId={userId} onChanged={onPhotoUpdated} />
             <a href="/lost-flyer" className="inline-block mt-4" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 800, color: th("lost").color }}>Make a printable lost pet flyer →</a>
           </div>

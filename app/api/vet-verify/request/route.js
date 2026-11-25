@@ -4,6 +4,7 @@ import { allowRequest, clientIp } from "../../../../lib/rateLimit";
 import { sendResendEmail } from "../../../../lib/serverEmail";
 import { hashToken, newToken } from "../../../../lib/ppgSign";
 import { vetRequestEmail } from "../../../../lib/vetVerifyEmail";
+import { petPhotoAttachment } from "../../../../lib/emailHtml";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -23,7 +24,7 @@ export async function POST(req) {
   if (user.email && vetEmail === String(user.email).toLowerCase()) return NextResponse.json({ error: "This goes to your vet clinic, not to you." }, { status: 400 });
   const ok = await allowRequest(sb, `vet_verify:${user.id}:${clientIp(req)}`, 5, 3600);
   if (!ok) return NextResponse.json({ error: "Too many requests. Try again in an hour." }, { status: 429 });
-  const { data: pet } = await sb.from("pets").select("id,name,animal_type,breed,handler_name").eq("id", petId).eq("user_id", user.id).maybeSingle();
+  const { data: pet } = await sb.from("pets").select("id,name,animal_type,breed,role,passport_no,photo_url,handler_name").eq("id", petId).eq("user_id", user.id).maybeSingle();
   if (!pet) return NextResponse.json({ error: "Pet not found." }, { status: 404 });
   const { count } = await sb.from("pet_health_records").select("id", { count: "exact", head: true }).eq("pet_id", petId).in("kind", ["vaccine", "medication"]);
   if (!count) return NextResponse.json({ error: "Add at least one vaccine first, then ask your vet to confirm it." }, { status: 400 });
@@ -31,8 +32,10 @@ export async function POST(req) {
   const token = newToken();
   const { error } = await sb.from("vet_verifications").insert({ token_hash: hashToken(token), pet_id: petId, user_id: user.id, vet_email: vetEmail, expires_at: new Date(Date.now() + 14 * 864e5).toISOString() });
   if (error) return NextResponse.json({ error: "Couldn't create the request. Try again." }, { status: 500 });
-  const mail = vetRequestEmail({ owner: pet.handler_name, pet, token });
-  const sent = await sendResendEmail({ to: vetEmail, replyTo: user.email || undefined, kind: "vet_verify_request", subject: mail.subject, text: mail.text });
+  const { data: recs } = await sb.from("pet_health_records").select("name,date_given,expires_on").eq("pet_id", petId).eq("kind", "vaccine").order("expires_on", { ascending: true, nullsFirst: false }).limit(8);
+  const photo = await petPhotoAttachment(sb, pet);
+  const mail = vetRequestEmail({ owner: pet.handler_name, pet, token, records: recs || [], photoCid: photo ? "petphoto" : null });
+  const sent = await sendResendEmail({ to: vetEmail, replyTo: user.email || undefined, fromName: pet.handler_name ? `${String(pet.handler_name).split(" ")[0]} via PetPassGo` : undefined, kind: "vet_verify_request", subject: mail.subject, text: mail.text, html: mail.html, attachments: photo ? [photo] : undefined });
   if (!sent.ok) return NextResponse.json({ error: "We couldn't send the email. Check the address and try again." }, { status: 502 });
   return NextResponse.json({ sent: true });
 }

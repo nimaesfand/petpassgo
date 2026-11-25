@@ -5,6 +5,7 @@ import { sendResendEmail, emailPetOwner } from "../../../../lib/serverEmail";
 import { vetRequestEmail } from "../../../../lib/vetVerifyEmail";
 import { hashToken, newToken } from "../../../../lib/ppgSign";
 import { SITE_URL } from "../../../../lib/site";
+import { brandedEmail, petPhotoAttachment } from "../../../../lib/emailHtml";
 
 export const dynamic = "force-dynamic";
 
@@ -83,14 +84,15 @@ export async function GET(req) {
   for (const v of open || []) {
     const expired = v.expires_at < nowIso;
     if (!expired && !v.reminded_at && Date.now() - new Date(v.created_at).getTime() > 3 * 864e5) {
-      const { data: pet } = await sb.from("pets").select("name,animal_type,breed,handler_name").eq("id", v.pet_id).maybeSingle();
+      const { data: pet } = await sb.from("pets").select("name,animal_type,breed,role,passport_no,photo_url,handler_name").eq("id", v.pet_id).maybeSingle();
       if (!pet) continue;
       const token = newToken();
       const { error: upErr } = await sb.from("vet_verifications").update({ token_hash: hashToken(token), reminded_at: nowIso }).eq("id", v.id).is("reminded_at", null);
       if (upErr) continue;
       const { data: u } = await sb.auth.admin.getUserById(v.user_id);
-      const mail = vetRequestEmail({ owner: pet.handler_name, pet, token, reminder: true });
-      const r = await sendResendEmail({ to: v.vet_email, replyTo: u?.user?.email || undefined, kind: "vet_verify_reminder", subject: mail.subject, text: mail.text });
+      const photo = await petPhotoAttachment(sb, pet);
+      const mail = vetRequestEmail({ owner: pet.handler_name, pet, token, reminder: true, photoCid: photo ? "petphoto" : null });
+      const r = await sendResendEmail({ to: v.vet_email, replyTo: u?.user?.email || undefined, kind: "vet_verify_reminder", subject: mail.subject, text: mail.text, html: mail.html, attachments: photo ? [photo] : undefined });
       if (r.ok) vetReminded++;
     } else if (expired && !v.owner_notified_at) {
       await sb.from("vet_verifications").update({ owner_notified_at: nowIso }).eq("id", v.id);
@@ -99,8 +101,9 @@ export async function GET(req) {
     }
   }
   const letters = await letterReminders(sb, today, targets["30d"], optedOut);
+  const life = await lifeReminders(sb, today, addDays);
   const renewals = await membershipNotices(sb, today);
-  return NextResponse.json({ sent, docSent, vetReminded, vetExpired, letters, renewals });
+  return NextResponse.json({ sent, docSent, vetReminded, vetExpired, letters, life, renewals });
 }
 
 // Pet Vault renewal reminders: 3 days before the first renewal, then once a year.
@@ -160,6 +163,7 @@ async function letterReminders(sb, today, in30, optedOut) {
   let n = 0;
   for (const l of rows || []) {
     if (optedOut?.has(l.user_id)) continue;
+    { const { data: mk } = await sb.from("user_marketing").select("document_reminders").eq("user_id", l.user_id).maybeSingle(); if (mk?.document_reminders === false) continue; }
     const { data: claimed } = await sb.from("pet_letters").update({ reminder_sent_at: new Date().toISOString() }).eq("id", l.id).is("reminder_sent_at", null).select("id");
     if (!claimed?.length) continue;
     const { data: u } = await sb.auth.admin.getUserById(l.user_id);
@@ -177,4 +181,92 @@ async function letterReminders(sb, today, in30, optedOut) {
     else await sb.from("pet_letters").update({ reminder_sent_at: null }).eq("id", l.id);
   }
   return n;
+}
+
+// Reminders around real life: vaccines typed into the Vault (30 days before they
+// expire), the next grooming/daycare/boarding visit (4 days before, so records
+// arrive before the place's cutoff), and an ESA lease renewal (30 days before).
+// Each is sent once. Honors the document-reminder opt-out.
+async function lifeReminders(sb, today, addDays) {
+  const out = { vaccines: 0, visits: 0, leases: 0 };
+  const optOut = new Map();
+  const optedOutUser = async (uid) => {
+    if (!optOut.has(uid)) {
+      const { data } = await sb.from("user_marketing").select("document_reminders").eq("user_id", uid).maybeSingle();
+      optOut.set(uid, data?.document_reminders === false);
+    }
+    return optOut.get(uid);
+  };
+  const ownerEmail = async (uid) => (await sb.auth.admin.getUserById(uid))?.data?.user?.email || null;
+  const petsById = new Map();
+  const petOf = async (id) => {
+    if (!petsById.has(id)) {
+      const { data } = await sb.from("pets").select("id,name,breed,animal_type,role,passport_no").eq("id", id).maybeSingle();
+      petsById.set(id, data);
+    }
+    return petsById.get(id);
+  };
+  const VISIT = { grooming: "grooming", daycare: "daycare", boarding: "boarding stay", training: "training", vet: "vet visit" };
+
+  // 1) Vaccines and medications typed into the Vault
+  const in30 = addDays(today, 30);
+  const { data: recs } = await sb.from("pet_health_records").select("id,user_id,pet_id,kind,name,expires_on").in("kind", ["vaccine", "medication"]).is("reminder_sent_at", null).gte("expires_on", today).lte("expires_on", in30);
+  for (const r of recs || []) {
+    if (await optedOutUser(r.user_id)) continue;
+    const { data: claimed } = await sb.from("pet_health_records").update({ reminder_sent_at: new Date().toISOString() }).eq("id", r.id).is("reminder_sent_at", null).select("id");
+    if (!claimed?.length) continue;
+    const to = await ownerEmail(r.user_id);
+    const pet = await petOf(r.pet_id);
+    if (!to || !pet) continue;
+    const res = await sendResendEmail({
+      to, kind: "vaccine_reminder",
+      subject: `${pet.name}'s ${r.name} is due ${fmt(r.expires_on)}`,
+      text: `${pet.name}'s ${r.name} is due on ${fmt(r.expires_on)}.\n\nBook it with your vet now so groomers, daycare, boarding and airlines see it's current. When you have the new date, update it in Pet Vault: ${SITE_URL}/account`,
+      html: brandedEmail({ eyebrow: "COMING UP", title: `${pet.name}'s ${r.name} is due ${fmt(r.expires_on)}`, intro: ["Book it with your vet now, so groomers, daycare, boarding and airlines all see it's current.", "When you have the new date, update it in Pet Vault and you're set."], pet, button: { label: "Open Pet Vault", href: `${SITE_URL}/account` } }),
+    });
+    if (res.ok) out.vaccines++;
+    else await sb.from("pet_health_records").update({ reminder_sent_at: null }).eq("id", r.id);
+  }
+
+  // 2) Next grooming / daycare / boarding visit: 4 days before
+  const in4 = addDays(today, 4);
+  const { data: visits } = await sb.from("pets").select("id,user_id,name,breed,animal_type,role,passport_no,next_visit_kind,next_visit_date,next_visit_place").is("next_visit_reminded_at", null).gte("next_visit_date", today).lte("next_visit_date", in4);
+  for (const p of visits || []) {
+    if (await optedOutUser(p.user_id)) continue;
+    const { data: claimed } = await sb.from("pets").update({ next_visit_reminded_at: new Date().toISOString() }).eq("id", p.id).is("next_visit_reminded_at", null).select("id");
+    if (!claimed?.length) continue;
+    const to = await ownerEmail(p.user_id);
+    if (!to) continue;
+    const what = VISIT[p.next_visit_kind] || "visit";
+    const where = p.next_visit_place ? ` at ${p.next_visit_place}` : "";
+    const res = await sendResendEmail({
+      to, kind: "visit_reminder",
+      subject: `${p.name}'s ${what} is ${fmt(p.next_visit_date)}: send their records now`,
+      text: `${p.name}'s ${what}${where} is on ${fmt(p.next_visit_date)}.\n\nMany places want proof of vaccines a few days ahead. Send ${p.name}'s records in one tap: ${SITE_URL}/account`,
+      html: brandedEmail({ eyebrow: "COMING UP", title: `${p.name}'s ${what} is ${fmt(p.next_visit_date)}`, intro: [`Many places want proof of vaccines a few days ahead. Send ${p.name}'s records now${where ? ` to ${p.next_visit_place}` : ""}, and you're all set.`], pet: p, button: { label: "Share records", href: `${SITE_URL}/account` } }),
+    });
+    if (res.ok) out.visits++;
+    else await sb.from("pets").update({ next_visit_reminded_at: null }).eq("id", p.id);
+  }
+
+  // 3) ESA lease renewal: 30 days before
+  const { data: leases } = await sb.from("pets").select("id,user_id,name,breed,animal_type,role,passport_no,lease_renewal_date").is("lease_reminded_at", null).gte("lease_renewal_date", today).lte("lease_renewal_date", in30);
+  for (const p of leases || []) {
+    if (await optedOutUser(p.user_id)) continue;
+    const { data: claimed } = await sb.from("pets").update({ lease_reminded_at: new Date().toISOString() }).eq("id", p.id).is("lease_reminded_at", null).select("id");
+    if (!claimed?.length) continue;
+    const to = await ownerEmail(p.user_id);
+    if (!to) continue;
+    const { data: letter } = await sb.from("pet_letters").select("expires_on,provider_name").eq("pet_id", p.id).order("expires_on", { ascending: false, nullsFirst: false }).limit(1).maybeSingle();
+    const letterLine = letter?.expires_on ? ` Your housing letter is valid until ${fmt(letter.expires_on)}.` : "";
+    const res = await sendResendEmail({
+      to, kind: "lease_reminder",
+      subject: `Your lease renews ${fmt(p.lease_renewal_date)}: is ${p.name}'s letter ready?`,
+      text: `Your lease renews on ${fmt(p.lease_renewal_date)}.${letterLine}\n\nIf your landlord asks, your letter and your provider's contact details are in Pet Vault: ${SITE_URL}/account`,
+      html: brandedEmail({ eyebrow: "COMING UP", title: `Your lease renews ${fmt(p.lease_renewal_date)}`, intro: [`If your landlord asks about ${p.name}, you're ready.${letterLine}`, letter?.provider_name ? `Need a new letter? ${letter.provider_name}'s contact details are saved with it.` : "Your letter and your provider's contact details are in Pet Vault."], pet: p, button: { label: "Open Pet Vault", href: `${SITE_URL}/account` } }),
+    });
+    if (res.ok) out.leases++;
+    else await sb.from("pets").update({ lease_reminded_at: null }).eq("id", p.id);
+  }
+  return out;
 }

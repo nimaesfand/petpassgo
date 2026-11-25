@@ -18,7 +18,7 @@ function entry(urlPath, now, changeFrequency, priority) {
 // Only routes that have a page.
 export default function sitemap() {
   const now = new Date();
-  const staticPaths = ["", "/assessment", "/airlines", "/blog", "/faq", "/contact", "/pet-vault", "/travel-pass", "/lost-flyer", "/mexico", "/canada", "/service-dog", "/service-dog-passport", "/esa-passport", "/pet-passport", "/passport/create", "/guides", "/terms", "/privacy"];
+  const staticPaths = ["", "/assessment", "/airlines", "/blog", "/faq", "/contact", "/pet-vault", "/travel-pass", "/mexico", "/canada", "/service-dog", "/service-dog-passport", "/esa-passport", "/pet-passport", "/passport/create", "/guides", "/terms", "/privacy"];
   const pages = staticPaths
     .filter((p) => pageExists(p.split("/").filter(Boolean)))
     .map((p) => entry(p, now, p === "/terms" || p === "/privacy" || p === "/guarantee" ? "yearly" : p === "/lost-flyer" ? "monthly" : "weekly", p === "" ? 1 : p === "/terms" || p === "/privacy" || p === "/guarantee" ? 0.3 : p === "/lost-flyer" ? 0.6 : 0.7));

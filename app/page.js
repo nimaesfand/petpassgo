@@ -27,14 +27,15 @@ const STEPS = [
 const PRICE_CARDS = [
   { title: "Free checklist", sub: "For simple flights", price: "$0", unit: "with a free account", checks: ["Every step for your flight, in order", "Your airline's pet fee and carrier size", "Saved for travel day"], cta: "Get my pet ready to fly", href: "/assessment", bordered: true },
   { title: "Travel Pass", sub: "For flights that need paperwork", price: P.memberPass, unit: "per trip, with Pet Vault", checks: ["Mexico, Canada, Hawaii, service dogs and cargo", "Your dates, reminders and forms filled in", "Flight-Ready Guarantee"], cta: "Get my pet ready to fly", href: "/assessment", dark: true },
-  { title: "Pet Vault", sub: "Their passport and every record", price: P.member, unit: "a month", checks: ["All their vet records, always with you", "A collar tag anyone can scan if they're lost", "Cancel anytime"], cta: "Make your pet's passport", href: "/passport/create", accent: true, tag: "Best for records and frequent travel" },
+  { title: "Pet Vault", sub: "Their passport and every record", price: P.member, unit: "a month", checks: ["Records sent for you when someone needs proof", "A tag anyone can scan if they're lost", "Cancel anytime"], cta: "Make your pet's passport", href: "/passport/create", accent: true, tag: "Best for records and frequent travel" },
 ];
 
 const ICON = (d) => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{d}</svg>;
 const VAULT_TILES = [
-  { text: "All their vet records, always with you", icon: ICON(<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6M9 15l2 2 4-4" /></>) },
-  { text: "Lost? Anyone who scans their tag can reach you, and your info stays private.", icon: ICON(<><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" /></>) },
-  { text: "A reminder before anything expires", icon: ICON(<><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></>) },
+  { text: "At the airport? One tap shows everything you've saved for them.", icon: ICON(<><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" /></>) },
+  { text: "Groomer, daycare or boarding needs proof? We send it for you.", icon: ICON(<><path d="m22 2-7 20-4-9-9-4z" /><path d="M22 2 11 13" /></>) },
+  { text: "Lost? Anyone who scans their tag can reach you. You choose what they see.", icon: ICON(<><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" /></>) },
+  { text: "About to expire? We remind you first.", icon: ICON(<><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></>) },
 ];
 
 const HOME_FAQ = [FAQ[1], FAQ[3], FAQ[2], FAQ[4]];
@@ -56,7 +57,6 @@ const FOOTER_LINKS = [
   { href: "/faq", label: "FAQ" },
   { href: "/contact", label: "Contact" },
   { href: "/service-dog", label: "Flying with a service dog" },
-  { href: "/lost-flyer", label: "Free lost pet flyer" },
   { href: "/guarantee", label: "Flight-Ready Guarantee" },
   { href: "/business", label: "For Businesses — Advertise with PetPassGo" },
   { href: "/terms", label: "Terms" },
@@ -152,7 +152,7 @@ export default async function PetPassGoLanding() {
             <SamplePassportCard kind="service" />
           </div>
         </div>
-        <ul className={`${WRAP} grid md:grid-cols-3 gap-3 md:gap-4 mt-12 lg:mt-16`} style={{ listStyle: "none" }}>
+        <ul className={`${WRAP} grid sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mt-12 lg:mt-16`} style={{ listStyle: "none" }}>
           {VAULT_TILES.map((t) => (
             <li key={t.text} className="flex items-center gap-4 rounded-3xl p-5" style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.12)" }}>
               <span className="flex-shrink-0 flex items-center justify-center rounded-2xl" style={{ width: 48, height: 48, background: "rgba(242,184,75,.14)", color: tokens.gold }}>{t.icon}</span>

@@ -30,7 +30,7 @@ function Ring({ pct }) {
 
 // Big, warm header for each pet: photo, quick facts, how complete the profile is,
 // and the single most useful next step.
-export default function PetHero({ pet, photo, onGo, onPhoto, photoBusy }) {
+export default function PetHero({ pet, photo, onGo, onPhoto, photoBusy, onShare }) {
   const [booth, setBooth] = useState(false);
   const prog = profileProgress(pet);
   const missingPassport = passportMissing(pet);
@@ -87,6 +87,15 @@ export default function PetHero({ pet, photo, onGo, onPhoto, photoBusy }) {
         </div>
         <Ring pct={prog.pct} />
       </div>
+      {onShare ? (
+        <div className="relative mt-4 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-2 sm:items-center">
+          <button type="button" onClick={onShare} className="ppg-lift inline-flex items-center justify-center gap-2 rounded-full px-5 min-h-[48px]"
+            style={{ background: tokens.gold, color: tokens.navy, border: "none", cursor: "pointer", fontFamily: font.body, fontWeight: 800, fontSize: 15.5 }}>
+            <Icon name="send" size={18} />Share records
+          </button>
+          <span style={{ fontFamily: font.body, fontSize: 13.5, color: "#D5DEEB", lineHeight: 1.35 }}>Groomer, daycare, boarding or a new vet. We email them for you.</span>
+        </div>
+      ) : null}
       {next ? (
         <button type="button" onClick={() => onGo?.(next.section, next.field)} className="relative mt-4 w-full flex items-center justify-between gap-3 rounded-2xl px-3.5 py-2.5 text-left ppg-lift"
           style={{ background: "#fff", color: tokens.navy, border: "none", cursor: "pointer" }}>
