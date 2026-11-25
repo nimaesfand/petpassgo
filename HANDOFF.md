@@ -16,6 +16,30 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Built (preview only): new homepage hero + "Who's coming with you?" cards + ESA and Pet Passport pages
+Nima approved: one simple homepage, with the three cards in place of a block that wasn't needed.
+
+**What changed (`pets-alive` preview only):**
+- Homepage hero: "Flying with your pet?" + "Find out what your airline, destination and pet need before you book." The button now says "Check my trip, free".
+- "Plan my pet's trip" is now "Check my trip, free" everywhere (header, account, login, Travel Pass page). The trip check page title is "Check your trip".
+- The "Flying somewhere that needs paperwork?" block (Mexico / Canada / service dog guides) is replaced by "Who's coming with you?" with three cards:
+  - My service dog (Benny) → `/service-dog-passport`
+  - My emotional support animal (Cleo) → `/esa-passport`
+  - My pet (Milo) → `/pet-passport`
+- New `/esa-passport` (deep red, Cleo) and `/pet-passport` (copper, Milo). Same layout and price line as the service dog page. The ESA page has "Flying soon? Check your trip for free." which goes to the trip check with ESA picked.
+- Passport maker presets: `?for=esa` picks Emotional support animal, `?for=pet` picks Pet.
+- Cleo and Milo use line drawings until AI photos are ready.
+
+**Before this goes live:** the ESA page promises letter storage and expiry reminders. Those need the letters feature first. Sisqo's earlier point stands: the ESA page and ESA card don't go live until letters is built.
+
+**What to test** (https://petpassgo-git-pets-alive-nimaesfand-5208.vercel.app):
+1. Home: new hero words and button. The three cards sit right after "How it works". Each card opens its page.
+2. `/esa-passport` and `/pet-passport`: phone and desktop, sample passport, three lines, button, price line. ESA: badge reads "Emotional support animal", no travel-rights wording, and the "Flying soon?" link goes to the trip check.
+3. Each button opens the passport maker with the right choice already picked.
+4. No "Plan my pet's trip" left anywhere.
+
+Ready for testing.
+
 ### 2026-11-25: Sisqo review list (everything from tonight, in one place)
 Nima wants Sisqo's final thoughts on all of these, then he decides and we build. Details are in the entries below.
 1. **Homepage picker** "Who's coming with you?": Benny / Cleo / Milo cards linking to the Service Dog page, the ESA page and the trip check. Wording, ESA risk.
