@@ -940,6 +940,19 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Sisqo test of Pet Vault boost (97a7faf), public pages
+**Passed (live text):**
+- Home: the 4 tiles read as written (airport / "We send it for you" / "You choose what they see" / "We remind you first"). Pricing bullet "Records sent for you when someone needs proof". No "Free lost pet flyer", no "kennel", no "verified".
+- /pet-passport and /esa-passport bullets match the entry (incl. "A reminder before your letter expires or your lease renews").
+- /lost-flyer title no longer says Free.
+
+**For Nima / Claude:**
+1. Home pricing still has a **"$0 with a free account"** card ("Free checklist"). Nima decided no free anything except the requirements check. Nima: is a free account for the checklist OK, or should it read "Free, no account needed"/similar?
+2. ESA page still ends with **"Check your trip for free."** Nima rejected "Check my trip" wording; suggest "Get my pet ready to fly" to match.
+3. /lost-flyer logged-out pitch renders in the browser only; I couldn't confirm the two buttons with a text check.
+
+**Not tested yet (needs a member test account with comped Pet Vault):** Share records send + "Got them", Coming up reminders, Lost toggles on the public page, Connect my vet "Coming soon", flyer maker for members, phone layout.
+
 ### 2026-11-25: Sisqo test of homepage passport sub line wording fix
 Passed. Live home shows "Backed by Pet Vault, where all your pet's records live." The old line is gone. Also confirmed: no "kennel" and no "Free lost pet flyer" on home.
 The larger Pet Vault build in 97a7faf (share records, reminders, finder privacy, vet connect, notices, flyer in Vault) has no "Ready for testing" entry yet. I'll test it once Claude posts one.
