@@ -16,6 +16,50 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Claude's response to Sisqo's messaging review + build plan for launch (Nima decides)
+**I checked Sisqo's claims:** they hold.
+- The reminder cron doesn't read `pet_health_records`, so vaccines typed into the Vault get no reminder.
+- The share page says "not verified by PetPassGo" and prints as a web page.
+- `vet_verifications` has 1 request, and `pet_share_cards` has 0 links.
+- Thanks for the Pawprint correction (bought by Covetrus, accounts free now). The lesson changes to "the vet relationship is where the power is".
+
+**I agree with:**
+- Keep "Backed by your Pet Vault, where every record lives." The "moments" go in the tiles only.
+- "Reaches you" instead of "alerts you".
+- "One tap shows everything you've saved for them".
+- The lighter vet version: the vet just emails the records to the pet's private address, with no attestation.
+- Ask for the next grooming, daycare or boarding date (and the ESA lease date), and remind before the place's cutoff.
+- Never auto-add a date from an email: the owner taps "Looks right".
+- Keep "verified" out of customer copy until real vets are confirming. Until then: "Your vet can confirm them".
+- Transactional-only send emails (CAN-SPAM).
+- The notification center comes after launch.
+
+**I disagree with:** nothing major. "Kennel" was in my candidate line before Nima's rule. Fixed going forward.
+
+**Proposed build plan (Nima's build-before-launch list, in order):**
+1. **Share records / "We send it for you":**
+   - A Share button at the top of the pet's Vault. The owner types any email and taps "I agree".
+   - We send the actual uploaded documents as attachments, from "{Owner}, via PetPassGo", with reply-to set to the owner and a copy to the owner.
+   - Clear subject: "{Pet}'s vaccine records from {Owner}". Daily send limit. No promotion in the email.
+   - The owner sees "Sent to {name}" and can tap "Ask them to confirm they got it".
+   - The old "Care card for sitters" link stays as a second option.
+2. **Reminders that match real life:**
+   - Vaccines typed into the Vault get reminders, from `pet_health_records` in the cron.
+   - Optional "Next grooming, daycare or boarding date?". The reminder goes 4 days before, saying "send their records now", with the Share button.
+   - ESA: lease renewal date, with a reminder 30 days before.
+3. **Lost pet page:** the line "Lost? Anyone who scans their tag can reach you. You choose what they see." Owner toggles for showing name, phone and email on the scan page (all private by default except the pet's name and a message button).
+4. **Vet:**
+   - Polish the existing "Ask your vet to confirm" flow.
+   - Add "Connect my vet": the pet's private address, plus a ready-made email asking the clinic to send records there. The owner reviews anything that comes in ("Looks right").
+   - Vets stay free.
+5. **Then the copy:** home tiles, the Pet Vault card and the passport-page bullets go live once 1–4 are live, so every line is true on day one.
+
+**Open for Nima:**
+- The live home page still offers a "Free lost pet flyer". Keep it free, or not?
+- Database changes this plan needs (Nima approves migrations): fields for the next-visit date and lease date, a share-send log, the lost-page visibility toggles, and the pet inbox address.
+
+Ready for review.
+
 ### 2026-11-25: Review order for the whole site (Nima)
 We verify and polish the site in this order. Each step: Claude plans, Sisqo reviews, Nima decides, Claude builds, Sisqo tests.
 1. **Homepage and the three passport pages** (Service Dog, ESA, Pet): finish the copy from `docs/messaging-plan.md` once Sisqo has reviewed it. The regular-pet option is "My pet" on the homepage card, and its page is "Pet Passport" (`/pet-passport`).
