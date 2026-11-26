@@ -1,4 +1,5 @@
 import { Wordmark } from "./Logo";
+import RoleBadge from "./RoleBadge";
 import { tokens, font } from "../lib/theme";
 
 // A static sample passport for landing pages, matching the Nov 25 mockups.
@@ -70,20 +71,7 @@ export default function SamplePassportCard({ kind = "service" }) {
               )}
               <div style={{ position: "absolute", left: 7, top: 7, background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 900, fontSize: 9, letterSpacing: ".22em", padding: "3px 7px", borderRadius: 6 }}>SAMPLE</div>
             </div>
-            {s.badge === "service" ? (
-              <div className="ppg-badge ppg-badge-service" style={{ width: 128, boxSizing: "border-box", borderRadius: 10, padding: "7px 6px", textAlign: "center", color: "#fff" }}>
-                <div className="flex items-center justify-center" style={{ gap: 5, fontFamily: font.body, fontWeight: 900, fontSize: 10.5, letterSpacing: ".12em", lineHeight: 1.2, textShadow: "0 1px 1px rgba(0,0,0,.35)" }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-                  SERVICE DOG
-                </div>
-                <div style={{ fontFamily: font.body, fontSize: 10.5, fontWeight: 700, opacity: 0.95, marginTop: 2 }}>Handler statement signed</div>
-              </div>
-            ) : s.badge === "esa" ? (
-              <div className="ppg-badge ppg-badge-esa flex items-center justify-center" style={{ width: 128, boxSizing: "border-box", borderRadius: 10, padding: "7px 8px", gap: 6, color: "#fff" }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z" /></svg>
-                <div style={{ fontFamily: font.body, fontWeight: 900, fontSize: 9.5, letterSpacing: ".1em", lineHeight: 1.2, textAlign: "center", textShadow: "0 1px 1px rgba(0,0,0,.35)" }}>EMOTIONAL SUPPORT ANIMAL</div>
-              </div>
-            ) : null}
+            <RoleBadge kind={s.badge || "pet"} sub={s.badge === "service" ? "Handler statement signed" : s.badge === "esa" ? "Flies as a pet" : "Records in Pet Vault"} />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <Label>NAME</Label>

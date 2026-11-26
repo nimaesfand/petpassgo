@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import RoleBadge from "./RoleBadge";
 import { supabase } from "../lib/supabaseClient";
 import { Wordmark } from "./Logo";
 import Icon from "./Icon";
@@ -109,14 +110,8 @@ function trainingText(pet) {
 
 // Role badge under the photo: deep blue (service dog) or deep red (ESA), metallic sheen.
 function RoleLabel({ kind, signed }) {
-  const c = SEALS[kind];
-  const sub = kind === "esa" ? "ANIMAL" : signed ? "Handler statement signed" : "Statement not signed yet";
-  return (
-    <div className={`ppg-badge ppg-badge-${kind} w-full rounded-lg px-2 py-1.5 text-center`}>
-      <div style={{ fontFamily: font.body, fontWeight: 900, fontSize: 11, letterSpacing: "0.14em", color: "#fff", lineHeight: 1.15, textShadow: "0 1px 1px rgba(0,0,0,.35)" }}>{c.title}</div>
-      <div style={kind === "esa" ? { fontFamily: font.body, fontWeight: 900, fontSize: 11, letterSpacing: "0.14em", color: "#fff", lineHeight: 1.15, textShadow: "0 1px 1px rgba(0,0,0,.35)" } : { fontFamily: font.body, fontWeight: 700, fontSize: 9.5, color: "rgba(255,255,255,.92)", lineHeight: 1.25, marginTop: 1 }}>{sub}</div>
-    </div>
-  );
+  const sub = kind === "esa" ? "Flies as a pet" : kind === "pet" ? "Records in Pet Vault" : signed ? "Handler statement signed" : "Statement not signed yet";
+  return <RoleBadge kind={kind} sub={sub} width="100%" />;
 }
 
 // Role seals. Service dogs (including psychiatric service dogs) get blue; emotional
@@ -281,7 +276,7 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
                 </button>
               ) : null}
             </div>
-            {st === STATUS.service || st === STATUS.esa ? <RoleLabel kind={st === STATUS.service ? "service" : "esa"} signed={!!pet.service_attested_at} /> : null}
+            <RoleLabel kind={st === STATUS.service ? "service" : st === STATUS.esa ? "esa" : "pet"} signed={!!pet.service_attested_at} />
             <div className="flex items-center gap-2">
               {photo ? <div aria-hidden="true" className="ppg-pp-ghost rounded-md overflow-hidden" style={{ width: 34, height: 42, opacity: 0.22, filter: "grayscale(1) contrast(1.2)", mixBlendMode: "multiply" }}>{photo}</div> : null}
               <HoloSeal size={40} />
