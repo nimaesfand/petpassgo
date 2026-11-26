@@ -1210,6 +1210,8 @@ function CheckoutBanner() {
   useEffect(() => {
     const u = new URLSearchParams(window.location.search); const q = u.get("checkout");
     if (q === "success") {
+      // Started Pet Vault for an easy trip: go back and unlock its checklist.
+      try { if (localStorage.getItem("petpassgo_pending_trip") && localStorage.getItem("petpassgo_purchase_intent") === "free") { window.location.href = "/assessment"; return; } } catch {}
       setMsg("paid");
       const sid = u.get("session_id"); setSessionId(sid);
       // Fire Purchase (and MembershipStart for membership kinds) once, with the

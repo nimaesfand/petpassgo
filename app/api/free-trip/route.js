@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
-import { requireUser } from "../../../lib/paidUser";
+import { requireUser, vaultIsOpen } from "../../../lib/paidUser";
 import { loadTripPlan, isEasyTrip } from "../../../lib/easyTrip";
 import { allowRequest, clientIp } from "../../../lib/rateLimit";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-// Easy trips are free with an account. The server checks the saved trip
-// itself; the browser's word that a trip is easy is never trusted.
+// Easy trips: the checklist comes with Pet Vault, no Travel Pass (Nima, Nov 25).
+// The server checks membership and the saved trip itself; the browser's word is never trusted.
 export async function POST(req) {
   const { user, sb } = await requireUser(req);
-  if (!user || !sb) return NextResponse.json({ error: "Make a free account first." }, { status: 401 });
+  if (!user || !sb) return NextResponse.json({ error: "Start Pet Vault first." }, { status: 401 });
+  if (!(await vaultIsOpen(sb, user.id))) return NextResponse.json({ error: "This checklist comes with Pet Vault.", need: "vault" }, { status: 403 });
   if (!(await allowRequest(sb, `free_trip:${user.id}:${clientIp(req)}`, 20, 3600))) return NextResponse.json({ error: "Too many tries. Try again later." }, { status: 429 });
   const body = await req.json().catch(() => ({}));
   const tripId = String(body.trip_id || "");

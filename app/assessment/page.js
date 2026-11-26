@@ -281,11 +281,25 @@ export default function PetPassGoQuiz() {
 
   }
 
-  // Easy trips: free with an account. The server re-checks the trip before unlocking it.
-  async function unlockFree() {
+  // Easy trips: the checklist comes with Pet Vault (no Travel Pass needed). Nima, Nov 25.
+  // Not a member yet: start Pet Vault first, then this trip unlocks on the way back.
+  // The server re-checks membership and that the trip is easy before unlocking it.
+  async function unlockFree(fromReturn = false) {
     if (buying) return;
     const { data } = await supabase.auth.getUser();
-    if (!data.user) { trackEvent("free_trip_start", { content_type: "assessment" }); setFreeReturn(autoBuy === "free"); setFreeOpen(true); return; }
+    if (!data.user || (!isMember && !fromReturn)) {
+      if (!fromReturn && !consent) { setConsentErr(WITHDRAWAL_BLOCKED); return; }
+      try { localStorage.setItem("petpassgo_pending_trip", JSON.stringify(answers)); localStorage.setItem("petpassgo_purchase_intent", "free"); } catch {}
+      trackBeginCheckout("membership");
+      if (!data.user) { setGuestPlan("membership"); return; }
+      setBuying(true);
+      const { data: s0 } = await supabase.auth.getSession();
+      const r0 = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": s0?.session?.access_token || "" }, body: JSON.stringify({ plan: "membership", attribution: getAttribution(), immediate_access_consent: true, marketing_opt_in: tips }) });
+      const j0 = await r0.json().catch(() => ({}));
+      if (!r0.ok || !j0.url) { setBuying(false); alert(j0.error || "Checkout isn't available right now. Please try again."); return; }
+      window.location.href = j0.url;
+      return;
+    }
     setBuying(true);
     const saved = await saveTripFor(data.user);
     if (saved.paid) { if (data.user.user_metadata?.pending_trip) await supabase.auth.updateUser({ data: { pending_trip: null } }).catch(() => {}); window.location.href = "/account?free_trip=1"; return; }
@@ -345,7 +359,7 @@ export default function PetPassGoQuiz() {
     autoBuyRan.current = true;
     supabase.auth.getSession().then(({ data }) => {
       if (!data?.session) return;
-      if (autoBuy === "free") { unlockFree(); return; }
+      if (autoBuy === "free") { unlockFree(true); return; }
       if (takeWithdrawalConsent()) handlePurchase(autoBuy === "join" ? "member" : "pass", true);
     });
   }, [autoBuy, answers]);
@@ -608,11 +622,11 @@ export default function PetPassGoQuiz() {
                 </div>
               ) : easyTrip ? (
                 <div className="rounded-2xl p-5 ppg-rise" style={{ border: `2px solid ${tokens.green}`, background: "#F3FBF6" }}>
-                  <div className="flex items-center justify-between gap-3">
-                    <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 21, color: tokens.navy, lineHeight: 1.15 }}>Your checklist is ready</div>
-                  </div>
-                  <p className="mt-1.5 mb-4" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }}>{signedIn ? "We'll save it to your account with how to do each step." : <>Make your account and we&apos;ll show you how to do each step.</>}</p>
-                  <button type="button" disabled={buying} onClick={unlockFree} className="w-full rounded-full py-3.5" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer", opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : "Get my checklist"}</button>
+                  <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 21, color: tokens.navy, lineHeight: 1.15 }}>Good news: no Travel Pass needed</div>
+                  <p className="mt-1.5 mb-3" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }}>{isMember ? "Your step-by-step checklist comes with Pet Vault. We'll save it to your account with how to do each step." : <>This trip&apos;s step-by-step checklist comes with Pet Vault, {usd(P.member)} a month. You also get {answers.role === "Service animal" ? "your dog" : "your pet"}&apos;s passport, records and reminders.</>}</p>
+                  {!isMember ? <WithdrawalConsent short renews checked={consent} onChange={(v) => { setConsent(v); setConsentErr(""); }} error={consentErr} /> : null}
+                  <button type="button" disabled={buying} onClick={() => unlockFree()} className="w-full rounded-full py-3.5" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer", opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : isMember ? "Get my checklist" : "Start Pet Vault and get my checklist"}</button>
+                  {!isMember ? <p className="mt-2 text-center" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>{usd(P.member)}/month. Cancel anytime in your account.</p> : null}
                 </div>
               ) : <>
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">This trip needs paperwork</h2>
@@ -657,8 +671,8 @@ export default function PetPassGoQuiz() {
         </div>
       </div>
       </div>
-      <FreeAccountSheet returning={freeReturn} open={freeOpen} onClose={() => setFreeOpen(false)} trip={answers} petWord={answers.role === "Service animal" ? "your service dog" : `your ${answers.animal === "Other" || !answers.animal ? "pet" : answers.animal.toLowerCase()}`} onReady={async () => { setFreeOpen(false); await unlockFree(); }} />
-      <GuestEmailSheet open={!!guestPlan} showConsent={false} showMarketing={false} marketingOptIn={tips} title={guestPlan === "join" ? `Join + Travel Pass · ${usd(P.joinToday)}` : `Travel Pass · ${usd(P.pass)}`} plan={guestPlan} trip={answers} cancelPath="/assessment?checkout=canceled" onClose={() => setGuestPlan("")} />
+      <FreeAccountSheet returning={freeReturn} open={freeOpen} onClose={() => setFreeOpen(false)} trip={answers} petWord={answers.role === "Service animal" ? "your service dog" : `your ${answers.animal === "Other" || !answers.animal ? "pet" : answers.animal.toLowerCase()}`} onReady={async () => { setFreeOpen(false); await unlockFree(true); }} />
+      <GuestEmailSheet open={!!guestPlan} showConsent={false} showMarketing={false} marketingOptIn={tips} title={guestPlan === "join" ? `Join + Travel Pass · ${usd(P.joinToday)}` : guestPlan === "membership" ? `Pet Vault · ${usd(P.member)}/month` : `Travel Pass · ${usd(P.pass)}`} plan={guestPlan} trip={answers} cancelPath="/assessment?checkout=canceled" onClose={() => setGuestPlan("")} />
     </div>
   );
 }
