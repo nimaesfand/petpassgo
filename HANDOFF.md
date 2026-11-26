@@ -2536,6 +2536,37 @@ We have no keyword-volume data, so this order uses **proxies, not search volume*
 3. One link from a state's service page to the same state's ESA page (and back), or keep strictly hub/airlines/CTA?
 4. Pricing: the SEO brief said $49.99 / $19.99 trip passes. The repo says Travel Pass $14.99 with Pet Vault ($21.98 first trip). This spec uses the repo. Confirm.
 
+### Update 2026-11-25: Nima's decisions on the state pages spec (QUEUED, start after Travel Pass and Pet Vault are finished)
+**Status: still Queued. Start after Travel Pass and Pet Vault are finished.** This update belongs to the state pages spec just above. PR #87 is merged. Where the lines below differ from the spec, these win. Everything else in the spec stands.
+
+**Resolves open question 2 (redirects; Nima's item 3): yes, permanent redirects.** This supersedes the "after Nima confirms (Open question 2)" wording in §1 Redirects and in build checklist step 7.
+- Put them in `next.config.mjs` → `redirects()`, next to the existing `/service-dog-kit` and `/service-dog/dot-form` entries (the repo's pattern). Use `statusCode: 301` instead of `permanent: true`: Next.js serves `permanent: true` as a 308, and Nima asked for a 301. List the 6 old URLs explicitly. Don't use a `/guides/:state` wildcard, so an unknown slug doesn't redirect to a page that doesn't exist.
+- Mapping. All 6 go to the service dog page: the old pages are titled "[State] service dog, PSD and ESA laws", so service dog is the lead topic and the best match for the links and rankings they've earned. Florida and California are ESA-heavy, but each new service dog page already has the ESA housing and letter rules in its own ESA page one hub away, so one consistent rule is clearer.
+
+| Old URL | New URL |
+|---|---|
+| `/guides` | `/service-dog/states` |
+| `/guides/california` | `/service-dog/california` |
+| `/guides/texas` | `/service-dog/texas` |
+| `/guides/florida` | `/service-dog/florida` |
+| `/guides/new-york` | `/service-dog/new-york` |
+| `/guides/illinois` | `/service-dog/illinois` |
+| `/guides/arizona` | `/service-dog/arizona` |
+
+- Ship the redirects in the same deploy as those 6 service dog pages, and only once each one passes the publish gate (§4). All 6 are in the first batch. Until a target page is published, keep its old guide live. Never redirect to a 404.
+- **Sitemap:** remove `"/guides"` from `staticPaths`, and remove the `STATES` → `/guides/${slug}` block and the `lib/stateGuides` import from `app/sitemap.js`. Then delete `app/guides/` and `components/StateGuide.js`. Check `/sitemap.xml` has no `/guides` URLs.
+- **Homepage:** remove the `/guides` link ("service dog and ESA laws by state") from the "Guides:" line in `app/page.js` (~line 216). Don't replace it with a hub or state link (no homepage state links).
+- Acceptance: each of the 7 old URLs returns a 301 to the URL in the table. There are no `/guides` URLs in the sitemap and no `/guides` link anywhere on the site.
+
+**Resolves open question 1 (sources on the page; Nima's item 4): small plain-text citations, no links.** This supersedes the matching §0 "Source links" and §3 lines where they differ.
+- Each fact on the page shows its citation as small plain text (e.g. "Fla. Stat. §413.08(9)" or "14 CFR 382.75"), in `tokens.muted`, about 12.5–13px, under or beside the fact. Use the same text on the quick-facts cards, in the accordion rows and in the federal block.
+- No `<a>` on citations, no outbound source links, and don't show the URLs. `sourceUrl` stays in `lib/stateLaws/` only. It's what the publish gate and the monthly re-check use.
+- Keep "Last checked [date]" and the laws-change line. Change "Confirm with the source listed" to "Laws change. Check the cited law or the state's own site before you rely on this. Not legal advice." That way the line doesn't promise a link.
+
+**Still open:**
+- Open question 3 (one cross-link between a state's service dog and ESA pages): not answered. Keep the strict hub, airlines and CTA linking.
+- Open question 4 (pricing: the brief's $49.99 / $19.99 vs. the repo's $14.99 Travel Pass with Pet Vault, $21.98 first trip): not answered. Leave as is, and keep using `PRICES` from `lib/pricing.js`.
+
 ### 2026-11-22: Nima's decisions on the pick-list plan + more tasks for the list (from Sisqo)
 **Nima decided (relayed by Sisqo):**
 - Training organization is typed in by the owner, not picked from a list of programs. No program drop-down.
