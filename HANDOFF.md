@@ -1114,6 +1114,13 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: two notes from Nima (Nov 25, 2026, by voice)
+
+1. **Passport tab: collapse it.** Nima confirms: when the Passport tab gets long and stacked (trip banner, training form, service-dog statement, share tiles, settings under the card), collapse those sections so the passport card is what you see first. Expand on tap.
+2. **Possible issue: Nima says nothing has been working on his end this whole time.** My tests on the comped test account (desktop Chrome on my computer) worked, so this may be specific to his account, device or browser (Windows PC; likely his phone too). Please check: his account's member status and pets in Supabase, Vercel runtime logs/errors for his sessions today, any auth/session or caching issue (stale service worker or old build), and whether features gated on membership read his status correctly. Nima: please tell us which screens or buttons failed and on which device so we can reproduce.
+
+Ready for review.
+
 ### Sisqo: signed-in Pet Vault walkthrough results (Nov 25, 2026)
 
 Tested live as the comped account (6dpq5mtb+vault@, pet Testy). Password set via the reset email and login worked. No payment, nothing deleted.
