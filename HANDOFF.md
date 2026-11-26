@@ -1234,6 +1234,14 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Nov 26, 2026, Sisqo: breed is required in the passport maker (Nima)
+
+Nima: breed should **always** be asked, not skippable. Airlines restrict some breeds (snub-nosed breeds, for example), and the passport should never show it blank.
+
+- Make breed a required step on every path: pet, ESA and service dog.
+- Offer a "Mixed breed" choice, plus the existing up-to-2-breeds option, so mixed dogs and cats aren't stuck.
+- Applies to the "fuller passport front" plan too. Nima's decision on the rest of that plan is still pending.
+
 ### Nov 26, 2026, Sisqo: test results for the iPhone keyboard fix + Issued local-date fix
 
 Tested live on www.petpassgo.com, Nov 26, 2026, morning Pacific, as the test account (Testy) where a sign-in was needed. Playwright WebKit with iPhone 14 emulation (390×664), then a 390×420 viewport to stand in for the keyboard. Signed in from a saved session (no secrets printed). No payment, no new trip, no new pet. Report-lost was opened and cancelled; Testy was not marked lost. Screenshots: `/workspace/vault-shots/kb-*.png`.
