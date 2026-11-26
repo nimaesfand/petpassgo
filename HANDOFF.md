@@ -1114,6 +1114,18 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Backgrounds for Cleo and Milo (Nov 25, 2026, by voice)
+
+Nima: Cleo's and Milo's photos must match Benny's style and quality, and **backgrounds should not always be an airport**. Vary them. Nima wants input on what fits; my suggestion, tied to what each pet sells:
+
+- **Benny (service dog):** airport, as is. He sells "no worry at the gate."
+- **Cleo (ESA, red "Emotional Support" vest):** a warm, sunlit **home** setting, e.g. curled on a sofa by a big window in a bright apartment. ESA life is about home and comfort, and it matches the "ESA letter for the landlord" ad idea.
+- **Milo (regular pet, no gear):** an everyday **out-and-about** setting, e.g. a bright, modern groomer or daycare front desk, or a sunny park path. This shows Pet Vault is for everyday life (groomer, daycare, vet), not only flying, and matches the "regular pet at the groomer" ad idea.
+
+Same look across all three: photoreal, natural soft light, shallow depth of field, pet sharp and centered at eye level, 16:9 at Benny's size. Nima makes the final call on backgrounds.
+
+Ready for review.
+
 ### Sisqo: Milo wears nothing (Nov 25, 2026, by voice)
 
 Confirmed: **Milo wears nothing.** Regular pet, no vest, no collar tags or gear featured. Milo's photo is no longer on hold; go ahead with the black and brown dachshund photo.
