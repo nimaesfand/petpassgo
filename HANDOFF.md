@@ -1149,6 +1149,36 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Nima's walkthrough of the passport maker, service dog path (Nov 25, 2026, desktop)
+
+Nima went Home > "Who's coming with you?" > Benny > "Get your service dog passport" and made a passport for "Milo". Notes in order, plus mine:
+
+**Bugs**
+1. **Second "Keep Milo's passport" screen loses data.** After tapping Keep, the passport card changes from "Handler statement signed" to **"Statement not signed yet"**, and **Weight and Training disappear**, even though he signed. (Screens: first has Weight 25 lb / Training Task trained / Handler statement signed; second has neither.)
+2. **Names aren't capitalized.** "milo" shows lowercase everywhere ("milo's passport is ready!", card name). Auto-capitalize each word of pet and owner names (e.g. "Milo S. Van Darmez").
+3. **Breed wraps badly.** "Miniature Dachshund" breaks mid-word on the card ("Miniatur / e"). Use short display names on the card (e.g. "Mini Dachshund") and never break words.
+4. **Tasks picked don't show anywhere.** He chose about 11 tasks (psychiatric, mobility, other); none appear on the passport. The step text "Only the kind of help can show on the passport" is confusing. Either show the kinds (e.g. "Psychiatric · Mobility") on the card, or say plainly: "We show the type of help, not the details, to protect your privacy."
+
+**Checkout (Nima: "this is very bad")**
+5. **Two near-identical screens.** "Keep Milo's passport" leads to almost the same page again, just adding an email box. Make it one step.
+6. **Don't ask for email again.** We already have it from the maker (it even says "We also emailed it to…"). Prefill it, or skip the field.
+7. **Renewal/cancel said 3–4 times.** Cut to one short line by the button, e.g. "$6.99/month. Cancel anytime in your account. You keep access through the month you paid." Keep the required consent checkbox but make its text short: "Start Pet Vault at $6.99/month." Check the minimum the auto-renewal law needs and say it once.
+8. **Benefit copy is weak.** "Your vet confirms each vaccine with one click" and "Everything on one screen at the airport" say what it does, not why it matters. Sell the feeling, e.g. Vet Verified: "Records the airline trusts, straight from your vet." Gate Ready: "Walk up to the counter with everything already open."
+
+**Maker steps**
+9. **Service passport offers "my cat."** On the service dog path, only Dog should be offered (it's a service *dog* passport).
+10. **"What does Milo do for you?"** Service dog subtitle "Trained to do tasks for a disability, including psychiatric service dogs" is confusing. Suggest title "Service dog, including psychiatric service dog", subtitle "Trained to do tasks for a disability."
+11. **ESA option:** "Comfort and support at home" is too narrow; people take ESAs everywhere. Suggest "Comfort and emotional support."
+12. **ESA "Good to know" is hard to read** ("flies as pets, that means airline's regular pet fee and pet rules, not free"). Suggest: "On US flights, an emotional support animal flies as a pet, with the airline's usual pet fee and rules. Milo's passport still keeps everything in one place."
+13. **No confirmation on that choice.** Pet and Service dog jump ahead the moment you tap; ESA shows a "Got it". Make all three consistent: show a short confirmation (or a Next) so a mis-tap doesn't skip ahead.
+14. **Mixed breeds:** allow up to two breeds ("Mini Dachshund / Beagle mix"), kept clean on the card.
+15. **Sex question:** "boy or girl?" Nima prefers "Male or female?"
+16. **Vet step:** add clinic **email**. Replace "Rabies vaccine good until" with a snapshot option: "Snap a photo of the rabies certificate and we'll fill it in," with typing as the fallback.
+
+**Liked, keep:** "Who trained Milo? Every great story starts with a teacher", the signed service-dog promise ("goes on your DOT form too"), "Printing Milo's passport… Issued" animation, "We'll hold it for 7 days."
+
+Ready for review.
+
 ### Sisqo: Travel Pass consistency check (Nov 25, 2026, Nima's ask)
 
 Checked the repo (main at b2e17fa) and live public pages against current decisions. Most important first:
