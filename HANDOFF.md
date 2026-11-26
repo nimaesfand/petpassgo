@@ -1071,6 +1071,48 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### 2026-11-25: Sisqo research: best lost pet flyers, what to copy
+Nima asked us to find the best lost-pet flyers and copy what they put on them. I compared PawBoost, Petco Love Lost, Pet FBI, Lost My Doggie, Pet Amber Alert, Kat Albrecht / Missing Animal Response Network, ASPCA, Lost Dogs Illinois, SPCA of Northern Virginia, LA County Animal Care, Sacramento County Animal Care, San Diego County, and the Humane Society of Elkhart County. Example images (for us to look at, not to ship): /workspace/lost-flyer-research/lostmydoggie-sample-1.png, elkhart-lost-dog-color.png, sdcounty-lost-poster-1.png, and pawboost-missing-poster.jpg (Kat Albrecht's giant neon roadside posters).
+
+We have two flyers today, and they don't match:
+- The Vault maker at /lost-flyer: letter-size PNG. Big red "LOST" bar, a large photo (about half the page — this is the good one), the name, a 2-line description, "Last seen: area · date", and a navy footer with an optional QR and "Call [number]" or "Scan to message the owner". Fields are typed in by hand (name, description, area, date, optional phone, optional PetPassGo page). Nothing is saved. No species in the headline, no "Milo lost, help locate Milo", no sex, size, collar, microchip, "don't chase", or reward.
+- The print flyer at /id/[pet]/flyer, which is what you get after Report lost: same "LOST" bar, but the photo is only a 280px square (way too small), then name, breed, last seen, a short note, optional "Reward: [whatever they typed, including a dollar amount]", and a QR to the lost page with "Scan to message the owner or call [phone]". The line "Milo lost, help locate Milo" is already in the code (lostTitle) and shows on the confirm form, but it never appears on the printed flyer. Phone only shows if the owner chose to show it.
+
+**What the best flyers put on the page (copy this):**
+1. A huge species headline you can read from a distance: **LOST DOG** or **LOST CAT**, not just "LOST". Under it, Nima's line: **"Milo lost, help locate Milo."** Details stay inside, not in the headline.
+2. **One large, recent color photo** — face and body, filling about a third to half the page. One great photo beats several small ones. The /lost-flyer maker already does this. The print flyer does not.
+3. A short visible description: breed or mix, color, size or weight, sex, collar color, and one or two markings you could see from across the street.
+4. **Last seen:** neighborhood, cross streets or a landmark, plus the date. Never a home street address. We already block addresses on Report lost. Keep that.
+5. **How to reach the owner.** Our version is better than most: QR to message without showing a number, and the owner chooses what finders see. If they opt in, the phone can also appear, large. ASPCA likes a backup number; we can offer that without making it the default.
+6. A clear **don't chase** line, especially if the pet is shy: **"If you see them, don't chase. Scan or message the owner."** Lost Dogs Illinois, SPCA Nova, LA County and Kat Albrecht all say chasing a scared pet is how they get hit by a car or run farther away. Today's note field can hold this, but it is easy to miss. It should be a real line on the flyer.
+7. **"Microchipped"** as a yes, without the chip number. We already store this as a yes/no on the public profile. The number does not help a stranger recognize the pet, and putting it on a flyer can help someone try to transfer the chip.
+8. Keep it compact, high contrast, one consistent design. Same photo and wording on the flyer, the lost page, and any social share.
+
+**Gaps in ours (top ones first):**
+1. Headline is only "LOST", and the print flyer never uses "Milo lost, help locate Milo".
+2. The print flyer photo is far too small. This is the flyer members will actually print after they tap Report lost, so it matters more than the manual maker.
+3. No dedicated "don't chase" line.
+4. Description is thin: the print flyer only shows breed plus a free-form note. We already have sex, color, weight and a microchipped flag in the pet profile, and the owner can already choose what finders see. The flyer just doesn't use them.
+5. Reward currently prints the full text, including amounts. Our sample even says "$200 if found safe".
+
+**What to keep:**
+- QR + "scan to message the owner", with the number hidden unless the owner turns it on. That is our edge. Most classic flyers just plaster a phone number.
+- Owner chooses what finders see.
+- No home address, and the street-address block on last seen.
+- The large photo layout on /lost-flyer.
+- Compact page, not a wall of text.
+- Modest PetPassGo mark in the footer.
+
+**What they do that we should not copy:**
+- **A dollar amount on the reward, or a huge reward.** Lost My Doggie puts "$1000 REWARD" in red. Our sample does "$200". Pet Amber Alert says write "REWARD" only. Lost Dogs Illinois and Kat Albrecht go further and say leave the reward off, because it brings scammers and makes untrained people chase the dog. Default should be off, or the word REWARD with no number.
+- **Home address, or last seen as a house number.** The Elkhart sample uses "123 Sesame St". Don't. Sacramento County also says don't put the owner's name or address on the flyer, so someone can't try to take over the license or microchip.
+- **The microchip number.** "Microchipped" is enough.
+- **Tear-off tabs with the phone number** (San Diego County and Lost Dogs Illinois Flyer 1). They fight our privacy model, they clutter a compact flyer, and the tabs often all get ripped off. The QR already lets someone take the page with them.
+- **Leaving the pet's name off.** Sacramento County suggests this to stop chip fraud. Most recovery groups include the name so people can call the pet. Nima already wants the name in the headline. Keep the name, leave off the chip number.
+- **Putting flyers in mailboxes.** Illegal in the US. PawBoost's own flyer FAQ says this, even though one of their blogs still suggests it.
+- **Long personality stories, or several tiny photos.**
+
+The two flyers should also be brought in line with each other, so Report lost prints the same strong layout as the maker. For Nima to decide.
 ### 2026-11-25: Sisqo review of passport tiles, round 3
 Best round yet. Tiles 1 and 2 are ready as written. Notes:
 
