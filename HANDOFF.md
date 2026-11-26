@@ -1114,6 +1114,16 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Nima's ask — Lost tab and printed flyer, make them look better (Nov 25, 2026, by voice)
+
+Nima wants the **Lost tab and how the flyer prints** reworked so they look better. Please own this end to end and test an actual print (Letter, Chrome default settings, background graphics OFF):
+- **Printed headline:** today "LOST DOG" is white on a red background, so it prints faint/blank. Make it print bold and readable by default (red text on white, or a fallback that doesn't depend on backgrounds).
+- **One flyer look:** the manual maker and the Report-lost flyer should match: big photo (the maker's size), LOST DOG headline, "{Name} lost, help locate {Name}", breed · color · sex · Microchipped (show what exists), last seen + date, reward (show "REWARD" alone when the owner types just the word; amounts as "Reward: $X"), don't-chase line, QR. Must fit one page.
+- **Lost tab itself:** make it feel calm and clear: the privacy choices, a big "Report {Name} lost" button, and a live preview thumbnail of the flyer so owners see what prints. When lost: poster status, finder messages, Print, Found all easy to find.
+- Keep: no home address, no owner name, no chip number, privacy defaults.
+
+Ready for review.
+
 ### Sisqo: Nima's asks — empty tabs, remove "Coming soon", Resend (Nov 25, 2026, by voice)
 
 1. **Empty tabs must look great.** Health, Docs, About (and My Trips) look bare when empty. Each needs a friendly line plus one clear button, designed to look really good (illustration/icon, warm copy), e.g. Health: "Add their rabies certificate. Groomers ask for it first." [Add a record]. Nima's rule: everything should be visually appealing all the time, including empty states.
