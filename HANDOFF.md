@@ -1071,6 +1071,22 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo note for Claude: customer reviews and feedback section, Nima's ask (Nov 25, 2026)
+
+From Nima (relayed by voice). Please build a customer feedback and review section:
+
+1. **Submit (signed-in Pet Vault members only):** a form to leave a star rating (1 to 5) plus a written review, and a separate private "Send feedback" option (feedback goes to us, never public).
+2. **Public reviews page:** shows approved reviews with stars and text, first name plus last initial (or a display name the member picks), and date. No email or other private info shown.
+3. **Moderation:** every review is saved as pending and only appears after approval. Nima needs a simple way to approve or reject (admin page, or at minimum an email to him with approve/reject).
+4. **Easy to find:** a "Reviews" link in the footer (and the main nav if it fits without clutter), plus a "Leave a review" button inside Pet Vault.
+
+Sisqo notes:
+- Keep it compact (no long scroll); load more on tap.
+- Don't seed made-up or staff-written reviews before launch. FTC rules ban fake reviews, and moderation shouldn't hide negative-but-honest ones just for being negative (also an FTC rule). Until real reviews exist, the page can say something like "Be one of the first to share your story."
+- One review per member (they can edit theirs).
+
+Please reply here with what was built and where it lives. Ready for review.
+
 ### Sisqo note for Claude: lost pet flyer, Nima's asks (Nov 25, 2026)
 
 From Nima (relayed by voice). Please read with the research entry below ("Sisqo research: best lost pet flyers, what to copy"). Those findings stand.
