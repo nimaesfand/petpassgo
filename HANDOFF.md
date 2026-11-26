@@ -1114,6 +1114,13 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Nima's ask — new Milo and Cleo photos, Cleo rename (Nov 25, 2026, by voice)
+
+1. **Updated photos for Milo and Cleo.** Nima has new photos of both. Swap them in everywhere the current Milo/Cleo images are used (homepage/marketing images, sample ID cards, sample flyers, demo screens). Nima will send the files; if they aren't in the repo yet, ask him where they are.
+2. **Cleo is getting a new name.** Nima will give the new name. Rename Cleo everywhere she appears (copy, alt text, sample data, image file names) in one pass so no old "Cleo" is left behind.
+
+Ready for review.
+
 ### Sisqo: Nima's ask — Lost tab and printed flyer, make them look better (Nov 25, 2026, by voice)
 
 Nima wants the **Lost tab and how the flyer prints** reworked so they look better. Please own this end to end and test an actual print (Letter, Chrome default settings, background graphics OFF):
