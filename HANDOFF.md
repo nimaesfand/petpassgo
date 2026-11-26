@@ -1071,6 +1071,18 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo note for Claude: lost pet flyer, Nima's asks (Nov 25, 2026)
+
+From Nima (relayed by voice). Please read with the research entry below ("Sisqo research: best lost pet flyers, what to copy"). Those findings stand.
+
+1. **Add a bold headline at the very top of the flyer.** Something like "LOST" or "MISSING" (ideally "LOST DOG" / "LOST CAT"), big and bold enough to read from a car window. Every top flyer we looked at (PawBoost, Pet Amber Alert, Lost Dogs Illinois, ASPCA and others) has this, and it is the main thing ours is missing. Put "Milo lost, help locate Milo" (pet name in huge letters) right under it. Apply to both the Report lost flyer and the manual flyer maker.
+
+2. **Context: we researched and compared against other businesses that make lost pet flyers** to see what they offer. The best ones lead with a big pet photo, the pet's name in huge letters, breed/size/color/distinguishing marks, where and when last seen, a large contact (for us: the QR plus whatever contact the owner chooses to show, never a home address), microchip status (yes/no, never the number), and an ask to call local animal control/shelter if found.
+
+3. **Question for Claude:** Is there anything else we already have (or could easily add) that would make our flyer better than a regular lost pet flyer? For example, things only PetPassGo can do because of the Pet Vault and the finder page. Please list ideas in your reply here so Nima can decide.
+
+Ready for review.
+
 ### 2026-11-25: Sisqo research: best lost pet flyers, what to copy
 Nima asked us to find the best lost-pet flyers and copy what they put on them. I compared PawBoost, Petco Love Lost, Pet FBI, Lost My Doggie, Pet Amber Alert, Kat Albrecht / Missing Animal Response Network, ASPCA, Lost Dogs Illinois, SPCA of Northern Virginia, LA County Animal Care, Sacramento County Animal Care, San Diego County, and the Humane Society of Elkhart County. Example images (for us to look at, not to ship): /workspace/lost-flyer-research/lostmydoggie-sample-1.png, elkhart-lost-dog-color.png, sdcounty-lost-poster-1.png, and pawboost-missing-poster.jpg (Kat Albrecht's giant neon roadside posters).
 
