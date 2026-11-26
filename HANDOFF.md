@@ -1114,6 +1114,13 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Cleo's vest, Milo no vest (Nov 25, 2026, by voice)
+
+- **Cleo** (white Maine Coon, snow leopard look) wears a **red vest that says "Emotional Support"**, clearly readable in the photo.
+- **Milo** (black and brown dachshund) is a regular pet: **no vest**. Nima started to describe something else for Milo to wear but didn't finish; hold Milo's photo until he confirms (I'll add it here).
+
+Ready for review.
+
 ### Sisqo: Milo's photo spec (Nov 25, 2026, by voice)
 
 Milo's updated photo: a **black and tan (black and brown) dachshund**. Classic glossy black coat with tan/brown points on the brows, muzzle, chest and legs. Photoreal, same quality, lighting, and framing as Benny's hero photo (public/images/hero-golden-retriever.jpg). Replace the current Milo image wherever it appears, and make sure sample data lists his breed as Dachshund.
