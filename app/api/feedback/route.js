@@ -13,13 +13,13 @@ export async function POST(req) {
   const { data: u } = await sb.auth.getUser(token);
   if (!u?.user) return NextResponse.json({ error: "Please sign in." }, { status: 401 });
   let b; try { b = await req.json(); } catch { return NextResponse.json({ error: "Bad request" }, { status: 400 }); }
-  const kind = b?.kind === "post_trip" ? "post_trip" : "purchase";
+  const kind = b?.kind === "post_trip" ? "post_trip" : b?.kind === "general" ? "general" : "purchase";
   const rating = Number(b?.rating);
   const comment = typeof b?.comment === "string" ? b.comment.trim().slice(0, 2000) : "";
   const tripId = typeof b?.trip_id === "string" ? b.trip_id : null;
-  const ref = typeof b?.ref === "string" ? b.ref.slice(0, 120) : tripId || "account";
-  if (!(rating >= 1 && rating <= 5)) return NextResponse.json({ error: "Please choose a rating." }, { status: 400 });
-  const { error } = await sb.from("feedback").insert({ user_id: u.user.id, kind, trip_id: tripId, ref, rating, comment: comment || null });
+  const ref = kind === "general" ? `general-${Date.now()}` : typeof b?.ref === "string" ? b.ref.slice(0, 120) : tripId || "account";
+  if (kind === "general" ? !comment : !(rating >= 1 && rating <= 5)) return NextResponse.json({ error: kind === "general" ? "Please write your feedback." : "Please choose a rating." }, { status: 400 });
+  const { error } = await sb.from("feedback").insert({ user_id: u.user.id, kind, trip_id: tripId, ref, rating: rating >= 1 && rating <= 5 ? rating : null, comment: comment || null });
   if (error) {
     if (error.code === "23505") return NextResponse.json({ ok: true, duplicate: true });
     return NextResponse.json({ error: "Couldn't save feedback. Please try again." }, { status: 500 });
@@ -28,8 +28,8 @@ export async function POST(req) {
     await sendResendEmail({
       to: "support@petpassgo.com",
       kind: "feedback",
-      subject: `PetPassGo feedback (${kind}) — ${rating}/5`,
-      text: `New private feedback from account ${u.user.email || u.user.id}\nKind: ${kind}\nRating: ${rating}/5\n${comment ? `Comment: ${comment}\n` : ""}\nStored in the feedback table. Not published.`,
+      subject: `PetPassGo feedback (${kind})${rating >= 1 ? ` — ${rating}/5` : ""}`,
+      text: `New private feedback from account ${u.user.email || u.user.id}\nKind: ${kind}\n${rating >= 1 ? `Rating: ${rating}/5\n` : ""}${comment ? `Comment: ${comment}\n` : ""}\nStored in the feedback table. Not published.`,
     });
   }
   return NextResponse.json({ ok: true });

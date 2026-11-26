@@ -39,6 +39,7 @@ import ShareRecordsSheet, { RecentShares } from "../../components/ShareRecordsSh
 import ComingUpCard from "../../components/ComingUpCard";
 import PetNotices from "../../components/PetNotices";
 import VetConnectCard from "../../components/VetConnectCard";
+import ReviewCard from "../../components/ReviewCard";
 import FinderPrivacy from "../../components/FinderPrivacy";
 import { SECTION_THEME } from "../../lib/petSections";
 import PetProfileExperience from "../../components/PetProfileExperience";
@@ -1379,6 +1380,7 @@ export default function AccountPage() {
           <h1 style={{ fontFamily: font.display, fontSize: 34, fontWeight: 800, color: tokens.navy, lineHeight: 1.08 }} className="mb-5">Account</h1>
           <AccountMenu onLogout={handleLogout} />
           <BillingTab userId={user?.id} email={user?.email} />
+          <div className="mt-5"><ReviewCard /></div>
         </>)}
       </main>
       )}

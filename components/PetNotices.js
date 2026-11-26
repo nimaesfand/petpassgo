@@ -18,7 +18,7 @@ async function call(method, body, petId) {
   const { data } = await supabase.auth.getSession();
   const token = data?.session?.access_token;
   const url = method === "GET" ? `/api/pet-notices?pet_id=${petId}` : "/api/pet-notices";
-  const r = await fetch(url, { method, headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: body ? JSON.stringify(body) : undefined });
+  const r = await fetch(url, { method, headers: { "Content-Type": "application/json", "x-sb-token": token || "" }, body: body ? JSON.stringify(body) : undefined });
   return r.json().catch(() => ({}));
 }
 

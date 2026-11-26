@@ -54,6 +54,7 @@ const FOOTER_LINKS = [
   { href: "/blog", label: "Blog" },
   { href: "#pricing", label: "Pricing" },
   { href: "/faq", label: "FAQ" },
+  { href: "/reviews", label: "Reviews" },
   { href: "/contact", label: "Contact" },
   { href: "/service-dog", label: "Flying with a service dog" },
   { href: "/guarantee", label: "Flight-Ready Guarantee" },

@@ -14,7 +14,7 @@ const fmt = (d) => (d ? new Date(d).toLocaleDateString("en-US", { month: "short"
 async function authed(url, opts = {}) {
   const { data } = await supabase.auth.getSession();
   const token = data?.session?.access_token;
-  const r = await fetch(url, { ...opts, headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) } });
+  const r = await fetch(url, { ...opts, headers: { "Content-Type": "application/json", "x-sb-token": token || "" } });
   return { status: r.status, body: await r.json().catch(() => ({})) };
 }
 
