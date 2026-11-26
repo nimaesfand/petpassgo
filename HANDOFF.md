@@ -1114,6 +1114,37 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: signed-in Pet Vault walkthrough results (Nov 25, 2026)
+
+Tested live as the comped account (6dpq5mtb+vault@, pet Testy). Password set via the reset email and login worked. No payment, nothing deleted.
+
+**Works well**
+- Login, Home (greeting, flying card, pet with Passport/Pet ID/Health, shortcuts).
+- Passport photo flow (Bev the clerk, crop, APPROVED stamp): polished. Photo uploaded, completion 30%→40%.
+- Share records: dialog clear, consent box gates Send. Email arrived ~1 min later at the recipient with file attached, "Got them" link, and a copy to the owner.
+- Lost tab privacy choices (name/photo/message always; phone and health off by default).
+- Report lost → confirm form ("Testy lost, help locate Testy") → "LOST · POSTER IS LIVE"; public page shows LOST banner + private message form; Found → confirm → cleared everywhere.
+- /lost-flyer chips switch LOST DOG / CAT / PET.
+- Reviews: post (pending), edit (still pending), private feedback confirmations all clear; /reviews correctly still empty.
+- Phone width (~393px): bottom nav, nothing cut off on Home, passport card, homepage tiles.
+
+**Fix (most important first)**
+1. **Printed flyer headline nearly invisible.** "LOST DOG" is white text on a red background; Chrome's default print drops background colors, so on paper it prints faint/blank. Use red text on white (or `print-color-adjust: exact` plus a fallback that doesn't rely on background). Same check for any other colored banners on the flyer.
+2. **Report-lost flyer is missing sex / color / "Microchipped"** (only breed shows). Testy's profile may lack those fields; if so, please show whatever exists and confirm the line appears when they're filled.
+3. **"Reward: REWARD"** reads doubled when the owner types the word. Show just "REWARD" when the value is the word itself (or label-less), amounts as "Reward: $X".
+4. **"Passport ready" next to a 40% ring** reads like a contradiction. Label the ring "Profile 40%".
+5. **Passport tab is long:** trip banner, training form, service-dog statement, 6 share tiles, settings all under the card. Collapse extras so the passport is the star (Nima doesn't want long scrolls).
+6. **"Coming up" reminders live inside Docs** where no one will look; move to Home or Health.
+7. **Empty states** on Health, Docs, About are bare. One friendly line + button each, e.g. "Add their rabies certificate. Groomers ask for it first."
+8. **"Never chase your vet again" shows "Coming soon."** Nima wants no "coming soon" at launch; pending his Resend setup.
+9. **Account tab:** "Cancel membership" sits right next to "Receipts and payment method"; move Cancel lower or make it a quiet text link.
+10. **My Trips empty state** is just "No trip yet" with lots of blank space; add one line on what a Travel Pass gets you.
+11. Minor: second inner scrollbar on /account at phone width; "Also show my emergency contact" greyed with no hint until a phone is added (fine, but say why).
+
+Not yet tested: vet confirm flow (Connect my vet is Coming soon), letters, Travel Pass with a real flight.
+
+Ready for review.
+
 ### Sisqo: Nima's decisions on today's build + public test results (Nov 25, 2026)
 
 **Nima's decisions (his words summarized):**
