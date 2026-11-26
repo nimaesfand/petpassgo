@@ -65,7 +65,7 @@ function FlyerInner({ params }) {
 function FlyerSheet({ name, kind = "PET", sex, color, weight, chipped, breed, area, date, note, reward, phone, pageUrl, qr, photo, animalType, backHref, sample }) {
   return (
     <main className="min-w-0 overflow-x-clip" style={{ background: "#fff", color: tokens.ink, fontFamily: font.body, margin: 0 }}>
-      <style>{`@media print { .no-print { display: none !important; } html, body { margin: 0 !important; background: #fff !important; height: auto !important; } .ppg-print-sheet { width: 8.5in !important; height: 10.9in !important; max-height: 10.9in !important; overflow: hidden !important; } .ppg-print-sheet svg { width: 120px !important; height: 120px !important; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } @page { size: letter; margin: 0; } }`}</style>
+      <style>{`@media print { .no-print { display: none !important; } html, body { margin: 0 !important; background: #fff !important; height: auto !important; } .ppg-print-sheet { width: 8.5in !important; height: 10.9in !important; max-height: 10.9in !important; overflow: hidden !important; } .ppg-print-sheet .ppg-flyer-qr svg { width: 150px !important; height: 150px !important; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } @page { size: letter; margin: 0; } }`}</style>
       {sample ? <div className="no-print" style={{ background: "#F2B84B", color: "#14213D", fontWeight: 800, textAlign: "center", padding: 8 }}>Sample</div> : null}
       <div className="no-print flex flex-wrap justify-center gap-3 py-4 px-4">
         <button onClick={() => window.print()} className="ppg-btn ppg-btn-primary">Print flyer</button>

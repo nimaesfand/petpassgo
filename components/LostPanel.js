@@ -137,7 +137,7 @@ export default function LostPanel({ pet, userId, onChanged }) {
           </button>
         </div>
         <div className="min-w-0">
-          <div aria-hidden="true" className="mx-auto overflow-hidden rounded-xl" style={{ width: 210, height: 236, border: `1px solid ${tokens.line}`, boxShadow: "0 10px 24px rgba(20,33,61,.12)", background: "#fff", pointerEvents: "none" }}>
+          <div aria-hidden="true" className="mx-auto overflow-hidden rounded-xl" style={{ width: 210, height: 262, border: `1px solid ${tokens.line}`, boxShadow: "0 10px 24px rgba(20,33,61,.12)", background: "#fff", pointerEvents: "none" }}>
             <div style={{ width: 816, transform: "scale(0.2574)", transformOrigin: "top left" }}>
               <LostFlyerSheet name={pet.name} kind={kind} breed={pet.breed} color={pet.color} sex={pet.sex} weight={pet.weight_lb} chipped={!!(pet.microchip_number || pet.microchipped)} animalType={pet.animal_type} placeholder
                 photo={photo ? <SignedImg value={photo} alt="" className="object-cover" style={{ width: "100%", height: "100%" }} /> : null} />
