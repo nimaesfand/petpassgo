@@ -1149,6 +1149,28 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Test results for "Built: Sisqo's walkthrough fixes, Lost tab + flyer, Home updates, empty states, no-free pass 2, Luna" (Nov 25, 2026)
+
+Signed in as the test account (Testy), desktop + 390px phone. Screens in my box at /workspace/vault-shots/retest-*.
+
+**Pass:** Lost tab intro, big Report button, live preview. Printed "LOST DOG" headline is now bold red and the flyer prints on 1 Letter page with background graphics off. "Reward: $100" formats right. Maker flyer has the details line + Microchipped + reward. Updates feed shows "Grooming at Test Groomer in 3 days" and "Testy's Rabies is due Dec 9" at the top of Home. Empty states on Health/Docs/About/My Trips look good. No vet "coming soon" card. Ring says "40% profile". "Trips and training" folded. Account: Receipts first, Cancel as a text link. One scrollbar on phone. Reviews is in the account menu. Luna on home + /esa-passport, no Cleo. No "free" on home, /terms, /pet-passport, /service-dog-passport, or the assessment.
+
+**Fail / fix:**
+1. **Report-lost flyer lost its photo.** It shows a placeholder dog icon on blue (page and PDF). Last round it showed Testy's real photo.
+2. **Report-lost flyer has no details line.** Only "Labrador Retriever". No color, sex, weight, Microchipped (the maker has them).
+3. **The two flyers still don't match.** Report-lost: QR + placeholder photo, no details. Maker: details, "Add a photo" slot, no QR. Don't-chase line differs ("Scan or call instead." on the maker).
+4. **Grooming update opens Docs**, not Health. Rabies opens Health correctly.
+5. **"Add to Apple Wallet · coming soon"** is still on the Passport tab. Nima: no "coming soon" anywhere. Hide it.
+6. **Health empty state has a duplicate "+ Add a record"** button under the main one.
+7. **Name wraps mid-word** on the passport-issued screen ("Emptyte / st"). Same family as "Miniatur / e".
+8. While a second pet existed, Testy's card stacked under the new pet on the page (check multi-pet layout).
+9. **Trip check is still free:** tapping "Get my checklist" while signed in created a real trip on Testy (LA to New York, Allegiant, 3 steps) with no payment. This is the decision Nima still has open; I've recommended putting the checklist behind the Travel Pass.
+10. Minor: the Lost tab preview's QR looks blank at thumbnail size; preview has no weight/Microchipped line.
+
+Not tested: the signed-out account sign-up sheet "free" check.
+
+Test data left on Testy: a Grooming item (Nov 28), a Rabies record (expires Dec 9), the LA to NY trip, and a lost report that is now turned off.
+
 ### Sisqo: Built passport should match the sample passport (Nov 25, 2026, Nima)
 
 Nima: the sample passport on the Service Dog Passport page (/service-dog, Benny) looks better than the passport a customer just built (maker result / "Keep Milo's passport" screen). Make them the **same card component and layout**:
