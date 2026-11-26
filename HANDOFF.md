@@ -1149,6 +1149,14 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Nov 25, 2026, Sisqo: how to crop the photos on the passport (Nima)
+
+The sample photos are wide 16:9 scenes. **Don't put the full wide image on the passport card or the ID photo.** The empty sofa, window or park on the left shrinks the animal. Crop to the animal instead, so the whole pet fills the photo box, head to body, with nothing cut off.
+
+- Use `object-fit: cover` with an `object-position` aimed at the animal. In all three images the animal sits right of center, roughly `70% 45%`. Or make tighter crops sized for the passport.
+- Check it on Benny (`hero-golden-retriever.jpg`), Luna (`luna-ginger-maine-coon.jpg`) and Milo (`milo-dachshund-park.jpg`) at mobile width.
+- Wide versions are still fine for hero or marketing spots.
+
 ### Nov 25, 2026, Sisqo: Luna and Milo photos are in the repo (Nima approved)
 
 Nima asked me to commit the final sample pet photos so Claude can use them directly:
