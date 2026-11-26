@@ -1114,6 +1114,12 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Milo's background decided (Nov 25, 2026, by voice)
+
+Nima picked the **sunny park path** for Milo's photo (black and brown dachshund, no vest or gear). Photoreal, soft natural light, shallow depth of field, matching Benny's quality. Luna's background stays the warm home setting unless Nima says otherwise.
+
+Ready for review.
+
 ### Sisqo: Cleo's new name is Luna (Nov 25, 2026, by voice)
 
 **Cleo is now Luna.** Rename her everywhere in one pass: the app, flyers, public pages, sample data, ID card samples, alt text, image file names, and any SEO/meta text. Afterward, search the repo for "Cleo" (case-insensitive) and confirm zero hits. Luna's photo spec is unchanged: white Maine Coon, snow leopard look, red "Emotional Support" vest, warm home background.
