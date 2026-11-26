@@ -17,12 +17,12 @@ const SAMPLES = {
     badge: "service",
   },
   esa: {
-    name: "Cleo",
+    name: "Luna",
     holder: ["OWNER", "Jamie Cruz"],
     icon: "cat",
-    alt: "Cleo, a Maine Coon",
+    alt: "Luna, a Maine Coon",
     fields: [["SPECIES", "Cat"], ["BREED", "Maine Coon"], ["SEX", "Female"], ["BORN", "Mar 3, 2022"], ["WEIGHT", "14 lb"], ["TRAINING", "Leash trained"], ["MICROCHIP", "•••• 4410", true], ["ISSUED", "Nov 1, 2026"]],
-    mrz: ["P<PPGCLEO<<MAINE<COON<<<<<<<<<<<<", "PPGSAMPLE<CAT<220303<ESA<<<<<<<"],
+    mrz: ["P<PPGLUNA<<MAINE<COON<<<<<<<<<<<<", "PPGSAMPLE<CAT<220303<ESA<<<<<<<"],
     badge: "esa",
   },
   pet: {

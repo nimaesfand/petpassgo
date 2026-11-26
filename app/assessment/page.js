@@ -609,12 +609,10 @@ export default function PetPassGoQuiz() {
               ) : easyTrip ? (
                 <div className="rounded-2xl p-5 ppg-rise" style={{ border: `2px solid ${tokens.green}`, background: "#F3FBF6" }}>
                   <div className="flex items-center justify-between gap-3">
-                    <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 21, color: tokens.navy, lineHeight: 1.15 }}>Your checklist is free</div>
-                    <div className="rounded-full px-3 py-1" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontSize: 13, fontWeight: 800, letterSpacing: ".04em" }}>$0</div>
+                    <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 21, color: tokens.navy, lineHeight: 1.15 }}>Your checklist is ready</div>
                   </div>
-                  <p className="mt-1.5 mb-4" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }}>{signedIn ? "Simple flights are free. We'll save it to your account with how to do each step." : <>Simple flights are free. Make an account and we&apos;ll show you how to do each step.</>}</p>
-                  <button type="button" disabled={buying} onClick={unlockFree} className="w-full rounded-full py-3.5" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer", opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : "Get my free checklist"}</button>
-                  <p className="mt-2 text-center" style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>No card needed.</p>
+                  <p className="mt-1.5 mb-4" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.45 }}>{signedIn ? "We'll save it to your account with how to do each step." : <>Make your account and we&apos;ll show you how to do each step.</>}</p>
+                  <button type="button" disabled={buying} onClick={unlockFree} className="w-full rounded-full py-3.5" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer", opacity: buying ? 0.7 : 1 }}>{buying ? "One moment…" : "Get my checklist"}</button>
                 </div>
               ) : <>
               <h2 style={{ fontFamily: font.display, fontSize: 24, color: tokens.navy }} className="mb-1">This trip needs paperwork</h2>

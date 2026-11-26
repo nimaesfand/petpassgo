@@ -66,7 +66,7 @@ const FOOTER_LINKS = [
 
 const WHO = [
   { href: "/service-dog-passport", title: "My service dog", sub: "Your DOT forms, filled in and ready", name: "Benny", bg: "linear-gradient(135deg, #0B1A45 0%, #1E3A8A 100%)", photo: "/images/hero-golden-retriever.jpg" },
-  { href: "/esa-passport", title: "My emotional support animal", sub: "Your housing letter, always on hand", name: "Cleo", bg: "linear-gradient(135deg, #3B0D0D 0%, #8F1D1D 100%)", icon: "cat" },
+  { href: "/esa-passport", title: "My emotional support animal", sub: "Your housing letter, always on hand", name: "Luna", bg: "linear-gradient(135deg, #3B0D0D 0%, #8F1D1D 100%)", icon: "cat" },
   { href: "/pet-passport", title: "My pet", sub: "Their records and airline rules, in one place", name: "Milo", bg: "linear-gradient(135deg, #3A160A 0%, #A3400F 100%)", icon: "dog" },
 ];
 

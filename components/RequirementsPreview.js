@@ -123,12 +123,12 @@ export default function RequirementsPreview({ answers, onVerdict }) {
                     <li key={name} className="flex items-center gap-3 rounded-lg px-3 py-2.5 ppg-rise" style={{ background: tokens.sky }}>
                       <span className="shrink-0 rounded-full flex items-center justify-center" style={{ width: 24, height: 24, background: "#fff", border: `2px solid ${i === 0 ? tokens.primary : tokens.line}`, fontFamily: font.body, fontSize: 12, fontWeight: 800, color: tokens.navy }}>{i + 1}</span>
                       <span className="flex-1 min-w-0" style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy }}>{name}</span>
-                      <span aria-label={easy ? "Details in your free checklist" : "Details in your Travel Pass"} style={{ color: tokens.muted }}><Icon name="lock" size={15} /></span>
+                      <span aria-label={easy ? "Details in your checklist" : "Details in your Travel Pass"} style={{ color: tokens.muted }}><Icon name="lock" size={15} /></span>
                     </li>
                   ))}
                 </ul>
                 <p style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted, lineHeight: 1.45 }} className="mt-3">
-                  {more > 0 ? `+ ${more} more. ` : ""}{easy ? "Your free checklist shows exactly how to do each one, with the airline's official page." : "Your Travel Pass shows how to do each one, when it's due, and the official source."}
+                  {more > 0 ? `+ ${more} more. ` : ""}{easy ? "Your checklist shows exactly how to do each one, with the airline's official page." : "Your Travel Pass shows how to do each one, when it's due, and the official source."}
                 </p>
               </>
             ) : null}

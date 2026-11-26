@@ -1157,7 +1157,7 @@ function FreeTripWelcome({ onClose }) {
       <div className="p-4 flex items-start gap-3">
         <span aria-hidden className="flex items-center justify-center rounded-full shrink-0" style={{ width: 36, height: 36, background: "#EAF6EE", color: tokens.green }}><Icon name="check" size={20} /></span>
         <div className="flex-1 min-w-0" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }}>
-          <b style={{ color: tokens.navy }}>Your free checklist is ready.</b> It&apos;s right below. Tap each step for the how-to, and check it off when it&apos;s done.
+          <b style={{ color: tokens.navy }}>Your checklist is ready.</b> It&apos;s right below. Tap each step for the how-to, and check it off when it&apos;s done.
         </div>
         <button type="button" aria-label="Dismiss" onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: tokens.muted, padding: 2 }}><Icon name="x" size={18} /></button>
       </div>

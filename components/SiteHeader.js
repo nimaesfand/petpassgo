@@ -66,6 +66,7 @@ const GUEST_MAIN = [
 ];
 const GUEST_MORE = [
   { href: "/faq", label: "Help & FAQ" },
+  { href: "/reviews", label: "Reviews" },
   { href: "/contact", label: "Contact us" },
 ];
 const MEMBER_MAIN = [
@@ -77,6 +78,7 @@ const MEMBER_MORE = [
   { href: "/account", label: "Dashboard" },
   { href: "/account?tab=billing", label: "Account & billing" },
   { href: "/faq", label: "Help & FAQ" },
+  { href: "/reviews", label: "Reviews" },
   { href: "/contact", label: "Contact us" },
 ];
 

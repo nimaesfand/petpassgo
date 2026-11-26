@@ -24,7 +24,7 @@ export default function PetPassportPage({ searchParams }) {
         { icon: <Icon name="tag" size={20} />, text: "If they ever get lost, anyone who scans their tag can message you. Your number stays hidden." },
       ]}
       button="Get your Pet Passport"
-      after={<>Flying with a small pet in the cabin? Checking their trip is free. <a href="/assessment?pet=dog" style={{ color: "#fff", fontWeight: 800 }}>Check my pet&apos;s trip</a></>}
+      after={<>Flying with a small pet in the cabin? <a href="/assessment?pet=dog" style={{ color: "#fff", fontWeight: 800 }}>Check my pet&apos;s trip</a></>}
     />
   );
 }

@@ -12,7 +12,7 @@ import { trackEvent } from "../lib/analytics";
 export default function FreeAccountSheet({ open, onClose, onReady, trip, petWord = "your pet", returning = false }) {
   const [mode, setMode] = useState("signup");
   const [sent, setSent] = useState(false);
-  useEffect(() => { if (open && returning) { setMode("login"); setMsg("Your email is confirmed. Log in to get your free checklist."); } }, [open, returning]);
+  useEffect(() => { if (open && returning) { setMode("login"); setMsg("Your email is confirmed. Log in to see your checklist."); } }, [open, returning]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -51,12 +51,11 @@ export default function FreeAccountSheet({ open, onClose, onReady, trip, petWord
   }
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="Create your free account" className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: "rgba(20,33,61,.45)" }} onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}>
+    <div role="dialog" aria-modal="true" aria-label="Create your account" className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: "rgba(20,33,61,.45)" }} onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}>
       <div className="w-full sm:max-w-[440px] rounded-t-3xl sm:rounded-3xl p-6 ppg-rise" style={{ background: "#fff", maxHeight: "92vh", overflowY: "auto" }}>
         <div className="flex items-start justify-between gap-3">
           <div>
-            <div className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 mb-2" style={{ background: "#EAF6EE", color: tokens.green, fontFamily: font.body, fontSize: 12.5, fontWeight: 800, letterSpacing: ".04em" }}>FREE · NO CARD</div>
-            <h2 style={{ fontFamily: font.display, fontSize: 24, fontWeight: 800, color: tokens.navy, lineHeight: 1.15 }}>{mode === "signup" ? "Get your free checklist" : "Log in to see your checklist"}</h2>
+            <h2 style={{ fontFamily: font.display, fontSize: 24, fontWeight: 800, color: tokens.navy, lineHeight: 1.15 }}>{mode === "signup" ? "Get your checklist" : "Log in to see your checklist"}</h2>
             <p className="mt-1" style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>Every step for {petWord}&apos;s flight, saved to your account.</p>
           </div>
           <button type="button" aria-label="Close" onClick={onClose} disabled={busy} style={{ background: "none", border: "none", cursor: "pointer", color: tokens.muted, padding: 4 }}><Icon name="x" size={20} /></button>
@@ -67,13 +66,13 @@ export default function FreeAccountSheet({ open, onClose, onReady, trip, petWord
           <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === "signup" ? "Create a password (8+ characters)" : "Password"} aria-label="Password" autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={mode === "signup" ? 8 : undefined} style={input} required />
           {msg && <div className="rounded-xl px-3 py-2.5" style={{ background: "#FFF8EC", fontFamily: font.body, fontSize: 14.5, color: "#7A4F00" }}>{msg}</div>}
           {sent ? null : <button type="submit" disabled={busy} className="rounded-full py-3.5 mt-1" style={{ background: tokens.green, color: "#fff", fontFamily: font.body, fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer", opacity: busy ? 0.7 : 1 }}>
-            {busy ? "One moment…" : mode === "signup" ? "Create free account" : "Log in"}
+            {busy ? "One moment…" : mode === "signup" ? "Create my account" : "Log in"}
           </button>}
         </form>
         <div className="mt-4 text-center" style={{ fontFamily: font.body, fontSize: 15, color: tokens.muted }}>
           {mode === "signup"
             ? <>Already have an account? <button type="button" onClick={() => { setMode("login"); setMsg(""); setSent(false); }} style={{ color: tokens.primary, fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>Log in</button></>
-            : <>New here? <button type="button" onClick={() => { setMode("signup"); setMsg(""); setSent(false); }} style={{ color: tokens.primary, fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>Create a free account</button> · <a href="/login" style={{ color: tokens.navy }}>Forgot password?</a></>}
+            : <>New here? <button type="button" onClick={() => { setMode("signup"); setMsg(""); setSent(false); }} style={{ color: tokens.primary, fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>Create an account</button> · <a href="/login" style={{ color: tokens.navy }}>Forgot password?</a></>}
         </div>
         {mode === "signup" && <p className="mt-3" style={{ fontFamily: font.body, fontSize: 13, color: tokens.muted, lineHeight: 1.5 }}>By creating an account you agree to the <a href="/terms" style={{ color: tokens.navy }}>Terms</a> and <a href="/privacy" style={{ color: tokens.navy }}>Privacy Policy</a>.</p>}
       </div>
