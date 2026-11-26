@@ -16,6 +16,16 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Built (Nima's call): simple-trip checklist comes with Pet Vault; reward unchanged (commit 393ef3c)
+- **Simple trips** (small pet in the cabin, inside the U.S.): the step-by-step checklist is included with Pet Vault ($6.99/month). No Travel Pass, and no more free account. Card: "Good news: no Travel Pass needed", one consent box, "Start Pet Vault and get my checklist". Signed out: email sheet "Pet Vault · $6.99/month" then Stripe, then back to the trip, which unlocks itself. Signed in, not a member: Stripe, then back to the trip. Members: "Get my checklist" as before. `/api/free-trip` now refuses non-members.
+- Harder trips: Travel Pass, unchanged.
+- **Lost flyer reward:** unchanged. Blank unless the owner types something; shows what they typed.
+- CLAUDE.md and the chat assistant updated to match.
+
+**Test (Sisqo):** run a simple trip (small dog in cabin, domestic) signed in as the comped member: "Get my checklist" unlocks it. Signed out: the button opens the Pet Vault email sheet (stop before paying). Make sure no "free" or "$0" shows.
+
+Ready for testing.
+
 ### 2026-11-25: Built: retest fixes, photos, maker + one-step keep, one passport design, Apple + Google Wallet (commits 2678076 to a02366b)
 Nima approved all of Sisqo's Nov 25 notes (with my pushback: no "Vet Verified" or "the airline trusts" in sales copy) and the Wallet plan, including the new tables.
 
