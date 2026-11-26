@@ -56,7 +56,7 @@ export default function KeepPassport() {
   }
 
   const name = d?.data?.name || "Your pet";
-  const pet = d ? { id: "sample-draft", name, animal_type: d.data.animal_type || "Dog", role: d.data.role || "Pet", breed: d.data.breed, sex: d.data.sex, date_of_birth: d.data.date_of_birth, handler_name: d.data.handler_name, passport_no: "PPG-PREVIEW", passport_issued_at: d.created_at } : null;
+  const pet = d ? { id: "sample-draft", name, animal_type: d.data.animal_type || "Dog", role: d.data.role || "Pet", breed: d.data.breed, sex: d.data.sex, date_of_birth: d.data.date_of_birth, handler_name: d.data.handler_name, weight_lb: Number(d.data.service?.weight) > 0 ? Number(d.data.service.weight) : null, training: d.data.service?.trained_by ? { levels: ["tasks"], trained_by: d.data.service.trained_by, tasks: d.data.service.tasks || [] } : null, service_attested_at: d.data.service?.attest && d.data.service?.signed_name ? d.created_at : null, passport_no: "PPG-PREVIEW", passport_issued_at: d.created_at } : null;
   const photo = d?.photo ? <img src={d.photo} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : null;
 
   let side = null;
@@ -79,18 +79,19 @@ export default function KeepPassport() {
       <BennySays sub="Keep it with Pet Vault and it's ready wherever you go.">Here&apos;s {name}&apos;s passport.</BennySays>
       <div className="mt-6 rounded-3xl p-5 sm:p-6" style={{ background: "#fff", border: `2px solid ${tokens.primary}`, boxShadow: "0 18px 44px rgba(194,65,12,.14)" }}>
         <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 800, color: tokens.navy, lineHeight: 1.2 }}>Keep {name}&apos;s passport</div>
-        <p className="mt-1" style={{ fontFamily: B, fontSize: 17, color: tokens.ink }}>Pet Vault, {P.member} a month. Cancel anytime.</p>
+        <p className="mt-1" style={{ fontFamily: B, fontSize: 17, color: tokens.ink }}>Pet Vault unlocks the rest of it:</p>
         <div className="mt-4"><LockedPages name={name} /></div>
         <div className="mt-5">
           {state === "guest" ? (
             <>
-              <GuestEmailStep plan="membership" cancelPath={`/passport/keep?t=${t}`} />
-              <p className="mt-3" style={{ fontFamily: B, fontSize: 15, color: tokens.muted }}>Use <b style={{ color: tokens.navy }}>{d?.email}</b> so {name}&apos;s passport moves into your account. Already a member? <a href="/login" style={{ color: tokens.navy, fontWeight: 700 }}>Log in</a></p>
+              <GuestEmailStep plan="membership" cancelPath={`/passport/keep?t=${t}`} defaultEmail={d?.email || ""} keepToken={t} compact showMarketing={false} cta={`Keep ${name}'s passport`} />
+              <p className="mt-3 text-center" style={{ fontFamily: B, fontSize: 15, color: tokens.muted }}>Already a member? <a href="/login" style={{ color: tokens.navy, fontWeight: 700 }}>Log in</a></p>
             </>
           ) : (
             <>
-              <WithdrawalConsent renews checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
+              <WithdrawalConsent short renews checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} />
               <button type="button" disabled={busy} onClick={pay} className="w-full rounded-full mt-2" style={{ minHeight: 60, background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 19, border: "none", cursor: "pointer" }}>{busy ? "One moment…" : `Keep ${name}'s passport`}</button>
+              <p className="mt-2 text-center" style={{ fontFamily: B, fontSize: 14, color: tokens.muted }}>{P.member}/month. Cancel anytime in your account. You keep access through the month you paid.</p>
             </>
           )}
         </div>

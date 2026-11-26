@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { shortBreed } from "../lib/breeds";
 import RoleBadge from "./RoleBadge";
 import { supabase } from "../lib/supabaseClient";
 import { Wordmark } from "./Logo";
@@ -103,6 +104,8 @@ function HoloSeal({ size = 54 }) {
 // QR on the check page, only when the owner shares them.
 function trainingText(pet) {
   const t = pet.training || {};
+  // Service dogs show the kind of help ("Psychiatric · Mobility"), never the task details.
+  if (Array.isArray(t.tasks) && t.tasks.length) { const g = taskGroupsLine(t.tasks).split(", ").filter(Boolean).slice(0, 2).join(" · "); if (g) return g; }
   if (pet.service_attested_at && Array.isArray(t.levels) && t.levels.includes("tasks")) return "Task trained";
   const two = trainingSummary(t).split(", ").filter(Boolean).slice(0, 2).join(", ");
   return two || (pet.trained == null ? "" : pet.trained ? "House trained" : "Not yet");
@@ -234,7 +237,7 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
   const holder = owner || sheet || String(pet.id || "").startsWith("sample") ? fullHolder : shortName(fullHolder);
   const fields = [
     ["Species", pet.animal_type],
-    ["Breed", pet.breed],
+    ["Breed", shortBreed(pet.breed)],
     ["Sex", pet.sex],
     ["Born", [fmtDob(pet.date_of_birth), age && `(${age})`].filter(Boolean).join(" ")],
     ["Weight", pet.weight_lb ? `${pet.weight_lb} lb` : ""],

@@ -9,12 +9,14 @@ import WithdrawalConsent from "./WithdrawalConsent";
 import { MEMBERSHIP_TERMS } from "../lib/travelPassOffer";
 import { WITHDRAWAL_BLOCKED, rememberWithdrawalConsent } from "../lib/withdrawal";
 import MarketingOptIn from "./MarketingOptIn";
+import { KEEP_TOKEN_KEY } from "../lib/passportDraft";
 
 // One small step before Stripe for signed-out buyers: email → Continue.
 // Existing accounts are sent to log in (members get the member price); new emails go to Stripe.
 // plan: "membership" | "pass" | "join". trip: assessment answers for passes.
-export default function GuestEmailStep({ plan, trip, cancelPath, onClose, showConsent = true, showMarketing = true, marketingOptIn, onMarketingChange }) {
-  const [email, setEmail] = useState("");
+export default function GuestEmailStep({ plan, trip, cancelPath, onClose, showConsent = true, showMarketing = true, marketingOptIn, onMarketingChange, defaultEmail = "", compact = false, keepToken = "", cta = "Continue" }) {
+  const [email, setEmail] = useState(defaultEmail);
+  const [editEmail, setEditEmail] = useState(!defaultEmail);
   const [consent, setConsent] = useState(false);
   const [localTips, setLocalTips] = useState(false);
   const tips = marketingOptIn != null ? marketingOptIn : localTips;
@@ -27,7 +29,7 @@ export default function GuestEmailStep({ plan, trip, cancelPath, onClose, showCo
     e.preventDefault();
     if (showConsent && !consent) { setErr(WITHDRAWAL_BLOCKED); return; }
     setBusy(true); setErr("");
-    try { localStorage.setItem("petpassgo_marketing_opt_in", tips ? "1" : "0"); } catch {}
+    try { localStorage.setItem("petpassgo_marketing_opt_in", tips ? "1" : "0"); if (keepToken) localStorage.setItem(KEEP_TOKEN_KEY, keepToken); } catch {}
     const r = await startGuestCheckout(plan, trip, cancelPath, email, { immediate_access_consent: true, marketing_opt_in: tips });
     if (r.redirecting) return;
     setBusy(false);
@@ -63,11 +65,19 @@ export default function GuestEmailStep({ plan, trip, cancelPath, onClose, showCo
         </>
       ) : (
         <form onSubmit={go} className="flex flex-col gap-3">
-          <input type="email" required autoFocus={finePointer()} autoComplete="email" inputMode="email" placeholder="Your email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, height: 52, lineHeight: "normal" }} className="rounded-xl px-4 outline-none" />
-          {plan === "membership" ? <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink, margin: 0 }}>{MEMBERSHIP_TERMS}</p> : <GuaranteeLine />}
+          {editEmail ? (
+            <input type="email" required autoFocus={finePointer()} autoComplete="email" inputMode="email" placeholder="Your email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ fontFamily: font.body, border: `2px solid ${tokens.line}`, fontSize: 16, height: 52, lineHeight: "normal" }} className="rounded-xl px-4 outline-none" />
+          ) : (
+            <div className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3" style={{ background: tokens.sky, fontFamily: font.body, fontSize: 16, color: tokens.navy }}>
+              <span className="min-w-0 truncate">Using <b>{email}</b></span>
+              <button type="button" onClick={() => setEditEmail(true)} style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.navy, textDecoration: "underline", background: "none", border: "none", cursor: "pointer" }}>Change</button>
+            </div>
+          )}
+          {compact ? null : plan === "membership" ? <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink, margin: 0 }}>{MEMBERSHIP_TERMS}</p> : <GuaranteeLine />}
           {showMarketing ? <MarketingOptIn checked={tips} onChange={setTips} /> : null}
-          {showConsent ? <WithdrawalConsent renews={plan !== "pass"} checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} /> : (err ? <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp, margin: 0 }}>{err}</p> : null)}
-          <button type="submit" disabled={busy} style={btn} className="btn-primary rounded-full py-3.5 text-[16px]">{busy ? "One moment…" : "Continue"}</button>
+          {showConsent ? <WithdrawalConsent short={compact} renews={plan !== "pass"} checked={consent} onChange={(v) => { setConsent(v); setErr(""); }} error={err} /> : (err ? <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp, margin: 0 }}>{err}</p> : null)}
+          <button type="submit" disabled={busy} style={btn} className="btn-primary rounded-full py-3.5 text-[16px]">{busy ? "One moment…" : cta}</button>
+          {compact && plan !== "pass" ? <p className="text-center" style={{ fontFamily: font.body, fontSize: 14, lineHeight: 1.4, color: tokens.muted, margin: 0 }}>{usd(P.member)}/month. Cancel anytime in your account. You keep access through the month you paid.</p> : null}
           {onClose && <button type="button" onClick={onClose} className="py-1" style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted, background: "none", border: "none" }}>Cancel</button>}
         </form>
       )}

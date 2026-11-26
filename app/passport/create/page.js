@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import GuestEmailStep from "../../../components/GuestEmailStep";
 import SiteHeader from "../../../components/SiteHeader";
 import PetPassport from "../../../components/PetPassport";
 import BreedInput from "../../../components/BreedInput";
@@ -50,7 +51,11 @@ async function shrink(file) {
   } finally { URL.revokeObjectURL(url); }
 }
 
-const EMPTY_FORM = { animal_type: "", role: "", name: "", breed: "", sex: "", month: "", year: "", handler_name: "", email: "", weight: "", trained_by: "", trainer_name: "", trainer_business: "", tasks: "", vet_name: "", vet_phone: "", rabies_exp: "", signed_name: "", attest: "" };
+// "milo s. van darmez" -> "Milo S. Van Darmez". Only first letters change.
+const capWords = (v) => String(v || "").trim().replace(/(^|[\s\-'.])([a-z])/g, (m, a, b) => a + b.toUpperCase());
+const breedText = (a, b) => { const x = String(a || "").trim(), y = String(b || "").trim(); return y ? `${x} / ${y} mix`.replace(/ mix mix$/, " mix") : x; };
+
+const EMPTY_FORM = { animal_type: "", role: "", name: "", breed: "", breed2: "", vet_email: "", sex: "", month: "", year: "", handler_name: "", email: "", weight: "", trained_by: "", trainer_name: "", trainer_business: "", tasks: "", vet_name: "", vet_phone: "", rabies_exp: "", signed_name: "", attest: "" };
 
 export default function CreatePassport() {
   const [step, setStep] = useState(0);
@@ -65,6 +70,9 @@ export default function CreatePassport() {
   useEffect(() => { supabase.auth.getSession().then(({ data }) => { const u = data?.session?.user; if (u) setUser({ id: u.id, email: u.email || "" }); }); }, []);
   const camRef = useRef(null);
   const libRef = useRef(null);
+  const rabRef = useRef(null);
+  const [scan, setScan] = useState("");
+  const [mix, setMix] = useState(false);
   const loaded = useRef(false);
 
   // Everything saves as she goes.
@@ -95,7 +103,7 @@ export default function CreatePassport() {
   useEffect(() => { try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch {} }, [step]);
 
   const set = (k) => (v) => { setF((x) => ({ ...x, [k]: v })); setErr(""); };
-  const name = f.name.trim() || "your pet";
+  const name = capWords(f.name) || "your pet";
   const kind = f.animal_type === "Cat" ? "cat" : "dog";
   const dob = f.year ? `${f.year}-${String(f.month ? MONTHS.indexOf(f.month) + 1 : 6).padStart(2, "0")}-15` : "";
   const go = (n) => { setErr(""); setStep(n); };
@@ -109,14 +117,29 @@ export default function CreatePassport() {
   const toggleTask = (k) => set("tasks")((taskList.includes(k) ? taskList.filter((x) => x !== k) : [...taskList, k]).join(","));
 
   const pet = {
-    id: "sample-draft", name: f.name.trim() || "Your pet", animal_type: f.animal_type, role: f.role || "Pet",
-    breed: f.breed.trim(), sex: f.sex, date_of_birth: dob, handler_name: f.handler_name.trim(),
+    id: "sample-draft", name: capWords(f.name) || "Your pet", animal_type: f.animal_type, role: f.role || "Pet",
+    breed: breedText(f.breed, f.breed2), sex: f.sex, date_of_birth: dob, handler_name: capWords(f.handler_name),
     weight_lb: Number(f.weight) > 0 ? Number(f.weight) : null,
     training: svc && f.trained_by ? { levels: ["tasks"], trained_by: f.trained_by, tasks: taskList } : null,
     service_attested_at: svc && f.attest && f.signed_name.trim() ? new Date().toISOString() : null,
     passport_no: "PPG-PREVIEW", passport_issued_at: done?.at || null,
   };
   const passportPhoto = photo ? <img src={photo} alt={f.name || "Your pet"} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : null;
+
+  async function scanRabies(e) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setScan("busy");
+    try {
+      const image = await shrink(file);
+      const r = await fetch("/api/rabies-scan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) { setScan(j.error || "We couldn't read it. Type the date below."); return; }
+      setF((x) => ({ ...x, rabies_exp: j.expires_on || x.rabies_exp, vet_name: x.vet_name || j.clinic_name || "", vet_phone: x.vet_phone || j.clinic_phone || "" }));
+      setScan(j.expires_on ? "Got it. Check the date below." : "We found the clinic but not the date. Type it below.");
+    } catch { setScan("We couldn't read it. Type the date below."); }
+  }
 
   async function pickPhoto(e) {
     const file = e.target.files?.[0];
@@ -125,7 +148,7 @@ export default function CreatePassport() {
     try { setPhoto(await shrink(file)); go(4); } catch { setErr("That photo didn't open. Try another one."); }
   }
 
-  const serviceData = () => svc ? { weight: f.weight, trained_by: f.trained_by, trainer_name: f.trainer_name, trainer_business: f.trainer_business, tasks: taskList, vet_name: f.vet_name, vet_phone: f.vet_phone, rabies_exp: f.rabies_exp, signed_name: f.signed_name, attest: f.attest === "1" } : null;
+  const serviceData = () => svc ? { weight: f.weight, trained_by: f.trained_by, trainer_name: f.trainer_name, trainer_business: f.trainer_business, tasks: taskList, vet_name: f.vet_name, vet_phone: f.vet_phone, vet_email: f.vet_email, rabies_exp: f.rabies_exp, signed_name: f.signed_name, attest: f.attest === "1" } : null;
   const draftData = () => ({ animal_type: pet.animal_type || "Dog", role: pet.role, name: pet.name, breed: pet.breed, sex: pet.sex, date_of_birth: dob, handler_name: pet.handler_name, service: serviceData() });
 
   // Members (and travelers with a paid trip) save straight to their account.
@@ -134,7 +157,7 @@ export default function CreatePassport() {
       user_id: user.id, name: pet.name, animal_type: pet.animal_type || "Dog", role: pet.role,
       breed: pet.breed || null, sex: pet.sex || null, date_of_birth: dob || null,
       handler_name: pet.handler_name || null, passport_issued_at: new Date().toISOString(),
-      ...(svc ? { weight_lb: Number(f.weight) > 0 ? Number(f.weight) : null, vet_name: f.vet_name.trim() || null, vet_phone: f.vet_phone.trim() || null } : {}),
+      ...(svc ? { weight_lb: Number(f.weight) > 0 ? Number(f.weight) : null, vet_name: f.vet_name.trim() || null, vet_phone: f.vet_phone.trim() || null, vet_email: /^\S+@\S+\.\S+$/.test(f.vet_email.trim()) ? f.vet_email.trim() : null } : {}),
     }).select("id").single();
     if (error || !created) return { limit: /PET_LIMIT/.test(error?.message || "") };
     if (svc) {
@@ -185,7 +208,7 @@ export default function CreatePassport() {
 
   function startOver() {
     try { localStorage.removeItem(KEY); } catch {}
-    setF({ animal_type: "", role: "", name: "", breed: "", sex: "", month: "", year: "", handler_name: "", email: "", weight: "", trained_by: "", trainer_name: "", trainer_business: "", tasks: "", vet_name: "", vet_phone: "", rabies_exp: "", signed_name: "", attest: "" });
+    setF({ ...EMPTY_FORM });
     setPhoto(""); setDone(null); setStep(0);
   }
 
@@ -201,7 +224,7 @@ export default function CreatePassport() {
       <BennySays sub="It takes about a minute, and you'll see it come together as you go.">Hi, I&apos;m Benny. Let&apos;s make your pet a passport!</BennySays>
       <div className="mt-6 grid gap-3">
         <Choice on={f.animal_type === "Dog"} onClick={() => { set("animal_type")("Dog"); go(1); }}>It&apos;s for my dog</Choice>
-        <Choice on={f.animal_type === "Cat"} onClick={() => { set("animal_type")("Cat"); go(1); }}>It&apos;s for my cat</Choice>
+        {f.role === "Service animal" ? null : <Choice on={f.animal_type === "Cat"} onClick={() => { set("animal_type")("Cat"); go(1); }}>It&apos;s for my cat</Choice>}
       </div>
     </>
   );
@@ -217,14 +240,20 @@ export default function CreatePassport() {
     <>
       <BennySays sub={f.animal_type === "Cat" ? "Either way, the passport keeps everything in one place." : "This sets the seal on the passport."}>What does {name} do for you?</BennySays>
       <div className="mt-6 grid gap-3">
-        <Choice on={f.role === "Pet"} onClick={() => { set("role")("Pet"); go(3); }}>{name} is my pet</Choice>
-        {f.animal_type !== "Cat" ? <Choice on={f.role === "Service animal"} onClick={() => { set("role")("Service animal"); go(3); }} sub="Trained to do tasks for a disability, including psychiatric service dogs">Service dog</Choice> : null}
-        <Choice on={f.role === "Emotional support animal"} onClick={() => set("role")("Emotional support animal")} sub="Comfort and support at home">Emotional support animal</Choice>
+        <Choice on={f.role === "Pet"} onClick={() => set("role")("Pet")}>{name} is my pet</Choice>
+        {f.animal_type !== "Cat" ? <Choice on={f.role === "Service animal"} onClick={() => set("role")("Service animal")} sub="Trained to do tasks for a disability.">Service dog, including psychiatric service dog</Choice> : null}
+        <Choice on={f.role === "Emotional support animal"} onClick={() => set("role")("Emotional support animal")} sub="Comfort and emotional support.">Emotional support animal</Choice>
       </div>
-      {f.role === "Emotional support animal" ? (
-        <div className="mt-5 rounded-2xl p-4" style={{ background: "#FEF2F2", border: "1.5px solid #FECACA" }}>
-          <p style={{ fontFamily: B, fontSize: 17, lineHeight: 1.5, color: tokens.ink }}><b style={{ color: "#991B1B" }}>Good to know:</b> on U.S. flights, emotional support animals fly as pets. That means the airline&apos;s regular pet fee and pet rules, not free. {name}&apos;s passport still keeps everything in one place.</p>
-          <div className="mt-4"><BigButton onClick={() => go(3)}>Got it</BigButton></div>
+      {f.role ? (
+        <div className="mt-5 rounded-2xl p-4" style={f.role === "Emotional support animal" ? { background: "#FEF2F2", border: "1.5px solid #FECACA" } : f.role === "Service animal" ? { background: "#EEF2FF", border: "1.5px solid #C7D2FE" } : { background: "#FBF7EE", border: "1.5px solid #E6DCC6" }}>
+          <p style={{ fontFamily: B, fontSize: 17, lineHeight: 1.5, color: tokens.ink }}>
+            {f.role === "Emotional support animal"
+              ? <><b style={{ color: "#991B1B" }}>Good to know:</b> on U.S. flights, an emotional support animal flies as a pet, with the airline&apos;s usual pet fee and rules. {name}&apos;s passport still keeps everything in one place.</>
+              : f.role === "Service animal"
+                ? <><b style={{ color: "#1E3A8A" }}>Service dog it is.</b> We&apos;ll ask a few questions for the DOT forms airlines use.</>
+                : <><b style={{ color: tokens.navy }}>Pet it is.</b> {name}&apos;s passport keeps their records in one place.</>}
+          </p>
+          <div className="mt-4"><BigButton onClick={() => go(3)}>Next</BigButton></div>
         </div>
       ) : null}
     </>
@@ -244,17 +273,22 @@ export default function CreatePassport() {
   );
   if (step === 4) q = (
     <form onSubmit={(e) => { e.preventDefault(); go(5); }}>
-      <BennySays sub="Mixed or not sure? Just type what you think.">What kind of {kind} is {name}?</BennySays>
-      <div className="mt-6"><BreedInput value={f.breed} onChange={(e) => set("breed")(e?.target ? e.target.value : String(e || ""))} animal={f.animal_type || "Dog"} style={big} placeholder="Like Dachshund or Mixed" aria-label="Breed" /></div>
+      <BennySays sub="A mix? Add a second breed. Not sure? Type what you think.">What kind of {kind} is {name}?</BennySays>
+      <div className="mt-6"><BreedInput value={f.breed} onChange={(e) => set("breed")(e?.target ? e.target.value : String(e || ""))} animal={f.animal_type || "Dog"} style={big} placeholder="Like Dachshund" aria-label="Breed" /></div>
+      {f.breed2 !== "" || mix ? (
+        <div className="mt-3"><BreedInput value={f.breed2} onChange={(e) => set("breed2")(e?.target ? e.target.value : String(e || ""))} animal={f.animal_type || "Dog"} style={big} placeholder="Second breed, like Beagle" aria-label="Second breed" /></div>
+      ) : (
+        <button type="button" onClick={() => setMix(true)} className="mt-3" style={{ fontFamily: B, fontWeight: 700, fontSize: 17, color: tokens.navy, background: "none", border: "none", textDecoration: "underline", cursor: "pointer" }}>+ It&apos;s a mix (add a second breed)</button>
+      )}
       <div className="mt-5 flex flex-wrap gap-3"><BigButton type="submit">Next</BigButton></div>
     </form>
   );
   if (step === 5) q = (
     <>
-      <BennySays>Is {name} a boy or a girl?</BennySays>
+      <BennySays>Is {name} male or female?</BennySays>
       <div className="mt-6 grid grid-cols-2 gap-3">
-        <Choice on={f.sex === "Male"} onClick={() => { set("sex")("Male"); go(6); }}>Boy</Choice>
-        <Choice on={f.sex === "Female"} onClick={() => { set("sex")("Female"); go(6); }}>Girl</Choice>
+        <Choice on={f.sex === "Male"} onClick={() => { set("sex")("Male"); go(6); }}>Male</Choice>
+        <Choice on={f.sex === "Female"} onClick={() => { set("sex")("Female"); go(6); }}>Female</Choice>
       </div>
     </>
   );
@@ -310,7 +344,7 @@ export default function CreatePassport() {
   );
   if (step === 12) q = (
     <>
-      <BennySays sub="Pick everything that fits. Only the kind of help can show on the passport.">What does {name} help you with?</BennySays>
+      <BennySays sub="Pick everything that fits. We show the type of help on the passport, not the details, to protect your privacy.">What does {name} help you with?</BennySays>
       <div className="mt-5 grid gap-4">
         {TASK_GROUPS.map((g) => (
           <div key={g.key}>
@@ -334,6 +368,15 @@ export default function CreatePassport() {
       <div className="mt-6 grid gap-3">
         <input value={f.vet_name} onChange={(e) => set("vet_name")(e.target.value)} maxLength={80} placeholder="Vet or clinic name" aria-label="Vet or clinic name" style={big} />
         <input type="tel" value={f.vet_phone} onChange={(e) => set("vet_phone")(e.target.value)} maxLength={30} placeholder="Clinic phone" aria-label="Clinic phone" inputMode="tel" style={big} />
+        <input type="email" value={f.vet_email} onChange={(e) => set("vet_email")(e.target.value)} maxLength={120} placeholder="Clinic email" aria-label="Clinic email" inputMode="email" style={big} />
+        <input ref={rabRef} type="file" accept="image/*" capture="environment" onChange={scanRabies} hidden />
+        <button type="button" onClick={() => rabRef.current?.click()} disabled={scan === "busy"} className="rounded-2xl p-4 text-left flex items-center gap-3" style={{ background: "#FBF7EE", border: `2px dashed ${tokens.gold}`, cursor: "pointer" }}>
+          <span className="flex-shrink-0 flex items-center justify-center rounded-full" style={{ width: 44, height: 44, background: tokens.navy, color: tokens.gold, fontSize: 20 }} aria-hidden="true">📷</span>
+          <span>
+            <span className="block" style={{ fontFamily: B, fontSize: 17, fontWeight: 800, color: tokens.navy }}>{scan === "busy" ? "Reading it…" : "Snap the rabies certificate"}</span>
+            <span className="block" style={{ fontFamily: B, fontSize: 15, color: tokens.muted }}>{scan && scan !== "busy" ? scan : "We'll fill in the date for you. Or type it below."}</span>
+          </span>
+        </button>
         <label className="block">
           <span style={{ fontFamily: B, fontSize: 17, fontWeight: 700, color: tokens.navy }}>Rabies vaccine good until</span>
           <input type="date" value={f.rabies_exp} onChange={(e) => set("rabies_exp")(e.target.value)} aria-label="Rabies vaccine expiration date" className="mt-1.5" style={big} />
@@ -403,9 +446,15 @@ export default function CreatePassport() {
       <BennySays sub={`We also emailed it to ${user?.email || f.email || "you"}.`}>{pet.name}&apos;s passport is ready!</BennySays>
       <div className="mt-6 rounded-3xl p-5 sm:p-6" style={{ background: "#fff", border: `2px solid ${tokens.primary}`, boxShadow: "0 18px 44px rgba(194,65,12,.14)" }}>
         <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 800, color: tokens.navy, lineHeight: 1.2 }}>Keep {pet.name}&apos;s passport</div>
-        <p className="mt-1" style={{ fontFamily: B, fontSize: 17, color: tokens.ink }}>Pet Vault, {P.member} a month. Cancel anytime. It unlocks the rest of the passport:</p>
+        <p className="mt-1" style={{ fontFamily: B, fontSize: 17, color: tokens.ink }}>Pet Vault unlocks the rest of it:</p>
         <div className="mt-4"><LockedPages name={pet.name} /></div>
-        <a href={`/passport/keep?t=${done.token}`} className="mt-5 flex items-center justify-center rounded-full" style={{ minHeight: 60, background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 19, textDecoration: "none" }}>Keep {pet.name}&apos;s passport</a>
+        <div className="mt-5">
+          {user ? (
+            <a href={`/passport/keep?t=${done.token}`} className="flex items-center justify-center rounded-full" style={{ minHeight: 60, background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 19, textDecoration: "none" }}>Keep {pet.name}&apos;s passport</a>
+          ) : (
+            <GuestEmailStep plan="membership" cancelPath="/passport/create" defaultEmail={f.email.trim()} keepToken={done.token} compact showMarketing={false} cta={`Keep ${pet.name}'s passport`} />
+          )}
+        </div>
       </div>
       <button type="button" onClick={startOver} className="mt-5" style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: tokens.muted, background: "none", border: "none", textDecoration: "underline", cursor: "pointer" }}>Make a passport for another pet</button>
     </>

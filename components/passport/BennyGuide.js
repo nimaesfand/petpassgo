@@ -20,14 +20,14 @@ export function BennySays({ children, sub }) {
 }
 
 const LOCKED = [
-  ["Vet Verified", "Your vet confirms each vaccine with one click."],
-  ["Gate Ready", "Everything on one screen at the airport."],
-  ["Never Expired", "Reminders before vaccines or documents run out."],
-  ["Bring Me Home tag", "A QR tag that lets anyone who finds them reach you."],
+  ["Straight from your vet", "Their records, ready when anyone asks for them."],
+  ["Ready at the counter", "Walk up with everything already open on your phone."],
+  ["Never caught out", "A heads-up weeks before a shot or document expires."],
+  ["Bring Me Home tag", "If they slip out, anyone who scans it can message you."],
 ];
 
 const EVERYTHING = [
-  "The passport, with its QR code and a phone wallet pass",
+  "The passport, with its QR code",
   "Vet Verified records: your vet confirms each vaccine",
   "Every document in one place: rabies and health certificates, with a document check",
   "Gate Ready travel mode for the airport",

@@ -21,11 +21,11 @@ export function useWithdrawalRequired() {
 // counts as accepted so the existing checkout checks pass.
 // renews: this checkout starts Pet Vault. Everyone ticks the box to agree to the
 // monthly renewal (auto-renewal laws want express consent, not just "Pay").
-export default function WithdrawalConsent({ checked, onChange, error, renews = false }) {
+export default function WithdrawalConsent({ checked, onChange, error, renews = false, short = false }) {
   const need = useWithdrawalRequired();
   useEffect(() => { if (need === false && !renews && !checked) onChange(true); }, [need, renews]); // eslint-disable-line react-hooks/exhaustive-deps
   const text = renews
-    ? `Start Pet Vault at ${PRICES.member} a month. It renews every month until I cancel, and I can cancel anytime in my account.${need === true ? " " + WITHDRAWAL_CHECKBOX : ""}`
+    ? `Start Pet Vault at ${PRICES.member} a month${short ? ", renewing monthly until I cancel" : ". It renews every month until I cancel, and I can cancel anytime in my account"}.${need === true ? " " + WITHDRAWAL_CHECKBOX : ""}`
     : WITHDRAWAL_CHECKBOX;
   if (need !== true && !renews) return error ? <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp, margin: "8px 0 0" }}>{error}</p> : null;
   return (
