@@ -251,7 +251,8 @@ function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPho
     ["Weight", pet.weight_lb ? `${pet.weight_lb} lb` : ""],
     ["Training", trainingText(pet)],
     ["Microchip", owner && !sheet ? chipMask(chipValue) : chipValue],
-    ["Issued", pet.passport_issued_at ? fmtDob(String(pet.passport_issued_at).slice(0, 10)) : ""],
+    // Local date, same as the ISSUED stamp (slicing the UTC timestamp showed tomorrow after 4pm PT).
+    ["Issued", pet.passport_issued_at && !Number.isNaN(new Date(pet.passport_issued_at).getTime()) ? new Date(pet.passport_issued_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : ""],
     ["Color", pet.color],
   ];
   const badge = st === STATUS.service ? "service" : st === STATUS.esa ? "esa" : "pet";

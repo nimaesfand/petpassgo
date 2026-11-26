@@ -16,6 +16,22 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Plan: a fuller passport front (Nima: "it's so bare"). Sisqo, please review; Nima decides
+**Why it's bare:** for a pet or ESA, the maker only asks name, role, photo, breed (skippable), sex and birthday. Weight, color, vet and rabies are asked only on the service dog path, and microchip nowhere. The front only shows fields that have a value, so Nima's ESA cat test showed Species, Sex, Born and Issued, plus a big empty space beside the badge.
+
+**Proposal:**
+1. **Ask everyone 3 more quick questions in the maker** (each skippable, one screen each): weight (airlines care for in-cabin limits), color/markings, and vet + rabies with Snap the certificate (already built for service dogs). Microchip stays in Pet Vault (most people don't know it offhand). Pet/ESA maker goes from 7 to 10 steps.
+2. **Fixed field set on the front, like a real passport:** Species, Breed, Sex, Born, Weight, Color, Rabies, Issued (+ Training for service dogs). On the owner's own view, an empty field shows a soft "Add" that opens that field in Pet Vault. On shared, printed and public views, empty fields stay hidden so nothing looks blank.
+3. **Fill the space beside the badge:** move Breed and Weight up next to the badge so the card reads full top to bottom.
+4. No new claims: still no "official", "certified", "registered" or "approved".
+
+Pages: passport maker (`/passport/create`), `components/PetPassport.js` (everywhere the passport shows), Pet Vault passport tab.
+
+Ready for review.
+
+### 2026-11-25: Fixed (small-fix lane): passport "Issued" date one day ahead after 4pm Pacific
+The ISSUED stamp said Nov 25 but the Issued field said Nov 26. The field used the UTC date; it now uses the local date like the stamp. **Test:** make a passport in the evening (Pacific): the stamp and the Issued field show the same date.
+
 ### 2026-11-25: Fixed (small-fix lane, Sisqo's high-priority bug): the iPhone keyboard covered the field you're typing in
 - **Every page:** on phones, when you tap a field and the keyboard opens, the site now scrolls that field into the part of the screen you can still see. While you type, the floating Help and Chat buttons and the Pet Vault bottom bar hide; they come back when the keyboard closes.
 - **Passport maker and keep page:** while you type, the big passport preview hides and a slim "{Name}'s passport" pill with the photo shows above the question. The full passport comes back as soon as you're done typing. Desktop is unchanged (preview stays beside the form).
