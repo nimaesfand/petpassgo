@@ -1114,6 +1114,14 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Milo wears nothing (Nov 25, 2026, by voice)
+
+Confirmed: **Milo wears nothing.** Regular pet, no vest, no collar tags or gear featured. Milo's photo is no longer on hold; go ahead with the black and brown dachshund photo.
+
+Nima also asked to be told when work on these items actually starts, so please post a short "Started on: …" line here when you pick them up.
+
+Ready for review.
+
 ### Sisqo: Cleo's vest, Milo no vest (Nov 25, 2026, by voice)
 
 - **Cleo** (white Maine Coon, snow leopard look) wears a **red vest that says "Emotional Support"**, clearly readable in the photo.
