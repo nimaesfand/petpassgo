@@ -1234,6 +1234,49 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+## 2026-11-26 (afternoon PT): Sisqo test of wallet/passport/photos build + simple-trip-with-Vault (commits 2678076–a02366b and 393ef3c) — Ready for review
+
+Live on www.petpassgo.com. Tested at desktop (1280×900) and iPhone 14 emulation with Playwright, signed in as 6dpq5mtb+vault@ (Testy). Screenshots: `/workspace/vault-shots/b2-*.png`. No payments completed. Jessica’s account was not touched.
+
+### Build A — retest fixes, photos, maker + one-step keep, one passport design, Wallet buttons
+
+**Pass**
+
+- **Photos.** Luna is the ginger Maine Coon with the slim red Emotional Support vest, on the sofa by the window (`luna-ginger-maine-coon.jpg`). Milo is the black-and-brown dachshund on the sunny park path, no vest or gear (`milo-dachshund-park.jpg`). Benny stays the golden retriever at the airport, no vest. No Cleo leftover on the pages I checked. Sample and vault passport photos are cropped in on the animal (`object-fit: cover` with a centered `object-position`); the wide empty sides of the 16:9 shots do not show. Close-ups: `b2-desk-luna-img-closeup.png`, `b2-desk-milo-img-closeup.png`.
+- **One passport design.** The /service-dog sample, the maker preview, the issued animation, the keep screen, and Testy’s Pet Vault card are the same tall, narrow card: gold-framed photo, role badge, big name, handler/owner, ISSUED stamp, two-column details, MRZ, holographic seal. Ratio is about 1.67. Matches on desktop and iPhone 14 (`b2-desk-sample-service-dog-passport.png`, `b2-desk-testy-passport.png`, `b2-desk-maker-keep.png`, `b2-re-phone-vault-passport-scrolled.png`).
+- **Maker + one-step keep (signed out).** Role confirms with Next (no jump-ahead). Tasks show kinds only (“Psychiatric tasks · Mobility tasks”), with the privacy line. Breed shortens to “Mini Dachshund / Beagle mix.” Name capitalizes to “Milo S. Van Darmez.” One “Snap the rabies paper” offer, then type-it-in as a fallback. After “See {name}'s passport,” keep is one screen: email prefilled (“Using 6dpq5mtb+b2maker@… · Change”), one consent box (“Start Pet Vault at $6.99 a month, renewing monthly until I cancel.”), one terms line (“$6.99 USD/month. Cancel anytime… You keep access through the month you paid.”). No 7-day hold. Stopped before paying. Draft POST `/api/passport-draft` returned 200.
+- **Lost flyer photo and details (earlier fail).** The Lost tab preview and the confirm form now show Testy’s real photo, not a placeholder, plus “Labrador Retriever · Male,” a QR code, and the line “If you see Testy, please don’t chase. Scan the code or call instead.” (`b2-r4-lost-tab-scrolled.png`, `b2-r4-lost-confirm.png`). I published a report (Echo Park · Los Angeles · Nov 26, 2026) and marked Testy found afterward.
+- **The two flyers are closer.** `/lost-flyer` “Use Testy’s details” fills the name, “Labrador Retriever · Male,” the microchip checkbox, a QR, and the same don’t-chase line (`b2-desk-flyer-maker-filled.png`). **Remaining mismatch:** the maker does not fill the photo (“Add a photo” stays empty).
+- **Grooming update opens Health,** not Docs. Health tab is selected after the click (`b2-desk-grooming-click.png`, `b2-desk-health.png`).
+- **Wallet “coming soon” is gone** from the Passport tab (desktop and iPhone 14) and the Tags page. `/api/pet-wallet` returns 200 with `apple: false` and `google: false`, so the Apple and Google buttons stay hidden. Honest state: Nima’s certs and env vars are not set up yet, so add-to-wallet and pass updates could not be tested.
+- **Duplicate “+ Add a record.”** Testy’s Health (which already has a Rabies record) shows a single “+ Add a record.” I did not re-check a brand-new pet with zero health records.
+- **Names do not wrap mid-word.** “Milo S. Van Darmez,” “Mini Dachshund / Beagle mix,” and “Labrador Retriever” stayed whole on the card.
+- **Multi-pet stacking is fixed.** With two pets, a switcher sits at the top of My Pets (Switchlet | Testy). Only one pet shows at a time. Switching to Testy works, and Grooming update still opened Testy’s Health. Switchlet was removed after the test (`b2-r4-two-pets-vault.png`, `b2-r4-switch-testy.png`).
+
+**Fail / still open**
+
+- **FAQ still says “Metal tags are coming soon.”** That breaks the no-“coming soon” rule. I didn’t see “coming soon” on the other pages I scanned (home, service-dog, service-dog-passport, esa-passport, pet-passport, pet-vault, travel-pass, blog, tags, terms, assessment results, account, keep).
+- **Public lost page photo is still empty.** While the report was live, `/id/testy-847a24` showed a generic paw icon and an empty passport photo, even though the Lost tab flyer preview used Testy’s real photo (`b2-r4-lost-public.png`). (Claude already noted the public /id page still uses its own card.)
+- **`/lost-flyer` “Use Testy’s details” still doesn’t fill the photo.** That’s the last real mismatch between the two flyers.
+- I did not get a close-up of the published full-size “View poster” (the click stayed on the management card). Judgment on the flyer itself is from the Lost tab preview, which already has the photo, details, QR, and don’t-chase line.
+- Color and weight were not successfully saved on Testy this run (“Next: add weight” is still showing), so the details line could only be checked with breed and sex — which matches Claude’s note that those fields only appear once they’re filled in.
+
+### Build B — simple-trip checklist comes with Pet Vault (393ef3c)
+
+**Pass.** The earlier fail (“Get my checklist” created a free trip for anyone) is fixed.
+
+- Signed out, small dog in cabin, LAX → LAS, Allegiant: results say “Good news: no Travel Pass needed” and the button is “Start Pet Vault and get my checklist.” The email sheet is titled “Pet Vault · $6.99/month” (rendered “Pet Vault - $6.99 USD/month”). No “free” or “$0.” Stopped before paying (`b2-r3-trip-sheet.png`).
+- Signed-in Vault member, same trip: “Get my checklist” unlocks the 3-step checklist. The banner says “Your checklist is ready.” No “free” or “$0” on the results or the unlocked page (the internal `?free_trip=1` param is stripped). `/api/free-trip` requires membership (`b2-r3-member-results.png`, `b2-r3-member-checklist.png`).
+
+### Word scan
+
+No customer-facing “free,” “$0,” or “coming soon” on the pages listed above, except the FAQ “Metal tags are coming soon” fail. The allowed “/service-dog flies with you, free” line was not needed as an exception this scan. Business listings were not in this pass.
+
+### Cleanup
+
+Switchlet was removed. Testy is not lost. The LAX → LAS Dec 24, 2026 Allegiant trip I created for this test was deleted. Left in place from earlier tests: the LAX → JFK Dec 20, 2026 Allegiant trip, Grooming on Nov 28, and Rabies expiring Dec 9. Color and weight were not changed.
+
+
 ### Nov 26, 2026, Sisqo: breed is required in the passport maker (Nima)
 
 Nima: breed should **always** be asked, not skippable. Airlines restrict some breeds (snub-nosed breeds, for example), and the passport should never show it blank.
