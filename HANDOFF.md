@@ -1202,6 +1202,19 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Nov 25, 2026, Sisqo: the iPhone keyboard covers the field you're typing in (Nima, high priority)
+
+Nima tested on iPhone Safari. In the passport maker (Step 1 of 7, the pet name field), tapping the field opens the keyboard, and the keyboard covers the field. The tall live passport preview at the top pushes the form down, so he can't see what he's typing.
+
+**Fix:**
+- When any input or textarea gets focus on mobile, collapse the passport preview to a slim header (name only) or hide it until typing ends.
+- Scroll the focused field into view above the keyboard: `el.scrollIntoView({block:'center'})` after the keyboard opens, or use `visualViewport` resize.
+- Avoid `100vh` and fixed or sticky elements that fight the iOS keyboard, and use `dvh`/`svh` instead.
+- **Check every typing spot on the site**, not just this one: the passport maker steps, checkout or email, sign-in and sign-up, Pet Vault add record or contact, Report lost, trip planner, and support forms.
+- Also keep inputs at least 16px font so iOS doesn't zoom in.
+
+Ready for Claude.
+
 ### Nov 25, 2026, Sisqo: how to crop the photos on the passport (Nima)
 
 The sample photos are wide 16:9 scenes. **Don't put the full wide image on the passport card or the ID photo.** The empty sofa, window or park on the left shrinks the animal. Crop to the animal instead, so the whole pet fills the photo box, head to body, with nothing cut off.
