@@ -1149,6 +1149,16 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Nov 25, 2026, Sisqo: Luna and Milo photos are in the repo (Nima approved)
+
+Nima asked me to commit the final sample pet photos so Claude can use them directly:
+
+- `public/images/luna-ginger-maine-coon.jpg`: Luna, the ESA sample pet. Ginger Maine Coon, slim red "Emotional Support" harness, sofa by a sunny window.
+- `public/images/milo-dachshund-park.jpg`: Milo, a regular pet. Black and brown dachshund, no gear, sunny park path.
+- Benny is unchanged: `public/images/hero-golden-retriever.jpg`.
+
+Both images are 16:9. Please swap them in wherever Cleo, Luna or Milo samples appear. No code was changed.
+
 ### Nov 25, 2026, Sisqo: Luna's final photo picked (supersedes earlier Luna coat notes)
 
 Nima picked the **red ginger tabby Maine Coon** for Luna (the emotional support sample pet). This replaces the earlier white and snow leopard coat notes.
