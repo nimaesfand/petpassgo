@@ -1114,6 +1114,29 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Nima's decisions on today's build + public test results (Nov 25, 2026)
+
+**Nima's decisions (his words summarized):**
+1. **/service-dog "Your service dog flies with you, free." stays.** A true service dog does fly free (airline charges nothing), so that's a fact, not a PetPassGo price claim. Keep it.
+2. **ESA badge keeps "Flies as a pet."** It's a passport; no need for "Housing letter on file" on the badge.
+3. **Reward stays optional and owner-entered**, amounts allowed. Nima's call: rewards are normally money, the owner types what they want.
+4. **Everything requires an account now. Nothing is free.** Remove every customer-facing line saying something can be done free or without an account, including:
+   - Terms: "The printable lost-pet flyer can still be made with no account." (and the terms/privacy lines calling the trip check free, e.g. "Trip requirements check: free, no payment").
+   - The trip check "free" wording too: /pet-passport "Checking their trip is free", assessment sheet "FREE · NO CARD", "Get your free checklist", "Create free account" / "Create a free account" / "Create your free account", "Log in to get your free checklist", preview "Your free checklist shows…", account "Your free checklist is ready."
+   - Unused leftovers in components/home/HomePricing.js and SampleAnswer.js (delete or clean so they can't come back).
+   Not affected: business listings ("List your business free" is for businesses), factual uses like "Screwworm-free certificate", "it's free on CDC's site", a free seat "if one is free", and the service dog line above.
+
+**Still open from my public test (fix):**
+- Reviews are hard to find: the "Reviews" footer link is only on the homepage; most pages (FAQ, Contact, Airlines, Pet Vault, Travel Pass, ESA, Login, /reviews) have no footer. Add the footer site-wide or put Reviews in the Help menu.
+- Flyers still don't match: maker photo 880x520 vs Report-lost 400x400; only Report-lost shows breed/color/sex/Microchipped; maker has no reward/sex/chip fields; weight on neither.
+- /pet-id returns 404 (fine if nothing links to it).
+
+**Passed:** no "free" on home/ESA/service-dog-passport/login/airlines/Canada/meta/FAQ; Get started chooser (both links 200); "Starts their Pet Vault. $6.99 a month, cancel anytime."; pricing order; guarantee teaser matches /guarantee and /terms; tiles with lost tile last; badges; LOST DOG headline, name line, don't-chase line; Report-lost photo 280→400px; /reviews 200 with empty state; privacy covers Share records and reviews; all homepage links 200.
+
+Signed-in walkthrough (comped account works, thanks) is in progress; results in a separate entry.
+
+Ready for review.
+
 ### Sisqo note for Claude: Benny homepage image, service dog vest (Nov 25, 2026)
 
 From Nima (relayed by voice). Update Benny's homepage image (`public/images/hero-golden-retriever.jpg`, the photorealistic golden retriever at the airport window):
