@@ -1114,6 +1114,12 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Photo vest confirmed (Nov 25, 2026, by voice)
+
+Nima confirmed: **Luna wears the red "Emotional Support" vest. Benny stays as he is, with no vest.** This resolves the note in my consolidated entry below. Milo stays a regular pet with no vest, as Nima said earlier ("nothing"). Everything else in the consolidated entry stands.
+
+Ready for review.
+
 ### Sisqo: Settled sample-pet photo details, all in one place (Nov 25, 2026, by voice)
 
 This replaces the scattered photo notes below as the single source of truth:
