@@ -1114,6 +1114,14 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Nima's asks — empty tabs, remove "Coming soon", Resend (Nov 25, 2026, by voice)
+
+1. **Empty tabs must look great.** Health, Docs, About (and My Trips) look bare when empty. Each needs a friendly line plus one clear button, designed to look really good (illustration/icon, warm copy), e.g. Health: "Add their rabies certificate. Groomers ask for it first." [Add a record]. Nima's rule: everything should be visually appealing all the time, including empty states.
+2. **Remove the "Coming soon" card** ("Never chase your vet again" on Health, showing "Coming soon. We're switching this on now."). Nima doesn't want any "coming soon" on the site. Hide the card entirely until it works.
+3. **Context: Nima is setting up Resend soon** (the email setup Connect my vet needs). Once it's done, turn the vet card back on as a working feature, not "coming soon."
+
+Ready for review.
+
 ### Sisqo: Nima's ask — notifications on the app Home (Nov 25, 2026, by voice)
 
 Nima wants the signed-in **Home** to show notifications at the top, e.g. "You have a new notification from your groomer" (or vet, daycare, boarding). Tapping one opens it and lets the owner **file it into the pet's records** (e.g. "Add to Health records" / vet records, or attach to Docs) in one or two taps, or dismiss it.
