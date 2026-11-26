@@ -1149,6 +1149,15 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Built passport should match the sample passport (Nov 25, 2026, Nima)
+
+Nima: the sample passport on the Service Dog Passport page (/service-dog, Benny) looks better than the passport a customer just built (maker result / "Keep Milo's passport" screen). Make them the **same card component and layout**:
+- Sample is a tall, narrow card: rainbow holographic sheen, photo with gold frame, big name, handler under it, ISSUED stamp under the name, two-column details (Species/Breed, Sex/Born, Weight/Training, Microchip/Issued), MRZ lines at the bottom, holo paw seal.
+- Built one is wider and flatter: plain cream, 4-column cramped details (breed wraps "Miniatur/e"), dashed verification code instead of the MRZ, stamp top-right.
+- The customer's own passport should look at least as good as the sample, since that's what they're paying to keep. One shared component everywhere (sample, maker preview, result, Pet Vault, public passport page).
+
+Ready for review.
+
 ### Sisqo: Nima's walkthrough of the passport maker, service dog path (Nov 25, 2026, desktop)
 
 Nima went Home > "Who's coming with you?" > Benny > "Get your service dog passport" and made a passport for "Milo". Notes in order, plus mine:
