@@ -4,6 +4,7 @@ import { suggestBreeds, isKnownBreed } from "../lib/breeds";
 import { tokens, font } from "../lib/theme";
 
 // Breed box with suggestions that forgive spelling ("daachound" -> Dachshund). Any text is still allowed.
+// Suggestions sit in the page flow (not on top), so they never cover the Next button.
 export default function BreedInput({ value, onChange, animal = "Dog", style, className = "", ...props }) {
   const [open, setOpen] = useState(false);
   const [hi, setHi] = useState(0);
@@ -32,7 +33,7 @@ export default function BreedInput({ value, onChange, animal = "Dog", style, cla
         }}
         className={`${className} w-full`} style={style} />
       {show && (
-        <ul role="listbox" className="absolute left-0 right-0 mt-1 rounded-2xl overflow-hidden" style={{ zIndex: 50, background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 14px 34px rgba(20,33,61,.16)", listStyle: "none", padding: 4, margin: 0 }}>
+        <ul role="listbox" className="mt-2 rounded-2xl overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 14px 34px rgba(20,33,61,.16)", listStyle: "none", padding: 4, margin: 0 }}>
           {list.map((b, i) => (
             <li key={b} role="option" aria-selected={i === hi}>
               <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => { clearTimeout(blurTimer.current); pick(b); }}

@@ -377,7 +377,7 @@ export default function CreatePassport() {
   );
   if (step === 7) q = (
     <form onSubmit={finish}>
-      <BennySays sub={user ? "" : `We'll email you ${name}'s passport. No password needed.`}>{user ? `Last step! Ready to make ${name}'s passport?` : <>Last step! Where should we send {name}&apos;s passport?</>}</BennySays>
+      <BennySays sub={user ? "" : `We'll email you a link to ${name}'s passport.`}>{user ? `Last step! Ready to make ${name}'s passport?` : <>Last step! Where should we send {name}&apos;s passport?</>}</BennySays>
       <label className="block mt-6">
         <span style={{ fontFamily: B, fontSize: 17, fontWeight: 700, color: tokens.navy }}>Your full name</span>
         <input value={f.handler_name} onChange={(e) => set("handler_name")(e.target.value)} maxLength={60} autoComplete="name" className="mt-1.5" style={big} />

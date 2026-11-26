@@ -58,7 +58,6 @@ export default function KeepPassport() {
   const name = d?.data?.name || "Your pet";
   const pet = d ? { id: "sample-draft", name, animal_type: d.data.animal_type || "Dog", role: d.data.role || "Pet", breed: d.data.breed, sex: d.data.sex, date_of_birth: d.data.date_of_birth, handler_name: d.data.handler_name, passport_no: "PPG-PREVIEW", passport_issued_at: d.created_at } : null;
   const photo = d?.photo ? <img src={d.photo} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : null;
-  const days = d?.expires_at ? Math.max(1, Math.ceil((new Date(d.expires_at) - Date.now()) / 864e5)) : 7;
 
   let side = null;
   if (state === "loading" || state === "moving") side = <BennySays>{state === "moving" ? `Adding ${name}'s passport to your account…` : "One moment…"}</BennySays>;
@@ -77,7 +76,7 @@ export default function KeepPassport() {
   );
   if (state === "guest" || state === "member-needed") side = (
     <>
-      <BennySays sub={`We'll hold it for ${days} more day${days === 1 ? "" : "s"}.`}>Welcome back! Here&apos;s {name}&apos;s passport.</BennySays>
+      <BennySays sub="Keep it with Pet Vault and it's ready wherever you go.">Here&apos;s {name}&apos;s passport.</BennySays>
       <div className="mt-6 rounded-3xl p-5 sm:p-6" style={{ background: "#fff", border: `2px solid ${tokens.primary}`, boxShadow: "0 18px 44px rgba(194,65,12,.14)" }}>
         <div style={{ fontFamily: font.display, fontSize: 24, fontWeight: 800, color: tokens.navy, lineHeight: 1.2 }}>Keep {name}&apos;s passport</div>
         <p className="mt-1" style={{ fontFamily: B, fontSize: 17, color: tokens.ink }}>Pet Vault, {P.member} a month. Cancel anytime.</p>
