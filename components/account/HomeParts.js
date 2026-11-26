@@ -164,3 +164,72 @@ export function QuickActions({ onOpen }) {
     </div>
   );
 }
+
+// Home notifications: one compact feed across all pets. New notices from a vet,
+// groomer, daycare or boarding come first (tap to check and file them), then
+// "got your records", upcoming visits, and shots or letters coming due.
+const VISIT = { grooming: "Grooming", daycare: "Daycare", boarding: "Boarding", training: "Training", vet: "Vet visit" };
+const inDays = (n) => (n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`);
+const shortDate = (d) => new Date(`${String(d).slice(0, 10)}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+
+export function HomeNotices({ userId, onOpen }) {
+  const [items, setItems] = useState(null);
+  const [all, setAll] = useState(false);
+  useEffect(() => {
+    if (!userId) return;
+    (async () => {
+      const today = todayPT();
+      const soon = new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 10);
+      const since = new Date(Date.now() - 14 * 864e5).toISOString();
+      const [{ data: pets }, { data: notices }, { data: sends }, { data: due }] = await Promise.all([
+        supabase.from("pets").select("id,name,role,next_visit_kind,next_visit_date,next_visit_place,lease_renewal_date").eq("user_id", userId),
+        supabase.from("pet_notices").select("id,pet_id,from_name,from_email,subject,summary,created_at").eq("user_id", userId).eq("status", "new").order("created_at", { ascending: false }).limit(10),
+        supabase.from("record_sends").select("id,pet_id,to_name,to_email,received_at").eq("user_id", userId).gte("received_at", since).order("received_at", { ascending: false }).limit(5),
+        supabase.from("pet_health_records").select("id,pet_id,name,kind,expires_on").eq("user_id", userId).in("kind", ["vaccine", "medication"]).gte("expires_on", today).lte("expires_on", soon).order("expires_on").limit(10),
+      ]);
+      const name = Object.fromEntries((pets || []).map((p) => [p.id, p.name]));
+      const out = [];
+      (notices || []).forEach((n) => out.push({ key: `n${n.id}`, unread: true, icon: "send", pet: n.pet_id, open: "health", title: `New notice from ${n.from_name || n.from_email || "your vet"}`, sub: `About ${name[n.pet_id] || "your pet"}. Tap to check it and add it to their records.` }));
+      (pets || []).forEach((p) => {
+        const d = daysTo(p.next_visit_date);
+        if (d != null && d >= 0 && d <= 14) out.push({ key: `v${p.id}`, icon: "calendar", pet: p.id, open: "docs", sort: d, title: `${VISIT[p.next_visit_kind] || "Visit"}${p.next_visit_place ? ` at ${p.next_visit_place}` : ""} ${inDays(d)}`, sub: `${p.name}'s records are ready to send.` });
+        const l = daysTo(p.lease_renewal_date);
+        if (l != null && l >= 0 && l <= 30) out.push({ key: `l${p.id}`, icon: "home", pet: p.id, open: "docs", sort: l, title: `Lease renews ${inDays(l)}`, sub: `Check ${p.name}'s housing letter is current.` });
+      });
+      (due || []).forEach((h) => out.push({ key: `h${h.id}`, icon: "stethoscope", pet: h.pet_id, open: "health", sort: daysTo(h.expires_on), title: `${name[h.pet_id] || "Your pet"}'s ${h.name} is due ${shortDate(h.expires_on)}`, sub: "Book it before the groomer, boarding or airline asks." }));
+      (sends || []).forEach((r) => out.push({ key: `r${r.id}`, icon: "check", pet: r.pet_id, open: "docs", sort: 99, title: `${r.to_name || r.to_email} got ${name[r.pet_id] || "your pet"}'s records`, sub: `Confirmed ${shortDate(r.received_at)}.` }));
+      out.sort((a, b) => (b.unread ? 1 : 0) - (a.unread ? 1 : 0) || (a.sort ?? 0) - (b.sort ?? 0));
+      setItems(out);
+    })().catch(() => setItems([]));
+  }, [userId]);
+
+  if (!items || !items.length) return null;
+  const unread = items.filter((i) => i.unread).length;
+  const shown = all ? items : items.slice(0, 3);
+  return (
+    <section className="mb-2">
+      <div className="flex items-end justify-between gap-3 mb-3">
+        <h2 className="flex items-center gap-2" style={{ fontFamily: font.display, fontSize: 22, fontWeight: 800, color: tokens.navy }}>
+          Updates
+          {unread ? <span className="inline-flex items-center justify-center rounded-full" style={{ minWidth: 24, height: 24, padding: "0 7px", background: tokens.primary, color: "#fff", fontFamily: font.body, fontSize: 13, fontWeight: 800 }}>{unread}</span> : null}
+        </h2>
+        {items.length > 3 ? <button type="button" onClick={() => setAll((v) => !v)} style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.primary, background: "none", border: "none", cursor: "pointer" }}>{all ? "Show less" : `See all ${items.length}`}</button> : null}
+      </div>
+      <div className="grid gap-2">
+        {shown.map((i) => (
+          <button key={i.key} type="button" onClick={() => onOpen(i.pet, i.open)} className="w-full text-left flex items-center gap-3 rounded-2xl p-3.5 ppg-lift" style={{ background: "#fff", border: `${i.unread ? 2 : 1}px solid ${i.unread ? tokens.gold : tokens.line}`, cursor: "pointer" }}>
+            <span className="flex-shrink-0 flex items-center justify-center rounded-2xl relative" style={{ width: 42, height: 42, background: i.unread ? "#FFF4DC" : tokens.sky, color: i.unread ? tokens.primary : tokens.navy }}>
+              <Icon name={i.icon} size={20} />
+              {i.unread ? <span aria-label="New" className="absolute rounded-full" style={{ top: -3, right: -3, width: 11, height: 11, background: tokens.primary, border: "2px solid #fff" }} /> : null}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block" style={{ fontFamily: font.body, fontSize: 15.5, fontWeight: 800, color: tokens.navy, lineHeight: 1.3 }}>{i.title}</span>
+              <span className="block mt-0.5" style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted, lineHeight: 1.35 }}>{i.sub}</span>
+            </span>
+            <span aria-hidden="true" style={{ color: tokens.muted, fontWeight: 800 }}>›</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}

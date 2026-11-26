@@ -31,6 +31,8 @@ const text = { fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tok
 const input = { fontFamily: font.body, fontSize: 16, border: `2px solid ${tokens.line}`, borderRadius: 12, padding: "10px 12px", width: "100%", background: "#fff" };
 const btn = { fontFamily: font.body, fontWeight: 700, fontSize: 16, borderRadius: 999, padding: "10px 16px", border: "none", cursor: "pointer", minHeight: 44 };
 
+const isServiceRole = (p) => /service/i.test(String(p?.role || ""));
+
 function Chip({ children }) {
   return (
     <span className="inline-flex items-center rounded-full px-3 py-1.5" style={{ background: tokens.sky, color: tokens.navy, fontFamily: font.body, fontSize: 15, fontWeight: 700 }}>{children}</span>
@@ -351,8 +353,22 @@ export default function PetProfileExperience({ pet, userId, mode = "owner", onCh
         justIssued={justIssued}
         onPhotoTap={owner ? () => setBooth(true) : null}
       /> : null}
-      {showPassport && owner && v !== "id" && pet?.id ? <TripPromptCard pet={pet} /> : null}
-      {showPassport && owner && v !== "id" && pet?.id ? <TrainingCard key={`${pet.id}-${pet.service_attested_at || ""}`} pet={pet} userId={userId} onChanged={onChanged} /> : null}
+      {showPassport && owner && v !== "id" && pet?.id ? (
+        // The passport is the star. Trip and training extras stay tucked under it until tapped.
+        <details className="ppg-fold rounded-3xl group" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
+          <summary className="flex items-center justify-between gap-3 px-4 py-3.5 cursor-pointer" style={{ listStyle: "none" }}>
+            <span className="min-w-0">
+              <span className="block" style={{ fontFamily: font.display, fontSize: 18, fontWeight: 800, color: tokens.navy }}>Trips and training</span>
+              <span className="block" style={{ fontFamily: font.body, fontSize: 14, color: tokens.muted }}>{isServiceRole(pet) ? "Next trip, training and your handler statement" : "Next trip and training"}</span>
+            </span>
+            <span aria-hidden="true" className="group-open:rotate-90 transition-transform" style={{ color: tokens.muted, fontWeight: 800, fontSize: 20 }}>›</span>
+          </summary>
+          <div className="grid gap-3 px-3 pb-3">
+            <TripPromptCard pet={pet} />
+            <TrainingCard key={`${pet.id}-${pet.service_attested_at || ""}`} pet={pet} userId={userId} onChanged={onChanged} />
+          </div>
+        </details>
+      ) : null}
       {booth ? <PhotoBooth pet={pet} onClose={() => setBooth(false)} onSave={(f) => uploadPhoto({ target: { files: [f], value: "" } })} /> : null}
       {showPassport && owner && !pet.passport_issued_at && missing.length > 0 ? <PassportQuest pet={pet} userId={userId} onChanged={onChanged} onPhoto={uploadPhoto} /> : null}
       {showPanel ? <section className="rounded-3xl overflow-hidden" style={{ background: "#fff", border: `1px solid ${tokens.line}`, boxShadow: "0 10px 30px rgba(20,33,61,0.08)" }}>

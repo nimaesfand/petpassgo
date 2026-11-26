@@ -42,6 +42,8 @@ export default function VetConnectCard({ pet }) {
   }
 
   const vets = state.providers.filter((p) => p.kind === "vet");
+  // Hidden until it works (Nima: no "coming soon" on the site). Shows once inbound email is set up.
+  if (state.ready !== true) return null;
   return (
     <section className="rounded-3xl p-4 sm:p-6 min-w-0" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
       <div className="flex items-start justify-between gap-3">

@@ -411,3 +411,6 @@ textarea {
 }
 @media print { .ppg-foil { display: none; } }
 .ppg-badge-pet { background: linear-gradient(135deg, #5A1A06 0%, #C2410C 36%, #F7A26B 50%, #C2410C 64%, #5A1A06 100%); border: 1px solid #5A1A06; }
+
+/* The account app scrolls inside .ppg-account-scroll; stop the page behind it from scrolling too (no second scrollbar on phones). */
+body:has(.ppg-account-app) { padding-bottom: 0 !important; overflow: hidden; height: 100dvh; }

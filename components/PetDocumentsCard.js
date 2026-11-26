@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import EmptyState from "./EmptyState";
 import { supabase } from "../lib/supabaseClient";
 import { tokens, font } from "../lib/theme";
 import { getSignedUrl } from "../lib/storage";
@@ -125,7 +126,9 @@ export default function PetDocumentsCard({ pet, userId, onChange, title }) {
 
   return (
     <section id={`documents-${pet.id}`} data-pet-documents className="rounded-3xl p-4 sm:p-6 min-w-0 max-w-full overflow-x-clip" style={{ background: "#fff", border: `1px solid ${tokens.line}` }}>
-      <h3 style={{ fontFamily: font.display, fontSize: 21, fontWeight: 800, color: tokens.navy }} className="mb-3">{docs.length ? `${docs.length} on file` : "Nothing on file yet"}</h3>
+      {docs.length ? <h3 style={{ fontFamily: font.display, fontSize: 21, fontWeight: 800, color: tokens.navy }} className="mb-3">{`${docs.length} on file`}</h3> : (
+        <div className="mb-4"><EmptyState icon="file" color="#4338CA" soft="#EEF0FF" title={`Keep ${pet.name}'s papers in one place`} text="Upload their rabies certificate and vaccine records. Then we can send them to the groomer, boarding or a new vet for you." /></div>
+      )}
       <div className="grid gap-3 min-w-0">
         {docs.map((doc) => {
           const status = documentStatus(doc.expires_on, today);

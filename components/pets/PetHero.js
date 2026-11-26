@@ -22,7 +22,7 @@ function Ring({ pct }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ color: "#fff" }}>
         <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 15, lineHeight: 1 }}>{pct}%</div>
-        <div style={{ fontFamily: font.body, fontSize: 9, fontWeight: 700, opacity: 0.85 }}>done</div>
+        <div style={{ fontFamily: font.body, fontSize: 9, fontWeight: 700, opacity: 0.85 }}>profile</div>
       </div>
     </div>
   );

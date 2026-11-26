@@ -40,6 +40,7 @@ import ComingUpCard from "../../components/ComingUpCard";
 import PetNotices from "../../components/PetNotices";
 import VetConnectCard from "../../components/VetConnectCard";
 import ReviewCard from "../../components/ReviewCard";
+import EmptyState from "../../components/EmptyState";
 import FinderPrivacy from "../../components/FinderPrivacy";
 import { SECTION_THEME } from "../../lib/petSections";
 import PetProfileExperience from "../../components/PetProfileExperience";
@@ -53,7 +54,7 @@ import { fmtTripDate } from "../../lib/tripAccess";
 import { BUCKET, SignedImg, getSignedUrl, toStoragePath } from "../../lib/storage";
 import { tokens, font } from "../../lib/theme";
 import SavedToast from "../../components/SavedToast";
-import { Greeting, SectionTitle, UnpaidTripCard, PlanTripCard, PetsStrip, QuickActions } from "../../components/account/HomeParts";
+import { Greeting, SectionTitle, UnpaidTripCard, PlanTripCard, PetsStrip, QuickActions, HomeNotices } from "../../components/account/HomeParts";
 
 
 
@@ -425,6 +426,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
             {sectionTitle("Vaccines & records", rab?.text || null)}
             <HealthPassport pet={pet} userId={userId} bare refreshKey={healthKey} onRows={setHealthRows} />
           </div>
+          <ComingUpCard pet={pet} onSaved={onPhotoUpdated} />
           <VetConnectCard pet={pet} />
           <Fold icon="camera" color={th("health").color} soft={th("health").soft} title="Scan a vet record" hint="Snap a photo, we fill it in">
             <VetImport pet={pet} userId={userId} onSaved={() => { setHealthKey((n) => n + 1); onPhotoUpdated(); }} />
@@ -473,7 +475,6 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
             </div>
             <RecentShares pet={pet} refreshKey={shareKey} />
           </section>
-          <ComingUpCard pet={pet} onSaved={onPhotoUpdated} />
           {pet.role === "Emotional support animal" || pet.role === "Service animal" ? <PetLettersCard pet={pet} userId={userId} /> : null}
           <Fold icon="home" color={th("docs").color} soft={th("docs").soft} title="Housing paperwork" hint="Pet resume, landlord forms, references">
             <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="docs" />
@@ -489,6 +490,7 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
         )}
 
         {section === "about" && (<>
+          {!pet.about_bio ? <EmptyState icon="paw" color="#B45309" soft="#FFF4DC" title={`Tell ${pet.name}'s story`} text="Favorite treats, funny habits, what calms them down. Sitters and anyone who finds them will know them in seconds." /> : null}
           <PetProfileExperience pet={pet} userId={userId} onChanged={onPhotoUpdated} view="about" />
           <Fold icon="plane" color={th("about").color} soft={th("about").soft} title="Trips flown" hint="Every Travel Pass adds a stamp">
             <TravelStamps pet={pet} />
@@ -1014,17 +1016,9 @@ function CurrentFlightTab({ userId }) {
 
   if (!anyTrip) {
     return (
-      <div className="rounded-xl p-8 text-center" style={{ background: "#fff", border: `1px dashed ${tokens.line}` }}>
-        <div style={{ fontFamily: font.display, fontSize: 20, color: tokens.navy }} className="mb-4">
-          No trip yet
-        </div>
-        <a
-          href="/assessment"
-          className="ppg-btn ppg-btn-primary"
-        >
-          {PLAN_CTA}
-        </a>
-      </div>
+      <EmptyState icon="plane" color={tokens.primary} soft="#FFF4EC" title="Flying soon?"
+        text={`Tell us where you're going. A Travel Pass gives you every step your airline and destination need, the deadlines, and the forms filled in. ${P.memberPass} per trip.`}
+        action={PLAN_CTA} href="/assessment" />
     );
   }
 
@@ -1105,9 +1099,11 @@ function BillingTab({ userId, email }) {
       {isMember === null ? <div style={{ fontFamily: font.body, color: tokens.muted }}>Loading…</div> : isMember ? <>
           <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-1">You're a PetPassGo member ({usd(P.member)}{P.memberUnit}).</p>
           {memberRow?.current_period_end && <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.muted }} className="mb-3">Current period ends {new Date(memberRow.current_period_end).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.</p>}
-          <button disabled={busy} onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary">Cancel membership</button>
-          <p style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.ink }} className="mt-3">Cancel online here. No phone call. You keep access through the period you've paid, and you won't be charged again.</p>
-          <button disabled={busy} onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary mt-3">Receipts and payment method</button>
+          <button disabled={busy} onClick={() => go("/api/stripe/portal")} className="ppg-btn ppg-btn-secondary">Receipts and payment method</button>
+          <div className="mt-5 pt-4" style={{ borderTop: `1px dashed ${tokens.line}` }}>
+            <button disabled={busy} onClick={() => go("/api/stripe/portal")} style={{ fontFamily: font.body, fontSize: 15.5, fontWeight: 700, color: tokens.navy, textDecoration: "underline", background: "none", border: "none", padding: 0, cursor: "pointer" }}>Cancel membership</button>
+            <p style={{ fontFamily: font.body, fontSize: 14.5, lineHeight: 1.45, color: tokens.muted }} className="mt-1">Cancel online here. No phone call. You keep access through the period you&apos;ve paid, and you won&apos;t be charged again.</p>
+          </div>
           {err && <p role="alert" style={{ fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: tokens.stamp }} className="mt-3">{err}</p>}
         </> : <>
           <p style={{ fontFamily: font.body, fontSize: 16, color: tokens.ink }} className="mb-4">{memberRow?.status === "canceled" ? "Your membership has ended. " : ""}<b>{VAULT_NAME}</b> · {usd(P.member)}{P.memberUnit}. {VAULT_SUB} Plus {usd(P.memberPass)} Travel Passes. {MEMBERSHIP_TERMS}</p>
@@ -1269,7 +1265,7 @@ export default function AccountPage() {
   }
   // From Home: open one pet's passport, Pet ID, health records or lost-pet panel.
   function openPet(petId, kind) {
-    const section = { passport: "passport", id: "passport", health: "health", lost: "lost" }[kind] || null;
+    const section = { passport: "passport", id: "passport", health: "health", lost: "lost", docs: "docs", about: "about" }[kind] || null;
     setBottomKey(section === "health" ? "health" : section === "passport" ? "passport" : null);
     if (section) {
       window.__ppgPetSection = { petId, section };
@@ -1361,6 +1357,7 @@ export default function AccountPage() {
 
         {activeTab === "dashboard" && (<>
           <Greeting user={user} />
+          <HomeNotices userId={user?.id} onOpen={(id, kind) => openPet(id, kind)} />
           <DashboardTab userId={user?.id} onOpenTrips={() => { setActiveTab("trips"); const sc = document.querySelector(".ppg-account-scroll"); (sc || window).scrollTo({ top: 0 }); }} />
           <SectionTitle action={<button type="button" onClick={() => openPet(null, null)} style={{ fontFamily: font.body, fontSize: 15, fontWeight: 700, color: tokens.primary, background: "none", border: "none", cursor: "pointer" }}>See all →</button>}>My pets</SectionTitle>
           <PetsStrip userId={user?.id} onOpen={(id, kind) => openPet(id, kind)} />
