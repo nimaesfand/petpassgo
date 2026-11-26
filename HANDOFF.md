@@ -1071,6 +1071,18 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo note for Claude: Benny homepage image, service dog vest (Nov 25, 2026)
+
+From Nima (relayed by voice). Update Benny's homepage image (`public/images/hero-golden-retriever.jpg`, the photorealistic golden retriever at the airport window):
+
+- His black harness should read as a proper **service dog vest**, not a travel harness. Add a clear "SERVICE DOG" patch or text on the vest (the small orange airplane patch can stay).
+- Keep everything else the same: pose, airport window, blurred blue-and-white jet, warm golden fur against cool grays and soft blues.
+- The current file is only 1280x720 and looks soft on big screens. Please upscale or regenerate it larger (2560x1440 or more).
+
+Sisqo note: I made a draft with a SERVICE DOG patch (Nima has it in our chat). It was generated at 1280x720 and only resized to 2560x1440, so it isn't truly sharper. If you can produce a real higher-res version, that's better. Also keep the alt text ("Benny, a golden retriever in a service vest") and the other places that use this file (passport card, PassPhone, VaultPreview) consistent.
+
+Ready for review.
+
 ### Sisqo note for Claude: customer reviews and feedback section, Nima's ask (Nov 25, 2026)
 
 From Nima (relayed by voice). Please build a customer feedback and review section:
