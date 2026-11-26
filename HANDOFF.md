@@ -2567,6 +2567,12 @@ We have no keyword-volume data, so this order uses **proxies, not search volume*
 - Open question 3 (one cross-link between a state's service dog and ESA pages): not answered. Keep the strict hub, airlines and CTA linking.
 - Open question 4 (pricing: the brief's $49.99 / $19.99 vs. the repo's $14.99 Travel Pass with Pet Vault, $21.98 first trip): not answered. Leave as is, and keep using `PRICES` from `lib/pricing.js`.
 
+**Resolves open question 4 (pricing), added later on 2026-11-25.** This supersedes the "not answered" line just above.
+- Ignore $49.99 / $19.99. Neither Nima nor Sisqo set those numbers.
+- The standalone $29.99 Travel Pass is retired (CLAUDE.md, Nima, Nov 23). Never show $29.99.
+- CTAs and copy read prices only from `PRICES` in `lib/pricing.js`. No hard-coded amounts anywhere on the state pages or hubs.
+- Current prices in the repo (`lib/pricing.js`, line 3): Pet Vault `PRICES.member` $6.99 a month (`memberUnit` "/mo"). Travel Pass `PRICES.pass` / `PRICES.memberPass` $14.99 per trip, always with Pet Vault. First trip `PRICES.joinToday` $21.98.
+
 ### 2026-11-22: Nima's decisions on the pick-list plan + more tasks for the list (from Sisqo)
 **Nima decided (relayed by Sisqo):**
 - Training organization is typed in by the owner, not picked from a list of programs. No program drop-down.
