@@ -1114,6 +1114,29 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Travel Pass consistency check (Nov 25, 2026, Nima's ask)
+
+Checked the repo (main at b2e17fa) and live public pages against current decisions. Most important first:
+
+1. **Free trip path is still live.** `/assessment`, `components/FreeAccountSheet.js`, `components/RequirementsPreview.js`, `/api/free-trip`, `FreeTripWelcome` in `app/account/page.js`. Easy in-cabin US trips unlock at $0 with "Your checklist is free," "$0," "Simple flights are free," "Get my free checklist," "No card needed," "FREE · NO CARD," "Create free account," "Your free checklist is ready," API "Make a free account first." Fix: every trip is a paid Travel Pass. Remove the $0 path and all free copy. For an easy trip: "This trip is straightforward" + "Get my Travel Pass · $21.98" ($14.99 for members).
+2. **Free/no-account wording on public pages.** `/pet-passport` ("Checking their trip is free"), `/terms` (free trip-check bullet; "flyer can still be made with no account"), `/privacy` ("a free trip check"), `lib/chatPrompt.js` (tells chat the trip check is free / sends to a free assessment). Fix: remove, and say the trip check and flyer come with an account.
+3. **`/travel-pass` sells a spec list.** Generic "Your Travel Pass" headline, feature-dump lead, chips "Airline requirements / Step-by-step checklist / Weather & cargo safety," trust badge about sources and "Last checked." The better layout already exists (`lib/travelPassOffer.js`, `components/TravelPassOffer.js` PassEdge/PassIncluded) but isn't used. Fix: lead with the feeling (e.g. "Walk up to the gate already sure." / "You'll know exactly what your airline needs, and have it ready when they ask."), then the differentiators, then the grouped list. Drop the source/citation trust line.
+4. **Sample pet is "Maple," not Benny** (`components/TravelPassPreview.js`), and the sample weather card shows just "81° Cancún" with "cargo heat and cold check." Fix: use Benny; weather leads with "Benny is in the cabin, so cargo temperature limits don't apply."
+5. **Mexico/Canada pricing and button differ** (`components/BorderGuide.js`): no mention of the $21.98 first trip; button "Get my dates and forms." Fix: "$14.99 per trip, added to Pet Vault. First trip $21.98." Button "Get my pet ready to fly."
+6. **Unused files still carry free copy**: `components/home/HomePricing.js`, `components/home/SampleAnswer.js`, `components/PricingPlans.js`. Delete them or the lines so it can't come back.
+7. **Empty Travel tab is bare** ("No trip yet" dashed box). Fix: warm line, e.g. "When you're ready to fly, we'll walk you through every step for your airline and your pet," plus "Get my pet ready to fly," styled like the new empty states.
+8. **FAQ** (`lib/faq.js`): "…before you pay anything." Fix: "The trip check tells you what your flight needs, then your Travel Pass gives you every step."
+9. **"Travel mode" is still customer-facing** (`/travel-pass`, assessment checkout bullet, Mexico/Canada, `TravelPassDashboard`, reminder email, header Pet Vault sub-line, `/pet-vault`, `/service-dog`). Fix: "on your phone at the airport."
+10. **Signed-in members on `/` still get the full sales page** under the Welcome Back card. Fix: send signed-in visits to their Home/Travel, or hide the sales page below Welcome Back. "Pet Vault? Start here" still exists on the Vault card; hide it for members.
+
+Also: "Cleo" is still on the homepage ESA tile and `components/SamplePassportCard.js`, which is covered by the Luna rename.
+
+Already in step: prices ($14.99 / $6.99 / $21.98), ESA "Flies as a pet," no "Health passport" / "Chip Vault" / "calm Travel Day," and the paid dashboard weather card already leads with in-cabin.
+
+Not yet checked: the signed-in Travel tab with a real trip, Stripe screens, and purchase emails in an inbox.
+
+Ready for review.
+
 ### Sisqo: Photo vest confirmed (Nov 25, 2026, by voice)
 
 Nima confirmed: **Luna wears the red "Emotional Support" vest. Benny stays as he is, with no vest.** This resolves the note in my consolidated entry below. Milo stays a regular pet with no vest, as Nima said earlier ("nothing"). Everything else in the consolidated entry stands.
