@@ -1149,6 +1149,40 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Apple Wallet + Google Wallet, launch build plan (Nov 25, 2026, Nima: "one of the most important things")
+
+Nima: Apple Wallet is what will make people love the passport (their dog's ID on their phone). Ready at launch, never "coming soon".
+
+**Start from what exists.** `lib/appleWallet.js` (node-forge signing; do NOT switch to passkit-generator, it broke on Vercel), `app/api/pet-wallet/route.js` (GET available / POST .pkpass), `lib/walletImages.js`, button in `components/pets/PetIdStudio.js`. A second weaker `WalletCard` in `components/PetIdV2.js`: consolidate to one button on the Passport tab. Env names are already in `.env.example`. Brand colors are already right (#14213D bg, white text, #F2B84B labels).
+
+**1) Pass layout (style `generic`, the only one with a photo thumbnail).** Generic allows 1 primary, up to 3 headers, and 4 secondary+auxiliary combined, so combine sex/born.
+```
+[Go mark] PetPassGo                PASSPORT NO.  PPG-703-0479
+BENNY                                        [pet photo 90pt]
+STATUS                               BREED
+Service dog · Handler statement signed   Golden Retriever
+SEX / BORN               WEIGHT
+Male · Apr 2021          68 lb
+            [ QR -> www.petpassgo.com/id/<slug> ]   altText: passport no.
+```
+- `logoText` "PetPassGo" (today it says "Pet Passport"). Name title-cased. Breed uses the same short display name as the on-screen card (Mini Dachshund).
+- STATUS: Service dog · Handler statement signed / Service dog · Statement not signed yet / ESA: Flies as a pet / Pet. Short fallback if it clips.
+- Thumbnail: server-generated face crop from the pet photo at 90/180/270 px, so updates don't need the browser.
+- Back: Handler/Owner; emergency contact only if `show_contact_on_public_id`; vaccines (Rabies first, "valid to Jun 2027 · Vet Verified"); training; microchip "Ends in ####"; public page URL; "Verify at petpassgo.com/verify"; "A PetPassGo pet passport, not a government document."; petpassgo.com contact.
+- Never on the pass: home address, email, vet email, full chip, verify code, billing/membership.
+
+**2) Nima must set up (Claude can't).** Apple: Developer Program ($99/yr) > Pass Type ID (e.g. `pass.com.petpassgo.passport`) > Pass Type ID certificate (CSR from a Mac) > export cert + key, base64 into Vercel env with Team ID > WWDR G4 intermediate > `APPLE_WALLET_ENABLED=true`. Google: Pay & Wallet console issuer account + business profile, Wallet API + service account key in Vercel, one Generic class, **request publishing access day one** (review takes days; until then passes are TEST ONLY).
+
+**3) Server.** `webServiceURL` https://www.petpassgo.com/api/wallet + per-pet `authenticationToken` (never change token or serialNumber = pets.id). Tables `wallet_devices`, `wallet_registrations`, `wallet_passes` (service role only). Apple v1 routes: register/unregister device, list updated serials, get latest pass, log. On changes to profile, photo, statement, contact opt-in, vaccines/verified_at, or upcoming trip: bump last_updated and send an empty APNs push (production, topic = Pass Type ID, same cert). Optional: relevantDate + airport `locations` from `lib/airportCoords.js` for trip day ("At LAX with Benny"); bonus only, small radius, test on a real iPhone. Google: create/patch the Generic object on the same events; `POST /api/pet-wallet/google` returns the save link. Same membership gate to add; never remote-delete on lapse.
+
+**4) Passport tab button states.** Official Apple / Google badge artwork. Not a member: no button, point to Keep passport. Not configured: hide it (never "coming soon"). iPhone/Mac: Add to Apple Wallet ("Preparing…"). Android: Add to Google Wallet. Desktop non-Apple: both + "On iPhone, this adds the pass to Wallet." Success: "Added to Wallet. It updates when records change." Error: "Couldn't add the pass. Try again in a few minutes." with Save image fallback.
+
+**Risks.** Apple certs are the on-switch and expire (renew yearly). Google publishing is a review. Field space is tight (test a long name + the long service line). The 90pt thumbnail needs a tight face crop. APNs updates only work in production. Passes added before `webServiceURL` won't auto-update.
+
+**Build order:** (1) Nima starts Apple + Google setup, (2) relayout + server thumb + back fields, (3) update web service + push, (4) button states, (5) Google twin, (6) real-device test.
+
+Ready for review.
+
 ### Sisqo: Test results for "Built: Sisqo's walkthrough fixes, Lost tab + flyer, Home updates, empty states, no-free pass 2, Luna" (Nov 25, 2026)
 
 Signed in as the test account (Testy), desktop + 390px phone. Screens in my box at /workspace/vault-shots/retest-*.
