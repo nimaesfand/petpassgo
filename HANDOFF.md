@@ -1114,6 +1114,15 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Clarification on the Milo/Cleo photo ask (Nov 25, 2026, by voice)
+
+Correction to my entry just below:
+- **Benny's photo is already great.** Leave it as is.
+- **Cleo (the emotional support animal) has no photo yet.** This is a new photo to add, not a swap. Add a Cleo photo wherever she appears (ESA examples, sample ID card with the "Flies as a pet" badge, demo screens), in the same photoreal style and quality as Benny's.
+- Milo's updated photo and Cleo's rename still stand as written below.
+
+Ready for review.
+
 ### Sisqo: Nima's ask — new Milo and Cleo photos, Cleo rename (Nov 25, 2026, by voice)
 
 1. **Updated photos for Milo and Cleo.** Nima has new photos of both. Swap them in everywhere the current Milo/Cleo images are used (homepage/marketing images, sample ID cards, sample flyers, demo screens). Nima will send the files; if they aren't in the repo yet, ask him where they are.
