@@ -52,7 +52,7 @@ export default function LostFlyer() {
 }
 
 function FlyerMaker() {
-  const [f, setF] = useState({ name: "", desc: "", area: "", date: "", contact: "", page: "" });
+  const [f, setF] = useState({ kind: "DOG", name: "", desc: "", area: "", date: "", contact: "", page: "" });
   const [photo, setPhoto] = useState(null);
   const [qr, setQr] = useState("");
   const [msg, setMsg] = useState("");
@@ -69,20 +69,25 @@ function FlyerMaker() {
     const c = canvas.current; if (!c) return; const ctx = c.getContext("2d");
     const draw = (img, qrImg) => {
       ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = tokens.primary; ctx.fillRect(0, 0, W, 150);
-      ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.font = "800 92px system-ui, sans-serif"; ctx.fillText("LOST", W / 2, 108);
-      const py = 190, ph = 560, pw = 860, px = (W - pw) / 2;
+      // Big headline you can read from a car: LOST DOG / LOST CAT / LOST PET.
+      ctx.fillStyle = "#B91C1C"; ctx.fillRect(0, 0, W, 170);
+      ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.font = "900 112px system-ui, sans-serif"; ctx.fillText(`LOST ${f.kind}`, W / 2, 125);
+      // "Milo lost, help locate Milo", sized to fit.
+      const petName = f.name.trim() || "Your pet";
+      const ask = `${petName} lost, help locate ${petName}`;
+      let askSize = 64;
+      ctx.fillStyle = tokens.navy; ctx.font = `900 ${askSize}px system-ui, sans-serif`;
+      while (askSize > 34 && ctx.measureText(ask).width > 960) { askSize -= 3; ctx.font = `900 ${askSize}px system-ui, sans-serif`; }
+      ctx.fillText(ask, W / 2, 240);
+      const py = 275, ph = 520, pw = 880, px = (W - pw) / 2;
       if (img) { const s = Math.max(pw / img.width, ph / img.height); const iw = img.width * s, ih = img.height * s; ctx.save(); ctx.beginPath(); ctx.rect(px, py, pw, ph); ctx.clip(); ctx.drawImage(img, px + (pw - iw) / 2, py + (ph - ih) / 2, iw, ih); ctx.restore(); }
       else { ctx.fillStyle = tokens.sky; ctx.fillRect(px, py, pw, ph); ctx.fillStyle = tokens.navy; ctx.font = "700 40px system-ui, sans-serif"; ctx.fillText("Add a photo", W / 2, py + ph / 2); }
-      const petName = f.name || "Pet's name";
-      let nameSize = 78;
-      ctx.fillStyle = tokens.navy; ctx.font = `800 ${nameSize}px system-ui, sans-serif`;
-      while (nameSize > 36 && ctx.measureText(petName).width > 940) { nameSize -= 4; ctx.font = `800 ${nameSize}px system-ui, sans-serif`; }
-      ctx.fillText(petName, W / 2, 830);
-      ctx.font = "600 32px system-ui, sans-serif"; ctx.fillStyle = "#1A2333";
-      let y = wrap(ctx, f.desc || "Breed, color, size, collar", W / 2, 885, 900, 42, 2);
-      ctx.font = "700 30px system-ui, sans-serif";
-      ctx.fillText([f.area && `Last seen: ${f.area}`, f.date].filter(Boolean).join(" · ") || "Last seen", W / 2, y + 8);
+      ctx.font = "600 34px system-ui, sans-serif"; ctx.fillStyle = "#1A2333";
+      let y = wrap(ctx, f.desc || "Breed, color, size, collar", W / 2, 860, 920, 44, 2);
+      ctx.font = "800 32px system-ui, sans-serif"; ctx.fillStyle = tokens.navy;
+      ctx.fillText([f.area && `Last seen: ${f.area}`, f.date].filter(Boolean).join(" · ") || "Last seen", W / 2, y + 10);
+      ctx.font = "italic 600 26px system-ui, sans-serif"; ctx.fillStyle = "#B91C1C";
+      ctx.fillText("If you see them, please don't chase. Scan or call instead.", W / 2, y + 58);
       ctx.fillStyle = tokens.navy; ctx.fillRect(0, H - 210, W, 210);
       ctx.fillStyle = "#fff"; ctx.font = "800 42px system-ui, sans-serif";
       if (qrImg) {
@@ -110,7 +115,7 @@ function FlyerMaker() {
   const fname = () => `lost-${(f.name || "pet").toLowerCase().replace(/[^a-z0-9]+/g, "-")}.png`;
   async function share() {
     const file = new File([await blob()], fname(), { type: "image/png" });
-    const text = `LOST: ${f.name || "my pet"}${f.area ? `, last seen ${f.area}` : ""}. Please share!`;
+    const text = `LOST ${f.kind}: ${f.name || "my pet"}${f.area ? `, last seen ${f.area}` : ""}. Please share!`;
     if (navigator.canShare?.({ files: [file] })) { try { await navigator.share({ files: [file], text }); } catch {} }
     else { download(); setMsg("Your device can't share images directly, so we downloaded the flyer. Post it from your photos."); }
   }
@@ -126,6 +131,9 @@ function FlyerMaker() {
           <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.ink }} className="mb-6">Nothing you enter leaves your device.</p>
           <div className="grid gap-3">
             <label className="inline-flex items-center min-h-[44px] rounded-full px-4 cursor-pointer" style={{ fontFamily: font.body, fontWeight: 700, color: "#fff", background: tokens.navy }}>Choose a photo<input type="file" accept="image/*" className="ppg-hp" onChange={(e) => { const x = e.target.files?.[0]; if (x) setPhoto(URL.createObjectURL(x)); }} /></label>
+            <div className="flex gap-2" role="group" aria-label="Lost dog, cat or pet">
+              {["DOG", "CAT", "PET"].map((k) => <button key={k} type="button" onClick={() => setF({ ...f, kind: k })} className="ppg-chip-btn" style={f.kind === k ? { background: tokens.navy, color: "#fff", borderColor: tokens.navy } : undefined}>Lost {k.toLowerCase()}</button>)}
+            </div>
             <input placeholder="Pet's name" value={f.name} onChange={set("name")} maxLength={30} className="rounded-lg px-3 py-2.5" style={input} aria-label="Pet's name" />
             <input placeholder="Description (breed, color, collar)" value={f.desc} onChange={set("desc")} maxLength={120} className="rounded-lg px-3 py-2.5" style={input} aria-label="Description" />
             <input placeholder="Last seen (area)" value={f.area} onChange={set("area")} maxLength={50} className="rounded-lg px-3 py-2.5" style={input} aria-label="Last seen area" />
