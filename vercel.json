@@ -1,3 +1,4 @@
 {
-  "crons": [{ "path": "/api/cron/reminders", "schedule": "0 16 * * *" }]
+  "crons": [{ "path": "/api/cron/reminders", "schedule": "0 16 * * *" }],
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ':(exclude)HANDOFF.md' ':(exclude)CLAUDE.md' ':(exclude)docs/**'"
 }
