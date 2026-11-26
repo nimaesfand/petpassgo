@@ -1114,6 +1114,12 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Cleo's new name is Luna (Nov 25, 2026, by voice)
+
+**Cleo is now Luna.** Rename her everywhere in one pass: the app, flyers, public pages, sample data, ID card samples, alt text, image file names, and any SEO/meta text. Afterward, search the repo for "Cleo" (case-insensitive) and confirm zero hits. Luna's photo spec is unchanged: white Maine Coon, snow leopard look, red "Emotional Support" vest, warm home background.
+
+Ready for review.
+
 ### Sisqo: Backgrounds for Cleo and Milo (Nov 25, 2026, by voice)
 
 Nima: Cleo's and Milo's photos must match Benny's style and quality, and **backgrounds should not always be an airport**. Vary them. Nima wants input on what fits; my suggestion, tied to what each pet sells:
