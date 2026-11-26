@@ -406,7 +406,6 @@ export default function CreatePassport() {
         <p className="mt-1" style={{ fontFamily: B, fontSize: 17, color: tokens.ink }}>Pet Vault, {P.member} a month. Cancel anytime. It unlocks the rest of the passport:</p>
         <div className="mt-4"><LockedPages name={pet.name} /></div>
         <a href={`/passport/keep?t=${done.token}`} className="mt-5 flex items-center justify-center rounded-full" style={{ minHeight: 60, background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 19, textDecoration: "none" }}>Keep {pet.name}&apos;s passport</a>
-        <p className="mt-3 text-center" style={{ fontFamily: B, fontSize: 15, color: tokens.muted }}>We&apos;ll hold it for 7 days.</p>
       </div>
       <button type="button" onClick={startOver} className="mt-5" style={{ fontFamily: B, fontWeight: 700, fontSize: 16, color: tokens.muted, background: "none", border: "none", textDecoration: "underline", cursor: "pointer" }}>Make a passport for another pet</button>
     </>

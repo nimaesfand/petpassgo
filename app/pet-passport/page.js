@@ -5,7 +5,7 @@ export const metadata = {
   title: "Pet Passport",
   description: "Their records, their airline's rules and every reminder, in one place.",
   alternates: { canonical: "/pet-passport" },
-  openGraph: { title: "Pet Passport", description: "Your best friend deserves a passport too." },
+  openGraph: { title: "Pet Passport", description: "Your best friend deserves a passport too.", images: ["/images/milo-dachshund-park.jpg"] },
 };
 
 export default function PetPassportPage({ searchParams }) {

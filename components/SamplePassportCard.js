@@ -11,7 +11,8 @@ const SAMPLES = {
     name: "Benny",
     holder: ["HANDLER", "Alex Morgan"],
     photo: "/images/hero-golden-retriever.jpg",
-    alt: "Benny, a golden retriever in a service vest",
+    pos: "70% 28%",
+    alt: "Benny, a golden retriever at the airport",
     fields: [["SPECIES", "Dog"], ["BREED", "Golden Retriever"], ["SEX", "Male"], ["BORN", "Apr 12, 2021"], ["WEIGHT", "68 lb"], ["TRAINING", "Task trained"], ["MICROCHIP", "•••• 6789", true], ["ISSUED", "Nov 1, 2026"]],
     mrz: ["P<PPGBENNY<<GOLDEN<RETRIEVER<<<<<<", "PPGSAMPLE<DOG<210412<SVC<<<<<<<"],
     badge: "service",
@@ -20,7 +21,9 @@ const SAMPLES = {
     name: "Luna",
     holder: ["OWNER", "Jamie Cruz"],
     icon: "cat",
-    alt: "Luna, a Maine Coon",
+    photo: "/images/luna-ginger-maine-coon.jpg",
+    pos: "70% 42%",
+    alt: "Luna, a ginger Maine Coon on a sofa",
     fields: [["SPECIES", "Cat"], ["BREED", "Maine Coon"], ["SEX", "Female"], ["BORN", "Mar 3, 2022"], ["WEIGHT", "14 lb"], ["TRAINING", "Leash trained"], ["MICROCHIP", "•••• 4410", true], ["ISSUED", "Nov 1, 2026"]],
     mrz: ["P<PPGLUNA<<MAINE<COON<<<<<<<<<<<<", "PPGSAMPLE<CAT<220303<ESA<<<<<<<"],
     badge: "esa",
@@ -29,7 +32,9 @@ const SAMPLES = {
     name: "Milo",
     holder: ["OWNER", "Sam Rivera"],
     icon: "dog",
-    alt: "Milo, a dachshund",
+    photo: "/images/milo-dachshund-park.jpg",
+    pos: "66% 62%",
+    alt: "Milo, a black and tan dachshund in a park",
     fields: [["SPECIES", "Dog"], ["BREED", "Dachshund"], ["SEX", "Male"], ["BORN", "Jun 2, 2020"], ["WEIGHT", "11 lb"], ["TRAINING", "House trained"], ["MICROCHIP", "•••• 2048", true], ["ISSUED", "Nov 1, 2026"]],
     mrz: ["P<PPGMILO<<DACHSHUND<<<<<<<<<<<<<", "PPGSAMPLE<DOG<200602<PET<<<<<<<"],
     badge: null,
@@ -65,7 +70,7 @@ export default function SamplePassportCard({ kind = "service" }) {
             <div className="relative overflow-hidden" style={{ width: 128, height: 156, borderRadius: 14, border: "3px solid #fff", outline: `2px solid ${tokens.gold}`, boxShadow: "0 8px 20px rgba(20,33,61,.2)" }}>
               {s.photo ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={s.photo} alt={s.alt} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "62% 22%" }} />
+                <img src={s.photo} alt={s.alt} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: s.pos || "62% 22%" }} />
               ) : (
                 <div role="img" aria-label={s.alt} className="flex items-center justify-center" style={{ width: "100%", height: "100%", background: "#F4ECDA" }}>{PET_ICONS[s.icon]}</div>
               )}

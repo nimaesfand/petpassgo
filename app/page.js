@@ -65,9 +65,9 @@ const FOOTER_LINKS = [
 ];
 
 const WHO = [
-  { href: "/service-dog-passport", title: "My service dog", sub: "Your DOT forms, filled in and ready", name: "Benny", bg: "linear-gradient(135deg, #0B1A45 0%, #1E3A8A 100%)", photo: "/images/hero-golden-retriever.jpg" },
-  { href: "/esa-passport", title: "My emotional support animal", sub: "Your housing letter, always on hand", name: "Luna", bg: "linear-gradient(135deg, #3B0D0D 0%, #8F1D1D 100%)", icon: "cat" },
-  { href: "/pet-passport", title: "My pet", sub: "Their records and airline rules, in one place", name: "Milo", bg: "linear-gradient(135deg, #3A160A 0%, #A3400F 100%)", icon: "dog" },
+  { href: "/service-dog-passport", title: "My service dog", sub: "Your DOT forms, filled in and ready", name: "Benny", bg: "linear-gradient(135deg, #0B1A45 0%, #1E3A8A 100%)", photo: "/images/hero-golden-retriever.jpg", pos: "64% 22%" },
+  { href: "/esa-passport", title: "My emotional support animal", sub: "Your housing letter, always on hand", name: "Luna", bg: "linear-gradient(135deg, #3B0D0D 0%, #8F1D1D 100%)", icon: "cat", photo: "/images/luna-ginger-maine-coon.jpg", pos: "66% 30%" },
+  { href: "/pet-passport", title: "My pet", sub: "Their records and airline rules, in one place", name: "Milo", bg: "linear-gradient(135deg, #3A160A 0%, #A3400F 100%)", icon: "dog", photo: "/images/milo-dachshund-park.jpg", pos: "64% 38%" },
 ];
 
 export default async function PetPassGoLanding() {
@@ -126,7 +126,7 @@ export default async function PetPassGoLanding() {
             <a key={w.href} href={w.href} className="ppg-lift relative overflow-hidden flex items-center gap-4 rounded-3xl p-4 md:p-5" style={{ background: w.bg, textDecoration: "none", boxShadow: "0 14px 30px rgba(20,33,61,.22)" }}>
               <span aria-hidden="true" className="ppg-foil" style={{ mixBlendMode: "screen", opacity: 0.55 }} />
               <span className="relative flex-shrink-0 overflow-hidden rounded-full flex items-center justify-center" style={{ width: 64, height: 64, border: `3px solid ${tokens.gold}`, background: "#FBF7EE", boxShadow: "0 0 0 3px rgba(255,255,255,.12)" }}>
-                {w.photo ? <Image src={w.photo} alt="" width={64} height={64} className="object-cover" style={{ width: "100%", height: "100%", objectPosition: "62% 22%" }} /> : <span style={{ transform: "scale(.55)", display: "flex" }}>{PET_ICONS[w.icon]}</span>}
+                {w.photo ? <Image src={w.photo} alt="" width={64} height={64} className="object-cover" style={{ width: "100%", height: "100%", objectPosition: w.pos || "62% 22%" }} /> : <span style={{ transform: "scale(.55)", display: "flex" }}>{PET_ICONS[w.icon]}</span>}
               </span>
               <span className="relative flex-1 min-w-0">
                 <span className="block" style={{ fontFamily: D, fontSize: 20, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>{w.title}</span>

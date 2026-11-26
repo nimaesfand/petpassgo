@@ -16,12 +16,17 @@ function FlyerInner({ params }) {
   const { status, pet, lost } = usePublicPet(params.petId);
   const [qr, setQr] = useState("");
   const [reward, setReward] = useState("");
-  const [photoFailed, setPhotoFailed] = useState(false);
+  const [photoFailed, setPhotoFailed] = useState(0);
+  const [extra, setExtra] = useState(null);
   const pageUrl = sample ? `${SITE_URL}/id/sample` : (pet ? `${SITE_URL}/id/${pet.public_slug || pet.id}` : "");
   useEffect(() => {
     if (!pageUrl) return;
     QRCode.toString(pageUrl, { type: "svg", margin: 1, errorCorrectionLevel: "M", color: { dark: "#14213D", light: "#ffffff" } }).then(setQr);
   }, [pageUrl]);
+  useEffect(() => {
+    if (!pet?.id || !lost) return;
+    supabase.rpc("get_public_lost_details", { pet_id: pet.id }).then(({ data }) => setExtra(Array.isArray(data) ? data[0] : data));
+  }, [pet?.id, lost]);
   useEffect(() => {
     if (!pet?.id || !lost) return;
     supabase.rpc("get_public_lost_reward", { pet_id: pet.id }).then(({ data, error }) => {
@@ -43,10 +48,10 @@ function FlyerInner({ params }) {
     <FlyerSheet
       name={pet.name}
       kind={/cat/i.test(pet.animal_type || "") ? "CAT" : /dog/i.test(pet.animal_type || "Dog") ? "DOG" : "PET"}
-      sex={pet.sex}
-      chipped={!!pet.microchipped}
-      color={pet.color}
-      weight={pet.weight_lb}
+      sex={pet.sex || extra?.sex}
+      chipped={!!(pet.microchipped || extra?.microchipped)}
+      color={pet.color || extra?.color}
+      weight={pet.weight_lb || extra?.weight_lb}
       animalType={pet.animal_type}
       breed={pet.breed}
       area={lost.last_seen_area}
@@ -56,7 +61,7 @@ function FlyerInner({ params }) {
       phone={pet.emergency_contact_phone}
       pageUrl={pageUrl}
       qr={qr}
-      photo={pet.photo_path && !photoFailed ? <img src={`/api/pet-photo/${pet.id}`} onError={() => setPhotoFailed(true)} alt={pet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : <PetIllustration type={pet.animal_type} size={180} />}
+      photo={pet.photo_path && photoFailed < 2 ? <img key={photoFailed} src={`/api/pet-photo/${pet.id}${photoFailed ? `?r=${Date.now()}` : ""}`} onError={() => setPhotoFailed((n) => n + 1)} alt={pet.name} className="object-cover" style={{ width: "100%", height: "100%" }} /> : <PetIllustration type={pet.animal_type} size={180} />}
       backHref={`/id/${pet.public_slug || pet.id}`}
     />
   );

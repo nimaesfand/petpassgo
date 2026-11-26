@@ -122,6 +122,26 @@ function SectionBanner({ k, title, text }) {
   );
 }
 
+function PetSwitcher({ pets, value, onChange }) {
+  const cur = pets.some((p) => p.id === value) ? value : pets[0].id;
+  return (
+    <div className="flex gap-2 overflow-x-auto ppg-noscrollbar mb-4" role="tablist" aria-label="Your pets">
+      {pets.map((p) => {
+        const on = p.id === cur;
+        return (
+          <button key={p.id} type="button" role="tab" aria-selected={on} onClick={() => onChange(p.id)} className="flex items-center gap-2 rounded-full pl-1.5 pr-4 py-1.5 flex-shrink-0"
+            style={{ background: on ? tokens.navy : "#fff", color: on ? "#fff" : tokens.navy, border: `1.5px solid ${on ? tokens.navy : tokens.line}`, cursor: "pointer", fontFamily: font.body, fontWeight: 800, fontSize: 15 }}>
+            <span className="rounded-full overflow-hidden flex items-center justify-center" style={{ width: 32, height: 32, background: "#FBF7EE", border: `2px solid ${tokens.gold}` }}>
+              {p.photo_url ? <SignedImg value={p.photo_url} alt="" className="object-cover" style={{ width: "100%", height: "100%" }} /> : <PetIllustration type={p.animal_type} size={26} />}
+            </span>
+            {p.name}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function PetCard({ pet, userId, onPhotoUpdated }) {
   const [section, setSection] = useState(() => {
     const want = typeof window !== "undefined" ? window.__ppgPetSection : null;
@@ -551,6 +571,13 @@ function MemberUpsell() {
 }
 
 function PetProfileTab({ userId }) {
+  // With more than one pet, show one at a time (switcher on top) instead of stacking them.
+  const [selPet, setSelPet] = useState(() => (typeof window !== "undefined" && window.__ppgPetSection?.petId) || null);
+  useEffect(() => {
+    const go = (e) => { if (e.detail?.petId) setSelPet(e.detail.petId); };
+    window.addEventListener("ppg-pet-section", go);
+    return () => window.removeEventListener("ppg-pet-section", go);
+  }, []);
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -688,7 +715,8 @@ function PetProfileTab({ userId }) {
         </div>
       ) : (
         <>
-          {pets.map((pet) => (
+          {pets.length > 1 ? <PetSwitcher pets={pets} value={selPet} onChange={setSelPet} /> : null}
+          {pets.filter((p) => pets.length < 2 || p.id === (pets.some((x) => x.id === selPet) ? selPet : pets[0].id)).map((pet) => (
             <PetCard key={pet.id} pet={pet} userId={userId} onPhotoUpdated={loadPets} />
           ))}
           {!showForm && (isMember ? (

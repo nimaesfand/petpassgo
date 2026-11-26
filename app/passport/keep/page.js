@@ -70,7 +70,7 @@ export default function KeepPassport() {
   );
   if (state === "expired") side = (
     <>
-      <BennySays sub="We hold passports for 7 days. Making it again takes about a minute.">{name}&apos;s passport has expired.</BennySays>
+      <BennySays sub="Making it again takes about a minute.">This link has expired.</BennySays>
       <a href="/passport/create" className="mt-6 inline-flex items-center justify-center rounded-full px-8" style={{ minHeight: 60, background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 19, textDecoration: "none" }}>Make it again</a>
     </>
   );

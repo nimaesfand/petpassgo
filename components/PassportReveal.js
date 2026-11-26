@@ -91,9 +91,9 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose, preview 
               <div aria-hidden="true" className="ppg-holo rounded-full" style={{ width: 26, height: 26 }} />
             </div>
             <div className="min-w-0 flex flex-col gap-1" style={{ paddingRight: 70 }}>
-              <div>{label("NAME")}<div style={{ fontFamily: font.display, fontSize: 26, fontWeight: 800, lineHeight: 1.05, color: tokens.navy, overflowWrap: "break-word" }}>{pet.name}</div></div>
+              <div>{label("NAME")}<div style={{ fontFamily: font.display, fontSize: String(pet.name || "").length > 12 ? 17 : String(pet.name || "").length > 9 ? 20 : String(pet.name || "").length > 6 ? 23 : 26, fontWeight: 800, lineHeight: 1.05, color: tokens.navy, wordBreak: "keep-all", overflowWrap: "normal", hyphens: "none" }}>{pet.name}</div></div>
               <span className="self-start rounded-md px-2 py-0.5" style={{ background: /service/i.test(pet.role || "") ? "#1D4ED8" : /emotional|esa/i.test(pet.role || "") ? "#B91C1C" : tokens.gold, color: /service|emotional|esa/i.test(pet.role || "") ? "#fff" : tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 9.5, letterSpacing: "0.14em" }}>{/service/i.test(pet.role || "") ? "SERVICE DOG" : /emotional|esa/i.test(pet.role || "") ? "EMOTIONAL SUPPORT" : "PET"}</span>
-              {pet.breed ? <div className="mt-1">{label("BREED")}<div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.navy, overflowWrap: "anywhere" }}>{pet.breed}</div></div> : null}
+              {pet.breed ? <div className="mt-1">{label("BREED")}<div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.navy, wordBreak: "keep-all", overflowWrap: "normal" }}>{pet.breed}</div></div> : null}
             </div>
           </div>
           <div className="px-4 pt-3 pb-1 grid grid-cols-3 gap-x-3 gap-y-2" style={{ borderTop: "1px dashed #D9CDB2", marginTop: 12 }}>

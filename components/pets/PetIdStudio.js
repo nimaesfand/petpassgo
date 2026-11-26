@@ -175,10 +175,12 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
       {/* Actions */}
       {toolsOnly ? (
         <>
-          <button type="button" onClick={wallet ? addWallet : undefined} disabled={!wallet || !!busy} className="w-full rounded-2xl flex items-center justify-center gap-2.5" style={{ minHeight: 54, background: "#000", color: "#fff", border: "none", cursor: wallet ? "pointer" : "default", opacity: wallet ? 1 : 0.55, fontFamily: font.body, fontWeight: 700, fontSize: 16 }}>
+          {wallet ? (
+          <button type="button" onClick={addWallet} disabled={!!busy} className="w-full rounded-2xl flex items-center justify-center gap-2.5" style={{ minHeight: 54, background: "#000", color: "#fff", border: "none", cursor: wallet ? "pointer" : "default", opacity: wallet ? 1 : 0.55, fontFamily: font.body, fontWeight: 700, fontSize: 16 }}>
             <Icon name="smartphone" size={20} />
-            {busy === "wallet" ? "Preparing…" : wallet ? "Add to Apple Wallet" : "Add to Apple Wallet · coming soon"}
+            {busy === "wallet" ? "Preparing…" : "Add to Apple Wallet"}
           </button>
+          ) : null}
           <div className="grid gap-2" style={{ gridTemplateColumns: "repeat(3, minmax(0,1fr))" }}>
             <ActionTile icon="download" title="Save image" sub="Passport + QR" onClick={saveImage} busy={busy === "png" ? "Saving…" : ""} />
             <ActionTile icon="send" title={copied ? "Link copied" : "Share"} sub="Send the link" onClick={share} />
@@ -193,7 +195,7 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
         <ActionTile icon="smartphone" title="Save image" sub="Card image with QR" onClick={saveImage} busy={busy === "png" ? "Saving…" : ""} />
         <ActionTile icon="link" title={copied ? "Copied!" : "Copy link"} sub="Share the profile" onClick={copy} />
         <ActionTile icon="external" title="Public page" sub="What a finder sees" href={profileUrl(pet)} />
-        <ActionTile icon="tag" title="Print QR tags" sub="Print at home · metal tags soon" href={`/account/tags?pet=${pet.id}`} />
+        <ActionTile icon="tag" title="Print QR tags" sub="Print at home" href={`/account/tags?pet=${pet.id}`} />
         {wallet ? <ActionTile icon="bag" title="Apple Wallet" sub="Next to your cards" onClick={addWallet} busy={busy === "wallet" ? "Preparing…" : ""} /> : null}
       </div>
       )}

@@ -192,7 +192,7 @@ export function HomeNotices({ userId, onOpen }) {
       (notices || []).forEach((n) => out.push({ key: `n${n.id}`, unread: true, icon: "send", pet: n.pet_id, open: "health", title: `New notice from ${n.from_name || n.from_email || "your vet"}`, sub: `About ${name[n.pet_id] || "your pet"}. Tap to check it and add it to their records.` }));
       (pets || []).forEach((p) => {
         const d = daysTo(p.next_visit_date);
-        if (d != null && d >= 0 && d <= 14) out.push({ key: `v${p.id}`, icon: "calendar", pet: p.id, open: "docs", sort: d, title: `${VISIT[p.next_visit_kind] || "Visit"}${p.next_visit_place ? ` at ${p.next_visit_place}` : ""} ${inDays(d)}`, sub: `${p.name}'s records are ready to send.` });
+        if (d != null && d >= 0 && d <= 14) out.push({ key: `v${p.id}`, icon: "calendar", pet: p.id, open: "health", sort: d, title: `${VISIT[p.next_visit_kind] || "Visit"}${p.next_visit_place ? ` at ${p.next_visit_place}` : ""} ${inDays(d)}`, sub: `${p.name}'s records are ready to send.` });
         const l = daysTo(p.lease_renewal_date);
         if (l != null && l >= 0 && l <= 30) out.push({ key: `l${p.id}`, icon: "home", pet: p.id, open: "docs", sort: l, title: `Lease renews ${inDays(l)}`, sub: `Check ${p.name}'s housing letter is current.` });
       });

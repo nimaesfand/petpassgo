@@ -5,6 +5,7 @@ import SiteHeader from "../../components/SiteHeader";
 import { tokens, font } from "../../lib/theme";
 import { LOGIN_CTA } from "../../lib/cta";
 import { rewardText } from "../../components/LostFlyerSheet";
+import { SITE_URL } from "../../lib/site";
 import { supabase } from "../../lib/supabaseClient";
 import { usePetAccess } from "../../lib/access";
 import { PRICES } from "../../lib/pricing";
@@ -53,6 +54,8 @@ export default function LostFlyer() {
 }
 
 function FlyerMaker() {
+  const [myPets, setMyPets] = useState([]);
+  useEffect(() => { supabase.from("pets").select("id,name,public_slug,animal_type,breed,color,sex,weight_lb,microchip_number").order("created_at").then(({ data }) => setMyPets(data || [])); }, []);
   const [f, setF] = useState({ kind: "DOG", name: "", desc: "", area: "", date: "", reward: "", chipped: false, contact: "", page: "" });
   const [photo, setPhoto] = useState(null);
   const [qr, setQr] = useState("");
@@ -93,7 +96,7 @@ function FlyerMaker() {
       const rw = rewardText(f.reward);
       if (rw) { ctx.font = "900 40px system-ui, sans-serif"; ctx.fillStyle = RED; ctx.fillText(rw, W / 2, y + 50); y += 50; }
       ctx.font = "italic 700 26px system-ui, sans-serif"; ctx.fillStyle = RED;
-      ctx.fillText(`If you see ${petName}, please don't chase. Scan or call instead.`, W / 2, y + 46);
+      ctx.fillText(`If you see ${petName}, please don't chase. Scan the code or call instead.`, W / 2, y + 46);
       ctx.fillStyle = tokens.line; ctx.fillRect(60, H - 220, W - 120, 3);
       ctx.fillStyle = tokens.navy;
       if (qrImg) {
@@ -138,6 +141,16 @@ function FlyerMaker() {
           <p style={{ fontFamily: font.body, fontSize: 17, color: tokens.ink }} className="mb-6">Nothing you enter leaves your device.</p>
           <div className="grid gap-3">
             <label className="inline-flex items-center min-h-[44px] rounded-full px-4 cursor-pointer" style={{ fontFamily: font.body, fontWeight: 700, color: "#fff", background: tokens.navy }}>Choose a photo<input type="file" accept="image/*" className="ppg-hp" onChange={(e) => { const x = e.target.files?.[0]; if (x) setPhoto(URL.createObjectURL(x)); }} /></label>
+            {myPets.length ? (
+              <div className="flex flex-wrap gap-2" role="group" aria-label="Fill in from your pet">
+                {myPets.map((p) => (
+                  <button key={p.id} type="button" className="ppg-chip-btn" onClick={() => setF({ ...f,
+                    kind: /cat/i.test(p.animal_type || "") ? "CAT" : /dog/i.test(p.animal_type || "Dog") ? "DOG" : "PET",
+                    name: p.name || "", page: `${SITE_URL}/id/${p.public_slug || p.id}`, chipped: !!p.microchip_number,
+                    desc: [p.breed, p.color, p.sex, Number(p.weight_lb) > 0 ? `${Math.round(Number(p.weight_lb))} lb` : ""].filter(Boolean).join(" · ") })}>Use {p.name}&apos;s details</button>
+                ))}
+              </div>
+            ) : null}
             <div className="flex gap-2" role="group" aria-label="Lost dog, cat or pet">
               {["DOG", "CAT", "PET"].map((k) => <button key={k} type="button" onClick={() => setF({ ...f, kind: k })} className="ppg-chip-btn" style={f.kind === k ? { background: tokens.navy, color: "#fff", borderColor: tokens.navy } : undefined}>Lost {k.toLowerCase()}</button>)}
             </div>

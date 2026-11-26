@@ -8,6 +8,8 @@ import { US_STATES, stateName, placeFromArea, visitorArea, lostTitle } from "../
 import { BUCKET, SignedImg } from "../lib/storage";
 import { PetIllustration } from "./PetIdCard";
 import LostFlyerSheet from "./LostFlyerSheet";
+import QRCode from "qrcode";
+import { SITE_URL } from "../lib/site";
 
 const todayPT = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
 const when = (ts) => new Date(ts).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/Los_Angeles" }) + " PT";
@@ -26,6 +28,10 @@ export default function LostPanel({ pet, userId, onChanged }) {
   const [photo, setPhoto] = useState(pet.photo_url || null);
   const [err, setErr] = useState("");
   const [ask, setAsk] = useState(null);
+  const [qr, setQr] = useState("");
+  useEffect(() => {
+    QRCode.toString(`${SITE_URL}/id/${pet.public_slug || pet.id}`, { type: "svg", margin: 1, errorCorrectionLevel: "M", color: { dark: "#14213D", light: "#ffffff" } }).then(setQr).catch(() => {});
+  }, [pet.id, pet.public_slug]);
 
   async function load() {
     const [r, m, s] = await Promise.all([
@@ -139,7 +145,7 @@ export default function LostPanel({ pet, userId, onChanged }) {
         <div className="min-w-0">
           <div aria-hidden="true" className="mx-auto overflow-hidden rounded-xl" style={{ width: 210, height: 262, border: `1px solid ${tokens.line}`, boxShadow: "0 10px 24px rgba(20,33,61,.12)", background: "#fff", pointerEvents: "none" }}>
             <div style={{ width: 816, transform: "scale(0.2574)", transformOrigin: "top left" }}>
-              <LostFlyerSheet name={pet.name} kind={kind} breed={pet.breed} color={pet.color} sex={pet.sex} weight={pet.weight_lb} chipped={!!(pet.microchip_number || pet.microchipped)} animalType={pet.animal_type} placeholder
+              <LostFlyerSheet name={pet.name} kind={kind} breed={pet.breed} color={pet.color} sex={pet.sex} weight={pet.weight_lb} chipped={!!(pet.microchip_number || pet.microchipped)} animalType={pet.animal_type} placeholder qr={qr}
                 photo={photo ? <SignedImg value={photo} alt="" className="object-cover" style={{ width: "100%", height: "100%" }} /> : null} />
             </div>
           </div>
