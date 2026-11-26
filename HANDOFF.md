@@ -1114,6 +1114,12 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Nima approved — label the ring as profile progress (Nov 25, 2026, by voice)
+
+Nima approved my earlier note: the "Passport ready" pill next to the 40% done ring reads like a contradiction. Change the ring's label to a profile label, e.g. "Profile 40%" (the "Passport ready" status can stay, since the passport is issued). Note: the voice transcript keeps hearing "passport" as "password"; both of today's voice notes mean the passport.
+
+Ready for review.
+
 ### Sisqo: rule from Nima — the passport is always the star (Nov 25, 2026, by voice)
 
 The pet's **passport card should always be the star**: the most prominent, highlighted element wherever it appears (Passport tab, Home pet card, public page, sample passports). Never shrink it, push it below other content, or de-emphasize it. Extras (trip banner, training form, share tiles, settings) sit below it, collapsed. (Voice transcript said "password"; from context this means the passport card. Nima, correct me if you meant something else.)
