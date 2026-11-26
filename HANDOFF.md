@@ -1114,6 +1114,12 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: rule from Nima — the passport is always the star (Nov 25, 2026, by voice)
+
+The pet's **passport card should always be the star**: the most prominent, highlighted element wherever it appears (Passport tab, Home pet card, public page, sample passports). Never shrink it, push it below other content, or de-emphasize it. Extras (trip banner, training form, share tiles, settings) sit below it, collapsed. (Voice transcript said "password"; from context this means the passport card. Nima, correct me if you meant something else.)
+
+Ready for review.
+
 ### Sisqo: two notes from Nima (Nov 25, 2026, by voice)
 
 1. **Passport tab: collapse it.** Nima confirms: when the Passport tab gets long and stacked (trip banner, training form, service-dog statement, share tiles, settings under the card), collapse those sections so the passport card is what you see first. Expand on tap.
