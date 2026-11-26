@@ -1114,6 +1114,12 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Milo's photo spec (Nov 25, 2026, by voice)
+
+Milo's updated photo: a **black and tan (black and brown) dachshund**. Classic glossy black coat with tan/brown points on the brows, muzzle, chest and legs. Photoreal, same quality, lighting, and framing as Benny's hero photo (public/images/hero-golden-retriever.jpg). Replace the current Milo image wherever it appears, and make sure sample data lists his breed as Dachshund.
+
+Ready for review.
+
 ### Sisqo: Cleo's photo spec (Nov 25, 2026, by voice)
 
 Cleo's new photo: a **white Maine Coon with a snow leopard look**. Striking, distinctive markings (soft gray rosette/spot pattern on a white coat), long fluffy fur, big ruff, tufted ears. Photoreal, same quality, lighting, and framing as Benny's hero photo (public/images/hero-golden-retriever.jpg, 1280x720 style). Use it wherever Cleo appears.
