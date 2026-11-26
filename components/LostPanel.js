@@ -7,6 +7,7 @@ import { fmtDate } from "../lib/lost";
 import { US_STATES, stateName, placeFromArea, visitorArea, lostTitle } from "../lib/places";
 import { BUCKET, SignedImg } from "../lib/storage";
 import { PetIllustration } from "./PetIdCard";
+import LostFlyerSheet from "./LostFlyerSheet";
 
 const todayPT = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
 const when = (ts) => new Date(ts).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/Los_Angeles" }) + " PT";
@@ -125,10 +126,26 @@ export default function LostPanel({ pet, userId, onChanged }) {
   if (report === undefined) return null;
 
   if (!report && !form) {
+    const kind = /cat/i.test(pet.animal_type || "") ? "CAT" : /dog/i.test(pet.animal_type || "Dog") ? "DOG" : "PET";
     return (
-      <button data-report-lost onClick={openForm} className="ppg-btn ppg-btn-primary w-full mt-3">
-        Report {pet.name} lost
-      </button>
+      <div className="mt-4 grid gap-4 sm:grid-cols-[minmax(0,1fr)_210px] items-center">
+        <div className="min-w-0">
+          <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 21, color: tokens.navy, lineHeight: 1.2 }}>If {pet.name} ever slips out</div>
+          <p className="mt-1" style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink, lineHeight: 1.5 }}>One tap makes {pet.name}&apos;s flyer, puts up their lost page, and emails you each time someone scans their tag.</p>
+          <button data-report-lost onClick={openForm} className="ppg-btn w-full mt-4" style={{ background: "#B91C1C", color: "#fff", border: "none", minHeight: 56, fontSize: 17 }}>
+            Report {pet.name} lost
+          </button>
+        </div>
+        <div className="min-w-0">
+          <div aria-hidden="true" className="mx-auto overflow-hidden rounded-xl" style={{ width: 210, height: 236, border: `1px solid ${tokens.line}`, boxShadow: "0 10px 24px rgba(20,33,61,.12)", background: "#fff", pointerEvents: "none" }}>
+            <div style={{ width: 816, transform: "scale(0.2574)", transformOrigin: "top left" }}>
+              <LostFlyerSheet name={pet.name} kind={kind} breed={pet.breed} color={pet.color} sex={pet.sex} weight={pet.weight_lb} chipped={!!(pet.microchip_number || pet.microchipped)} animalType={pet.animal_type} placeholder
+                photo={photo ? <SignedImg value={photo} alt="" className="object-cover" style={{ width: "100%", height: "100%" }} /> : null} />
+            </div>
+          </div>
+          <div className="text-center mt-2" style={{ fontFamily: font.body, fontSize: 13, fontWeight: 700, color: tokens.muted }}>Your flyer, ready to print</div>
+        </div>
+      </div>
     );
   }
 
@@ -179,6 +196,7 @@ export default function LostPanel({ pet, userId, onChanged }) {
               {l}
             </label>
           ))}
+          {!pet.emergency_contact_phone ? <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }}>To show a phone number, add an emergency contact phone in {pet.name}&apos;s About tab.</div> : null}
         </fieldset>
         {trip && (
           <label className="flex items-center gap-2" style={{ fontFamily: font.body, fontSize: 15, color: tokens.ink }}>
@@ -216,6 +234,24 @@ export default function LostPanel({ pet, userId, onChanged }) {
         <a href={`/id/${pet.id}`} target="_blank" rel="noopener noreferrer" style={{ fontFamily: font.body, fontWeight: 700, color: "#fff", textDecoration: "underline", fontSize: 14.5 }}>View poster</a>
       </div>
       <div className="p-4 grid gap-4">
+        {err && <div role="alert" style={{ color: "#B42318", fontSize: 14 }}>{err}</div>}
+        <div className="flex flex-wrap gap-2">
+          <a href={`/id/${pet.public_slug || pet.id}/flyer`} className="ppg-btn ppg-btn-primary">Print flyer</a>
+        {ask ? (
+          <div role="dialog" aria-label={ask === "found" ? "Mark found" : "Turn off report"} className="rounded-2xl p-4 w-full" style={{ border: `2px solid ${tokens.navy}` }}>
+            <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-3">{ask === "found" ? `Mark ${pet.name} found? The lost page comes down.` : `Turn off ${pet.name}'s lost report? The poster and board post come down.`}</div>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" disabled={busy} onClick={ask === "found" ? reunited : turnOff} className="ppg-btn ppg-btn-primary">{ask === "found" ? "Found" : "Turn off"}</button>
+              <button type="button" onClick={() => setAsk(null)} className="ppg-btn ppg-btn-secondary">Cancel</button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <button disabled={busy} onClick={() => setAsk("found")} className="ppg-btn" style={{ background: "#2F7A4A", color: "#fff", border: "none" }}>{pet.name} is home</button>
+            <button data-turn-off disabled={busy} onClick={() => setAsk("off")} className="ppg-btn ppg-btn-secondary">Turn off report</button>
+          </>
+        )}
+        </div>
         <div style={{ fontFamily: font.body, fontSize: 15.5, color: tokens.ink }}>
           Last seen <b>{report.last_seen_area}</b>{place && !(report.last_seen_area || "").toLowerCase().includes((report.city || "").toLowerCase()) ? ` · ${place}` : report.state ? `, ${report.state}` : ""}{report.last_seen_date ? ` · ${fmtDate(report.last_seen_date)}` : ""}
           {report.trip_airline ? ` · while traveling with ${report.trip_airline}${report.trip_flight ? ` ${report.trip_flight}` : ""}${report.trip_destination ? ` to ${report.trip_destination}` : ""}` : ""}
@@ -256,22 +292,6 @@ export default function LostPanel({ pet, userId, onChanged }) {
           )}
         </details>
 
-        {err && <div role="alert" style={{ color: "#B42318", fontSize: 14 }}>{err}</div>}
-        <a href={`/id/${pet.public_slug || pet.id}/flyer`} className="ppg-btn ppg-btn-secondary">Print flyer</a>
-        {ask ? (
-          <div role="dialog" aria-label={ask === "found" ? "Mark found" : "Turn off report"} className="rounded-2xl p-4" style={{ border: `2px solid ${tokens.navy}` }}>
-            <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 16, color: tokens.navy }} className="mb-3">{ask === "found" ? `Mark ${pet.name} found? The lost page comes down.` : `Turn off ${pet.name}'s lost report? The poster and board post come down.`}</div>
-            <div className="flex flex-wrap gap-2">
-              <button type="button" disabled={busy} onClick={ask === "found" ? reunited : turnOff} className="ppg-btn ppg-btn-primary">{ask === "found" ? "Found" : "Turn off"}</button>
-              <button type="button" onClick={() => setAsk(null)} className="ppg-btn ppg-btn-secondary">Cancel</button>
-            </div>
-          </div>
-        ) : (
-          <>
-            <button disabled={busy} onClick={() => setAsk("found")} className="ppg-btn ppg-btn-primary">Found</button>
-            <button data-turn-off disabled={busy} onClick={() => setAsk("off")} className="ppg-btn ppg-btn-secondary">Turn off report</button>
-          </>
-        )}
       </div>
     </div>
   );
