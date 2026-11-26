@@ -184,7 +184,7 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
             <ActionTile icon="send" title={copied ? "Link copied" : "Share"} sub="Send the link" onClick={share} />
             <ActionTile icon="printer" title="Print" sub="Both sides" href={`/account/passport/print?pet=${pet.id}`} />
             <ActionTile icon="external" title="Public page" sub="What a finder sees" href={profileUrl(pet)} />
-            <ActionTile icon="tag" title="QR tags" sub="Free to print" href={`/account/tags?pet=${pet.id}`} />
+            <ActionTile icon="tag" title="QR tags" sub="Print at home" href={`/account/tags?pet=${pet.id}`} />
             <ActionTile icon="link" title={copied ? "Copied!" : "Copy link"} sub="For texts and bios" onClick={copy} />
           </div>
         </>
@@ -193,7 +193,7 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
         <ActionTile icon="smartphone" title="Save image" sub="Card image with QR" onClick={saveImage} busy={busy === "png" ? "Saving…" : ""} />
         <ActionTile icon="link" title={copied ? "Copied!" : "Copy link"} sub="Share the profile" onClick={copy} />
         <ActionTile icon="external" title="Public page" sub="What a finder sees" href={profileUrl(pet)} />
-        <ActionTile icon="tag" title="Print QR tags" sub="Free to print · metal tags soon" href={`/account/tags?pet=${pet.id}`} />
+        <ActionTile icon="tag" title="Print QR tags" sub="Print at home · metal tags soon" href={`/account/tags?pet=${pet.id}`} />
         {wallet ? <ActionTile icon="bag" title="Apple Wallet" sub="Next to your cards" onClick={addWallet} busy={busy === "wallet" ? "Preparing…" : ""} /> : null}
       </div>
       )}

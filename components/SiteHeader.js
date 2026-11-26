@@ -10,6 +10,46 @@ import { readHomeIntentHref } from "../lib/tripIntent";
 const COMMUNITY = process.env.NEXT_PUBLIC_COMMUNITY_ENABLED === "true";
 const DISCOVER = process.env.NEXT_PUBLIC_DISCOVER_ENABLED === "true";
 
+// "Get started" offers the two doors into PetPassGo. Both end in the same Pet Vault.
+function GetStarted({ style }) {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+  const opt = (href, title, sub, icon) => (
+    <a href={href} onClick={href === "/assessment" ? (e) => { const h = readHomeIntentHref(); if (h !== "/assessment") { e.preventDefault(); window.location.href = h; } } : undefined}
+      className="flex items-center gap-3 rounded-2xl p-4 ppg-lift" style={{ background: "#fff", border: `1.5px solid ${tokens.line}`, textDecoration: "none" }}>
+      <span className="flex-shrink-0 flex items-center justify-center rounded-2xl" style={{ width: 46, height: 46, background: "#FFF4EC", color: tokens.primary }}><Icon name={icon} size={22} /></span>
+      <span className="min-w-0">
+        <span className="block" style={{ fontFamily: font.display, fontSize: 18, fontWeight: 800, color: tokens.navy, lineHeight: 1.2 }}>{title}</span>
+        <span className="block mt-0.5" style={{ fontFamily: font.body, fontSize: 14.5, color: tokens.muted, lineHeight: 1.4 }}>{sub}</span>
+      </span>
+    </a>
+  );
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-expanded={open} className="btn-primary rounded-full px-3 sm:px-5 py-2" style={{ ...style, border: "none", cursor: "pointer" }}>Get started</button>
+      {open && (
+        <div role="dialog" aria-modal="true" aria-label="Get started" className="fixed inset-0 z-[80] flex items-start justify-center px-4" style={{ background: "rgba(20,33,61,.45)", paddingTop: 76 }} onClick={() => setOpen(false)}>
+          <div className="w-full max-w-[440px] rounded-3xl p-4 sm:p-5 ppg-menu-sheet" style={{ background: tokens.sky, boxShadow: "0 24px 60px rgba(20,33,61,.3)" }} onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between gap-3 mb-3 px-1">
+              <span style={{ fontFamily: font.display, fontSize: 20, fontWeight: 800, color: tokens.navy }}>Where do you want to start?</span>
+              <button type="button" onClick={() => setOpen(false)} aria-label="Close" className="rounded-full flex items-center justify-center" style={{ width: 36, height: 36, background: "#fff", border: `1px solid ${tokens.line}`, color: tokens.navy, cursor: "pointer" }}>✕</button>
+            </div>
+            <div className="grid gap-2.5">
+              {opt("/assessment", "Flying soon?", "Get my pet ready to fly: what your airline and destination need, step by step.", "plane")}
+              {opt("/passport/create", "Make your pet's passport", "Their passport and records, always on your phone. Starts their Pet Vault.", "passport")}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 // Kept for pages that list the public links (footer, sitemap).
 export const NAV_LINKS = [
   { href: "/airlines", label: "Airlines" },
@@ -20,8 +60,8 @@ export const NAV_LINKS = [
 
 // Main links, by who is looking. Kept short on purpose: one job per page.
 const GUEST_MAIN = [
-  { href: "/assessment", label: "Plan a trip", icon: "plane", sub: "Free check for your flight" },
-  { href: "/passport/create", label: "Pet Passport", icon: "tag", sub: "Make your pet\u2019s passport free" },
+  { href: "/assessment", label: "Plan a trip", icon: "plane", sub: "What your pet needs to fly" },
+  { href: "/passport/create", label: "Pet Passport", icon: "tag", sub: "Starts their Pet Vault" },
   { href: "/pet-vault", label: "Pet Vault", icon: "shield", sub: "Passport, records, travel mode" },
 ];
 const GUEST_MORE = [
@@ -191,7 +231,7 @@ export default function SiteHeader({ onLogout }) {
           {signedIn ? (
             <a href="/account" aria-label="My account" className="lg:hidden rounded-full flex items-center justify-center" style={{ width: 40, height: 40, background: tokens.gold || "#F2B84B", color: tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 16, textDecoration: "none" }}>{initial || "•"}</a>
           ) : (
-            <a href="/assessment" onClick={(e) => { const href = readHomeIntentHref(); if (href !== "/assessment") { e.preventDefault(); window.location.href = href; } }} className="btn-primary rounded-full px-3 sm:px-5 py-2" style={{ ...link, background: tokens.primary, color: "#fff", fontWeight: 700, fontSize: 15 }}>Get started</a>
+            <GetStarted style={{ ...link, background: tokens.primary, color: "#fff", fontWeight: 700, fontSize: 15 }} />
           )}
           <button type="button" onClick={() => setMenu(true)} aria-label="Open menu" aria-expanded={menu} className="lg:hidden rounded-xl flex items-center justify-center" style={{ width: 40, height: 40, background: tokens.sky, border: "none", color: tokens.navy }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>

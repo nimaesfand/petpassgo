@@ -13,28 +13,28 @@ const B = font.body;
 
 export const metadata = {
   title: { absolute: "PetPassGo | Fly with your pet" },
-  description: "Flying with your pet? Find out what your airline, destination and pet need before you book. Free to start.",
+  description: "Flying with your pet? Find out what your airline, destination and pet need before you book, and keep their passport and records in one place.",
 };
 
 const STEPS = [
-  { n: "1", title: "Tell us about the trip", body: "Where and when you're flying. Haven't booked yet? We show which airlines take your pet and what each one charges." },
-  { n: "2", title: "See what your pet needs", body: "A checklist of everything to do before you fly, with dates. Simple flights are free." },
-  { n: "3", title: "Keep it in their passport", body: "Records, vaccines and the microchip in one place, ready to show at the airport on every trip." },
+  { n: "1", title: "Tell us where you're flying", body: "Pick your airline and dates. Haven't booked yet? We show which airlines take your pet and what each one charges." },
+  { n: "2", title: "We get your pet ready", body: "Every step in order, with deadlines: vet visit, health certificate, airline forms. We remind you before each one." },
+  { n: "3", title: "Show it in one tap", body: "It all lives in their passport. At check-in, open it and show the agent what they ask for." },
 ];
 
 
 
 const PRICE_CARDS = [
-  { title: "Travel Pass", sub: "For flights that need paperwork", price: P.memberPass, unit: "per trip, with Pet Vault", checks: ["Mexico, Canada, Hawaii, service dogs and cargo", "Your dates, reminders and forms filled in", "Flight-Ready Guarantee"], cta: "Get my pet ready to fly", href: "/assessment", dark: true },
-  { title: "Pet Vault", sub: "Their passport and every record", price: P.member, unit: "a month", checks: ["Records sent for you when someone needs proof", "A tag anyone can scan if they're lost", "Cancel anytime"], cta: "Make your pet's passport", href: "/passport/create", accent: true, tag: "Best for records and frequent travel" },
+  { title: "Pet Vault", sub: "Their passport and records, wherever you go", price: P.member, unit: "a month", checks: ["Their passport and shots, always on your phone", "We send their records to the groomer, boarding or a new vet", "A tag that brings them home if they get lost", "A heads-up weeks before anything expires", "Cancel anytime"], cta: "Make your pet's passport", href: "/passport/create", accent: true },
+  { title: "Travel Pass", sub: "Everything for one flight", price: P.memberPass, unit: `per trip, added to Pet Vault. First trip ${P.joinToday}.`, checks: ["Exactly what your airline and destination need, step by step", "Every deadline on your calendar, so nothing sneaks up on you", "Forms filled in for you. If something needs your signature, we tell you.", "Service dog? Your DOT forms, done"], cta: "Get my pet ready to fly", href: "/assessment", dark: true, guarantee: true },
 ];
 
 const ICON = (d) => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{d}</svg>;
 const VAULT_TILES = [
-  { text: "At the airport? One tap shows everything you've saved for them.", icon: ICON(<><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" /></>) },
-  { text: "Groomer, daycare or boarding needs proof? We send it for you.", icon: ICON(<><path d="m22 2-7 20-4-9-9-4z" /><path d="M22 2 11 13" /></>) },
-  { text: "Lost? Anyone who scans their tag can reach you. You choose what they see.", icon: ICON(<><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" /></>) },
-  { text: "About to expire? We remind you first.", icon: ICON(<><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></>) },
+  { title: "Nervous about check-in?", text: "Their passport and paperwork open with one tap, so you're ready when the agent asks.", icon: ICON(<><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" /></>) },
+  { title: "Groomer or boarding asking for records?", text: "We send their vaccine records for you before you get there. One tap.", icon: ICON(<><path d="m22 2-7 20-4-9-9-4z" /><path d="M22 2 11 13" /></>) },
+  { title: "Rabies shot due? Housing letter expiring?", text: "We remind you weeks ahead, so you're ready before anyone asks.", icon: ICON(<><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></>) },
+  { title: "If they ever get lost", wide: true, text: "Pet Vault comes with a QR tag you print and clip to their collar. If they slip out, tap Report lost. Anyone who scans it sees their photo and can message you right away, and we email you every time it's scanned, with the area. Your number stays hidden unless you choose to show it. Add their allergies, vet, a reward or a note like “Friendly, please call me.”", icon: ICON(<><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" /></>) },
 ];
 
 const HOME_FAQ = [FAQ[1], FAQ[3], FAQ[2], FAQ[4]];
@@ -146,16 +146,20 @@ export default async function PetPassGoLanding() {
             <h2 style={{ fontFamily: D, color: "#fff", lineHeight: 1.05, letterSpacing: "-0.01em" }} className="text-[36px] md:text-[52px] font-extrabold max-w-[14ch]">Their passport, ready wherever you go.</h2>
             <p className="mt-5 max-w-[30rem]" style={{ fontFamily: B, color: "#D5DEEB", fontSize: 19, lineHeight: 1.5 }}>Backed by Pet Vault, where all your pet&apos;s records live.</p>
             <a href="/passport/create" className="mt-8 inline-flex items-center justify-center rounded-full px-9 min-h-[56px]" style={{ background: "#fff", color: tokens.navy, fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Make your pet&apos;s passport</a>
+            <p className="mt-3" style={{ fontFamily: B, color: "#C9D4E4", fontSize: 15 }}>Starts their Pet Vault. {P.member} a month, cancel anytime.</p>
           </div>
           <div className="flex justify-center" style={{ transform: "rotate(-2deg)" }}>
             <SamplePassportCard kind="service" />
           </div>
         </div>
-        <ul className={`${WRAP} grid sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mt-12 lg:mt-16`} style={{ listStyle: "none" }}>
+        <ul className={`${WRAP} grid md:grid-cols-3 gap-3 md:gap-4 mt-12 lg:mt-16`} style={{ listStyle: "none" }}>
           {VAULT_TILES.map((t) => (
-            <li key={t.text} className="flex items-center gap-4 rounded-3xl p-5" style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.12)" }}>
+            <li key={t.title} className={`flex items-start gap-4 rounded-3xl p-5 ${t.wide ? "md:col-span-3 md:p-7" : ""}`} style={{ background: t.wide ? "rgba(185,28,28,.14)" : "rgba(255,255,255,.06)", border: `1px solid ${t.wide ? "rgba(248,113,113,.35)" : "rgba(255,255,255,.12)"}` }}>
               <span className="flex-shrink-0 flex items-center justify-center rounded-2xl" style={{ width: 48, height: 48, background: "rgba(242,184,75,.14)", color: tokens.gold }}>{t.icon}</span>
-              <span style={{ fontFamily: B, fontSize: 17, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>{t.text}</span>
+              <span className="min-w-0">
+                <span className="block" style={{ fontFamily: D, fontSize: t.wide ? 22 : 19, fontWeight: 800, color: "#fff", lineHeight: 1.25 }}>{t.title}</span>
+                <span className="block mt-1.5 max-w-[60rem]" style={{ fontFamily: B, fontSize: 16, color: "#D5DEEB", lineHeight: 1.5 }}>{t.text}</span>
+              </span>
             </li>
           ))}
         </ul>
@@ -164,7 +168,7 @@ export default async function PetPassGoLanding() {
       <section id="pricing" style={{ background: "#fff", borderTop: `1px solid ${tokens.line}`, borderBottom: `1px solid ${tokens.line}` }} className="py-16 lg:py-24">
         <div className={WRAP}>
           <h2 style={{ fontFamily: D, color: tokens.navy, lineHeight: 1.05 }} className="text-[32px] md:text-[44px] font-extrabold">What it costs</h2>
-          <p className="mt-3 max-w-[38rem]" style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }}>Seeing what your pet needs is free. You only pay when a flight needs paperwork.</p>
+          <p className="mt-3 max-w-[38rem]" style={{ fontFamily: B, fontSize: 18, lineHeight: 1.5, color: tokens.ink }}>Pet Vault keeps their passport and records. Add a Travel Pass when you fly.</p>
           <div className="grid md:grid-cols-2 gap-4 mt-10 max-w-[900px]">
             {PRICE_CARDS.map((c) => (
               <article key={c.title} className="rounded-3xl p-6 flex flex-col" style={{ background: c.dark ? tokens.navy : c.accent ? "#fff" : tokens.sky, color: c.dark ? "#fff" : tokens.navy, border: c.accent || c.bordered ? `2px solid ${tokens.primary}` : "none", boxShadow: c.accent ? "0 18px 44px rgba(194,65,12,.14)" : "none" }}>
@@ -177,7 +181,7 @@ export default async function PetPassGoLanding() {
                 {c.body ? <p className={`mt-4 ${c.checks ? "" : "flex-1"}`} style={{ fontFamily: B, fontSize: 16, lineHeight: 1.55, color: c.dark ? "#E7EDF6" : tokens.ink }}>{c.body}</p> : null}
                 {c.checks ? <ul className="mt-4 flex flex-col gap-2">{c.checks.map((t) => <li key={t} className="flex items-start gap-2" style={{ fontFamily: B, fontSize: 15.5, lineHeight: 1.4, color: c.dark ? "#E7EDF6" : tokens.ink }}><span aria-hidden="true" className="flex-shrink-0 flex items-center justify-center rounded-full" style={{ width: 20, height: 20, marginTop: 1, background: tokens.green, color: "#fff", fontSize: 12, fontWeight: 900 }}>✓</span>{t}</li>)}</ul> : null}
                 {c.note ? <div className="mt-4 flex items-start gap-2 rounded-2xl px-3 py-2.5" style={{ background: c.accent ? "#FFF4EC" : "#E7F6EC", color: tokens.ink, fontFamily: B, fontSize: 14, lineHeight: 1.4 }}><span aria-hidden="true" style={{ color: c.accent ? tokens.primary : tokens.green, fontWeight: 900 }}>✓</span><span><b style={{ color: tokens.navy }}>{c.note.strong}</b> {c.note.text}</span></div> : null}
-                {c.guarantee ? <a href="/faq" className="mt-4 flex items-start gap-2 rounded-2xl px-3 py-2.5" style={{ background: "rgba(255,255,255,.08)", color: "#E7EDF6", fontFamily: B, fontSize: 14, lineHeight: 1.4, textDecoration: "none" }}><span aria-hidden="true" style={{ color: tokens.gold, fontWeight: 900 }}>✓</span><span><b style={{ color: "#fff" }}>Flight-Ready Guarantee.</b> If your pet is refused boarding because our information was wrong, we refund your Travel Pass. <span style={{ textDecoration: "underline" }}>How it works</span></span></a> : null}
+                {c.guarantee ? <a href="/guarantee" className="mt-4 flex items-start gap-2 rounded-2xl px-3 py-2.5" style={{ background: "rgba(255,255,255,.08)", color: "#E7EDF6", fontFamily: B, fontSize: 14, lineHeight: 1.4, textDecoration: "none" }}><span aria-hidden="true" style={{ color: tokens.gold, fontWeight: 900 }}>✓</span><span><b style={{ color: "#fff" }}>Flight-Ready Guarantee.</b> If your pet is refused because a requirement we showed you was wrong, we refund your Travel Pass. <span style={{ textDecoration: "underline" }}>How it works</span></span></a> : null}
                 {c.checks ? <div className="flex-1" /> : null}
                 <a href={c.href} className="mt-6 inline-flex items-center justify-center rounded-full min-h-[50px] px-6" style={{ background: c.dark || c.accent ? tokens.primary : "#fff", color: c.dark || c.accent ? "#fff" : tokens.navy, border: c.dark || c.accent ? "none" : `1.5px solid ${tokens.line}`, fontFamily: B, fontWeight: 800, fontSize: 15.5, textDecoration: "none" }}>{c.cta}</a>
               </article>

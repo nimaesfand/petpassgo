@@ -137,7 +137,7 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose, preview 
         <>
           <div className="ppg-pp-fade mt-6 text-center" style={{ maxWidth: 340 }}>
             <h2 style={{ fontFamily: font.display, fontSize: 30, fontWeight: 800, color: "#fff", lineHeight: 1.1 }}>{sample ? "This is a sample passport" : <>{pet.name}&apos;s passport is ready!</>}</h2>
-            <p className="mt-2" style={{ fontFamily: font.body, fontSize: 15.5, color: "rgba(255,255,255,.8)" }}>{sample ? "Make your pet's own passport free in a few minutes. Benny walks you through it." : preview ? `Keep it to show it at the counter, add it to your phone, and share it with a sitter.` : `${pet.name}'s passport and QR code are ready. Show them at the counter, add them to your phone, or share them with a sitter.`}</p>
+            <p className="mt-2" style={{ fontFamily: font.body, fontSize: 15.5, color: "rgba(255,255,255,.8)" }}>{sample ? "Make your pet's own passport in a few minutes. Benny walks you through it." : preview ? `Keep it to show it at the counter, add it to your phone, and share it with a sitter.` : `${pet.name}'s passport and QR code are ready. Show them at the counter, add them to your phone, or share them with a sitter.`}</p>
           </div>
           <div className="ppg-pp-fade mt-5 flex flex-col gap-2.5 w-full" style={{ maxWidth: 340, animationDelay: ".35s" }}>
             {sample ? (

@@ -2,7 +2,7 @@ import BorderGuide from "../../components/BorderGuide";
 
 export const metadata = {
   title: "Flying to Mexico with your dog: what you need, there and back",
-  description: "The screwworm certificate, the SENASICA inspection, and the CDC form to get your dog home. Check your trip free with PetPassGo.",
+  description: "The screwworm certificate, the SENASICA inspection, and the CDC form to get your dog home. Get your pet ready to fly with PetPassGo.",
   alternates: { canonical: "/mexico" },
 };
 

@@ -23,10 +23,10 @@ export default function EsaPassportPage({ searchParams }) {
       items={[
         { icon: <Icon name="lock" size={20} />, text: "Your housing letter, saved and private to you" },
         { icon: BELL, text: "A reminder before your letter expires or your lease renews" },
-        { icon: <Icon name="tag" size={20} />, text: "Lost? Anyone who scans their tag can reach you. You choose what they see." },
+        { icon: <Icon name="tag" size={20} />, text: "If they ever get lost, anyone who scans their tag can message you. Your number stays hidden." },
       ]}
       button="Get your ESA Passport"
-      after={<>Flying soon? <a href="/assessment?pet=esa" style={{ color: "#fff", fontWeight: 800 }}>Check your trip for free.</a></>}
+      after={<>Flying soon? <a href="/assessment?pet=esa" style={{ color: "#fff", fontWeight: 800 }}>Get my pet ready to fly</a></>}
     />
   );
 }

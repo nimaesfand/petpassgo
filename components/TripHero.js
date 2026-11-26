@@ -53,7 +53,7 @@ export default function TripHero() {
             See which airlines take your pet, what it costs, and exactly what you need to fly. Then keep your pet&apos;s records and passport in one place.
           </p>
           <div className="mt-4 inline-flex flex-wrap items-center gap-2" style={{ fontFamily: B, fontSize: 15.5, fontWeight: 700 }}>
-            <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5" style={{ background: "#EAF6EE", color: tokens.green }}><span aria-hidden>✓</span> Easy flights: free</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5" style={{ background: "#EAF6EE", color: tokens.green }}><span aria-hidden>✓</span> Pet Vault: {P.member}/mo</span>
             <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5" style={{ background: "#fff", color: tokens.navy, border: `1px solid ${tokens.line}` }}>Complicated trips: {P.pass}</span>
           </div>
           <p className="mt-3" style={{ fontFamily: B, fontSize: 15.5, color: tokens.ink }}>
@@ -99,7 +99,7 @@ export default function TripHero() {
             <a href={href} data-testid="hero-plan" className="btn-primary inline-flex items-center justify-center rounded-full px-8 py-3.5 min-h-[52px] w-full max-sm:w-[calc(100%-4.75rem)] sm:w-auto" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 700, fontSize: 16, textDecoration: "none" }}>
               Get my pet ready to fly
             </a>
-            <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mt-2 max-sm:w-[calc(100%-4.75rem)] sm:pl-4 text-center sm:text-left">Free · takes a minute</div>
+            <div style={{ fontFamily: font.body, fontSize: 13.5, color: tokens.muted }} className="mt-2 max-sm:w-[calc(100%-4.75rem)] sm:pl-4 text-center sm:text-left">Takes about a minute</div>
           </div>
         </div>
       </div>

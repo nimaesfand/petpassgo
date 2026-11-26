@@ -2,7 +2,7 @@ import BorderGuide from "../../components/BorderGuide";
 
 export const metadata = {
   title: "Flying to Canada with your dog: what you need, there and back",
-  description: "The rabies certificate Canada checks, what happens at the border, and the CDC form to bring your dog home. Check your trip free with PetPassGo.",
+  description: "The rabies certificate Canada checks, what happens at the border, and the CDC form to bring your dog home. Get your pet ready to fly with PetPassGo.",
   alternates: { canonical: "/canada" },
 };
 

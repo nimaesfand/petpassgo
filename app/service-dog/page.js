@@ -23,7 +23,7 @@ const NEED = [
 ];
 
 const STEPS = [
-  { title: "Check your flight", body: "Your route, airline and dog. Free, in about a minute." },
+  { title: "Check your flight", body: "Your route, airline and dog. Takes about a minute." },
   { title: "Make your dog's passport", body: "Benny walks you through it, with your dog's training and your signed statement." },
   { title: "Your DOT form, filled in", body: "Ready for every trip. You check the boxes, sign, and you're set." },
 ];

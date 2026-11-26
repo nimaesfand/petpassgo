@@ -71,7 +71,7 @@ export default function BorderGuide({ g }) {
             <div className="rounded-3xl p-6" style={{ background: tokens.sky }}>
               <div style={{ fontFamily: B, fontSize: 14, fontWeight: 800, letterSpacing: ".06em", color: tokens.muted }}>TRAVEL PASS · {g.name.toUpperCase()}</div>
               <div className="mt-1 flex items-baseline gap-2"><span style={{ fontFamily: D, fontSize: 44, fontWeight: 800, color: tokens.navy }}>{P.memberPass}</span><span style={{ fontFamily: B, color: tokens.muted }}>one trip, there and back, with Pet Vault ({P.member}/mo)</span></div>
-              <p className="mt-1" style={{ fontFamily: B, fontSize: 15, color: tokens.ink }}>Per trip, with Pet Vault ({P.member} a month, cancel anytime). Checking your trip is free.</p>
+              <p className="mt-1" style={{ fontFamily: B, fontSize: 15, color: tokens.ink }}>Per trip, with Pet Vault ({P.member} a month, cancel anytime).</p>
               <a href={cta} className="mt-4 flex items-center justify-center rounded-full min-h-[54px]" style={{ background: tokens.primary, color: "#fff", fontFamily: B, fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Get my dates and forms</a>
             </div>
           </div>
