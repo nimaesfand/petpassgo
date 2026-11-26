@@ -7,6 +7,7 @@ import ContactBubble from "../components/ContactBubble";
 const ChatWidget = dynamic(() => import("../components/ChatWidget"), { ssr: false });
 const Analytics = dynamic(() => import("../components/Analytics"), { ssr: false });
 import AuthResume from "../components/AuthResume";
+const KeyboardHelper = dynamic(() => import("../components/KeyboardHelper"), { ssr: false });
 import JsonLd from "../components/JsonLd";
 
 // Self-hosted latin subsets. next/font/google fetches these during the build, and that
@@ -72,6 +73,7 @@ export default function RootLayout({ children }) {
         {children}
         <Analytics />
         <AuthResume />
+        <KeyboardHelper />
         <ChatWidget />
         <ContactBubble />
       </body>

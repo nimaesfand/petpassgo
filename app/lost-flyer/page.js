@@ -130,7 +130,7 @@ function FlyerMaker() {
     else { download(); setMsg("Your device can't share images directly, so we downloaded the flyer. Post it from your photos."); }
   }
   async function download() { const a = document.createElement("a"); a.href = URL.createObjectURL(await blob()); a.download = fname(); a.click(); }
-  const input = { fontFamily: font.body, fontSize: 15.5, border: `2px solid ${tokens.line}`, background: "#fff" };
+  const input = { fontFamily: font.body, fontSize: 16, border: `2px solid ${tokens.line}`, background: "#fff" };
 
   return (
     <div style={{ background: tokens.sky, minHeight: "100vh" }}>

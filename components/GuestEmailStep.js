@@ -96,7 +96,7 @@ function finePointer() {
 export function GuestEmailSheet({ open, title, showConsent = true, ...rest }) {
   if (!open) return null;
   return (
-    <div role="dialog" aria-modal="true" aria-label={title} className="fixed inset-0 z-50 flex items-end md:items-center justify-center" style={{ background: "rgba(20,33,61,0.45)" }} onClick={(e) => { if (e.target === e.currentTarget) rest.onClose?.(); }}>
+    <div role="dialog" aria-modal="true" aria-label={title} className="ppg-kb-aware fixed inset-0 z-50 flex items-end md:items-center justify-center" style={{ background: "rgba(20,33,61,0.45)" }} onClick={(e) => { if (e.target === e.currentTarget) rest.onClose?.(); }}>
       <div className="w-full md:max-w-[440px] rounded-t-2xl md:rounded-2xl p-6" style={{ background: "#fff", paddingBottom: "calc(24px + env(safe-area-inset-bottom))" }}>
         <div style={{ fontFamily: font.display, fontSize: 20, fontWeight: 700, color: tokens.navy }} className="mb-3">{title}</div>
         <GuestEmailStep showConsent={showConsent} {...rest} />

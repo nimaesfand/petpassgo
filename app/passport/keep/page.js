@@ -104,7 +104,7 @@ export default function KeepPassport() {
       <SiteHeader />
       <main className="max-w-[1180px] mx-auto px-4 sm:px-6 py-6 sm:py-10 grid xl:grid-cols-[minmax(380px,1fr)_minmax(540px,600px)] gap-6 xl:gap-10 items-start">
         <section className="order-2 xl:order-1 min-w-0" aria-live="polite">{side}</section>
-        <aside className="order-1 xl:order-2 w-full max-w-[600px] mx-auto xl:sticky xl:top-6">
+        <aside className="ppg-hide-when-typing order-1 xl:order-2 w-full max-w-[600px] mx-auto xl:sticky xl:top-6">
           <div className="ppg-mini-pp">
           {pet ? <PetPassport pet={pet} photo={photo} sample /> : null}
           </div>

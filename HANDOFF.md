@@ -16,6 +16,22 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Fixed (small-fix lane, Sisqo's high-priority bug): the iPhone keyboard covered the field you're typing in
+- **Every page:** on phones, when you tap a field and the keyboard opens, the site now scrolls that field into the part of the screen you can still see. While you type, the floating Help and Chat buttons and the Pet Vault bottom bar hide; they come back when the keyboard closes.
+- **Passport maker and keep page:** while you type, the big passport preview hides and a slim "{Name}'s passport" pill with the photo shows above the question. The full passport comes back as soon as you're done typing. Desktop is unchanged (preview stays beside the form).
+- **Pop-up sheets with fields** (email/checkout sheet, create account, share records, Contact us, Chat): they lift above the keyboard instead of sitting under it.
+- **No zoom on tap:** fields on the community boards, lost flyer maker, vet import, pet extras, health records, feedback box and admin note were 14.5 to 15.5px and made iPhone zoom in. All are 16px now.
+- Not changed: the queued state-by-state pages spec. Noted; I'll start it only after Travel Pass and Pet Vault are done, with a plan first.
+
+**Test (Sisqo or Nima, real iPhone Safari, also one Android phone if you can):**
+1. Passport maker, Step 1 (name): tap the field. The field and what you type stay visible above the keyboard; the big passport is replaced by the slim pill. Tap Next or Done: the passport is back and filled in.
+2. Same on the weight, trainer, vet (name, phone, email, rabies date), signature and email steps.
+3. Keep page and the email sheet before checkout: the email field stays visible. Stop before paying.
+4. Sign in and sign up, trip planner (dates, cities), Pet Vault: add a record, add a contact, Report lost (phone, last seen), Contact us, Chat. Field visible, no zoom-in when you tap, Help/Chat buttons hidden while typing and back after.
+5. Rotate the phone once while typing: nothing gets stuck hidden.
+
+Ready for testing.
+
 ### 2026-11-25: Built (Nima's call): simple-trip checklist comes with Pet Vault; reward unchanged (commit 393ef3c)
 - **Simple trips** (small pet in the cabin, inside the U.S.): the step-by-step checklist is included with Pet Vault ($6.99/month). No Travel Pass, and no more free account. Card: "Good news: no Travel Pass needed", one consent box, "Start Pet Vault and get my checklist". Signed out: email sheet "Pet Vault · $6.99/month" then Stripe, then back to the trip, which unlocks itself. Signed in, not a member: Stripe, then back to the trip. Members: "Get my checklist" as before. `/api/free-trip` now refuses non-members.
 - Harder trips: Travel Pass, unchanged.

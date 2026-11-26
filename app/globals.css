@@ -414,3 +414,22 @@ textarea {
 
 /* The account app scrolls inside .ppg-account-scroll; stop the page behind it from scrolling too (no second scrollbar on phones). */
 body:has(.ppg-account-app) { padding-bottom: 0 !important; overflow: hidden; height: 100dvh; }
+
+/* Phones: while the keyboard is up (KeyboardHelper adds html.ppg-typing), keep the field
+   you're typing in visible. Hide tall previews and floating buttons; lift bottom sheets
+   above the keyboard. */
+.ppg-show-when-typing { display: none; }
+@media (max-width: 1279px) {
+  html.ppg-typing .ppg-hide-when-typing { display: none !important; }
+  html.ppg-typing .ppg-show-when-typing { display: flex; }
+  html.ppg-typing .ppg-contact-fab:not(.is-docked),
+  html.ppg-typing .ppg-support-dock:not(:focus-within),
+  html.ppg-typing [data-ppg-chat]:not(:focus-within) { display: none !important; }
+  html.ppg-typing [data-ppg-chat]:focus-within { bottom: calc(var(--ppg-kb, 0px) + 8px) !important; }
+  html.ppg-typing [data-ppg-chat] .ppg-chat-box { height: min(calc(var(--ppg-vvh, 60dvh) - 24px), 440px) !important; }
+  html.ppg-typing .ppg-chat-sheet { bottom: calc(var(--ppg-kb, 0px) + 8px); }
+  html.ppg-typing .ppg-kb-aware { top: var(--ppg-vvtop, 0px) !important; bottom: var(--ppg-kb, 0px) !important; }
+  html.ppg-typing .ppg-kb-aware > * { max-height: 100%; overflow-y: auto; }
+  html.ppg-typing .ppg-contact-layer { top: var(--ppg-vvtop, 0px); bottom: var(--ppg-kb, 0px); }
+  html.ppg-typing .ppg-contact-panel { bottom: var(--ppg-kb, 0px); max-height: calc(var(--ppg-vvh, 92dvh) - 8px); }
+}

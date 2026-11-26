@@ -466,6 +466,12 @@ export default function CreatePassport() {
       <SiteHeader />
       <main className="max-w-[1180px] mx-auto px-4 sm:px-6 py-6 sm:py-10 grid xl:grid-cols-[minmax(380px,1fr)_minmax(540px,600px)] gap-6 xl:gap-10 items-start">
         <section className="order-2 xl:order-1 min-w-0" aria-live="polite">
+          {step < 99 ? (
+            <div className="ppg-show-when-typing items-center gap-2.5 mb-3 rounded-full px-3 py-1.5" style={{ background: "#fff", border: `1px solid ${tokens.line}`, width: "fit-content", maxWidth: "100%" }} aria-hidden="true">
+              <span className="flex-shrink-0 rounded-full overflow-hidden" style={{ width: 26, height: 26, background: tokens.sky, border: `1.5px solid ${tokens.gold || "#D4A24C"}` }}>{passportPhoto}</span>
+              <span className="truncate" style={{ fontFamily: B, fontSize: 15, fontWeight: 800, color: tokens.navy }}>{f.name.trim() ? `${capWords(f.name.trim())}'s passport` : "Your passport"}</span>
+            </div>
+          ) : null}
           {step > 0 && step < 99 ? (
             <div className="flex items-center justify-between mb-4">
               {back}
@@ -479,7 +485,7 @@ export default function CreatePassport() {
           ) : null}
           {q}
         </section>
-        <aside className="order-1 xl:order-2 w-full max-w-[600px] mx-auto xl:sticky xl:top-6">
+        <aside className="ppg-hide-when-typing order-1 xl:order-2 w-full max-w-[600px] mx-auto xl:sticky xl:top-6">
           <div className="ppg-mini-pp">
           <PetPassport pet={pet} photo={passportPhoto} sample justIssued={step === 99} />
           </div>

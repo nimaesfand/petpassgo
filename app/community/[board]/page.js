@@ -12,7 +12,7 @@ import { US_STATES, stateName, titleCase, visitorArea } from "../../../lib/place
 import { tokens, font } from "../../../lib/theme";
 import CommunityPetChip from "../../../components/CommunityPetChip";
 
-const input = { fontFamily: font.body, fontSize: 15.5, border: `2px solid ${tokens.line}`, background: "#fff" };
+const input = { fontFamily: font.body, fontSize: 16, border: `2px solid ${tokens.line}`, background: "#fff" };
 
 function DisplayNameSetup({ onDone }) {
   const [name, setName] = useState(""); const [err, setErr] = useState(""); const [busy, setBusy] = useState(false);

@@ -98,7 +98,7 @@ export default function ShareRecordsSheet({ pet, open, onClose, onSent }) {
   }
 
   return (
-    <div role="dialog" aria-modal="true" aria-label={`Share ${pet.name}'s records`} className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: "rgba(20,33,61,.45)" }} onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}>
+    <div role="dialog" aria-modal="true" aria-label={`Share ${pet.name}'s records`} className="ppg-kb-aware fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: "rgba(20,33,61,.45)" }} onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}>
       <div className="w-full sm:max-w-[480px] rounded-t-3xl sm:rounded-3xl ppg-rise overflow-hidden" style={{ background: "#fff", maxHeight: "92vh", overflowY: "auto" }}>
         <div className="relative px-5 pt-5 pb-4" style={{ background: `linear-gradient(135deg, ${tokens.navy} 0%, #1D3463 100%)`, color: "#fff" }}>
           <button type="button" aria-label="Close" onClick={onClose} disabled={busy} className="absolute" style={{ top: 14, right: 14, background: "rgba(255,255,255,.14)", border: "none", borderRadius: 999, width: 36, height: 36, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="x" size={18} /></button>

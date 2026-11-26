@@ -80,7 +80,7 @@ export default function ChatWidget() {
     <button type="button" onClick={() => setOpen(true)} className="ppg-chat-launch rounded-full shadow-lg px-5 py-3" style={{ background: navy, color: "#F3F5F9", fontWeight: 600 }}>Questions? Chat</button>
   );
   const sheet = open ? (
-    <div className="rounded-2xl shadow-xl flex flex-col" style={{ width: "min(320px, calc(100vw - 24px))", height: "min(60dvh, 440px)", background: "#fff", border: "1px solid #DCE3EC" }}>
+    <div className="ppg-chat-box rounded-2xl shadow-xl flex flex-col" style={{ width: "min(320px, calc(100vw - 24px))", height: "min(60dvh, 440px)", background: "#fff", border: "1px solid #DCE3EC" }}>
       <div className="px-4 py-3 flex justify-between items-center rounded-t-2xl" style={{ background: navy, color: "#F3F5F9" }}>
         <span style={{ fontWeight: 600 }}>PetPassGo help</span>
         <button type="button" onClick={() => setOpen(false)} aria-label="Close chat">✕</button>

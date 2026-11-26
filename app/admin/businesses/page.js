@@ -74,7 +74,7 @@ export default function AdminBusinesses() {
                       <li>Pet policy is specific and believable</li>
                       <li>No medical claims or guarantees in the description</li>
                     </ul>
-                    <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3} placeholder="Note to the business (needed for 'Ask for a change')" style={{ border: `1px solid ${tokens.line}`, borderRadius: 12, padding: 10, fontSize: 14.5 }} />
+                    <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3} placeholder="Note to the business (needed for 'Ask for a change')" style={{ border: `1px solid ${tokens.line}`, borderRadius: 12, padding: 10, fontSize: 16 }} />
                     <div className="flex flex-wrap gap-2">
                       {b.status !== "published" && <button onClick={() => act(b, "approve")} style={btn(tokens.green)}>Approve and publish</button>}
                       <button onClick={() => act(b, "changes")} style={btn("#8A5A00")}>Ask for a change</button>

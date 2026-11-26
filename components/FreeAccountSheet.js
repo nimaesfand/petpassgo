@@ -51,7 +51,7 @@ export default function FreeAccountSheet({ open, onClose, onReady, trip, petWord
   }
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="Create your account" className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: "rgba(20,33,61,.45)" }} onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}>
+    <div role="dialog" aria-modal="true" aria-label="Create your account" className="ppg-kb-aware fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: "rgba(20,33,61,.45)" }} onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}>
       <div className="w-full sm:max-w-[440px] rounded-t-3xl sm:rounded-3xl p-6 ppg-rise" style={{ background: "#fff", maxHeight: "92vh", overflowY: "auto" }}>
         <div className="flex items-start justify-between gap-3">
           <div>

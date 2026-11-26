@@ -10,7 +10,7 @@ import { buildUrgencyItems, deriveStamps, tripBelongsToPet, SAMPLE_DOG } from ".
 const h3 = { fontFamily: font.display, fontSize: 18, fontWeight: 700, color: tokens.navy };
 const section = { borderTop: `1px solid ${tokens.line}`, paddingTop: 16, marginTop: 16 };
 const btn = { fontFamily: font.body, fontWeight: 700, fontSize: 14.5, borderRadius: 999, padding: "9px 16px", cursor: "pointer" };
-const input = { fontFamily: font.body, fontSize: 15.5, border: `2px solid ${tokens.line}`, borderRadius: 10, padding: "9px 12px", width: "100%", background: "#fff" };
+const input = { fontFamily: font.body, fontSize: 16, border: `2px solid ${tokens.line}`, borderRadius: 10, padding: "9px 12px", width: "100%", background: "#fff" };
 const fmtDate = (v) => (v ? new Date(`${v}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "");
 
 function useFirstPetId() {

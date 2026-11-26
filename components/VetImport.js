@@ -4,7 +4,7 @@ import { supabase } from "../lib/supabaseClient";
 import { BUCKET } from "../lib/storage";
 import { tokens, font } from "../lib/theme";
 
-const input = { fontFamily: font.body, fontSize: 15.5, border: `2px solid ${tokens.line}`, borderRadius: 10, padding: "9px 12px", width: "100%", background: "#fff" };
+const input = { fontFamily: font.body, fontSize: 16, border: `2px solid ${tokens.line}`, borderRadius: 10, padding: "9px 12px", width: "100%", background: "#fff" };
 const label = { fontFamily: font.body, fontSize: 13, fontWeight: 700, color: tokens.navy };
 const btn = { fontFamily: font.body, fontWeight: 700, fontSize: 14.5, borderRadius: 999, padding: "9px 16px" };
 const todayISO = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
