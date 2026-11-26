@@ -2295,6 +2295,234 @@ Tested on the live site, logged out unless noted, at phone width (390–400px, C
 
 ## Ideas and pushback
 
+### 2026-11-25: QUEUED, start after Travel Pass and Pet Vault are finished. Spec: state-by-state service dog and ESA pages (Nima's call, from Sisqo)
+**Status: Queued. Start after Travel Pass and Pet Vault are finished.** Claude: don't pick this up yet. When it's time, follow the usual process: post a dated plan under "Claude updates" ending with `Ready for review`, and build only after Nima approves. Nima's decisions are relayed by Sisqo. The SEO agent wrote the spec after reading the repo at `main`.
+
+**What Nima decided**
+- Every state gets its own service dog page and its own ESA page: 50 states + DC, so 51 per type and 102 pages. Each type also gets one hub, a clean state list. These are guide pages, not blog posts or FAQ answers.
+- **Don't scatter state links around the site.** The blog index gets exactly two new entries: "Service dog info by state" and "ESA info by state". Each opens its hub. Tapping a state on the hub opens that state's page. No state or hub links go in the main nav, the footer or the homepage. Every page still has its own URL and is in the sitemap.
+- Pages are compact and good-looking: no long scroll, no clutter.
+
+---
+
+#### 0. What's in the repo now (read before building)
+- **`/guides` and `/guides/[state]` already exist.** They're built from `lib/stateGuides.js` and `components/StateGuide.js`. Each page covers service dogs and ESAs together, for 6 states (CA, TX, FL, NY, IL, AZ). They're in `app/sitemap.js` (`STATES` → `/guides/${slug}`). The homepage links to `/guides` ("service dog and ESA laws by state", `app/page.js` ~line 216), and that breaks Nima's no-homepage-links rule. `/guides` also says "More states are on the way." The new pages replace these (see §1, Redirects).
+- **`/service-dog`** (`app/service-dog/page.js`) is the static landing page. Its H1 is "Your service dog flies with you, free.", which is the only allowed use of "free". `next.config.mjs` redirects `/service-dog/dot-form` → `/service-dog`. That slug isn't a state, so it doesn't clash with `[state]`.
+- **No `/esa` route exists.** `/esa-passport` is the ESA landing page.
+- **`/airlines/[airline]`** (`app/airlines/[airline]/page.js`) reads `AIRLINE_GUIDES` from `lib/airlineGuides.js`. Slugs: delta, american-airlines, united, southwest, jetblue, alaska-airlines, hawaiian-airlines, frontier, allegiant, sun-country, aeromexico, volaris, viva-aerobus.
+- **Blog**: `lib/blog.js` reads `content/blog/*.md` (front matter: title, description, date, author, status). `app/blog/page.js` lists posts. The empty state on that page says "Guides are coming soon", which breaks the no-"coming soon" rule; fix it in this build. `app/blog/[slug]/page.js` emits Article JSON-LD.
+- **FAQ**: `lib/faq.js` + `app/faq/page.js` (`<details>` accordions + FAQPage JSON-LD). Reuse that accordion pattern.
+- **Shared pieces**: `components/JsonLd.js`, `components/SiteHeader.js`, `components/Icon.js`, `components/Analytics.js` (`TrackOnMount`), `lib/theme.js` (`tokens`, `font`), `lib/site.js` (`SITE_URL`), `lib/pricing.js` (`PRICES`), the `.ppg-badge-service` (blue) and `.ppg-badge-esa` (red) classes in `app/globals.css`, and the `lib/airports.js` list.
+- **Pricing in the repo** (`lib/pricing.js`, CLAUDE.md): Pet Vault is $6.99/month, monthly only. Travel Pass is $14.99 and always comes with Pet Vault, so the first trip is $21.98. **The $49.99 / $19.99 numbers in the SEO brief are wrong for this site. Don't use them.** Never show the retired $29.99. Always read prices from `PRICES`. Never hard-code them.
+- **Source links**: Nima's Batch 2 trims removed source links from the public state guides. Inside the paid Travel Pass, sources stay. This spec keeps a source URL for every fact **in the data** (that's what gates publishing). Public pages show the statute citation as plain text (e.g. "Fla. Stat. §413.08(9)") plus "Last checked", with no outbound links. If Nima wants links back, it's a one-line change (Open question 1).
+
+#### 1. URL scheme
+- `/service-dog/[state]` and `/esa/[state]`, using full-name kebab slugs: `new-york`, `district-of-columbia`, `north-carolina`.
+  - Why: they sit under the topic people search for, and `/service-dog` already ranks as the topic page. Full names match how people search ("service dog laws new york") and read well in results. Two-letter codes (`/ny`) are ambiguous and add nothing.
+- Hubs: `/service-dog/states` and `/esa/states`. The `states` segment is static and wins over `[state]` in Next.js. Never use `states` as a state slug.
+- `/esa` (no page today): add a permanent redirect `/esa` → `/esa/states` so the parent path never 404s. `/service-dog` stays the existing landing page.
+- **Redirects** in `next.config.mjs`, after Nima confirms (Open question 2): `/guides` → `/service-dog/states`, and `/guides/:state` → `/service-dog/:state`, both permanent. Then remove `/guides` from `staticPaths` and drop the `STATES` → `/guides/...` block in `app/sitemap.js`. Retire `app/guides/*` and `components/StateGuide.js`. Move any still-valid content from `lib/stateGuides.js` into the new data (re-verify it first; see §6).
+- Routes:
+  - `app/service-dog/states/page.js`, `app/service-dog/[state]/page.js`
+  - `app/esa/states/page.js`, `app/esa/[state]/page.js`
+  - In each `[state]` page: `export const dynamicParams = false;` and `generateStaticParams()` → `publishedStates("service" | "esa").map(s => ({ state: s.slug }))`. Unknown or unpublished slugs 404.
+- **Data source: a typed data file, not Supabase.** The site is JS (jsconfig, no TS), state law changes slowly, and the content needs review in PRs. A new table would also need Nima's approval for a migration. Layout:
+  - `lib/stateLaws/index.js`: `STATE_LIST` (all 51 with slug, name, USPS code), `getState(slug)`, `publishedStates(type)`, `isPublishable(state, type)`. Facts are typed with JSDoc `@typedef`.
+  - `lib/stateLaws/federal.js`: the shared federal block (§5).
+  - `lib/stateLaws/states/<slug>.js`: one file per state (§4 shape). Small diffs and easy review.
+
+#### 2. Keyword targets (no search volumes; we don't have any)
+Each phrase is a target, not a promise. Real data from Search Console replaces this once it exists.
+- **Service dog state page**: "service dog laws [state]" (primary), "[state] service animal law", "[state] service dog rules", "fake service dog penalty [state]", "service dog in training [state]", "service dog housing [state]", "flying with a service dog from [main airport]".
+- **ESA state page**: "ESA laws [state]" (primary), "emotional support animal laws [state]", "emotional support animal housing [state]", "ESA letter requirements [state]", "fake ESA letter penalty [state]", "can I fly with an ESA from [main airport]".
+- **Hubs**: "service dog laws by state", "emotional support animal laws by state".
+- Put the primary phrase in the title, H1 and first line. Put secondary phrases in the quick-facts labels and FAQ questions, written naturally. No keyword stuffing.
+
+#### 3. Template layout (compact, no long scroll)
+Same look as the site: `tokens.sky` background, navy headings, the one `tokens.primary` button colour, `font.display`/`font.body`, rounded-2xl/3xl white cards with a `tokens.line` border. Service pages use the blue `.ppg-badge-service` and ESA pages the red `.ppg-badge-esa` (CLAUDE.md seal rule). New components live in `components/stateLaws/`:
+
+| # | Component | What it shows | Height budget (mobile, collapsed) |
+|---|---|---|---|
+| 1 | `StateLawHero` | Badge (SERVICE DOG / EMOTIONAL SUPPORT ANIMAL), H1 "[State] service dog laws" / "[State] ESA laws", a one-line emotional promise, "Last checked [date]" | ≤ 260px |
+| 2 | `QuickFacts` | 4 small cards in a 2×2 grid (4-across on desktop). Service: Public access · Housing · Faking it · Trainers. ESA: Housing · Public places · Letters · Flying. Each is a one-line answer plus a statute tag | ≤ 300px |
+| 3 | `LawAccordion` | 3–5 `<details>` rows (FAQ-page pattern), all closed by default: the state statute, housing, public access, misrepresentation, trainer/handler rights. Each opens to 2–4 short sentences plus the citation text | ≤ 5 × 56px closed |
+| 4 | `FederalFlightNote` | One short card from `lib/stateLaws/federal.js` (§5) | ≤ 160px |
+| 5 | `AirportStrip` | One horizontal row of chips: "LAX · Los Angeles International". Under it, one line of links to the relevant `/airlines/[slug]` guides | ≤ 120px |
+| 6 | `StateCtaBand` | Navy band: feeling line + one button (§9) | ≤ 220px |
+| 7 | `StateFaq` | 3 questions, `<details>`, same component as LawAccordion | ≤ 3 × 56px |
+| 8 | `LawsChangeNote` | One muted line: laws change, confirm with the source, not legal advice | ≤ 40px |
+
+- **Total budget**: about 1,700px on a 390px-wide phone with everything closed (about 2.5 screens), and about 1,300px on desktop. No section repeats another. No long federal essays; that content belongs on `/service-dog`.
+- **Hubs** (`StateHub` + `StateSearchGrid`, a small `"use client"` filter): H1 "Service dog laws by state" / "ESA laws by state", one line of intro, a search box ("Type your state"), and an A–Z grid of state name chips (3 columns on mobile, 5 on desktop). The grid shows only published states. **No** text like "more on the way" or "coming soon". Under the grid, the same `FederalFlightNote` and one CTA. Target height: about one screen plus the grid.
+- Breadcrumb line above the H1: Blog › Service dog laws by state › Texas. It matches the BreadcrumbList.
+
+#### 4. What makes each state page unique (data fields + source rule)
+Every fact is an object `{ text, cite, sourceUrl, verifiedOn, status }`. `status` is `"complete"` or `"verify"`. `sourceUrl` must be an official page: the state legislature or code site, the state AG, or the state civil-rights or fair-housing agency. Federal facts use ecfr.gov, federalregister.gov, transportation.gov, ada.gov or hud.gov. Law-firm blogs, Justia, Wikipedia, ESA-letter sellers and registries aren't sources.
+
+```js
+/** @typedef {{text:string, cite:string, sourceUrl:string, verifiedOn:string, status:"complete"|"verify"}} Fact */
+export default {
+  slug, name, usps,
+  service: {
+    promise,                 // hero line (copy rules, §10)
+    statute: Fact,           // state service-animal statute + one-line plain summary
+    publicAccess: Fact,      // where a service dog can go, what staff may ask
+    housing: Fact,           // state housing rule for service dogs (FHA baseline lives in federal.js)
+    misrepresentation: Fact, // statute + penalty
+    trainerRights: Fact|null,// dogs in training / trainer access, only where the state grants it
+    faq: [{ q, a }],         // 3, built from the facts above
+  },
+  esa: {
+    promise,
+    statute: Fact|null,      // state ESA statute if one exists
+    housing: Fact,           // state ESA housing rule, or "federal baseline only" (see §5)
+    publicAccess: Fact,      // usually: no public-access rights for ESAs
+    letters: Fact|null,      // rules on ESA documentation (e.g. CA 30-day rule)
+    misrepresentation: Fact|null,
+    faq: [{ q, a }],
+  },
+  airports: [{ iata, name, hub, sourceUrl, verifiedOn, status }], // 2–5 large/medium hubs from FAA's CY2025 enplanement list
+  airlines: ["delta", "southwest", ...],                           // AIRLINE_GUIDES slugs with real service at those airports (Fact-Checker confirms)
+  lastVerified: "2026-11-25",                                      // the oldest verifiedOn on the page
+};
+```
+
+**Publish gate:** `isPublishable(state, "service")` is true only when `statute`, `publicAccess`, `housing`, `misrepresentation` and at least 2 airports are all `complete`. The ESA gate needs `housing`, `publicAccess` and at least 2 airports. Any optional fact still marked `verify` is left out of the page entirely. It's never shown with a hedge. A page that fails the gate isn't built, isn't on the hub and isn't in the sitemap.
+
+#### 5. Shared federal block (`lib/stateLaws/federal.js`), checked Nov 25, 2026
+- **Service dogs on planes (ACAA, 14 CFR Part 382).** A service animal is a dog, of any breed, individually trained to do work or perform tasks for a person with a disability, including a psychiatric disability. It flies in the cabin. Source: [14 CFR 382.3](https://www.ecfr.gov/current/title-14/chapter-II/subchapter-D/part-382/subpart-A/section-382.3).
+- **The DOT form.** An airline may require the U.S. DOT Service Animal Air Transportation Form. On flights of 8 hours or more, it may also require the DOT relief attestation form. It can't require other documents beyond these, except for a government's animal-import rules. Source: [14 CFR 382.75](https://www.ecfr.gov/current/title-14/chapter-II/subchapter-D/part-382/subpart-E/section-382.75). Public pages say *what* the form is, never how to fill it in or by when (paywall rule, §9). Leave out the 48-hour advance-notice detail; it's a deadline.
+- **ESAs on planes.** The same definition (382.3) says emotional support, comfort and companionship animals, and service animals in training, are not service animals. That's the Dec 2020 DOT rule, 85 FR 79774, in effect since 2021. On U.S. airlines an ESA flies under the airline's pet rules. Source: 382.3 above.
+- **ESAs in public places.** ADA public access covers only trained service dogs. "The provision of emotional support, well-being, comfort, or companionship" is not a task. Source: [28 CFR 36.104](https://www.ecfr.gov/current/title-28/chapter-I/part-36/subpart-A/section-36.104).
+- **Housing baseline (FHA). Be careful here.** The Fair Housing Act itself didn't change. But HUD withdrew its 2013 and 2020 assistance-animal guidance (effective Sept 17, 2025; [Federal Register, Apr 6, 2026](https://www.federalregister.gov/documents/2026/04/06/2026-06624/notification-of-withdrawal-of-fair-housing-and-equal-opportunity-guidance-documents)). A May 22, 2026 FHEO memo says HUD will find cause only in cases involving animals trained to provide disability-related assistance ([hud.gov PDF](https://www.hud.gov/sites/default/files/hudclips/documents/AS-Trainor-Enforcement-Guidance-Assessing-Requests-for-the-use-of-an-animal-as-a-reasonable-accommodation-under-the-fair-housing-act.pdf)). So state "FHA is the federal baseline, and state law can add more", and don't promise federal ESA housing rights. **Replace the dredf.org link in `lib/stateGuides.js` (`HUD_2026`) with the hud.gov and federalregister.gov sources.**
+- The Airline Fact-Checker agent re-verifies this block and every airport and airline fact before launch, then monthly. It already does the monthly "Last checked" re-check for /service-dog, /mexico and /canada.
+
+#### 6. Fact verification workflow
+1. Draft the state file with every fact marked `status: "verify"`.
+2. Verify each fact on the official source (legislature/code site, state AG, state civil-rights agency). Then set `verifiedOn` and `status: "complete"`. If no official page confirms it, delete the fact. Never soften it into a guess.
+3. The Airline Fact-Checker verifies the airports, the airline slugs and the federal block.
+4. PR review: Sisqo spot-checks 1 in 5 facts against `sourceUrl` before Nima approves.
+5. Monthly: re-check. Any change → update the fact, the `verifiedOn` date and the page's `lastVerified`.
+6. Content in `lib/stateGuides.js` is a starting point only. Re-verify it, because some of its sources aren't official (Justia, legalreader.com, dredf.org).
+
+**Sample data, verified by the SEO agent on Nov 25, 2026** (copy the shape; text is plain-language summaries):
+
+*California*
+- service.statute: Civ. Code §54.2(a). A person with a disability may bring a trained guide, signal or service dog into the places in §54.1, with no extra charge or deposit, and is liable for damage. [leginfo §54.2](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=54.2) complete
+- service.housing: Civ. Code §54.1(b)(6). Refusing to rent to someone because they use a service dog, or refusing to let them keep it, is a denial of equal access. [leginfo §54.1](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=54.1) complete
+- service.misrepresentation: Penal Code §365.7. Knowingly and fraudulently claiming to own or train a guide, signal or service dog is a misdemeanor: up to 6 months in county jail, a fine up to $1,000, or both. [leginfo §365.7](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=PEN&sectionNum=365.7) complete
+- service.trainerRights: Civ. Code §54.2(b) and §54.1(c). People authorized to train service dogs may bring dogs in training to the same places, with no extra charge. The dog must be leashed and wear an ID tag issued by the county clerk, animal control or another authorized agency. complete
+- esa.letters: Health & Safety Code §122318. A practitioner may provide documentation for an emotional support dog only if they're licensed where it's provided, have a client relationship of at least 30 days (waived for people verified as homeless), complete a clinical evaluation, and warn that faking a service dog is a misdemeanor. [leginfo §122318](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=HSC&sectionNum=122318) complete
+- esa.misrepresentation: Health & Safety Code §122319. Knowingly and fraudulently selling or representing an emotional support dog as having service-dog rights brings a civil penalty: $500 first, $1,000 second, $2,500 for later violations. [leginfo §122319](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=HSC&sectionNum=122319) complete
+- esa.housing: FEHA support-animal rules (2 CCR §12005/§12185). **verify.** The official regulation page (Westlaw CCR) timed out. §122319(b) confirms FEHA housing rights aren't limited by the ESA law, but that isn't enough to describe them. Confirm at calcivilrights.ca.gov before publishing.
+- esa.publicAccess: no ADA public access (federal block). State-specific wording: verify.
+- airports (FAA CY2025, large hubs): LAX Los Angeles International, SFO San Francisco International, SAN San Diego International. Medium: SMF, SNA, SJC, OAK. complete (FAA location IDs; the Fact-Checker confirms they match IATA)
+
+*Texas*
+- service.statute + publicAccess: Hum. Res. Code §121.003(c), (k), (l). No one with a disability can be denied a public facility or the use of an assistance animal. Where the disability isn't obvious, staff may ask only whether the animal is required because of a disability and what work or task it's trained to perform. "Assistance animal"/"service animal" means a trained canine (§121.002(1)). [statutes.capitol.texas.gov ch. 121](https://statutes.capitol.texas.gov/Docs/HR/htm/HR.121.htm) complete
+- service.housing: §121.003(h). Full and equal access to housing, with no extra charge or deposit for the animal; the tenant is liable for damage beyond normal wear. complete
+- service.misrepresentation: §121.006(a). Knowingly claiming an animal is a service or assistance animal when it isn't specially trained is a misdemeanor: fine up to $1,000 plus 30 hours of community service, to be done within a year (amended by HB 4164, eff. Sept 1, 2023). complete
+- service.trainerRights: §121.003(i). A service animal in training can't be denied a public facility when it's with an approved trainer. complete
+- esa.statute / esa.housing: I found no Texas ESA statute in ch. 121, whose definition is canine and trained. Show "federal baseline (FHA)" only, with the §5 wording. **verify**: confirm with the Texas Workforce Commission Civil Rights Division that there's no separate state ESA housing rule.
+- airports (FAA CY2025, large hubs): DFW Dallas-Fort Worth International, IAH George Bush Intercontinental/Houston, AUS Austin-Bergstrom International. Medium: DAL, HOU, SAT. complete
+
+*Florida*
+- service.statute + publicAccess: Fla. Stat. §413.08(1)(d), (3). A service animal (a dog or miniature horse, for access) is trained to do work or tasks; emotional support isn't a task. Staff may ask only whether it's required because of a disability and what tasks it's trained to do. No documentation may be required, and no deposit or surcharge. Air carriers covered by the ACAA are excluded from the state definition. [leg.state.fl.us §413.08](http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0400-0499/0413/Sections/0413.08.html) complete
+- service.housing: §413.08(6)(b). Full and equal access to housing with a service animal, no extra charge, liable for damage; the landlord may ask for proof of vaccinations. complete
+- service.misrepresentation: §413.08(9). Knowingly misrepresenting yourself as using, or qualified to use, a service animal, or as a trainer, is a second-degree misdemeanor (up to 60 days, §775.082(4)(b); fine up to $500, §775.083(1)(e)) plus 30 hours of community service within 6 months. complete
+- service.trainerRights: §413.08(8). A trainer, while training, has the same public-access rights and the same damage liability as a handler. complete
+- esa.statute + esa.housing: §760.27. To the extent federal law requires, housing providers may not discriminate against a person with a disability-related need for an ESA, and may not charge extra for it. If the need isn't obvious, they may ask for reliable information, e.g. from a practitioner with personal knowledge (an out-of-state provider must have seen the tenant in person at least once). They can't demand a diagnosis or a specific form. An internet registration, ID card or certificate isn't enough by itself. [§760.27](http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0700-0799/0760/Sections/0760.27.html) complete. Note: Florida's protection is tied to "the extent required by federal law", so word it carefully given HUD's 2026 change (§5).
+- esa.misrepresentation: §817.265. Falsifying ESA documentation, or misrepresenting a need for an ESA, is a second-degree misdemeanor plus 30 hours of community service. [§817.265](http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0800-0899/0817/Sections/0817.265.html) complete
+- airports (FAA CY2025, large hubs): MCO Orlando International, MIA Miami International, FLL Fort Lauderdale/Hollywood International, TPA Tampa International. Medium: RSW, JAX. complete. **Palm Beach: FAA's CY2025 list shows it as "President Donald J Trump International", location ID DJT.** The repo uses PBI. Leave it out until the Fact-Checker confirms the current IATA code and name.
+
+Not verified this time, so left out: California FEHA ESA housing detail, Texas "no state ESA rule" confirmation, and the penalties for *denying* access (TX §121.004, CA Civ. Code §54.3).
+
+#### 7. Internal linking (Nima's structure: minimal)
+- **Into the hubs:** the blog index (`app/blog/page.js`) gets exactly two pinned entries above the posts, styled like posts with a small badge:
+  - "Service dog info by state" → `/service-dog/states` (blue badge)
+  - "ESA info by state" → `/esa/states` (red badge)
+- **Hubs → states:** the A–Z grid only.
+- **Inside a state page:** (1) the breadcrumb/back link to its hub, (2) links to `/airlines/[slug]` for airlines in `state.airlines` that exist in `AIRLINE_GUIDES`, (3) the CTA. Nothing else. No neighbouring-state grids, no links to other states, and no cross-link to the other type. (Open question 3 if Nima wants a single "ESA rules in [State]" link.)
+- **Existing posts:** at most one contextual link to a hub, never to individual states, and no state lists inside posts:
+  - `content/blog/dot-service-animal-form.md` → one sentence linking `/service-dog/states`.
+  - `content/blog/service-dog-vs-esa-vs-psd-flying.md` → one sentence linking `/esa/states`.
+- **No links** in `SiteHeader`, the footer, the homepage or `lib/faq.js`. Remove the existing homepage `/guides` link (`app/page.js` ~line 216) as part of this build.
+
+#### 8. Schema, metadata, canonical, sitemap
+- **State pages** (`generateMetadata`):
+  - Service title: `${name} Service Dog Laws (${year}): Public Access, Housing & Penalties`
+  - ESA title: `${name} ESA Laws (${year}): Housing, Letters & Flying`
+  - Descriptions: one sentence built from 2 quick facts (≤ 155 characters), e.g. "Where a service dog can go in Texas, what staff can ask, housing rules and the penalty for faking one. Last checked Nov 2026."
+  - `alternates.canonical`: `/service-dog/${slug}` / `/esa/${slug}`. `openGraph` gets `type: "article"`, url and title.
+- **Hubs**: "Service Dog Laws by State (2026)" / "Emotional Support Animal (ESA) Laws by State (2026)". Canonical `/service-dog/states` and `/esa/states`.
+- **JSON-LD** via `components/JsonLd.js`:
+  - State pages: `Article` with `headline`, `description`, `dateModified` = `lastVerified`, `datePublished`, publisher PetPassGo, `mainEntityOfPage` = `${SITE_URL}/service-dog/${slug}`. Also `BreadcrumbList` (Blog → hub → state) and `FAQPage` built from the 3 visible FAQ items only.
+  - Hubs: `CollectionPage` + `BreadcrumbList` (Blog → hub).
+- **Sitemap** (`app/sitemap.js`): add both hubs (weekly, 0.6). Add every published state page per type (`lastModified` = `lastVerified`, monthly, 0.6) from `publishedStates()`. Remove `/guides` after the redirects ship.
+
+#### 9. CTAs into PetPassGo (prices from `PRICES`)
+- **Service pages:** button "Check my flight" → `/assessment?pet=service` (the existing `/service-dog` pattern). One line under it: Pet Vault `${PRICES.member}` a month, with your dog's passport and the DOT form filled in for every trip.
+- **ESA pages:** button "Check my flight" → `/assessment?pet=esa`. Under it: the Travel Pass (`${PRICES.pass}`, comes with Pet Vault) for harder trips. On ESA pages the CTA is about flying as a pet and the housing letter in Pet Vault. **Never imply ESA travel rights** (CLAUDE.md).
+- **Paywall rule:** public pages say *what* the law and the airline can ask for. They never give the step-by-step, the deadlines and order of steps, or which form by which date for a given trip. That stays in the Travel Pass. Don't link the DOT PDF from these pages, and don't reproduce form sections.
+
+#### 10. Copy rules for Claude
+- Sell the feeling, not features: calm, ready, together.
+- Never say "free". The only exception is the existing `/service-dog` line "flies with you, free." Don't say it on state pages either; say "in the cabin with you".
+- Never say "coming soon", "more on the way" or "launching".
+- Never use or mention US Dog Registry / USDR, its details or any registry. Never call anything we sell "official", "certified", "registered" or "approved". The DOT form may be called the government's form.
+- No fake reviews, testimonials or claims. Benny, Milo and Luna are never shown as real customers.
+- Every page carries one line: "Laws change. Confirm with the source listed before you rely on this. Not legal advice."
+- Plain words, short sentences, no legalese in the summaries. Citations go in small tags.
+
+Examples (follow the rules):
+- Service hero: "Texas, side by side. Know your rights before you walk in the door."
+- ESA hero: "Home is where they are. Here's how Florida protects that."
+- CTA band: "Fly with your dog at your feet and nothing to worry about." Button: "Check my flight".
+- Hub intro: "Pick your state. Know where your dog belongs."
+
+#### 11. Acceptance criteria
+- `/service-dog/states` and `/esa/states` load with a working search box and a grid of published states only.
+- Each published `/service-dog/[state]` and `/esa/[state]` page: fits the height budget on a 390px phone with everything closed, has the 8 blocks in order, and shows only `complete` facts with a "Last checked" date. Unpublished or unknown slugs return 404.
+- 102 state pages once all facts are complete. The first batch (below) can ship first.
+- The blog index shows exactly the two new entries. There are no state or hub links in the header, footer, homepage or FAQ. Each of the two existing posts gets at most one hub link.
+- Each state page links only to its hub, its airline guides and the CTA.
+- Titles, descriptions, canonicals and JSON-LD (Article with `dateModified`, BreadcrumbList, FAQPage) pass the Rich Results Test. All hubs and published pages are in `/sitemap.xml`. `/guides` redirects (once approved) and is gone from the sitemap.
+- Prices come from `PRICES`. No $49.99, $19.99 or $29.99 anywhere. No "free" (except the existing /service-dog H1), no "coming soon", no USDR, no "official/certified/registered/approved" about us.
+- The laws-change note is on every page.
+
+**Build checklist (Claude)**
+1. Post the plan under "Claude updates" (`Ready for review`). Wait for Nima.
+2. `lib/stateLaws/` (index, federal, 51 state files starting from `STATE_LIST`, all `verify`). Fill and verify the first batch.
+3. Components in `components/stateLaws/`. Routes for both hubs and both `[state]` pages with `generateStaticParams` + `dynamicParams = false`.
+4. Metadata, JSON-LD and sitemap.
+5. Blog index: the two entries; fix the "coming soon" empty state.
+6. One hub link in each of the two existing posts.
+7. `/esa` redirect. After Nima's OK: the `/guides` redirects, remove the homepage `/guides` link, retire `app/guides` and `StateGuide.js`.
+8. Copy check: grep for `free`, `coming soon`, `USDR`, `official`, `certified`, `registered`, `approved`, `29.99`, `49.99`, `19.99`.
+9. Post "Built ... Ready for testing" with the URLs for Sisqo to test on phone and desktop.
+
+#### First batch (about 10 states, service dog + ESA pages for each)
+We have no keyword-volume data, so this order uses **proxies, not search volume**: state population, main-airport passenger traffic, and how active the state's ESA/service-animal law is. Airport traffic comes from FAA's [CY2025 commercial-service enplanements](https://www.faa.gov/airports/planning_capacity/passenger_allcargo_stats/passenger) (state totals in that file rank CA, FL, TX, NY, GA, IL, CO, NC, VA, NV, WA, AZ, NJ, MA, PA). Population is used as a proxy only; no figures are given here.
+1. California: biggest airport traffic; very active ESA law (30-day letter rule, seller penalties).
+2. Texas: top-3 airport traffic; penalty raised in 2023.
+3. Florida: top-2 airport traffic; its own ESA housing law and fake-ESA crime.
+4. New York: #4 airport traffic.
+5. Illinois: top-6 airport traffic; Assistance Animal Integrity Act (in the current guide; re-verify).
+6. Georgia: #5 airport traffic (ATL).
+7. North Carolina: top-8 airport traffic.
+8. Arizona: misrepresentation fine law (in the current guide; re-verify).
+9. Washington: top-11 airport traffic.
+10. Pennsylvania: large population, though only #15 in airport traffic.
+- Alternate: **Colorado** ranks #7 in FAA airport traffic (DEN), above NC, WA, AZ and PA. Swap it in for Pennsylvania if Nima prefers traffic over population.
+- 6 of these (CA, TX, FL, NY, IL, AZ) already have `/guides` pages, so reuse the research after re-verifying it.
+- Replace this ranking with real volumes as soon as Search Console or keyword data exists.
+
+#### Open questions for Nima
+1. Source links on public state pages: plain-text citation only (current rule since Batch 2), or link out?
+2. OK to redirect `/guides` → `/service-dog/states` and `/guides/:state` → `/service-dog/:state`, and remove the homepage `/guides` link?
+3. One link from a state's service page to the same state's ESA page (and back), or keep strictly hub/airlines/CTA?
+4. Pricing: the SEO brief said $49.99 / $19.99 trip passes. The repo says Travel Pass $14.99 with Pet Vault ($21.98 first trip). This spec uses the repo. Confirm.
+
 ### 2026-11-22: Nima's decisions on the pick-list plan + more tasks for the list (from Sisqo)
 **Nima decided (relayed by Sisqo):**
 - Training organization is typed in by the owner, not picked from a list of programs. No program drop-down.
