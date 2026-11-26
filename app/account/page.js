@@ -147,6 +147,10 @@ function PetCard({ pet, userId, onPhotoUpdated }) {
     const want = typeof window !== "undefined" ? window.__ppgPetSection : null;
     return want && (!want.petId || want.petId === pet.id) ? want.section : "passport";
   });
+  // Send any pending Wallet pass update when the owner opens this pet.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => fetch("/api/wallet/sync", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": data?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id }) }).catch(() => {}));
+  }, [pet.id]);
   useEffect(() => {
     function go(e) {
       const d = e.detail || {};

@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import WalletButtons from "../WalletButtons";
 import Icon from "../Icon";
 import Fold from "./Fold";
 import PetQr from "../../lib/PetQr";
 import { Wordmark } from "../Logo";
 import { savePetIdImage } from "../PetIdV2";
-import { savePassportImage, walletThumbBase64 } from "../../lib/passportImage";
+import { savePassportImage } from "../../lib/passportImage";
 import { PUBLIC_ID_BASE } from "../../lib/PetQr";
 import { supabase } from "../../lib/supabaseClient";
 import { tokens, font } from "../../lib/theme";
@@ -93,19 +94,9 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
   const [local, setLocal] = useState({});
   const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState("");
-  const [wallet, setWallet] = useState(false);
   const [askRemove, setAskRemove] = useState(false);
 
   useEffect(() => { setLocal({}); }, [pet.id, pet.updated_at]);
-  useEffect(() => {
-    let live = true;
-    supabase.auth.getSession().then(async ({ data }) => {
-      const r = await fetch("/api/pet-wallet", { headers: { "x-sb-token": data?.session?.access_token || "" } }).catch(() => null);
-      const j = r ? await r.json().catch(() => ({})) : {};
-      if (live) setWallet(!!j.available);
-    }).catch(() => {});
-    return () => { live = false; };
-  }, [pet.id]);
 
   const isOn = (k) => (k in local ? local[k] : !!pet[k]);
   async function flip(k) {
@@ -129,21 +120,6 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
     const url = profileUrl(pet);
     try { if (navigator.share) { await navigator.share({ title: `${pet.name || "Pet"}'s passport`, url }); return; } } catch { return; }
     copy();
-  }
-  async function addWallet() {
-    setBusy("wallet");
-    try {
-      const { data } = await supabase.auth.getSession();
-      const thumb = await walletThumbBase64().catch(() => "");
-      const r = await fetch("/api/pet-wallet", { method: "POST", headers: { "Content-Type": "application/json", "x-sb-token": data?.session?.access_token || "" }, body: JSON.stringify({ pet_id: pet.id, thumb }) });
-      if (!r.ok) { setWallet(false); return; }
-      const blob = await r.blob();
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `${(pet.name || "pet").replace(/[^a-z0-9]+/gi, "-")}-pet-id.pkpass`;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-    } finally { setBusy(""); }
   }
 
   const visible = TOGGLES.filter(([k]) => isOn(k));
@@ -175,12 +151,7 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
       {/* Actions */}
       {toolsOnly ? (
         <>
-          {wallet ? (
-          <button type="button" onClick={addWallet} disabled={!!busy} className="w-full rounded-2xl flex items-center justify-center gap-2.5" style={{ minHeight: 54, background: "#000", color: "#fff", border: "none", cursor: wallet ? "pointer" : "default", opacity: wallet ? 1 : 0.55, fontFamily: font.body, fontWeight: 700, fontSize: 16 }}>
-            <Icon name="smartphone" size={20} />
-            {busy === "wallet" ? "Preparing…" : "Add to Apple Wallet"}
-          </button>
-          ) : null}
+          <WalletButtons pet={pet} onSaveImage={saveImage} />
           <div className="grid gap-2" style={{ gridTemplateColumns: "repeat(3, minmax(0,1fr))" }}>
             <ActionTile icon="download" title="Save image" sub="Passport + QR" onClick={saveImage} busy={busy === "png" ? "Saving…" : ""} />
             <ActionTile icon="send" title={copied ? "Link copied" : "Share"} sub="Send the link" onClick={share} />
@@ -190,15 +161,15 @@ export default function PetIdStudio({ pet, userId, photo, card, onChanged, onRem
             <ActionTile icon="link" title={copied ? "Copied!" : "Copy link"} sub="For texts and bios" onClick={copy} />
           </div>
         </>
-      ) : (
+      ) : (<>
+      <WalletButtons pet={pet} onSaveImage={saveImage} />
       <div className="grid gap-2" style={{ gridTemplateColumns: "repeat(2, minmax(0,1fr))" }}>
         <ActionTile icon="smartphone" title="Save image" sub="Card image with QR" onClick={saveImage} busy={busy === "png" ? "Saving…" : ""} />
         <ActionTile icon="link" title={copied ? "Copied!" : "Copy link"} sub="Share the profile" onClick={copy} />
         <ActionTile icon="external" title="Public page" sub="What a finder sees" href={profileUrl(pet)} />
         <ActionTile icon="tag" title="Print QR tags" sub="Print at home" href={`/account/tags?pet=${pet.id}`} />
-        {wallet ? <ActionTile icon="bag" title="Apple Wallet" sub="Next to your cards" onClick={addWallet} busy={busy === "wallet" ? "Preparing…" : ""} /> : null}
       </div>
-      )}
+      </>)}
 
       {/* Privacy: switches + live preview */}
       <Fold icon="lock" color={T.color} soft={T.soft} title="What people see when they scan" hint={`Name, photo, breed + ${visible.length} you chose`}>

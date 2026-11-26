@@ -6,6 +6,7 @@ import { vetRequestEmail } from "../../../../lib/vetVerifyEmail";
 import { hashToken, newToken } from "../../../../lib/ppgSign";
 import { SITE_URL } from "../../../../lib/site";
 import { brandedEmail, petPhotoAttachment } from "../../../../lib/emailHtml";
+import { syncAllWalletPasses } from "../../../../lib/walletSync";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,8 @@ export const dynamic = "force-dynamic";
 export async function GET(req) {
   if (!process.env.CRON_SECRET || req.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Wallet passes that changed (shots, statement, photo) get their update push, even if emails are off.
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) await syncAllWalletPasses(createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } })).catch(() => 0);
   const needed = ["SUPABASE_SERVICE_ROLE_KEY", "RESEND_API_KEY", "REMINDER_FROM_EMAIL"].filter((k) => !process.env[k]);
   if (process.env.REMINDER_EMAILS_ENABLED !== "true" || needed.length)
     return NextResponse.json({ skipped: true, reason: "Reminder emails are disabled or not configured.", missing: needed });
