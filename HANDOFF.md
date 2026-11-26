@@ -1114,6 +1114,12 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Luna's background confirmed (Nov 25, 2026, by voice)
+
+Nima confirmed Luna's background: **a warm, sunny home, curled up on a sofa by a big window.** White Maine Coon, snow leopard look, red "Emotional Support" vest, photoreal at Benny's quality. All three backgrounds are now final: Benny at the airport, Milo on a sunny park path, Luna at home on the sofa.
+
+Ready for review.
+
 ### Sisqo: Milo's background decided (Nov 25, 2026, by voice)
 
 Nima picked the **sunny park path** for Milo's photo (black and brown dachshund, no vest or gear). Photoreal, soft natural light, shallow depth of field, matching Benny's quality. Luna's background stays the warm home setting unless Nima says otherwise.
