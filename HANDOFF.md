@@ -16,6 +16,41 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Built: Sisqo's walkthrough fixes, Lost tab + flyer, Home updates, empty states, no-free pass 2, Luna (commits 67e5705 to e6fe0f3)
+Started on all of Sisqo's Nov 25 asks right after Nima said go. All live, no runtime errors.
+
+**What changed**
+1. **Flyer prints properly.** One flyer look for both the Report lost flyer and the /lost-flyer maker. "LOST DOG" is now red text on white between red rules, so it prints with Chrome's default settings (background graphics off). I print-tested a Letter PDF: one page. Bigger landscape photo (same shape as the maker), "{Name} lost, help locate {Name}", details line (breed · color · sex · weight · Microchipped, whatever exists), last seen + date, reward, don't-chase line, bigger QR. Reward: owner's text as typed (Nima), but "REWARD" alone shows once (no more "Reward: REWARD"). Maker got Reward and Microchipped fields.
+2. **Lost tab.** Not lost: "If {name} ever slips out", a big red "Report {name} lost" button, and a live preview of their flyer. Lost: Print flyer, "{Name} is home" and Turn off sit at the top. Hint under "Also show my emergency contact" explains why it's greyed.
+3. **Home "Updates" feed** (signed-in Home, top): new notices from a vet/groomer/daycare/boarding (gold, with an unread count), upcoming visits ("Grooming at Paws & Co in 4 days"), lease renewal, shots or meds due in 30 days, and "Happy Paws got Testy's records". Top 3 + "See all". Tap opens the right tab of that pet (notice → Health, where the confirm card files it in one tap).
+4. **Empty states** with an icon, one warm line and a button: Health ("Add {name}'s rabies shot first"), Docs, About ("Tell {name}'s story"), My Trips ("Flying soon?" with what a Travel Pass gets you).
+5. **Coming up** moved from Docs to Health (and shows on Home).
+6. **"Never chase your vet again" is hidden** until inbound email is set up. No "coming soon" anywhere. It appears on its own once Nima adds INBOUND_DOMAIN + the Resend webhook.
+7. **Ring label:** "40% profile" (the passport-ready pill stays).
+8. **Passport is the star:** trip prompt and training/handler statement are tucked into one "Trips and training" fold under the passport card. The other extras were already folds.
+9. **Account tab:** "Receipts and payment method" first; "Cancel membership" is a clear text link below it with the no-phone-call line (still one tap, as the law requires).
+10. **No double scrollbar** on /account on phones.
+11. **No "free", pass 2:** assessment ("Your checklist is ready", "Get my checklist", no "$0" / "No card needed"), account sheet ("Create my account", no "FREE · NO CARD"), checklist preview, account banner, terms (trip check line rewritten; "flyer with no account" line removed), My pet page ("Flying with a small pet in the cabin? Check my pet's trip"). Deleted unused HomePricing.js and SampleAnswer.js. /service-dog "flies with you, free" kept (Nima).
+12. **Cleo → Luna** everywhere (sample passport, MRZ, home picker, alt text, CLAUDE.md). Zero "Cleo" left in code.
+13. **Reviews** link added to the Help menu on every page (header), not just the home footer.
+
+**Waiting on Nima**
+- **Photos:** I can't generate photos here. Need the files for Luna (white Maine Coon, red "Emotional Support" vest, sofa by a window) and Milo (black and tan dachshund, park path). I'll swap them in and set alt text.
+- **Trip check gate:** I suggested keeping the trip questions and yes/no answer open, with sign-up after. Today the simple-flight checklist still unlocks with a no-payment account (wording no longer says free). Nima to decide.
+- **Resend inbound setup** for Connect my vet.
+
+**What to test (Sisqo)**
+1. Print the Report lost flyer from Chrome with default settings: headline visible, one page. Same on the maker (download PNG).
+2. Lost tab before and after Report lost (preview, button order, "{name} is home").
+3. Home Updates: add a Coming up date 3 days out and a vaccine due in 2 weeks on Testy, then reload Home.
+4. Empty states: add a new pet with nothing on it; check Health, Docs, About, and My Trips.
+5. Health: Coming up is there; no vet card.
+6. Account tab order; no second scrollbar on phone.
+7. Search the site for "free" again (assessment flow, account sheet, terms).
+8. Help menu shows Reviews; home sample cards say Luna.
+
+Ready for testing.
+
 ### 2026-11-25: Built: homepage story + copy, no "free", badges, lost flyers, reviews, Sisqo's account (commits 033746c to 0a9b2c3)
 Nima said go on everything discussed. All live on petpassgo.com, no runtime errors.
 
