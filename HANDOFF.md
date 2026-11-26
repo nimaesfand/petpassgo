@@ -16,6 +16,49 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Built: homepage story + copy, no "free", badges, lost flyers, reviews, Sisqo's account (commits 033746c to 0a9b2c3)
+Nima said go on everything discussed. All live on petpassgo.com, no runtime errors.
+
+**Sisqo's test account: ready.** `6dpq5mtb+vault@mail.grokbot.com` now exists and is an active Pet Vault member (no Stripe, no end date). A "set your password" email was sent to that inbox. Open it, choose your password, then log in at /login. If the email didn't arrive, use "Forgot password" on /login with that address. (New route `/api/welcome/comp?email=` does this for any email on the `comp_emails` list only.)
+
+**What changed**
+1. **Home, one story:** header "Get started" opens two choices ("Flying soon?" / "Make your pet's passport"). Passport button has "Starts their Pet Vault. $6.99 a month, cancel anytime." How it works rewritten (no "free").
+2. **Passport tiles:** round 3 with Sisqo's fixes. Three tiles, then a wide red-tinted "If they ever get lost" tile at the bottom.
+3. **Pricing:** Pet Vault first (5 bullets), Travel Pass second ("per trip, added to Pet Vault. First trip $21.98."), guarantee line says exactly what the terms promise and links to /guarantee. Intro: "Pet Vault keeps their passport and records. Add a Travel Pass when you fly."
+4. **No "free" to customers:** removed from home (incl. meta + FAQ "What does it cost?"), header menu, service dog page, ESA page ("Get my pet ready to fly"), Canada/Mexico meta, maker title, sample passport reveal, airline guide hero, Pet ID "Print at home". Only the My pet page says "Flying with a small pet in the cabin? Checking their trip is free." with "Check my pet's trip". Terms line about the trip check kept (legal accuracy). Chat assistant told not to call things free unless asked. Business listings stay free (businesses, not owners).
+5. **Badges:** one shared badge on sample and real passports. Icon in a white circle, bold role (SERVICE DOG / EMOTIONAL SUPPORT / PET), thin gold rule, smaller gold second line ("Handler statement signed" / "Flies as a pet" / "Records in Pet Vault"). Pets now get a PET badge too.
+6. **Lost flyers (both):** big "LOST DOG / LOST CAT / LOST PET" headline in red, then "{Name} lost, help locate {Name}", bigger photo, breed · color · sex · Microchipped on the Report lost flyer, and "If you see them, please don't chase. Scan or call instead." Maker has Lost dog / cat / pet chips.
+7. **Reviews:** Account tab > "How are we doing?" card: Leave a review (stars, words, name shown, one per member, editable) or Send private feedback. Reviews stay hidden until approved: support@ gets an email with Approve / Reject links. Public page /reviews (approved only, newest first, Show more, empty state "Be one of the first to share your story"). Footer link "Reviews". Nothing seeded.
+8. **Maker fixes:** breed suggestions no longer cover Next; keep page no longer says "Welcome back" or "hold it for 7 more days"; no "No password needed".
+9. **Privacy policy:** now covers records providers email to the pet's address, Share records logs, and reviews.
+10. **Bug fix:** the vet notice card and "Never chase your vet again" were sending the wrong sign-in header, so they'd have failed. Fixed.
+
+**What to test (Sisqo, signed in as the comped account)**
+1. Home on phone: tiles, lost tile at the bottom, pricing order, guarantee line, Get started chooser (both choices go to the right place), no "free" anywhere.
+2. /pet-passport shows the free trip check line and button; /esa-passport and /service-dog-passport don't say free.
+3. Sample passports on home and the 3 pages: new badges, nothing cut off on a phone.
+4. Your own pet: passport badge, Share records (send to your inbox), Coming up, Lost settings, "Never chase your vet again" (Coming soon until Nima's Resend setup).
+5. Report lost on your test pet, then print the flyer: headline, name line, photo size, don't-chase line, fits one page. Then mark found.
+6. /lost-flyer maker as a member: Lost dog/cat/pet chips change the headline.
+7. Account tab: leave a review, edit it, send private feedback. /reviews should still be empty until Nima approves from the email.
+8. Vet test with you as the vet (steps in my entry "Sisqo's test account: sign up now").
+
+**Not done, needs Nima**
+- **Benny's photo with a SERVICE DOG vest:** I can't generate or truly upscale a photo here. Options: Nima sends me Sisqo's draft file and I swap it in everywhere (with the new alt text), or we use it as is until a real higher-res photo exists.
+- **Reward on flyers:** today it prints whatever the owner types, including amounts. Sisqo recommends showing only the word "REWARD". Nima decides.
+
+Ready for testing.
+
+### 2026-11-25: Claude answer: what could make our lost flyer better than a regular one (Nima decides)
+Already ours: QR to message the owner without a phone number, owner chooses what finders see, scan alerts with area, details pulled from the Vault.
+Ideas, easiest first:
+1. **Square and story versions** of the flyer for Instagram, Facebook and Nextdoor, same photo and words. Small.
+2. **"FOUND" switch:** one tap turns the flyer and the QR page into "FOUND, thank you!", so people stop searching and calling. Small.
+3. **Medical line:** if the owner turned on allergies/meds, a short "Needs daily medication" line, which makes people act faster. Small.
+4. **"I saw them" button** on the QR page: a finder taps it, shares where, and the owner gets the spot on a map, even if they can't catch the pet. Medium.
+5. **Spanish version** with one tap. Small to medium.
+6. **Nearby shelters and vets** listed on the QR page so a finder knows where to take them. Later, with Discover.
+
 ### 2026-11-25: Plan update 2: passport tiles, round 3 (Nima's notes) — Sisqo, please give your opinion, then we three decide
 Nima's notes on round 2: don't promise ("already open on your phone" isn't always true); say which shots and letters; the lost tile needs more room and should explain the whole feature; move it to the bottom and make it bigger. Pet Vault first, Travel Pass second: agreed.
 
