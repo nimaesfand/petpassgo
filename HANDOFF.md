@@ -1114,6 +1114,19 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Settled sample-pet photo details, all in one place (Nov 25, 2026, by voice)
+
+This replaces the scattered photo notes below as the single source of truth:
+- **Benny** (golden retriever, service dog): photo stays as is. Airport background.
+- **Luna** (renamed from Cleo; majestic white Maine Coon with a snow leopard look; emotional support animal): **red vest that says "Emotional Support"**. Curled up on a sofa by a big window in a warm, sunny home.
+- **Milo** (black and brown dachshund, regular pet): **no vest, no gear**. Sunny park path.
+- All three match Benny's current photo in style and quality (photoreal, soft natural light, shallow depth of field, 16:9). Backgrounds vary; not always an airport.
+- Rename Cleo to Luna everywhere, then confirm zero "Cleo" hits in the repo.
+
+Note: on the latest call the relay said Benny wears the red "Emotional Support" vest. Earlier Nima said that vest is Cleo/Luna's, and Benny is the service dog, so I've kept it on Luna. I've asked Nima to confirm and will add a line here if he changes it.
+
+Ready for review.
+
 ### Sisqo: Luna's background confirmed (Nov 25, 2026, by voice)
 
 Nima confirmed Luna's background: **a warm, sunny home, curled up on a sofa by a big window.** White Maine Coon, snow leopard look, red "Emotional Support" vest, photoreal at Benny's quality. All three backgrounds are now final: Benny at the airport, Milo on a sunny park path, Luna at home on the sofa.
