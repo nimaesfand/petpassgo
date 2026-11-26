@@ -113,6 +113,7 @@ function trainingText(pet) {
 
 // Role badge under the photo: deep blue (service dog) or deep red (ESA), metallic sheen.
 function RoleLabel({ kind, signed }) {
+  // Same badge as the sample passports.
   const sub = kind === "esa" ? "Flies as a pet" : kind === "pet" ? "Records in Pet Vault" : signed ? "Handler statement signed" : "Statement not signed yet";
   return <RoleBadge kind={kind} sub={sub} width="100%" />;
 }
@@ -189,8 +190,8 @@ function Field({ k, v, wide = false, mono = false }) {
   if (!filled(v)) return null;
   return (
     <div className={`min-w-0 ${wide ? "col-span-2" : ""}`}>
-      <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>{String(k).toUpperCase()}</div>
-      <div className="ppg-pp-val" style={{ fontFamily: mono ? MONO : font.body, fontWeight: 700, color: tokens.navy, overflowWrap: "break-word", letterSpacing: mono ? "0.04em" : 0 }}>{v}</div>
+      <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: ".16em", color: "#4B5565" }}>{String(k).toUpperCase()}</div>
+      <div style={{ fontFamily: mono ? MONO : font.body, fontWeight: 700, fontSize: 15, lineHeight: 1.25, color: tokens.navy, wordBreak: "keep-all", overflowWrap: "normal", letterSpacing: mono ? "0.04em" : 0 }}>{v}</div>
     </div>
   );
 }
@@ -213,7 +214,7 @@ function RabiesField({ rabies }) {
   if (!rabies) return null;
   const today = new Date().toISOString().slice(0, 10);
   const expired = rabies.expires_on && rabies.expires_on < today;
-  const tag = expired ? ["EXPIRED", "#B91C1C", "#FDECEC"] : rabies.verified_at ? ["✓ VET VERIFIED", "#15803D", "#EAF6EE"] : ["OWNER-STATED", "#6B7585", "#EEF1F5"];
+  const tag = expired ? ["EXPIRED", "#B91C1C", "#FDECEC"] : rabies.verified_at ? ["✓ VET CONFIRMED", "#15803D", "#EAF6EE"] : ["OWNER-STATED", "#6B7585", "#EEF1F5"];
   return (
     <div className="min-w-0">
       <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>RABIES</div>
@@ -223,98 +224,101 @@ function RabiesField({ rabies }) {
   );
 }
 
+const capWords = (v) => String(v || "").trim().replace(/(^|[\s\-'.])([a-z])/g, (m, a, b) => a + b.toUpperCase());
+
 export function shortName(full) {
   const parts = String(full || "").trim().split(/\s+/).filter(Boolean);
   if (parts.length < 2) return parts[0] || "";
   return `${parts[0]} ${parts[parts.length - 1][0].toUpperCase()}.`;
 }
 
-function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPhotoTap, onFlip, rabies, code }) {
+// One passport look everywhere (Nima, Nov 25): the same tall card as the sample
+// passports on the landing pages. Photo with a gold frame and the role badge,
+// big name, handler or owner, ISSUED stamp, two-column details, MRZ lines, holo seal.
+function Front({ pet, photo, owner, chipValue, sheet, pending, justIssued, onPhotoTap, onFlip, rabies }) {
   const st = statusOf(pet.role);
   const age = ageLabel(pet.date_of_birth);
   // Full name for the owner, prints and samples; first name + last initial anywhere it's shared.
-  const fullHolder = String(pet.handler_name || "").trim();
+  const fullHolder = capWords(pet.handler_name);
   const holder = owner || sheet || String(pet.id || "").startsWith("sample") ? fullHolder : shortName(fullHolder);
+  const name = capWords(pet.name) || "Your pet";
+  const nameSize = name.length > 12 ? 24 : name.length > 9 ? 28 : name.length > 6 ? 33 : 38;
   const fields = [
     ["Species", pet.animal_type],
     ["Breed", shortBreed(pet.breed)],
     ["Sex", pet.sex],
     ["Born", [fmtDob(pet.date_of_birth), age && `(${age})`].filter(Boolean).join(" ")],
     ["Weight", pet.weight_lb ? `${pet.weight_lb} lb` : ""],
-    ["Color", pet.color],
     ["Training", trainingText(pet)],
     ["Microchip", owner && !sheet ? chipMask(chipValue) : chipValue],
     ["Issued", pet.passport_issued_at ? fmtDob(String(pet.passport_issued_at).slice(0, 10)) : ""],
+    ["Color", pet.color],
   ];
+  const badge = st === STATUS.service ? "service" : st === STATUS.esa ? "esa" : "pet";
   return (
-    <article data-pet-passport className="ppg-passport ppg-sheen rounded-[22px] overflow-hidden min-w-0 max-w-full relative h-full flex flex-col" style={{ background: "#FBF7EE", boxShadow: "0 1px 0 #E6DCC6, 0 22px 50px rgba(20,33,61,0.18)" }}>
-      <div className="ppg-guilloche-dark px-4 sm:px-6 py-3 flex items-center justify-between gap-3 min-w-0" style={{ background: `linear-gradient(120deg, ${tokens.navy}, #22386A)` }}>
+    <article data-pet-passport className="ppg-passport ppg-guilloche-light rounded-[24px] overflow-hidden min-w-0 relative mx-auto" style={{ width: "100%", maxWidth: 380, background: "#FBF7EE", boxShadow: "0 1px 0 #E6DCC6, 0 26px 56px rgba(20,33,61,0.22)" }}>
+      <div className="flex items-center justify-between gap-3" style={{ padding: "14px 18px", backgroundImage: "repeating-radial-gradient(circle at 50% 160%, rgba(242,184,75,.10) 0 1px, transparent 1px 10px), linear-gradient(120deg, #0E1A33, #1E3466)" }}>
         <div className="min-w-0">
-          <Wordmark size={19} onDark />
-          <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 9.5, letterSpacing: "0.22em", color: tokens.gold, marginTop: 2 }}>PET PASSPORT</div>
+          <Wordmark size={21} onDark />
+          <div style={{ fontFamily: font.body, fontSize: 9, fontWeight: 800, letterSpacing: ".24em", color: tokens.gold, marginTop: 3 }}>PET PASSPORT</div>
         </div>
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="flex items-center gap-2.5 flex-shrink-0">
           {pet.passport_no ? (
             <div className="text-right">
-              <div style={{ fontFamily: font.body, fontSize: 9, fontWeight: 800, letterSpacing: "0.16em", color: tokens.gold }}>PASSPORT NO.</div>
-              <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 13.5, color: "#fff", whiteSpace: "nowrap", letterSpacing: "0.04em" }}>{pet.passport_no}</div>
+              <div style={{ fontFamily: font.body, fontSize: 8.5, fontWeight: 800, letterSpacing: ".16em", color: tokens.gold }}>PASSPORT NO.</div>
+              <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 13.5, color: "#fff", letterSpacing: ".05em", whiteSpace: "nowrap" }}>{pet.passport_no}</div>
             </div>
           ) : null}
           {onFlip ? (
-            <button type="button" onClick={(e) => { e.stopPropagation(); onFlip(); }} aria-label="Flip to the QR side" className="ppg-no-print flex items-center justify-center rounded-full" style={{ width: 34, height: 34, background: "rgba(255,255,255,.14)", color: "#fff", border: "1px solid rgba(255,255,255,.25)", cursor: "pointer" }}><Icon name="repeat" size={16} /></button>
+            <button type="button" onClick={(e) => { e.stopPropagation(); onFlip(); }} aria-label="Flip to the QR side" className="ppg-no-print flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: "rgba(255,255,255,.14)", color: "#fff", border: "1px solid rgba(255,255,255,.25)", cursor: "pointer" }}>
+              <Icon name="repeat" size={15} />
+            </button>
           ) : null}
         </div>
       </div>
-      <div style={{ height: 3, background: `linear-gradient(90deg, ${tokens.gold}, #F7D98C 50%, ${tokens.gold})` }} />
-
-      <div className="ppg-guilloche-light px-4 sm:px-6 pt-4 pb-4 min-w-0 relative flex-1 flex flex-col">
-        <div className="ppg-pp-grid min-w-0">
-          {/* Photo column: main photo + ghost image, like a real data page */}
-          <div className="ppg-pp-photocol flex flex-col items-center gap-2">
-            <div className="ppg-pp-photo relative rounded-xl overflow-hidden" style={{ border: "3px solid #fff", outline: `1.5px solid ${tokens.gold}`, background: "#E8EEF7", boxShadow: "0 6px 16px rgba(20,33,61,0.14)" }}>
+      <div style={{ height: 3, background: "linear-gradient(90deg, #F2B84B, #FBE3A6 50%, #F2B84B)" }} />
+      <div style={{ padding: "18px 18px 14px" }}>
+        <div className="flex items-start" style={{ gap: 16 }}>
+          <div className="flex flex-col items-center flex-shrink-0" style={{ gap: 10 }}>
+            <div className="relative overflow-hidden" style={{ width: 128, height: 156, borderRadius: 14, border: "3px solid #fff", outline: `2px solid ${tokens.gold}`, boxShadow: "0 8px 20px rgba(20,33,61,.2)", background: "#F4ECDA" }}>
               {photo || <PhotoSlot type={pet.animal_type} />}
+              {pet.passport_no === "PPG-SAMPLE" ? <div style={{ position: "absolute", left: 7, top: 7, background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 900, fontSize: 9, letterSpacing: ".22em", padding: "3px 7px", borderRadius: 6 }}>SAMPLE</div> : null}
               {onPhotoTap ? (
                 <button type="button" onClick={(e) => { e.stopPropagation(); onPhotoTap(); }} aria-label={photo ? "Retake passport photo" : "Add passport photo"} className="ppg-no-print absolute inset-0" style={{ background: "transparent", border: "none", cursor: "pointer" }}>
-                  <span className="absolute flex items-center justify-center rounded-full" style={{ top: 6, right: 6, width: 28, height: 28, background: "#fff", color: tokens.navy, boxShadow: "0 2px 8px rgba(20,33,61,.3)" }}><Icon name="camera" size={14} /></span>
+                  <span className="absolute flex items-center justify-center rounded-full" style={{ top: 6, right: 6, width: 28, height: 28, background: "#fff", color: tokens.navy, boxShadow: "0 2px 8px rgba(20,33,61,.3)" }}><Icon name="camera" size={15} /></span>
                 </button>
               ) : null}
             </div>
-            <RoleLabel kind={st === STATUS.service ? "service" : st === STATUS.esa ? "esa" : "pet"} signed={!!pet.service_attested_at} />
-            <div className="flex items-center gap-2">
-              {photo ? <div aria-hidden="true" className="ppg-pp-ghost rounded-md overflow-hidden" style={{ width: 34, height: 42, opacity: 0.22, filter: "grayscale(1) contrast(1.2)", mixBlendMode: "multiply" }}>{photo}</div> : null}
-              <HoloSeal size={40} />
-            </div>
+            <RoleLabel kind={badge} signed={!!pet.service_attested_at} />
           </div>
-
-          <div className="min-w-0">
-            <div className="ppg-pp-namerow flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>NAME</div>
-                <h2 className={`ppg-pp-name ${String(pet.name || "").length > 9 ? "is-long" : String(pet.name || "").length > 5 ? "is-mid" : ""}`} style={{ fontFamily: font.display, fontWeight: 800, lineHeight: 1, letterSpacing: "-0.02em", color: tokens.navy, overflowWrap: "break-word" }}>{pet.name}</h2>
-                {holder ? (
-                  <div className="mt-2">
-                    <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: tokens.muted }}>{st === STATUS.service ? "HANDLER" : "OWNER"}</div>
-                    <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 15, color: tokens.navy, overflowWrap: "break-word" }}>{holder}</div>
-                  </div>
-                ) : null}
-                {st === STATUS.service || st === STATUS.esa ? null : <span className="inline-block rounded-md px-2 py-0.5 mt-2" style={{ background: st.bg, color: st.fg, fontFamily: font.body, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.14em" }}>{st.label}</span>}
+          <div className="min-w-0" style={{ flex: 1 }}>
+            <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: ".16em", color: "#4B5565" }}>NAME</div>
+            <h2 style={{ fontFamily: font.display, fontWeight: 800, fontSize: nameSize, lineHeight: 1, letterSpacing: "-.02em", color: tokens.navy, wordBreak: "keep-all", overflowWrap: "normal", margin: 0 }}>{name}</h2>
+            {holder ? (
+              <div style={{ marginTop: 8 }}>
+                <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: ".16em", color: "#4B5565" }}>{st === STATUS.service ? "HANDLER" : "OWNER"}</div>
+                <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 14, color: tokens.navy, wordBreak: "keep-all" }}>{holder}</div>
               </div>
-              {pet.passport_issued_at ? (
-                <div className="ppg-pp-stampspot2 flex-shrink-0" style={{ mixBlendMode: "multiply", pointerEvents: "none" }}><PassportStamp date={pet.passport_issued_at} size={86} className={justIssued ? "ppg-pp-stamp" : ""} style={{ opacity: 0.9 }} /></div>
-              ) : pending ? (
-                <div className="ppg-no-print flex-shrink-0" aria-label="Not issued yet" role="img" style={{ width: 82, height: 82, borderRadius: "50%", border: "2.5px dashed #9AA4B2", display: "flex", alignItems: "center", justifyContent: "center", color: "#7B8595", transform: "rotate(-12deg)", textAlign: "center", fontFamily: font.display, fontSize: 12, fontWeight: 800, lineHeight: 1.05 }}>NOT YET<br />ISSUED</div>
-              ) : null}
-            </div>
-          </div>
-          <div className="ppg-pp-fields pt-3 grid gap-x-4 gap-y-2.5 min-w-0" style={{ borderTop: "1px dashed #D9CDB2" }}>
-            {fields.map(([k, v]) => <Field key={k} k={k} v={v} mono={k === "Microchip"} wide={k === "Training" && String(v).length > 24} />)}
-            <RabiesField rabies={rabies} />
+            ) : null}
+            {pet.passport_issued_at ? (
+              <div style={{ marginTop: 8, mixBlendMode: "multiply", pointerEvents: "none" }}><PassportStamp date={pet.passport_issued_at} size={80} className={justIssued ? "ppg-pp-stamp" : ""} style={{ opacity: 0.9 }} /></div>
+            ) : pending ? (
+              <div className="ppg-no-print" aria-label="Not issued yet" role="img" style={{ marginTop: 8, width: 76, height: 76, borderRadius: "50%", border: "2.5px dashed #9AA4B2", display: "flex", alignItems: "center", justifyContent: "center", color: "#6B7585", fontFamily: font.body, fontSize: 10, fontWeight: 800, letterSpacing: ".1em", textAlign: "center", lineHeight: 1.2 }}>NOT<br />ISSUED</div>
+            ) : null}
           </div>
         </div>
-
-        <div className="flex-1" />
-        <div className="mt-4"><Microprint /></div>
-        <div className="mt-1.5">{pet.passport_issued_at ? <VerifyStrip no={pet.passport_no} code={code} /> : <MrzStrip pet={pet} />}</div>
+        <div style={{ borderTop: "1.5px dashed #D9CDB2", margin: "16px 0 12px" }} />
+        <div className="grid grid-cols-2" style={{ gap: "11px 16px" }}>
+          {fields.map(([k, v]) => <Field key={k} k={k} v={v} mono={k === "Microchip"} />)}
+          <RabiesField rabies={rabies} />
+        </div>
+      </div>
+      <div style={{ margin: "0 14px 16px", paddingRight: 62 }}><MrzStrip pet={{ ...pet, name }} /></div>
+      <div className="ppg-foil" aria-hidden="true" />
+      <div className="ppg-holo" aria-hidden="true" style={{ position: "absolute", right: 16, bottom: 12, width: 56, height: 56, borderRadius: "50%", zIndex: 2 }}>
+        <svg width="60%" height="60%" viewBox="0 0 24 24" aria-hidden="true" style={{ position: "absolute", left: "20%", top: "20%", opacity: 0.55, mixBlendMode: "multiply" }}>
+          <g fill={tokens.navy}><ellipse cx="12" cy="15.5" rx="4.2" ry="3.6" /><circle cx="6.5" cy="10" r="1.9" /><circle cx="17.5" cy="10" r="1.9" /><circle cx="9.5" cy="6.5" r="1.8" /><circle cx="14.5" cy="6.5" r="1.8" /></g>
+        </svg>
       </div>
     </article>
   );
@@ -344,7 +348,7 @@ async function downloadTagPdf(pet) {
   } catch { alert("The tag sheet could not be made."); }
 }
 
-function Back({ pet, stamps, owner, qr, onFlip, onCheckin }) {
+function Back({ pet, stamps, owner, qr, onFlip, onCheckin, code }) {
   const contact = [pet.emergency_contact_name, pet.emergency_contact_phone].filter(filled);
   const showContact = owner || pet.show_contact_on_public_id;
   const medical = (owner || pet.show_medical_on_public) ? [
@@ -353,7 +357,7 @@ function Back({ pet, stamps, owner, qr, onFlip, onCheckin }) {
     pet.vet_name && ["Vet", [pet.vet_name, pet.vet_phone].filter(Boolean).join(" · ")],
   ].filter(Boolean) : [];
   return (
-    <article className="rounded-[22px] overflow-hidden min-w-0 h-full flex flex-col relative" style={{ background: `linear-gradient(160deg, ${tokens.navy}, #1B2D55 60%, #0F1B36)`, color: "#fff", boxShadow: "0 22px 50px rgba(20,33,61,0.25)" }}>
+    <article className="rounded-[24px] overflow-hidden min-w-0 h-full flex flex-col relative mx-auto" style={{ width: "100%", maxWidth: 380, background: `linear-gradient(160deg, ${tokens.navy}, #1B2D55 60%, #0F1B36)`, color: "#fff", boxShadow: "0 22px 50px rgba(20,33,61,0.25)" }}>
       <div className="ppg-guilloche-dark absolute inset-0 pointer-events-none" aria-hidden="true" />
       <div className="relative px-4 sm:px-6 py-3 flex items-center justify-between">
         <div style={{ fontFamily: font.body, fontWeight: 800, fontSize: 11, letterSpacing: "0.22em", color: tokens.gold }}>IF FOUND · SCAN ME</div>
@@ -407,6 +411,7 @@ function Back({ pet, stamps, owner, qr, onFlip, onCheckin }) {
           </div>
         </div>
       ) : null}
+      {pet.passport_issued_at && code ? <div className="relative px-4 sm:px-6 pb-2" style={{ fontFamily: font.body, fontSize: 12, color: "rgba(255,255,255,.75)" }}>Verification code <b style={{ fontFamily: MONO, color: "#fff", letterSpacing: ".1em" }}>{code}</b> · petpassgo.com/verify</div> : null}
       <div className="relative px-4 sm:px-6 pb-3"><Microprint dark /></div>
     </article>
   );
@@ -424,6 +429,7 @@ export default function PetPassport({
   pending = false,
   justIssued = false,
   onPhotoTap = null,
+  frontOnly = false,
 }) {
   const [flipped, setFlipped] = useState(false);
   const [rabies, setRabies] = useState(null);
@@ -443,9 +449,10 @@ export default function PetPassport({
     }
     return () => { live = false; };
   }, [pet?.id, pet?.passport_issued_at, pet?.verify_code, owner, sample]);
-  const front = <Front pet={pet} photo={photo} owner={owner} chipValue={chipValue} sheet={sheet} pending={pending} justIssued={justIssued} onPhotoTap={onPhotoTap} onFlip={sheet ? null : flip} rabies={rabies} code={code} />;
-  const back = <Back pet={pet} stamps={stamps} owner={owner} qr={qr} onFlip={sheet ? null : flip} onCheckin={owner && !sheet && !sample ? () => openTravelMode(pet) : null} />;
+  const front = <Front pet={pet} photo={photo} owner={owner} chipValue={chipValue} sheet={sheet} pending={pending} justIssued={justIssued} onPhotoTap={onPhotoTap} onFlip={sheet ? null : flip} rabies={rabies} />;
+  const back = <Back pet={pet} stamps={stamps} owner={owner} qr={qr} code={code} onFlip={sheet ? null : flip} onCheckin={owner && !sheet && !sample ? () => openTravelMode(pet) : null} />;
 
+  if (frontOnly) return front;
   // Printed: both sides, one above the other.
   if (sheet) return <div className="grid gap-4 min-w-0">{front}{back}</div>;
 

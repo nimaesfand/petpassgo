@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { shortBreed } from "../lib/breeds";
 import { createPortal } from "react-dom";
 import { Wordmark } from "./Logo";
+import PetPassport from "./PetPassport";
 import { PassportStamp, MrzStrip, PhotoSlot } from "./PetPassport";
 import { chipMask } from "../lib/petProfile";
 import { tokens, font } from "../lib/theme";
@@ -72,59 +73,13 @@ export default function PassportReveal({ pet, photo, issuedAt, onClose, preview 
     <div role="dialog" aria-modal="true" aria-label={`${pet.name}'s passport is issued`} className="fixed inset-0 z-[1000] flex flex-col items-center justify-center px-5 py-8 overflow-y-auto overflow-x-hidden" style={{ background: "radial-gradient(120% 80% at 50% 30%, #1B2C52 0%, #0B1529 70%)" }}>
       <div style={{ fontFamily: font.body, fontSize: 12, fontWeight: 800, letterSpacing: "0.2em", color: tokens.gold, minHeight: 16 }}><span key={stage < 2 ? "a" : stage < 3 ? "b" : "c"} className="ppg-pp-fade inline-block">{stage < 2 ? `PRINTING ${String(pet.name || "").toUpperCase()}'S PASSPORT…` : stage < 3 ? "CHECKING THE DETAILS…" : "PASSPORT ISSUED"}</span></div>
 
-      <div className="ppg-pp-book ppg-pp-float relative mt-5" style={{ width: 340, maxWidth: "90vw" }}>
-        <div className={`ppg-pp-page ppg-guilloche-light relative rounded-2xl overflow-hidden flex flex-col ${stage === 3 ? "is-thud" : ""}`} style={{ background: "#FBF7EE", boxShadow: "0 30px 60px rgba(0,0,0,.45)" }}>
-          <div style={{ height: 6, background: tokens.primary }} />
-          <div className="px-4 pt-3 flex justify-between items-center">
-            <span style={{ fontFamily: font.body, fontSize: 10, fontWeight: 800, letterSpacing: "0.16em", color: tokens.muted }}>PET PASSPORT</span>
-            <span style={{ fontFamily: font.body, fontSize: 10, fontWeight: 800, letterSpacing: "0.1em", color: tokens.muted }}>PETPASSGO</span>
-          </div>
-          <div className="px-4 pt-3 flex gap-3">
-            <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
-              <div className="rounded-xl overflow-hidden" style={{ width: 112, height: 140, border: "3px solid #fff", outline: `1.5px solid ${tokens.gold}`, background: "#E8EEF7", boxShadow: "0 6px 16px rgba(20,33,61,.14)" }}>
-                {photo || <PhotoSlot type={pet.animal_type} />}
-              </div>
-              {/service|emotional|esa/i.test(pet.role || "") ? (() => { const svc = /service/i.test(pet.role || ""); return (
-                <div className={`ppg-badge ppg-badge-${svc ? "service" : "esa"} rounded-md px-1.5 py-1 text-center`} style={{ width: 112 }}>
-                  <div style={{ fontFamily: font.body, fontWeight: 900, fontSize: 9, letterSpacing: "0.12em", color: "#fff", lineHeight: 1.15, textShadow: "0 1px 1px rgba(0,0,0,.35)" }}>{svc ? "SERVICE DOG" : "EMOTIONAL SUPPORT"}</div>
-                  <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 8.5, color: "rgba(255,255,255,.92)", lineHeight: 1.2 }}>{svc ? (pet.service_attested_at || sample ? "Handler statement signed" : "Statement not signed yet") : "ANIMAL"}</div>
-                </div>); })() : null}
-              <div aria-hidden="true" className="ppg-holo rounded-full" style={{ width: 26, height: 26 }} />
-            </div>
-            <div className="min-w-0 flex flex-col gap-1" style={{ paddingRight: 70 }}>
-              <div>{label("NAME")}<div style={{ fontFamily: font.display, fontSize: String(pet.name || "").length > 12 ? 17 : String(pet.name || "").length > 9 ? 20 : String(pet.name || "").length > 6 ? 23 : 26, fontWeight: 800, lineHeight: 1.05, color: tokens.navy, wordBreak: "keep-all", overflowWrap: "normal", hyphens: "none" }}>{pet.name}</div></div>
-              <span className="self-start rounded-md px-2 py-0.5" style={{ background: /service/i.test(pet.role || "") ? "#1D4ED8" : /emotional|esa/i.test(pet.role || "") ? "#B91C1C" : tokens.gold, color: /service|emotional|esa/i.test(pet.role || "") ? "#fff" : tokens.navy, fontFamily: font.body, fontWeight: 800, fontSize: 9.5, letterSpacing: "0.14em" }}>{/service/i.test(pet.role || "") ? "SERVICE DOG" : /emotional|esa/i.test(pet.role || "") ? "EMOTIONAL SUPPORT" : "PET"}</span>
-              {pet.breed ? <div className="mt-1">{label("BREED")}<div style={{ fontFamily: font.body, fontSize: 14, fontWeight: 700, color: tokens.navy, wordBreak: "keep-all", overflowWrap: "normal" }}>{shortBreed(pet.breed)}</div></div> : null}
-            </div>
-          </div>
-          <div className="px-4 pt-3 pb-1 grid grid-cols-3 gap-x-3 gap-y-2" style={{ borderTop: "1px dashed #D9CDB2", marginTop: 12 }}>
-            {[
-              pet.animal_type && ["SPECIES", pet.animal_type],
-              pet.sex && ["SEX", pet.sex],
-              pet.date_of_birth && ["BORN", fmtDob(pet.date_of_birth)],
-              Number(pet.weight_lb) > 0 && ["WEIGHT", `${pet.weight_lb} lb`],
-              pet.color && ["COLOR", pet.color],
-              pet.trained != null && ["TRAINED", pet.trained ? "Yes" : "Not yet"],
-              pet.microchip_number && ["MICROCHIP", chipMask(pet.microchip_number)],
-              pet.handler_name && [pet.role === "Service animal" ? "HANDLER" : "OWNER", pet.handler_name],
-              pet.passport_no && ["PASSPORT NO.", pet.passport_no],
-            ].filter(Boolean).slice(0, 9).map(([k, v], i) => (
-              <div key={k} className={`min-w-0 ${k === "OWNER" || k === "PASSPORT NO." ? "col-span-2" : ""}`} style={{ paddingTop: i < 3 ? 8 : 0, opacity: stage >= 2 ? 1 : 0, transform: stage >= 2 ? "none" : "translateY(6px)", transition: `opacity .45s ease ${i * 0.22}s, transform .45s ease ${i * 0.22}s` }}>
-                {label(k)}
-                <div className="truncate" style={{ fontFamily: k === "PASSPORT NO." || k === "MICROCHIP" ? "ui-monospace, Menlo, monospace" : font.body, fontSize: 13, fontWeight: 700, color: tokens.navy }}>{v}</div>
-              </div>
-            ))}
-          </div>
-          <div aria-hidden="true" className="px-4 pt-2 overflow-hidden whitespace-nowrap" style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 6, letterSpacing: "0.18em", color: "rgba(20,33,61,.28)" }}>{"PETPASSGO · PET PASSPORT · ".repeat(8)}</div>
-          <div className="px-2.5 pt-2 pb-3" style={{ transform: "scale(0.86)", transformOrigin: "left bottom" }}><MrzStrip pet={pet} /></div>
-          {stage >= 3 ? (
-            <div className="ppg-pp-stamp absolute" style={{ right: 6, top: 34, mixBlendMode: "multiply" }}>
-              <PassportStamp date={issuedAt} size={84} style={{ transform: "none" }} />
-            </div>
-          ) : null}
+      <div className="ppg-pp-book ppg-pp-float relative mt-5" style={{ width: 360, maxWidth: "92vw" }}>
+        {/* The same passport card customers keep (components/PetPassport.js). */}
+        <div className={`ppg-pp-page relative ${stage === 3 ? "is-thud" : ""}`}>
+          <PetPassport frontOnly sample={sample} pet={{ ...pet, passport_no: pet.passport_no || "PPG-PREVIEW", passport_issued_at: stage >= 3 ? issuedAt : null }} photo={photo} justIssued={stage === 3} chipValue={pet.microchip_number ? chipMask(pet.microchip_number) : ""} />
         </div>
 
-        <div className={`ppg-pp-cover ppg-guilloche-dark absolute inset-0 rounded-2xl overflow-hidden flex flex-col items-center justify-center gap-4 ${stage >= 1 ? "is-open" : ""}`} style={{ background: tokens.navy, boxShadow: "0 30px 60px rgba(0,0,0,.45), inset 0 0 0 1px rgba(242,184,75,.3)" }} aria-hidden="true">
+        <div className={`ppg-pp-cover ppg-guilloche-dark absolute inset-0 rounded-[24px] overflow-hidden flex flex-col items-center justify-center gap-4 ${stage >= 1 ? "is-open" : ""}`} style={{ background: tokens.navy, boxShadow: "0 30px 60px rgba(0,0,0,.45), inset 0 0 0 1px rgba(242,184,75,.3)" }} aria-hidden="true">
           <div className="absolute" style={{ left: 0, top: 0, bottom: 0, width: 16, background: tokens.navyDeep }} />
           <div className="absolute rounded-lg" style={{ inset: "16px 16px 16px 30px", border: `1.5px solid ${tokens.gold}`, opacity: 0.75 }} />
           <div style={{ fontFamily: font.body, fontSize: 11, fontWeight: 800, letterSpacing: "0.32em", color: tokens.gold, paddingLeft: 14 }}>PET PASSPORT</div>

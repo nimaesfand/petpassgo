@@ -1,5 +1,5 @@
 import { Wordmark } from "./Logo";
-import RoleBadge from "./RoleBadge";
+import PetPassport from "./PetPassport";
 import { tokens, font } from "../lib/theme";
 
 // A static sample passport for landing pages, matching the Nov 25 mockups.
@@ -49,70 +49,21 @@ function Label({ children }) {
   return <div style={{ fontFamily: font.body, fontSize: 9.5, fontWeight: 800, letterSpacing: ".16em", color: "#4B5565" }}>{children}</div>;
 }
 
+// Samples render with the exact card customers keep (components/PetPassport.js).
+const SAMPLE_PETS = {
+  service: { id: "sample-service", name: "Benny", handler_name: "Alex Morgan", animal_type: "Dog", role: "Service animal", breed: "Golden Retriever", sex: "Male", date_of_birth: "2021-04-12", weight_lb: 68, training: { levels: ["tasks"] }, service_attested_at: "2026-11-01T12:00:00Z", passport_no: "PPG-SAMPLE", passport_issued_at: "2026-11-01T12:00:00Z", chip: "•••• 6789" },
+  esa: { id: "sample-esa", name: "Luna", handler_name: "Jamie Cruz", animal_type: "Cat", role: "Emotional support animal", breed: "Maine Coon", sex: "Female", date_of_birth: "2022-03-03", weight_lb: 14, training: { levels: ["leash"] }, passport_no: "PPG-SAMPLE", passport_issued_at: "2026-11-01T12:00:00Z", chip: "•••• 4410" },
+  pet: { id: "sample-pet", name: "Milo", handler_name: "Sam Rivera", animal_type: "Dog", role: "Pet", breed: "Dachshund", sex: "Male", date_of_birth: "2020-06-02", weight_lb: 11, training: { levels: ["house"] }, passport_no: "PPG-SAMPLE", passport_issued_at: "2026-11-01T12:00:00Z", chip: "•••• 2048" },
+};
+
 export default function SamplePassportCard({ kind = "service" }) {
   const s = SAMPLES[kind];
+  const pet = SAMPLE_PETS[kind];
+  // eslint-disable-next-line @next/next/no-img-element
+  const photo = s.photo ? <img src={s.photo} alt={s.alt} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: s.pos || "62% 22%" }} /> : <div role="img" aria-label={s.alt} className="flex items-center justify-center" style={{ width: "100%", height: "100%", background: "#F4ECDA" }}>{PET_ICONS[s.icon]}</div>;
   return (
-    <article className="ppg-guilloche-light relative overflow-hidden" style={{ width: 350, maxWidth: "100%", borderRadius: 24, background: "#FBF7EE", boxShadow: "0 1px 0 #E6DCC6, 0 30px 60px rgba(0,0,0,.45)" }} aria-label={`Sample passport for ${s.name}`}>
-      <div className="flex items-center justify-between" style={{ padding: "14px 18px", backgroundImage: "repeating-radial-gradient(circle at 50% 160%, rgba(242,184,75,.10) 0 1px, transparent 1px 10px), linear-gradient(120deg, #0E1A33, #1E3466)" }}>
-        <div>
-          <Wordmark size={21} onDark />
-          <div style={{ fontFamily: font.body, fontSize: 9, fontWeight: 800, letterSpacing: ".24em", color: tokens.gold, marginTop: 3 }}>PET PASSPORT</div>
-        </div>
-        <div style={{ textAlign: "right" }}>
-          <div style={{ fontFamily: font.body, fontSize: 8.5, fontWeight: 800, letterSpacing: ".16em", color: tokens.gold }}>PASSPORT NO.</div>
-          <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 13.5, color: "#fff", letterSpacing: ".05em" }}>PPG-SAMPLE</div>
-        </div>
-      </div>
-      <div style={{ height: 3, background: "linear-gradient(90deg, #F2B84B, #FBE3A6 50%, #F2B84B)" }} />
-      <div style={{ padding: "18px 18px 14px" }}>
-        <div className="flex items-start" style={{ gap: 16 }}>
-          <div className="flex flex-col items-center" style={{ gap: 10 }}>
-            <div className="relative overflow-hidden" style={{ width: 128, height: 156, borderRadius: 14, border: "3px solid #fff", outline: `2px solid ${tokens.gold}`, boxShadow: "0 8px 20px rgba(20,33,61,.2)" }}>
-              {s.photo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={s.photo} alt={s.alt} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: s.pos || "62% 22%" }} />
-              ) : (
-                <div role="img" aria-label={s.alt} className="flex items-center justify-center" style={{ width: "100%", height: "100%", background: "#F4ECDA" }}>{PET_ICONS[s.icon]}</div>
-              )}
-              <div style={{ position: "absolute", left: 7, top: 7, background: tokens.gold, color: tokens.navy, fontFamily: font.body, fontWeight: 900, fontSize: 9, letterSpacing: ".22em", padding: "3px 7px", borderRadius: 6 }}>SAMPLE</div>
-            </div>
-            <RoleBadge kind={s.badge || "pet"} sub={s.badge === "service" ? "Handler statement signed" : s.badge === "esa" ? "Flies as a pet" : "Records in Pet Vault"} />
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <Label>NAME</Label>
-            <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 38, lineHeight: 1, letterSpacing: "-.02em", color: tokens.navy }}>{s.name}</div>
-            <div style={{ marginTop: 8 }}>
-              <Label>{s.holder[0]}</Label>
-              <div style={{ fontFamily: font.body, fontWeight: 700, fontSize: 14, color: tokens.navy }}>{s.holder[1]}</div>
-            </div>
-            <div role="img" aria-label="Issued Nov 1, 2026" className="flex items-center justify-center" style={{ marginTop: 8, width: 76, height: 76, borderRadius: "50%", border: `3px solid ${tokens.primary}`, transform: "rotate(-13deg)", color: tokens.primary, opacity: 0.9, mixBlendMode: "multiply" }}>
-              <div className="flex flex-col items-center justify-center" style={{ width: 62, height: 62, borderRadius: "50%", border: `1.5px dashed ${tokens.primary}` }}>
-                <div style={{ fontFamily: font.body, fontSize: 5.5, fontWeight: 800, letterSpacing: ".2em" }}>PETPASSGO</div>
-                <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 17, lineHeight: 1.05 }}>ISSUED</div>
-                <div style={{ fontFamily: MONO, fontSize: 7, fontWeight: 700 }}>NOV 1, 2026</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div style={{ borderTop: "1.5px dashed #D9CDB2", margin: "16px 0 12px" }} />
-        <div className="grid grid-cols-2" style={{ gap: "11px 16px" }}>
-          {s.fields.map(([k, v, mono]) => (
-            <div key={k}>
-              <Label>{k}</Label>
-              <div style={{ fontFamily: mono ? MONO : font.body, fontWeight: 700, fontSize: 15, color: tokens.navy }}>{v}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div aria-hidden="true" style={{ margin: "0 14px 16px", borderRadius: 10, background: "#F1EADA", padding: "8px 70px 8px 12px", fontFamily: MONO, fontSize: 10.5, fontWeight: 700, letterSpacing: ".1em", color: "#2B3443", lineHeight: 1.55, overflow: "hidden", whiteSpace: "nowrap" }}>
-        {s.mrz[0]}<br />{s.mrz[1]}
-      </div>
-      <div className="ppg-foil" aria-hidden="true" />
-      <div className="ppg-holo" aria-hidden="true" style={{ position: "absolute", right: 16, bottom: 12, width: 56, height: 56, borderRadius: "50%", zIndex: 2 }}>
-        <svg width="60%" height="60%" viewBox="0 0 24 24" aria-hidden="true" style={{ position: "absolute", left: "20%", top: "20%", opacity: 0.55, mixBlendMode: "multiply" }}>
-          <g fill={tokens.navy}><ellipse cx="12" cy="15.5" rx="4.2" ry="3.6" /><circle cx="6.5" cy="10" r="1.9" /><circle cx="17.5" cy="10" r="1.9" /><circle cx="9.5" cy="6.5" r="1.8" /><circle cx="14.5" cy="6.5" r="1.8" /></g>
-        </svg>
-      </div>
-    </article>
+    <div aria-label={`Sample passport for ${s.name}`} style={{ width: 350, maxWidth: "100%" }}>
+      <PetPassport frontOnly sample sheet pet={pet} photo={photo} chipValue={pet.chip} />
+    </div>
   );
 }
