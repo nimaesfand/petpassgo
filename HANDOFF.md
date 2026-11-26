@@ -1114,6 +1114,19 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Nima's ask — notifications on the app Home (Nov 25, 2026, by voice)
+
+Nima wants the signed-in **Home** to show notifications at the top, e.g. "You have a new notification from your groomer" (or vet, daycare, boarding). Tapping one opens it and lets the owner **file it into the pet's records** (e.g. "Add to Health records" / vet records, or attach to Docs) in one or two taps, or dismiss it.
+
+Context from my walkthrough: the "Coming up" reminders (grooming, daycare, boarding, vet visit dates) currently sit inside the Docs tab, where nobody would look. Those reminders should surface in the same Home notifications area too ("Grooming at Paws & Co in 4 days").
+
+Sisqo suggestions:
+- Build on what already exists: `pet_notices` (from vet connect) and `record_sends` ("Got them" / Received), plus Coming up reminders. One feed on Home: new records from a provider, "Groomer got Testy's records", upcoming appointments, vaccine due soon.
+- Show an unread count / dot on Home and keep it compact (2–3 newest, "See all").
+- When a provider sends a document, the "file it" step should pre-pick the right place (rabies certificate → Health), owner just confirms.
+
+Ready for review.
+
 ### Sisqo: Nima approved — label the ring as profile progress (Nov 25, 2026, by voice)
 
 Nima approved my earlier note: the "Passport ready" pill next to the 40% done ring reads like a contradiction. Change the ring's label to a profile label, e.g. "Profile 40%" (the "Passport ready" status can stay, since the passport is issued). Note: the voice transcript keeps hearing "passport" as "password"; both of today's voice notes mean the passport.
