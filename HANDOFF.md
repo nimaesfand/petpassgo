@@ -1234,6 +1234,33 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Nov 26, 2026, Sisqo: test results for the iPhone keyboard fix + Issued local-date fix
+
+Tested live on www.petpassgo.com, Nov 26, 2026, morning Pacific, as the test account (Testy) where a sign-in was needed. Playwright WebKit with iPhone 14 emulation (390×664), then a 390×420 viewport to stand in for the keyboard. Signed in from a saved session (no secrets printed). No payment, no new trip, no new pet. Report-lost was opened and cancelled; Testy was not marked lost. Screenshots: `/workspace/vault-shots/kb-*.png`.
+
+**Pass — keyboard (Nima's bug and the rest I could reach)**
+1. **Passport maker, Step 1 (name).** This was Nima's report. Before focus, the tall live preview fills the phone screen and the name field is only just visible at the bottom (`kb-maker-step1-before.png`). After tap, the preview hides, the field sits fully in the short viewport (20px font), and `html.ppg-typing` is on (`kb-maker-step1-name.png`). After blur, the full passport comes back.
+2. **Rotate while typing on Step 1:** field stayed in view. Nothing got stuck hidden after rotating back and blurring.
+3. **Later maker steps** (service-dog path, logged out, stopped before "Make the passport"): weight, trainer name and business, vet name, clinic phone, clinic email, rabies date, and the signature field. All stayed in view, 20px except the signature at 26px, preview collapsed to the slim pill. (`kb-maker-weight.png`, `kb-maker-trainer-s-*.png`, `kb-maker-vet-or-clinic-name.png`, `kb-maker-clinic-*.png`, `kb-maker-rabies-*.png`, `kb-maker-your-full-name.png`)
+4. **Sign in** (`/login` email and password): in view, 16px. There is no sign-up link on `/login`; `/join` redirects to the passport maker.
+5. **Trip planner** (`/assessment`): departing city, destination city, and departure date. In view, 16px. Stopped before finishing a trip.
+6. **Pet Vault:** groomer/contact, medication, Share-records email sheet, and About. In view, 16px. Share sheet was closed without sending.
+7. **Report lost** (phone/area last-seen, city, date, notes): in view, 16px. Cancelled; Testy is not lost.
+8. **Contact page** (name, email, message) and the Contact/Chat sheet: in view, 16px. Help/Chat-style controls hid while typing on the pages that use `ppg-typing`.
+
+**Pass — Issued date**
+On Testy's live passport, the ISSUED stamp and the Issued field both say Nov 25, 2026 (`kb-issued-closeup.png`). The live formatters use the local date (`toLocaleDateString`), not the UTC calendar date. A 5pm Pacific sample (`2026-11-27T01:00:00Z`, which is already Nov 27 in UTC) formats as Nov 26, 2026 on both the stamp and the field. The old UTC slice would have shown Nov 27.
+
+**Skipped / not a product fail**
+- **Maker email step and the keep/checkout email sheet.** I did not click "Make Kbtest's passport", because that creates a live draft and opens the paid keep sheet (Stripe is live). `/join` no longer hosts the email sheet (it goes to the maker). So the checkout sheet itself was not opened. Every other typable maker step I reached used the same collapse behavior and passed.
+- **Vault weight field.** It is in the Health form at 16px (`Weight in pounds`), but in this run it sat in a section Playwright could not tap. Nearby Health fields (groomer, meds) passed.
+- A hidden contact honeypot (`tabindex="-1"`) is not a real typing field.
+
+**What this cannot prove**
+Playwright does not open a real iOS keyboard. Visual viewport does not shrink on its own; `--ppg-kb` stayed 0, so "lift the sheet above the keyboard" is unproven. Orientation was a viewport swap, not a physical rotate. The after-4pm Issued bug can't be reproduced live this morning (Pacific and UTC are still the same calendar day); the formatter check above is the evidence until someone makes a passport after 4pm Pacific. A real iPhone Safari pass is still the one that counts.
+
+Ready for Nima.
+
 ### Nov 25, 2026, Sisqo: the iPhone keyboard covers the field you're typing in (Nima, high priority)
 
 Nima tested on iPhone Safari. In the passport maker (Step 1 of 7, the pet name field), tapping the field opens the keyboard, and the keyboard covers the field. The tall live passport preview at the top pushes the form down, so he can't see what he's typing.
