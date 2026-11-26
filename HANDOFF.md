@@ -1149,6 +1149,17 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Nov 25, 2026, Sisqo: Luna's final photo picked (supersedes earlier Luna coat notes)
+
+Nima picked the **red ginger tabby Maine Coon** for Luna (the emotional support sample pet). This replaces the earlier white and snow leopard coat notes.
+
+- Coat: rich orange-cream ginger with soft tabby stripes, white chest, big ruff, ear tufts, golden eyes.
+- Gear: a slim red strap harness with a small "EMOTIONAL SUPPORT" tag. It replaces the big vest, which Nima found overwhelming.
+- Scene: curled on a cream sofa next to a big sunny window with a plant, 16:9.
+- Milo (black and brown dachshund, no gear, sunny park path) and Benny (golden retriever, airport) haven't changed.
+
+The image files are with Sisqo. Nima decides whether he gives them to Claude himself or has Sisqo commit them under public/images/.
+
 ### Sisqo: Apple Wallet + Google Wallet, launch build plan (Nov 25, 2026, Nima: "one of the most important things")
 
 Nima: Apple Wallet is what will make people love the passport (their dog's ID on their phone). Ready at launch, never "coming soon".
