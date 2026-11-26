@@ -16,6 +16,49 @@ Newest entries go at the top of each section.
 
 ## Claude updates
 
+### 2026-11-25: Built: retest fixes, photos, maker + one-step keep, one passport design, Apple + Google Wallet (commits 2678076 to a02366b)
+Nima approved all of Sisqo's Nov 25 notes (with my pushback: no "Vet Verified" or "the airline trusts" in sales copy) and the Wallet plan, including the new tables.
+
+**Note on deploys:** we hit Vercel's daily deployment limit (125 pushes today, plus preview copies). Retest fixes, maker and passport design are live (deploy 92db8c9). The Wallet commit (a02366b) goes live on the next deploy Vercel allows. Commits that only touch HANDOFF.md, CLAUDE.md or docs no longer trigger a build, and I've stopped pushing a preview copy on every commit.
+
+**1. Retest fixes**
+- Report lost flyer: color, sex, weight and Microchipped now show while the pet is lost (new `get_public_lost_details`, only while a lost report is active). The photo retries once before falling back. On Testy only Sex is saved; add color/weight to see the full line.
+- /lost-flyer maker: "Use Testy's details" fills name, details, Microchipped and the QR link from your pet. Same don't-chase line on both flyers. Lost tab preview shows the QR.
+- Grooming update opens Health. Apple Wallet "coming soon" gone (the button only shows once Wallet is set up). Tags page no "Coming soon" banner. No duplicate "+ Add a record" on the empty Health tab. Names/breeds don't split mid-word.
+- Two or more pets: one at a time with a pet switcher on top, instead of stacking.
+
+**2. Photos:** Luna (ginger Maine Coon) and Milo (dachshund) on home "Who's coming with you?", the sample passports and the ESA/My pet pages, cropped on the animal. Benny's alt text no longer says vest.
+
+**3. Maker + checkout (Nima's walkthrough)**
+- Keep screen keeps weight, training and "Handler statement signed" (was dropping them).
+- Names capitalized ("milo s. van darmez" -> "Milo S. Van Darmez"). Short breed names on the card ("Mini Dachshund"). Two-breed mixes ("+ It's a mix").
+- Service dog card shows the kind of help ("Psychiatric · Mobility"), never details. Tasks step: "We show the type of help on the passport, not the details, to protect your privacy."
+- Service path offers dogs only. Role step: "Service dog, including psychiatric service dog" / "Trained to do tasks for a disability."; ESA "Comfort and emotional support."; new ESA note; all three now confirm with Next (no jumping ahead).
+- "Male or female?" Vet step: clinic email + "Snap the rabies certificate" (new /api/rabies-scan, 6 per IP per day; fills the date and clinic) with typing as fallback. New column pets.vet_email.
+- One-step keep: the passport-ready screen has the checkout right there, email already filled ("Using x · Change"), one consent box ("Start Pet Vault at $6.99 a month, renewing monthly until I cancel.") and one line by the button. The keep link from the email works the same way. No 7-day hold wording.
+- Benefits: "Straight from your vet", "Ready at the counter", "Never caught out", "Bring Me Home tag". Removed "phone wallet pass" from the Pet Vault list until Wallet is live.
+
+**4. One passport design everywhere:** the customer's passport now IS the sample card (same component): tall card, gold-framed photo, role badge, big name, handler/owner, ISSUED stamp, two-column details, MRZ lines, holo seal. Used by the landing-page samples, maker preview, the issued animation, keep page, Pet Vault and prints. The verification code moved to the QR side. Rabies tag says "Vet confirmed" only when a vet actually confirmed it.
+
+**5. Apple + Google Wallet (hidden until set up)**
+- Pass: logo text PetPassGo, NAME, PASSPORT NO., STATUS ("Service dog · Handler statement signed" / "ESA · Flies as a pet" / "Pet"), BREED, SEX / BORN, WEIGHT, pet photo thumbnail made on the server, QR to the public page. Back: handler/owner, emergency contact only if shared, rabies, training kinds, chip last 4, issued, public page, verify, "not a government document", contact.
+- Updates: per-pet auth token, Apple web service at /api/wallet/v1/... (register, unregister, changed list, latest pass, log), APNs push when anything on the pass changes (DB triggers mark it; pushed when the owner opens the pet and by the daily cron). Lapsed membership: pass stays, stops updating.
+- Google: Generic pass "Add to Google Wallet" link + updates.
+- Buttons (Passport tab, one component): iPhone/Mac Apple, Android Google, other desktops both + "On iPhone, this adds the pass to Wallet." Errors offer "Save image instead". The badges are styled buttons; swap in Apple's and Google's official badge artwork before launch.
+- **Nima's setup:** Apple: Pass Type ID, certificate, then in Vercel `APPLE_WALLET_ENABLED=true`, `APPLE_PASS_TYPE_ID`, `APPLE_TEAM_ID`, `APPLE_PASS_CERT_BASE64`, `APPLE_PASS_KEY_BASE64`, `APPLE_WWDR_CERT_BASE64` (+ passphrase if any). Google: `GOOGLE_WALLET_ENABLED=true`, `GOOGLE_WALLET_ISSUER_ID`, `GOOGLE_WALLET_SA_EMAIL`, `GOOGLE_WALLET_SA_KEY_BASE64`; request publishing access.
+
+**Still open (Nima):** whether simple-trip checklists need a Travel Pass. The public /id page still uses its own card, not the passport (next, if Nima wants).
+
+**What to test (Sisqo)**
+1. Make a service dog passport for "milo s. van darmez", Miniature Dachshund + Beagle mix, tasks in two groups, signed statement, snap a rabies photo. Check capitalization, "Mini Dachshund / Beagle mix", "Psychiatric · Mobility", no mid-word breaks, the issued animation shows the same card as the sample.
+2. Passport-ready screen: email prefilled, one consent box, one terms line. Stop before paying (Stripe is live).
+3. Compare your Pet Vault passport with the /service-dog-passport sample at 390px: same look.
+4. Report lost on Testy after adding color and weight: details line, photo, print one page. Maker "Use Testy's details".
+5. Two pets: switcher works, Home Updates still open the right pet.
+6. Once Nima finishes Wallet setup: add to Apple Wallet on an iPhone, change Testy's weight, open the pet in Pet Vault, check the pass updates.
+
+Ready for testing.
+
 ### 2026-11-25: Built: Sisqo's walkthrough fixes, Lost tab + flyer, Home updates, empty states, no-free pass 2, Luna (commits 67e5705 to e6fe0f3)
 Started on all of Sisqo's Nov 25 asks right after Nima said go. All live, no runtime errors.
 
