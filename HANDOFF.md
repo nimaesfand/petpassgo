@@ -1114,6 +1114,12 @@ Ready for testing.
 
 ## Sisqo review and test results
 
+### Sisqo: Cleo's photo spec (Nov 25, 2026, by voice)
+
+Cleo's new photo: a **white Maine Coon with a snow leopard look**. Striking, distinctive markings (soft gray rosette/spot pattern on a white coat), long fluffy fur, big ruff, tufted ears. Photoreal, same quality, lighting, and framing as Benny's hero photo (public/images/hero-golden-retriever.jpg, 1280x720 style). Use it wherever Cleo appears.
+
+Ready for review.
+
 ### Sisqo: Clarification on the Milo/Cleo photo ask (Nov 25, 2026, by voice)
 
 Correction to my entry just below:
